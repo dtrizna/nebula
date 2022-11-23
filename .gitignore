@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints
+
+# data
+wazuh_*
+*auditd_msft_*
+*kubeaudit_msft_*
+reverse_shell_dataset.cm
+*zip
+*7z
+
+# models
+FastText*model
