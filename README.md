@@ -31,13 +31,13 @@
 
 - downstream tasks for malicious classification
   - *Speakeasy reports*: define pipeline for emulation logs from Quo.Vadis
-  - *Windows logs*: 
+  - *Windows logs*:
     - using public repos with Windows telemetry:  
   (a) mordor (redirects here: <https://github.com/OTRF/Security-Datasets>)  
   (b) <https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES>  
   (c) <https://github.com/NextronSystems/evtx-baseline>  
     - ask for `attackbot` data on windows?
-  - *Linux logs*: 
+  - *Linux logs*:
     - using logs from pentest machines?
     - simulate your own TTPs in validation environments?
       - automate it?
