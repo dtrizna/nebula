@@ -5,39 +5,59 @@
 
 ## Modelling
 
-- `modelling/language_model`: code for self-supervised learning from system logs
-- `modelling/tradition_nlp`: code for traditional NLP modeling of bash process titles
+- `modeling/language_model`: code for self-supervised learning from system logs
+- `modeling/tradition_nlp`: code for traditional NLP modeling of bash process titles
+- `modeling/tokenizer`: code for tokenizing bash process titles with sentencePiece
 
 ## To Be Done
 
-- intrinstic evaluation: `get_nearest_neighbors()` | `get_analogies()`  
+### `auditd` commandLine dataset for dowstream tasks
+
+- generate augmented reverse shells as malicious samples: (a) train -- one set of reverse shell binaries (b) val -- another binaries
+- random split of unique legitimate commands to train/val
+- A/B tests:
+  - test with traditional pipeline and different tokenizers: (1) sentencePiece (2) wordPiece (3) wordPunct
+  - (TF-IDF | HashingVectorizer) vs FastText
+  
+### Contextual embeddings
+
+- adjust preprocessing:
+  - remove artificial separator
+  - include only the minimal set of fields
+  - `fasttext`: any chance to use sentencePiece tokenizer instead of default one?
+
+- `fasttext` intrinstic evaluation: `get_nearest_neighbors()` | `get_analogies()`  
   see: <https://fasttext.cc/docs/en/unsupervised-tutorial.html#nearest-neighbor-queries>
-- ~~check what telemetry we have on Windows machines~~
+
 - downstream tasks for malicious classification
-  - cover pipeline for SpeakEasy emulation logs from Quo.Vadis
-  - using public repos with Windows telemetry:  
+  - *Speakeasy reports*: define pipeline for emulation logs from Quo.Vadis
+  - *Windows logs*: 
+    - using public repos with Windows telemetry:  
   (a) mordor (redirects here: <https://github.com/OTRF/Security-Datasets>)  
   (b) <https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES>  
   (c) <https://github.com/NextronSystems/evtx-baseline>  
-  - using pentest machines and auditd
-  - ask for `attackbot` data on windows?
-- A/B tests with default settings:
-  - separator - " , " | "\t"
-  - MAX_LINE_SIZE tests?
-    - chunk smaller windows
-    - chunk same window to multiple events
-    - is it a problem that one hosts length is larger that `MAX_LINE_SIZE` in fastText
-  - (TF-IDF | HashingVectorizer) vs FastText
-  - sequence of vectors (get_word_vector()) vs get_sentence_vector()
-  - fasttext hyperparameter tests: epochs, dimension, ngrams, etc.
+    - ask for `attackbot` data on windows?
+  - *Linux logs*: 
+    - using logs from pentest machines?
+    - simulate your own TTPs in validation environments?
+      - automate it?
+
+- `fasttext` A/B tests with default hyperparameters:
+  - `fasttext` MAX_LINE_SIZE analysis?
+    - is it a problem at all? if yes -- limit size:
+      - chunk smaller windows -- 5 min vs 1 min
+      - chunk the same window to multiple inputs
+  - sequence of vectors (`get_word_vector()`) vs `get_sentence_vector()`
+  - `fasttext` hyperparameter tests: epochs, dimension, ngrams, etc.
   - modeling -- embeddings:
-    - with trainable Embeddings from random initialization OR
-    - pre-trained frozen Embeddings
-    - pre-trained, but updated during supervised phase
+    - with trainable from scratch, random initialization
+    - pre-trained `fasttext` model, frozen (not updated)
+    - pre-trained `fasttext` model, but updated during supervised phase
   - modeling -- model:
     - LSTM
-    - attention
-    - plot mean epoch time with boxplots
+    - attention: (1) tranformer (2) reformer
+      > (a) use the same time for training, e.g. one day  
+      > (b) plot mean epoch time with boxplots
 
 ## Done
 
@@ -55,3 +75,5 @@
   - ~~anomaly detection on red team host~~ see `_auditd_c_fasttext.ipynb`
 - ~~consider unification of pre-processing to represent same/similar data as Sysmon/Speakeasy/(what Win telemetry uses Vanquish)?~~  
   Sort of done -- removed all non-essential stuff, left only fields, that can be replicated in case of Sysmon. See `utils.contants.AUDITD_FIELDS`
+- ~~check what telemetry we have on Windows machines~~  
+  Standard structure, but unusual EventIDs...
