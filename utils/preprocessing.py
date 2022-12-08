@@ -1,97 +1,87 @@
-import re
 import orjson
-from numpy import where
-from pandas import json_normalize, to_datetime, DataFrame
-from .constants import AUDITD_FIELDS, AUDITD_TYPES, FIELD_SEPARATOR
+from pandas import json_normalize, DataFrame
 from .misc import filterDictByKeys
 
 
-def normalizeCmd(cmd,
-                custom_domains=["skype.com", "microsoft.com", "azure.com", "example.com"], 
-                placeholder="_IPADDRESS_"
-                ):
-    # normalize IP addresses
-    cmd = re.sub(r"([0-9]{1,3}\.){3}[0-9]{1,3}", placeholder, cmd)
-    # normalize localhosts
-    cmd = cmd.replace("localhost", placeholder)
-    for domain in custom_domains:
-        cmd = cmd.replace(domain, placeholder)
-    return cmd
+def readAndFilterEvent(jsonEvent,
+              jsonType="normalized",
+              normalizedFields=None,
+              filterDict=None):
+    """Takes str of JSON and returns a filtered DataFrame.
+    NOTE: Per event parsing is ~50 times slower than reading events in bulk from file with readAndFilterFile()!
 
-
-def ipLabeler(ldf):
-    col = 'auditd.summary.object.primary'
-    ldf[col] = where(ldf[col].str.startswith('127.'), "(lopIP)", ldf[col])
-    ldf[col] = where(ldf[col].str.match('169.254.169.254'), "(imds)", ldf[col])
-    ldf[col] = where(ldf[col].str.match(r'(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)'), "(prvIP)", ldf[col])
-    ldf[col] = where(ldf[col].str.match(r'^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$'), "(pubIP)", ldf[col])
-    ldf[col] = where(ldf[col].str.match(r'^([0-9a-fA-F]{1,4}:){1,7}:'), "(IPv6)", ldf[col])
-    return ldf
-
-
-def auditdReadAndFilterFile(filename,  
-                            auditd_fields=AUDITD_FIELDS,
-                            auditd_types=AUDITD_TYPES):
+    Args:
+        jsonEvent (str, bytes, dict): raw event in JSON format
+        normalizedFields (dict): {"field": ["value1", "value2"]} to preserve from event
+        jsonType (str): "normalized" or "nested"
+        filterDict (list): list of normalized fields to preserve from event like 'process.title'
+    """
+    if jsonType not in ("normalized", "nested"):
+        raise ValueError("readAndFilterEvent(): jsonType must be 'normalized' or 'nested'")
     
-    with open(filename, "rb") as f:
-        # [:-1] since last element of JSON is non event
-        try:
+    if isinstance(jsonEvent, (str, bytes)):
+        jsonEvent = orjson.loads(jsonEvent)
+
+    # if event has normalized fields, can filter keys before json_normalize (faster)
+    if normalizedFields and jsonType == "normalized":
+        jsonEvent = filterDictByKeys(jsonEvent, key_list=normalizedFields)
+    
+    ldf = json_normalize(jsonEvent)
+    
+    # if event is nested (aka hierarchical), need to filter columns after normalization (slower)
+    if normalizedFields and jsonType == "nested":
+        # filter elemts in normalizedFields that are in ldf columns
+        normalizedFields = [field for field in normalizedFields if field in ldf.columns]
+        #normalizedFields = list(set(normalizedFields).intersection(set(ldf.columns)))
+        ldf = ldf[normalizedFields].copy()
+    
+    if filterDict:
+        for field, values in filterDict.items():
+            ldf = ldf[ldf[field].isin(values)].copy()
+    return ldf
+    
+
+def readAndFilterFile(jsonFile,  
+                      jsonType="normalized",
+                      normalizedFields=None,
+                      filterDict=None):
+    """Reads JSON file and returns a filtered DataFrame.
+
+    Args:
+        jsonFile (str): Filepath to JSON file with normalized fields (e.g. 'process.title') 
+                        where Events are in list format: [{event1}, {event2}, ...]
+        normalizedFields (list): list of normalized fields to preserve from event (e.g. 'process.title')
+        jsonType (str): "normalized" or "nested"
+        filterDict (dict): {"normalizedField": ["fieldValue1", "fieldValue2"]} to preserve from event
+
+    Returns:
+        pd.DataFrame: table with filtered events
+    """
+    if jsonType not in ("normalized", "nested"):
+        raise ValueError("readAndFilterEvent(): jsonType must be 'normalized' or 'nested'")
+    
+    with open(jsonFile, "rb") as f:
+        try: # [:-1] since last element of JSON is non event
             data = orjson.loads(f.read())[:-1]
         except orjson.JSONDecodeError as ex:
-            print(f"File: {filename} -- JSONDecodeError:\n\t", ex)
+            print(f"File: {jsonFile} -- JSONDecodeError:\n\t", ex)
             return DataFrame()
 
-    # preserve only necessary fields
-    data_filtered = [filterDictByKeys(x) for x in data]
+    # if event has normalized fields, can filter keys before json_normalize (faster)
+    if normalizedFields and jsonType == "normalized":
+        data = [filterDictByKeys(x, key_list=normalizedFields) for x in data]
     
-    # need to again specify column names to inforce ordering
-    df = json_normalize(data_filtered)[auditd_fields]
-
-    # for all events that has process.args -- put that value in process.title
-    df['process.title'] = where(df['process.args'].notna(), df['process.args'], df['process.title'])
-    df.drop(columns=['process.args'], inplace=True)
+    df = json_normalize(data)
+    
+    # need to again specify column names to enforce ordering
+    if normalizedFields and jsonType == "nested":
+        # filter elemts in normalizedFields that are in ldf columns
+        normalizedFields = [field for field in normalizedFields if field in df.columns]
+        df = df[normalizedFields].copy()
 
     # filter only necessary event types and columns
-    newdf = df[df['rule.sidid'].isin(auditd_types)].copy()
-    return newdf
-
-
-def auditdPreprocessTable(newdf, lengthLimit=20000):
-    """
-    input is a dataframe with 5min of data
-    output is a string with data in fastText format
-    length is the maximum length of the telemtry
-          20 000 corresponds to ~80 percentile from 61k of hosts
-          40 000 corresponds to ~90 percentile from 61k of hosts
-
-    # CONSIDER:
-        # my data has been already divided to 5min chunks
-        # it might be needed to do chunking here based on TimeStamp if needed
-    """
-    # timestamp -- sorting and discaring (might want preserve diff for future?)
-    newdf['TimeStamp'] = to_datetime(newdf.TimeStamp)
-    newdf.sort_values(by=['TimeStamp'], inplace=True)
-    newdf.drop(columns=['TimeStamp'], inplace=True)
-
-    # dealing with NaN to avoid errors
-    newdf.fillna("(none)", inplace=True)
-    
-    # ppid preprocessing
-    newdf['process.ppid'] = newdf['process.ppid'].apply(lambda x: x if x == "1" else "(pid)")    
-    
-    # ip address replacement
-    newdf = ipLabeler(newdf)
-    
-    # adds this as last column
-    newdf['event.separator'] = "(sep)"
-
-    out = []
-    for _, groupDf in newdf.groupby('hostname'):    
-        arr = groupDf.drop(columns=['hostname']).values.flatten()
-        # fastText expects whitespace separated values in utf-8
-        # I additionally introduce ',' since process.title has spaces
-        host_telemetry = FIELD_SEPARATOR.join(arr).encode().decode('utf-8', 'ignore') 
-        out.append(host_telemetry[:lengthLimit]+"\n")
-
-    return out
-
+    if filterDict:
+        for field, values in filterDict.items():
+            df = df[df[field].isin(values)].copy()
+    #newdf = df[df['rule.sidid'].isin(types)].copy()
+    return df
