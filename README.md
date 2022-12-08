@@ -5,9 +5,10 @@
 
 ## Modelling
 
-- `modeling/language_model`: code for self-supervised learning from system logs
-- `modeling/tradition_nlp`: code for traditional NLP modeling of bash process titles
+- `modeling/fastText`: code for self-supervised embeddings (`fastText`) from system logs
+- `modeling/traditionNLP`: code for traditional NLP modeling of bash process titles
 - `modeling/tokenizer`: code for tokenizing bash process titles with sentencePiece
+- `modeling/mlm`: code for masked language modelling CNN-Transformer model
 
 ## To Be Done
 
@@ -15,6 +16,8 @@
 
 - generate augmented reverse shells as malicious samples: (a) train -- one set of reverse shell binaries (b) val -- another binaries
 - random split of unique legitimate commands to train/val
+  > NOTE: Be sure that both generated commands resemble as close as possible to auditd telemetry!
+
 - A/B tests:
   - test with traditional pipeline and different tokenizers: (1) sentencePiece (2) wordPiece (3) wordPunct
   - (TF-IDF | HashingVectorizer) vs FastText
@@ -42,20 +45,38 @@
     - simulate your own TTPs in validation environments?
       - automate it?
 
-- `fasttext` A/B tests with default hyperparameters:
-  - `fasttext` MAX_LINE_SIZE analysis?
-    - is it a problem at all? if yes -- limit size:
-      - chunk smaller windows -- 5 min vs 1 min
-      - chunk the same window to multiple inputs
+### A/B tests
+
+- preprocessing for MLM training:
+  - minimalistic setup -- preserves only the most important fields
+  - raw JSON
+
+- tokenization & embeddings setup:
+  - wordpunct + embeddings + transformer
+  - sentencePiece + embeddings + transformer
+  - wordpunct + fastText + transformer
+  - sentencePiece + fastText + transformer
+    > Note: is it possible to define custom tokenizer for fastText?
+
+- `fasttext` with default hyperparameters:
   - sequence of vectors (`get_word_vector()`) vs `get_sentence_vector()`
-  - `fasttext` hyperparameter tests: epochs, dimension, ngrams, etc.
   - modeling -- embeddings:
     - with trainable from scratch, random initialization
     - pre-trained `fasttext` model, frozen (not updated)
     - pre-trained `fasttext` model, but updated during supervised phase
-  - modeling -- model:
-    - LSTM
-    - attention: (1) tranformer (2) reformer
+  - hyperparameter tests: epochs, dimension, ngrams, etc.
+  - fasttext `MAX_LINE_SIZE` analysis?
+    - is it a problem at all? if yes -- limit size:
+      - chunk smaller windows -- 5 min vs 1 min
+      - chunk the same window to multiple inputs
+
+- sequence modelling:
+  - LSTM
+  - 1D-CNN + LSTM
+  - tranformer
+  - 1D-CNN + transformer
+  - reformer
+      > NOTE!  
       > (a) use the same time for training, e.g. one day  
       > (b) plot mean epoch time with boxplots
 
