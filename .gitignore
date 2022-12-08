@@ -4,7 +4,9 @@ __pycache__/
 .ipynb_checkpoints
 
 # data
+emulationDataset/
 wazuh_*
+*windows_msft_*
 *auditd_msft_*
 *kubeaudit_msft_*
 reverse_shell_dataset.cm
