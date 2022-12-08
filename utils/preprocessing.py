@@ -18,28 +18,28 @@ def readAndFilterEvent(jsonEvent,
     """
     if jsonType not in ("normalized", "nested"):
         raise ValueError("readAndFilterEvent(): jsonType must be 'normalized' or 'nested'")
-    
+
     if isinstance(jsonEvent, (str, bytes)):
         jsonEvent = orjson.loads(jsonEvent)
 
     # if event has normalized fields, can filter keys before json_normalize (faster)
     if normalizedFields and jsonType == "normalized":
         jsonEvent = filterDictByKeys(jsonEvent, key_list=normalizedFields)
-    
+
     ldf = json_normalize(jsonEvent)
-    
+
     # if event is nested (aka hierarchical), need to filter columns after normalization (slower)
     if normalizedFields and jsonType == "nested":
         # filter elemts in normalizedFields that are in ldf columns
         normalizedFields = [field for field in normalizedFields if field in ldf.columns]
         #normalizedFields = list(set(normalizedFields).intersection(set(ldf.columns)))
         ldf = ldf[normalizedFields].copy()
-    
+
     if filterDict:
         for field, values in filterDict.items():
             ldf = ldf[ldf[field].isin(values)].copy()
     return ldf
-    
+
 
 def readAndFilterFile(jsonFile,  
                       jsonType="normalized",
@@ -59,7 +59,7 @@ def readAndFilterFile(jsonFile,
     """
     if jsonType not in ("normalized", "nested"):
         raise ValueError("readAndFilterEvent(): jsonType must be 'normalized' or 'nested'")
-    
+
     with open(jsonFile, "rb") as f:
         try: # [:-1] since last element of JSON is non event
             data = orjson.loads(f.read())[:-1]
@@ -70,9 +70,9 @@ def readAndFilterFile(jsonFile,
     # if event has normalized fields, can filter keys before json_normalize (faster)
     if normalizedFields and jsonType == "normalized":
         data = [filterDictByKeys(x, key_list=normalizedFields) for x in data]
-    
+
     df = json_normalize(data)
-    
+
     # need to again specify column names to enforce ordering
     if normalizedFields and jsonType == "nested":
         # filter elemts in normalizedFields that are in ldf columns
@@ -83,5 +83,5 @@ def readAndFilterFile(jsonFile,
     if filterDict:
         for field, values in filterDict.items():
             df = df[df[field].isin(values)].copy()
-    #newdf = df[df['rule.sidid'].isin(types)].copy()
+
     return df

@@ -3,7 +3,6 @@ from numpy import where
 from pandas import to_datetime
 from .constants import FIELD_SEPARATOR
 
-
 def labelFieldIP(df, col = 'auditd.summary.object.primary'):
     # NOTE: 
     # it is faster than using apply() on each row
@@ -68,7 +67,7 @@ def groupAuditdSequences(newdf, groupByCols=['hostname'], lengthLimit=20000):
         # it might be needed to do chunking here based on TimeStamp if needed
     """
     newdf = normalizeAuditdTable(newdf.copy())
-    
+
     out = []
     for _, groupDf in newdf.groupby(groupByCols):    
         arr = groupDf.drop(columns=groupByCols).values.flatten()
@@ -78,4 +77,3 @@ def groupAuditdSequences(newdf, groupByCols=['hostname'], lengthLimit=20000):
         out.append(host_telemetry[:lengthLimit]+"\n")
 
     return out
-

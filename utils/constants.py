@@ -30,5 +30,4 @@ AUDITD_TYPES = [
     'unsucces_file_access'
     ]
 
-
 FIELD_SEPARATOR = " , "

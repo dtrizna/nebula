@@ -2,11 +2,9 @@ import os
 import sys
 from pandas import to_datetime
 
-def getScriptPath():
-    return os.path.dirname(os.path.realpath(sys.argv[0]))
-
-def getNotebookPath():
-    return os.path.dirname(os.path.realpath(sys.argv[1]))
+def getRealPath(type="script"):
+    idx = 1 if type == "notebook" else 0
+    return os.path.dirname(os.path.realpath(sys.argv[idx]))
 
 def filterDictByKeys(dict, key_list):
     return {k: dict[k] for k in key_list if k in dict}
@@ -30,7 +28,7 @@ def json_unnormalize(df, sep="."):
     for _, row in df.iterrows():
         parsed_row = {}
         for col_label,v in row.items():
-            keys = col_label.split(".")
+            keys = col_label.split(sep)
 
             current = parsed_row
             for i, k in enumerate(keys):
