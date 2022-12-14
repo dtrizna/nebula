@@ -12,7 +12,12 @@
 
 ## To Be Done
 
-### `auditd` commandLine dataset for dowstream tasks
+### `SpeakEasy` dynamic analysis modelling
+
+- assess preprocessing: filtering and normalization
+- generate filtered dataset suitable for SSL pre-training
+
+### `auditd` **commandLine** work - dataset and dowstream tasks
 
 - generate augmented reverse shells as malicious samples: (a) train -- one set of reverse shell binaries (b) val -- another binaries
 - random split of unique legitimate commands to train/val

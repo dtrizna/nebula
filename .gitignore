@@ -4,7 +4,8 @@ __pycache__/
 .ipynb_checkpoints
 
 # data
-emulationDataset/
+windows_emulationDataset/
+speakeasy_trainset/
 wazuh_*
 *windows_msft_*
 *auditd_msft_*
