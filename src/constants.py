@@ -45,21 +45,21 @@ SPEAKEASY_SUBFILTER_MINIMALISTIC = {'apis': ['api_name', 'ret_val'],
 # good reference:
 # https://docs.microsoft.com/en-us/windows/deployment/usmt/usmt-recognized-environment-variables
 VARIABLE_MAP = {
-    r"%systemdrive%": r"[drive]", 
-    r"%systemroot%": r"[drive]\windows",
-    r"%windir%": r"[drive]\windows", 
-    r"%allusersprofile%": r"[drive]\programdata",
-    r"%programdata%": r"[drive]\programdata",
-    r"%programfiles%": r"[drive]\program files",
-    r"%programfiles(x86)%": r"[drive]\program files (x86)",
-    r"%programw6432%": r"[drive]\program files",
-    r"%commonprogramfiles%": r"[drive]\program files\common files",
-    r"%commonprogramfiles(x86)%": r"[drive]\program files (x86)\common files",
-    r"%commonprogramw6432%": r"[drive]\program files\common files",
-    r"%commonfiles%": r"[drive]\program files\common files",
-    r"%profiles%": r"[drive]\users",
-    r"%public%": r"[drive]\users\public",
-    r"%userprofile%": r"[drive]\users\[user]"
+    r"%systemdrive%": r"<drive>", 
+    r"%systemroot%": r"<drive>\windows",
+    r"%windir%": r"<drive>\windows", 
+    r"%allusersprofile%": r"<drive>\programdata",
+    r"%programdata%": r"<drive>\programdata",
+    r"%programfiles%": r"<drive>\program files",
+    r"%programfiles(x86)%": r"<drive>\program files (x86)",
+    r"%programw6432%": r"<drive>\program files",
+    r"%commonprogramfiles%": r"<drive>\program files\common files",
+    r"%commonprogramfiles(x86)%": r"<drive>\program files (x86)\common files",
+    r"%commonprogramw6432%": r"<drive>\program files\common files",
+    r"%commonfiles%": r"<drive>\program files\common files",
+    r"%profiles%": r"<drive>\users",
+    r"%public%": r"<drive>\users\public",
+    r"%userprofile%": r"<drive>\users\<user>"
 }
 # more user variables
 VARIABLE_MAP.update({

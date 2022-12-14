@@ -1,6 +1,7 @@
 import os
 import sys
 from pandas import to_datetime
+from collections.abc import Iterable
 
 def getRealPath(type="script"):
     idx = 1 if type == "notebook" else 0
@@ -8,6 +9,23 @@ def getRealPath(type="script"):
 
 def filterDictByKeys(dict, key_list):
     return {k: dict[k] for k in key_list if k in dict}
+
+def flatten(l):
+    for el in l:
+        if isinstance(el, Iterable) and not isinstance(el, (str, bytes)):
+            yield from flatten(el)
+        else:
+            yield 
+
+def fix_random_seed(seed_value=1763):
+    """Set seed for reproducibility."""
+    import random
+    import numpy as np
+    import torch
+    random.seed(seed_value)
+    np.random.seed(seed_value)
+    torch.manual_seed(seed_value)
+    torch.cuda.manual_seed_all(seed_value)
 
 def splitDataFrameTimeStampToChunks(df, timeFieldName='TimeStamp', chunkSize='5min'):
     df[timeFieldName] = to_datetime(df[timeFieldName])

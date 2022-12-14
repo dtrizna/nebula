@@ -86,7 +86,7 @@ def readAndFilterFile(jsonFile,
             df = df[df[field].isin(values)].copy()
 
     if fillna:
-        df.fillna("(none)", inplace=True)
+        df.fillna(r"<none>", inplace=True)
     
     return df
 

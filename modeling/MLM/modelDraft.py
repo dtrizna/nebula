@@ -24,33 +24,6 @@ class TransformerBlock(nn.Module):
     x = self.feed_forward(x)
     
     return x
-  
-
-# Define the CNN-transformer model
-class CNNTransformer(nn.Module):
-  def __init__(self, input_dim, hidden_dim, num_heads, kernel_sizes):
-    super().__init__()
-    
-    # Define the 1D convolutional layers
-    self.convs = nn.ModuleList([nn.Conv1d(input_dim, hidden_dim, kernel_size) for kernel_size in kernel_sizes])
-
-    # Define the transformer block
-    self.transformer = TransformerBlock(hidden_dim, hidden_dim, num_heads)
-
-    # Define the linear layer
-    self.linear = nn.Linear(hidden_dim, 1)
-
-  def forward(self, x):
-      # Pass the input through the convolutional layers
-      x = torch.cat([conv(x) for conv in self.convs], dim=1)
-      
-      # Pass the output through the transformer block
-      x = self.transformer(x)
-      
-      # Pass the output through the linear layer
-      x = self.linear(x)
-      
-      return x
 
 
 # Define the CNN-transformer model
