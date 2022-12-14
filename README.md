@@ -14,8 +14,11 @@
 
 ### `SpeakEasy` dynamic analysis modelling
 
-- assess preprocessing: filtering and normalization
-- generate filtered dataset suitable for SSL pre-training
+- ~~assess preprocessing: filtering and normalization~~
+- ~~generate filtered dataset suitable for SSL pre-training~~
+- ~~add clean samples from windows syswow64 folder~~
+- ~~perform tokenization and encoding~~
+- try different models: (0) Transformer (1) 1D-CNN-Transformer (2) Reformer (3) start transformer (4) 1D-CNN + Linear
 
 ### `auditd` **commandLine** work - dataset and dowstream tasks
 
