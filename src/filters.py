@@ -1,5 +1,5 @@
 import orjson
-from pandas import json_normalize, DataFrame
+from pandas import json_normalize, DataFrame, concat
 from .misc import filterDictByKeys
 
 
@@ -44,14 +44,15 @@ def readAndFilterEvent(jsonEvent,
 def readAndFilterFile(jsonFile,  
                       jsonType="normalized",
                       normalizedFields=None,
-                      filterDict=None):
+                      filterDict=None,
+                      fillna=True):
     """Reads JSON file and returns a filtered DataFrame.
 
     Args:
         jsonFile (str): Filepath to JSON file with normalized fields (e.g. 'process.title') 
                         where Events are in list format: [{event1}, {event2}, ...]
-        normalizedFields (list): list of normalized fields to preserve from event (e.g. 'process.title')
         jsonType (str): "normalized" or "nested"
+        normalizedFields (list): list of normalized fields to preserve from event (e.g. 'process.title')
         filterDict (dict): {"normalizedField": ["fieldValue1", "fieldValue2"]} to preserve from event
 
     Returns:
@@ -62,19 +63,19 @@ def readAndFilterFile(jsonFile,
 
     with open(jsonFile, "rb") as f:
         try: # [:-1] since last element of JSON is non event
-            data = orjson.loads(f.read())[:-1]
+            data = orjson.loads(f.read())#[:-1]
         except orjson.JSONDecodeError as ex:
             print(f"File: {jsonFile} -- JSONDecodeError:\n\t", ex)
             return DataFrame()
-
+    
     # if event has normalized fields, can filter keys before json_normalize (faster)
     if normalizedFields and jsonType == "normalized":
         data = [filterDictByKeys(x, key_list=normalizedFields) for x in data]
 
     df = json_normalize(data)
-
+    
     # need to again specify column names to enforce ordering
-    if normalizedFields and jsonType == "nested":
+    if normalizedFields and jsonType in ("nested", "hierachical"):
         # filter elemts in normalizedFields that are in ldf columns
         normalizedFields = [field for field in normalizedFields if field in df.columns]
         df = df[normalizedFields].copy()
@@ -84,4 +85,33 @@ def readAndFilterFile(jsonFile,
         for field, values in filterDict.items():
             df = df[df[field].isin(values)].copy()
 
+    if fillna:
+        df.fillna("(none)", inplace=True)
+    
     return df
+
+
+def getRecordsFromFile(jsonFile, 
+                        recordFields = ["apis", "registry_access", "file_access", 'network_events.traffic']):
+    """Reads JSON file and returns a filtered DataFrame.
+
+    Args:
+        jsonFile (str): Filepath to JSON file with normalized fields (e.g. 'process.title') 
+                        where Events are in list format: [{event1}, {event2}, ...]
+        recordFields (list): list of record fields to preserve from event (e.g. 'process.title')
+
+    Returns:
+        pd.DataFrame: table with filtered events
+    """
+    with open(jsonFile, "rb") as f:
+        try: # [:-1] since last element of JSON is non event
+            data = orjson.loads(f.read())#[:-1]
+        except orjson.JSONDecodeError as ex:
+            print(f"File: {jsonFile} -- JSONDecodeError:\n\t", ex)
+            return DataFrame()
+    
+    records = dict()
+    for recordField in recordFields:
+        recordList = [json_normalize(x, record_path=[recordField.split('.')]) for x in data if recordField.split('.')[0] in x]
+        records[recordField] = concat(recordList) if recordList else DataFrame()
+    return records
