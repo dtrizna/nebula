@@ -159,3 +159,9 @@ def joinSpeakEasyRecordsToJSON(recordDict, subFilter = SPEAKEASY_SUBFILTER_MINIM
         jsonEvent = jsonEvent[:-1]
     jsonEvent += "}"
     return jsonEvent
+
+def cleanJsonEvent(jsonEvent, patternCleanup = ['"', ":", ",", "[", "]", "{", "}", "\\", "/"]):
+    jsonEvent = jsonEvent.lower()
+    for x in patternCleanup:
+        jsonEvent = jsonEvent.replace(x, " ")
+    return jsonEvent

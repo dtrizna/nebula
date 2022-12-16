@@ -1,7 +1,7 @@
 import orjson
 from pandas import json_normalize, DataFrame, concat
 from .misc import filterDictByKeys
-
+from .constants import SPEAKEASY_RECORDS
 
 def readAndFilterEvent(jsonEvent,
               jsonType="normalized",
@@ -90,9 +90,14 @@ def readAndFilterFile(jsonFile,
     
     return df
 
+def getRecordsFromReport(entryPoints, recordFields=SPEAKEASY_RECORDS):
+    records = dict()
+    for recordField in recordFields:
+        recordList = [json_normalize(x, record_path=[recordField.split('.')]) for x in entryPoints if recordField.split('.')[0] in x]
+        records[recordField] = concat(recordList) if recordList else DataFrame()
+    return records
 
-def getRecordsFromFile(jsonFile, 
-                        recordFields = ["apis", "registry_access", "file_access", 'network_events.traffic']):
+def getRecordsFromFile(jsonFile, recordFields = SPEAKEASY_RECORDS):
     """Reads JSON file and returns a filtered DataFrame.
 
     Args:

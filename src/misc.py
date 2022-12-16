@@ -17,6 +17,9 @@ def flatten(l):
         else:
             yield 
 
+def flattenList(l):
+    return [item for sublist in l for item in sublist]
+
 def fix_random_seed(seed_value=1763):
     """Set seed for reproducibility."""
     import random

@@ -8,29 +8,44 @@ from unicorn import UcError
 
 from pathlib import Path
 from numpy import sum
-
+from time import time
 
 def write_error(errfile):
-    # creating of empty file 
+    # just creating an empty file to incdicate failure
     Path(errfile).touch()
 
 
-def emulate(file, report_folder, i=0, l=0,
-            speakeasy_config = ""):
-    samplename = os.path.basename(file)
-    reportfile = f"{report_folder}/{samplename}.json"
-    errfile = f"{report_folder}/{samplename}.err"
+def emulate(file=None, data=None, report_folder=".", i=0, l=0,
+            speakeasy_config = "", forceEmulation=False):
+    
+    if file is None and data is None:
+        raise ValueError("Either 'file' or 'data' must be specified.")
+    if file:
+        if not os.path.exists(file):
+            raise ValueError(f"File {file} does not exist.")
+        sampleName = os.path.basename(file)
+        fileBase = f"{report_folder}/{sampleName}"
 
-    success = False
-    if os.path.exists(reportfile):
-        logging.warning(f" [!] {i}/{l} Exists, skipping analysis: {reportfile}\n")
-    elif os.path.exists(errfile):
-        logging.warning(f" [!] {i}/{l} Exists, skipping analysis: {errfile}\n")
+        analyze = False
+        if not forceEmulation and os.path.exists(fileBase+".json"):
+            logging.warning(f" [!] {i}/{l} Exists, skipping analysis: {fileBase}.json\n")
+        elif not forceEmulation and os.path.exists(fileBase+".err"):
+            logging.warning(f" [!] {i}/{l} Exists, skipping analysis: {fileBase}\n")
+        else:
+            analyze = True
+    if data:
+        fileBase = f"{report_folder}/{time()}"
+    if not analyze:
+        return None
     else:
+        config = json.load(open(speakeasy_config)) if speakeasy_config else None
+        se = speakeasy.Speakeasy(config=config)
+        success = False
         try:
-            config = json.load(open(speakeasy_config)) if speakeasy_config else None
-            se = speakeasy.Speakeasy(config=config)
-            module = se.load_module(file)
+            if file:
+                module = se.load_module(path=file)
+            if data:
+                module = se.load_module(data=data)
             se.run_module(module)
             report = se.get_report()
 
@@ -39,47 +54,44 @@ def emulate(file, report_folder, i=0, l=0,
             
             if api_seq_len >= 1:
                 # 1 API call is sometimes already enough
-                with open(f"{reportfile}".replace(".exe",""), "w") as f:
+                with open(f"{fileBase}.json".replace(".exe",""), "w") as f:
                     json.dump(report["entry_points"], f, indent=4)
                 success = True
         
-            if api_seq_len == 1 or api_seq_len == 0:
-                # some uninformative failures with 0 or 1 API calls - e.g. ordinal_100
-                api = [x['apis'] for x in report['entry_points']][0] if api_seq_len == 1 else ''
+            else:
                 err = [x['error']['type'] if "error" in x.keys() and "type" in x["error"].keys() else "" for x in report['entry_points']]
                 if "unsupported_api" in err:
                     try:
                         err.extend([x['error']['api']['name'] for x in report['entry_points']])
                     except KeyError:
                         err.extend([x['error']['api_name'] for x in report['entry_points']])
-                logging.debug(f" [D] {i}/{l} API nr.: {api_seq_len}; Err: {err}; APIs: {api}")
-                if api_seq_len == 0:
-                    write_error(errfile)
+                logging.debug(f" [D] {i}/{l} API nr.: {api_seq_len}; Err: {err};")
+                write_error(fileBase+".err")
 
             logging.warning(f" [+] {i}/{l} Finished emulation {file}, took: {took:.2f}s, API calls acquired: {api_seq_len}")
             return success
 
         except PEFormatError as ex:
             logging.error(f" [-] {i}/{l} Failed emulation, PEFormatError: {file}\n{ex}\n")
-            write_error(errfile)
+            write_error(fileBase+".err")
             return success
         except UcError as ex:
             logging.error(f" [-] {i}/{l} Failed emulation, UcError: {file}\n{ex}\n")
-            write_error(errfile)
+            write_error(fileBase+".err")
             return success
         except IndexError as ex:
             logging.error(f" [-] {i}/{l} Failed emulation, IndexError: {file}\n{ex}\n")
-            write_error(errfile)
+            write_error(fileBase+".err")
             return success
         except speakeasy.errors.NotSupportedError as ex:
             logging.error(f" [-] {i}/{l} Failed emulation, NotSupportedError: {file}\n{ex}\n")
-            write_error(errfile)
+            write_error(fileBase+".err")
             return success
         except speakeasy.errors.SpeakeasyError as ex:
             logging.error(f" [-] {i}/{l} Failed emulation, SpeakEasyError: {file}\n{ex}\n")
-            write_error(errfile)
+            write_error(fileBase+".err")
             return success
         except Exception as ex:
             logging.error(f" [-] {i}/{l} Failed emulation, general Exception: {file}\n{ex}\n")
-            write_error(errfile)
+            write_error(fileBase+".err")
             return success
