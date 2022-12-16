@@ -28,9 +28,6 @@ JSON_CLEANUP_SYMBOLS = ['"', "'", ":", ",", "[", "]", "{", "}", "\\", "/"]
 
 SPEAKEASY_TOKEN_STOPWORDS = flattenList([SPEAKEASY_RECORD_SUBFILTER_MINIMALISTIC[x] for x in SPEAKEASY_RECORD_SUBFILTER_MINIMALISTIC])
 
-VOCAB_SIZE = 10000
-MAX_SEQ_LEN = 2048
-
 # =========================
 
 def plotCounterCountsLineplot(counter, outfile):
@@ -51,16 +48,19 @@ def dumpTokenizerFiles(tokenizer, outFolder):
     tokenizer.dumpVocab(file)
     print("Dumped vocab to {}".format(file))
     
-    file = f"{outFolder}\\speakeasy_VocabSize_{VOCAB_SIZE}_counter.pkl"
+    file = f"{outFolder}\\speakeasy_counter.pkl"
     print("Dumped vocab counter to {}".format(file))
     with open(file, "wb") as f:
         pickle.dump(tokenizer.counter, f)
 
-    file = f"{outFolder}\\speakeasy_VocabSize_{VOCAB_SIZE}_counter_plot.png"
+    file = f"{outFolder}\\speakeasy_counter_plot.png"
     plotCounterCountsLineplot(tokenizer.counter, file)
     print("Dumped vocab counter plot to {}".format(file))
 
-def parseDatasetFolders(subFolders, outFolder, limit=None):
+def parseDatasetFolders(subFolders, outFolder, limit=None, mode=None, tokenizer=None, extractor=None):
+    if not mode in ["train", "test"] or not tokenizer or not extractor:
+        raise Exception("Invalid arguments -- mode or tokenizer or extractor")
+    
     events = []
     y = []
     for subFolder in subFolders:
@@ -98,11 +98,11 @@ def parseDatasetFolders(subFolders, outFolder, limit=None):
     print(f"{timenow}: Tokenizing...")
     eventsTokenized = tokenizer.tokenize(events)
 
-    timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-    print(f"{timenow}: Building vocab...")
-    tokenizer.buildVocab(eventsTokenized, vocabSize=VOCAB_SIZE)
-
-    dumpTokenizerFiles(tokenizer, outFolder)
+    if mode == "train":
+        timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+        print(f"{timenow}: Building vocab...")
+        tokenizer.buildVocab(eventsTokenized, vocabSize=VOCAB_SIZE)
+        dumpTokenizerFiles(tokenizer, outFolder)
 
     timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
     print(f"{timenow}: Encoding...")
@@ -137,16 +137,18 @@ if __name__ == "__main__":
     BENIGN_FOLDERS = ["report_clean", "report_windows_syswow64"]
     print("Initialized ...")
 
-    limit = None 
+    limit = None # 10 
+    VOCAB_SIZE = 1500
+    MAX_SEQ_LEN = 2048
 
     EMULATION_TRAINSET_PATH = PATH + r"\..\data\data_raw\windows_emulation_trainset"
     subFoldersTrain = [os.path.join(EMULATION_TRAINSET_PATH, x) for x in os.listdir(EMULATION_TRAINSET_PATH) if x.startswith("report_")]
     trainOutFolder = PATH + r"\..\data\data_filtered\speakeasy_trainset"
     os.makedirs(trainOutFolder, exist_ok=True)
-    parseDatasetFolders(subFoldersTrain, trainOutFolder, limit=limit)
+    parseDatasetFolders(subFoldersTrain, trainOutFolder, limit=limit, mode="train", tokenizer=tokenizer, extractor=extractor)
 
     EMULATION_TESTSET_PATH = PATH + r"\..\data\data_raw\windows_emulation_testset"
     subFoldersTest = [os.path.join(EMULATION_TESTSET_PATH, x) for x in os.listdir(EMULATION_TESTSET_PATH) if x.startswith("report_")]
     testOutFolder = PATH + r"\..\data\data_filtered\speakeasy_testset"
     os.makedirs(testOutFolder, exist_ok=True)
-    parseDatasetFolders(subFoldersTest, testOutFolder, limit=limit)
+    parseDatasetFolders(subFoldersTest, testOutFolder, limit=limit, mode="test", tokenizer=tokenizer, extractor=extractor)

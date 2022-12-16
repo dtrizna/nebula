@@ -5,6 +5,7 @@ from time import time
 from nltk import WhitespaceTokenizer
 from pandas import json_normalize, concat, DataFrame
 import numpy as np
+from copy import deepcopy
 
 from .constants import *
 from .normalization import normalizeTableIP, normalizeTablePath
@@ -22,12 +23,13 @@ from collections import Counter
 class JSONTokenizer():
     def __init__(self, 
                 patternCleanup=JSON_CLEANUP_SYMBOLS,
-                stopwords = SPEAKEASY_TOKEN_STOPWORDS):
+                stopwords = SPEAKEASY_TOKEN_STOPWORDS,
+                specialTokens = ["<pad>", "<unk>", "<mask>"]):
         self.tokenizer = WhitespaceTokenizer()
         self.patternCleanup = patternCleanup
         self.stopwords = stopwords
         
-        self.specialTokens = {"<pad>": 0, "<unk>": 1, "<mask>": 2}
+        self.specialTokens = dict(zip(specialTokens, range(len(specialTokens))))
         self.pad_token = "<pad>"
         self.unk_token = "<unk>"
         self.mask_token = "<mask>"
@@ -67,8 +69,9 @@ class JSONTokenizer():
             counter.update(tokenList)
         
         idx = len(self.specialTokens)
-        vocab = self.specialTokens
+        vocab = deepcopy(self.specialTokens)
         vocab.update({x[0]:i+idx for i,x in enumerate(counter.most_common(vocabSize-idx))})
+
         self.vocab = vocab
         self.counter = counter
         self.vocabSize = len(self.vocab) if vocabSize > len(self.vocab) else vocabSize
