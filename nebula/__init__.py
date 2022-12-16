@@ -7,7 +7,6 @@ from pandas import json_normalize, concat, DataFrame
 import numpy as np
 
 from .constants import *
-from .misc import flattenList
 from .normalization import normalizeTableIP, normalizeTablePath
 
 import speakeasy
@@ -129,16 +128,12 @@ class JSONTokenizer():
 
 class PEDynamicFeatureExtractor():
     def __init__(self, 
-                    emulationOutputFolder=None, 
                     speakeasyConfig=None, 
                     speakeasyRecords=SPEAKEASY_RECORDS,
                     recordSubFilter=SPEAKEASY_RECORD_SUBFILTER_MINIMALISTIC,
                     recordLimits=SPEAKEASY_RECORD_LIMITS,
                     returnValues=RETURN_VALUES_TOKEEP
                 ):
-        self.outputFolder = emulationOutputFolder
-        if self.outputFolder:
-            os.makedirs(self.outputFolder, exist_ok=True)
         
         self.speakeasyConfig = speakeasyConfig
         if self.speakeasyConfig and not os.path.exists(speakeasyConfig):
@@ -183,7 +178,11 @@ class PEDynamicFeatureExtractor():
             logging.error(f" [-] Failed emulation, general Exception: {file}\n{ex}\n")
             return None
     
-    def emulate(self, path=None, data=None):
+    def emulate(self, path=None, data=None, emulationOutputFolder=None):
+        
+        if emulationOutputFolder:
+            os.makedirs(emulationOutputFolder, exist_ok=True)
+        
         if path is None and data is None:
             raise ValueError("Either 'file' or 'data' must be specified.")
         if path:
@@ -194,7 +193,7 @@ class PEDynamicFeatureExtractor():
             self.sampleName = f"{time()}"
         report = self._emulation(self.speakeasyConfig, path, data)
         
-        if self.outputFolder:
+        if emulationOutputFolder:
             if report:
                 with open(os.path.join(self.outputFolder, f"{self.sampleName}.json"), "w") as f:
                     f.write(report["entry_points"])
