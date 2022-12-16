@@ -1,7 +1,7 @@
 import re
 from numpy import where
 from pandas import to_datetime
-from .constants import FIELD_SEPARATOR, VARIABLE_MAP, SPEAKEASY_SUBFILTER_MINIMALISTIC
+from .constants import VARIABLE_MAP
 
 def normalizeTablePath(df, col="path"):
     if df.empty:
@@ -113,55 +113,4 @@ def normalizeAuditdTable(df):
     df['process.title'] = df['process.title'].apply(normalizeStringHash)
     # ppid preprocessing
     df['process.ppid'] = df['process.ppid'].apply(lambda x: x if x == "1" else "<pid>")
-    # adds this as last column
-    #df['event.separator'] = "<sep>"
     return df
-
-def groupAuditdSequences(newdf, groupByCols=['hostname'], lengthLimit=20000):
-    """
-    input is a dataframe with 5min of data
-    output is a string with auditd data for a host
-    length is the maximum length of the telemtry
-          20 000 corresponds to ~80 percentile from 61k of hosts
-          40 000 corresponds to ~90 percentile from 61k of hosts
-    # CONSIDER:
-        # my data has been already divided to 5min chunks
-        # it might be needed to do chunking here based on TimeStamp if needed
-    """
-    newdf = normalizeAuditdTable(newdf.copy())
-
-    out = []
-    for _, groupDf in newdf.groupby(groupByCols):    
-        arr = groupDf.drop(columns=groupByCols).values.flatten()
-        # fastText expects whitespace separated values in utf-8
-        # I additionally introduce ',' in FIELD_SEPARATOR since process.title has spaces
-        host_telemetry = FIELD_SEPARATOR.join(arr).encode().decode('utf-8', 'ignore') 
-        out.append(host_telemetry[:lengthLimit]+"\n")
-
-    return out
-
-def joinSpeakEasyRecordsToJSON(recordDict, subFilter = SPEAKEASY_SUBFILTER_MINIMALISTIC):
-    jsonEvent = "{"
-    
-    for i, key in enumerate(recordDict.keys()):
-        if recordDict[key].empty:
-            continue
-        if key in subFilter.keys():
-            jsonVal = recordDict[key][subFilter[key]].to_json(orient='records', indent=4)
-        else:
-            jsonVal = recordDict[key].to_json(orient='records', indent=4)
-        jsonEvent += f"\n\"{key}\":\n{jsonVal}"
-
-        if i != len(recordDict.keys())-1:
-            jsonEvent += ","
-    
-    if jsonEvent.endswith(","):
-        jsonEvent = jsonEvent[:-1]
-    jsonEvent += "}"
-    return jsonEvent
-
-def cleanJsonEvent(jsonEvent, patternCleanup = ['"', ":", ",", "[", "]", "{", "}", "\\", "/"]):
-    jsonEvent = jsonEvent.lower()
-    for x in patternCleanup:
-        jsonEvent = jsonEvent.replace(x, " ")
-    return jsonEvent
