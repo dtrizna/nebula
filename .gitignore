@@ -5,13 +5,15 @@ __pycache__/
 
 # data
 windows_emulation*
+speakeasy_testset/
+speakeasy_trainset/
 wazuh_*
 *windows_msft_*
 *auditd_msft_*
 *kubeaudit_msft_*
 reverse_shell_dataset.cm
 *zip
-*7z
+data_raw/*7z
 
 # models
 FastText*model
