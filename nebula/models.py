@@ -18,7 +18,7 @@ class ModelAPI(object):
                     lossFunction,
                     optimizer, 
                     verbosityBatches = 100,
-                    outputFolder="./",
+                    outputFolder=None,
                     stateDict = None):
         self.model = model
         self.optimizer = optimizer
@@ -82,12 +82,12 @@ class ModelAPI(object):
             trainMetrics.append([accuracy, f1])
             
             if batchIdx % self.verbosityBatches == 0:
-                logging.warning(" [*] {}: Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tF1-score: {:.2f} | Elapsed: {:.2f}s".format(
+                logging.warning(" [*] {}: Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}e-3\tF1-score: {:.2f} | Elapsed: {:.2f}s".format(
                     time.ctime(), epochId, batchIdx * len(data), len(trainLoader.dataset),
-                100. * batchIdx / len(trainLoader), loss.item(), np.mean([x[1] for x in trainMetrics]), time.time()-now))
+                100. * batchIdx / len(trainLoader), loss.item()*1e3, np.mean([x[1] for x in trainMetrics]), time.time()-now))
                 now = time.time()
         
-        self.trainMetrics = np.array(self.trainMetrics).mean(axis=0).reshape(-1,2)
+        trainMetrics = np.array(trainMetrics).mean(axis=0).reshape(-1,2)
         return trainLoss, trainMetrics
 
 
@@ -108,10 +108,12 @@ class ModelAPI(object):
 
                 timeElapsed = time.time() - epochStartTime
                 self.trainingTime.append(timeElapsed)
-                logging.warning(f" [*] {time.ctime()}: {epochIdx + 1:^7} | Tr.loss: {np.mean(epochTrainLoss):^12.6f} | Tr.F1.: {np.mean([x[1] for x in epochTrainMetric]):^9.2f} | {timeElapsed:^9.2f}")
-            self.dumpResults()
+                logging.warning(f" [*] {time.ctime()}: {epochIdx + 1:^7} | Tr.loss: {np.mean(epochTrainLoss)*1e3:.6f}e-3 | Tr.F1.: {np.mean([x[1] for x in epochTrainMetric]):^9.2f} | {timeElapsed:^9.2f}")
+            if self.outputFolder:
+                self.dumpResults()
         except KeyboardInterrupt:
-            self.dumpResults()
+            if self.outputFolder:
+                self.dumpResults()
 
     def evaluate(self, val_loader):
         self.model.eval()
@@ -134,6 +136,12 @@ class ModelAPI(object):
 
         self.testMetrics = np.array(self.testMetrics).mean(axis=0).reshape(-1,2)
         return self.testLoss, self.testMetrics
+
+    def predict(self, arr):
+        self.model.eval()
+        with torch.no_grad():
+            logits = self.model(torch.Tensor(arr).long().to(self.device))
+        return torch.sigmoid(logits).clone().detach().numpy()
 
 class Cnn1DLinear(nn.Module):
     def __init__(self, 
