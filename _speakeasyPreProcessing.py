@@ -137,18 +137,18 @@ if __name__ == "__main__":
     BENIGN_FOLDERS = ["report_clean", "report_windows_syswow64"]
     print("Initialized ...")
 
-    limit = None # 10 
+    limit = None # 10
     VOCAB_SIZE = 1500
     MAX_SEQ_LEN = 2048
 
-    EMULATION_TRAINSET_PATH = PATH + r"\..\data\data_raw\windows_emulation_trainset"
+    EMULATION_TRAINSET_PATH = PATH + r"\data\data_raw\windows_emulation_trainset"
     subFoldersTrain = [os.path.join(EMULATION_TRAINSET_PATH, x) for x in os.listdir(EMULATION_TRAINSET_PATH) if x.startswith("report_")]
-    trainOutFolder = PATH + r"\..\data\data_filtered\speakeasy_trainset"
+    trainOutFolder = PATH + r"\data\data_filtered\speakeasy_trainset"
     os.makedirs(trainOutFolder, exist_ok=True)
     parseDatasetFolders(subFoldersTrain, trainOutFolder, limit=limit, mode="train", tokenizer=tokenizer, extractor=extractor)
 
-    EMULATION_TESTSET_PATH = PATH + r"\..\data\data_raw\windows_emulation_testset"
+    EMULATION_TESTSET_PATH = PATH + r"\data\data_raw\windows_emulation_testset"
     subFoldersTest = [os.path.join(EMULATION_TESTSET_PATH, x) for x in os.listdir(EMULATION_TESTSET_PATH) if x.startswith("report_")]
-    testOutFolder = PATH + r"\..\data\data_filtered\speakeasy_testset"
+    testOutFolder = PATH + r"\data\data_filtered\speakeasy_testset"
     os.makedirs(testOutFolder, exist_ok=True)
     parseDatasetFolders(subFoldersTest, testOutFolder, limit=limit, mode="test", tokenizer=tokenizer, extractor=extractor)
