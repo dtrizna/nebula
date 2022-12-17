@@ -20,7 +20,7 @@ from collections.abc import Iterable
 from collections import Counter
 
 
-class JSONTokenizer():
+class JSONTokenizer(object):
     def __init__(self, 
                 patternCleanup=JSON_CLEANUP_SYMBOLS,
                 stopwords = SPEAKEASY_TOKEN_STOPWORDS,
@@ -37,8 +37,10 @@ class JSONTokenizer():
         self.unk_token_id = self.specialTokens[self.unk_token]
         self.mask_token_id = self.specialTokens[self.mask_token]
 
-        self.vocab = None
         self.counter = None
+        self.vocab = None
+        self.reverseVocab = None
+        self.vocabError = "Vocabulary not initialized! Use buildVocab() first or load it using loadVocab()!"
 
     # methods related to tokenization
     def tokenizeEvent(self, jsonEvent):
@@ -75,6 +77,7 @@ class JSONTokenizer():
         self.vocab = vocab
         self.counter = counter
         self.vocabSize = len(self.vocab) if vocabSize > len(self.vocab) else vocabSize
+        self.reverseVocab = {v:k for k,v in self.vocab.items()}
         if vocabSize > len(self.vocab):
             msg = " Provided 'vocabSize' is larger than number of tokens in corpus:"
             msg += f" {vocabSize} > {len(self.vocab)}. "
@@ -85,10 +88,14 @@ class JSONTokenizer():
         with open(vocabPickleFile, "wb") as f:
             pickle.dump(self.vocab, f)
 
-    def loadVocab(self, vocabPickleFile):
-        with open(vocabPickleFile, "rb") as f:
-            self.vocab = pickle.load(f)
+    def loadVocab(self, vocab):
+        if isinstance(vocab, dict):
+            self.vocab = vocab
+        else:
+            with open(vocab, "rb") as f:
+                self.vocab = pickle.load(f)
         self.vocabSize = len(self.vocab)
+        self.reverseVocab = {v:k for k,v in self.vocab.items()}
 
     # methods related to encoding
     def convertTokenListToIds(self, tokenList):
@@ -102,7 +109,7 @@ class JSONTokenizer():
         if self.vocab:
             return [self.vocab[x] if x in self.vocab else self.vocab["<unk>"] for x in tokenList]
         else:
-            raise Exception("Vocabulary not initialized! Use buildVocab() first or load it using loadVocab()!")
+            raise Exception("convertTokensToIds(): " + self.vocabError)
     
     def padSequence(self, encodedSequence, maxLen=None):
         self.maxLen = maxLen if maxLen else self.maxLen
@@ -113,7 +120,7 @@ class JSONTokenizer():
     
     def padSequenceList(self, encodedSequenceList, maxLen=None):
         self.maxLen = maxLen if maxLen else self.maxLen
-        return np.array([self.padSequence(x) for x in encodedSequenceList], dtype=np.int8)
+        return np.array([self.padSequence(x) for x in encodedSequenceList], dtype=np.int32)
 
     def encode(self, jsonInput, pad=True, maxLen=512):
         tokenized = self.tokenize(jsonInput)
@@ -127,9 +134,23 @@ class JSONTokenizer():
             return self.padSequenceList(encoded)
         else:
             return encoded
+    
+    def decode(self, encodedSequence):
+        if self.vocab and self.reverseVocab:
+            decodedSequence = []
+            for x in encodedSequence:
+                if x == self.pad_token_id:
+                    break
+                elif x in self.reverseVocab:
+                    decodedSequence.append(self.reverseVocab[x])
+                else:
+                    decodedSequence.append(self.unk_token)
+            return decodedSequence
+        else:
+            raise Exception("detokenize(): " + self.vocabError)
 
 
-class PEDynamicFeatureExtractor():
+class PEDynamicFeatureExtractor(object):
     def __init__(self, 
                     speakeasyConfig=None, 
                     speakeasyRecords=SPEAKEASY_RECORDS,
