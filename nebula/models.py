@@ -82,7 +82,7 @@ class ModelAPI(object):
             trainMetrics.append([accuracy, f1])
             
             if batchIdx % self.verbosityBatches == 0:
-                logging.warning(" [*] {}: Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.4f}e-3\tF1-score: {:.2f} | Elapsed: {:.2f}s".format(
+                logging.warning(" [*] {}: Train Epoch: {} [{:^5}/{:^5} ({:^2.0f}%)]\tLoss: {:.4f}e-3 | F1-score: {:.2f} | Elapsed: {:.2f}s".format(
                     time.ctime(), epochId, batchIdx * len(data), len(trainLoader.dataset),
                 100. * batchIdx / len(trainLoader), loss.item()*1e3, np.mean([x[1] for x in trainMetrics]), time.time()-now))
                 now = time.time()

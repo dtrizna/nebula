@@ -7,6 +7,7 @@ import numpy as np
 import sys
 sys.path.extend([".", ".."])
 from nebula.misc import getRealPath, flattenList
+from nebula.misc import dumpTokenizerFiles
 from nebula import PEDynamicFeatureExtractor, JSONTokenizer
 
 # PREPROCESSING CONFIG AS DEFINED IN nebula.constants
@@ -72,7 +73,7 @@ def main(limit=None):
     subFoldersTrain = [os.path.join(EMULATION_TRAINSET_PATH, x) for x in os.listdir(EMULATION_TRAINSET_PATH) if x.startswith("report_")]
     trainOutFolder = SCRIPT_PATH + r"\data\data_filtered\speakeasy_trainset"
     os.makedirs(trainOutFolder, exist_ok=True)
-    parseDatasetFolders(
+    folderReader(
         subFoldersTrain, 
         trainOutFolder, 
         parserFunction, 
@@ -85,7 +86,7 @@ def main(limit=None):
     subFoldersTest = [os.path.join(EMULATION_TESTSET_PATH, x) for x in os.listdir(EMULATION_TESTSET_PATH) if x.startswith("report_")]
     testOutFolder = SCRIPT_PATH + r"\data\data_filtered\speakeasy_testset"
     os.makedirs(testOutFolder, exist_ok=True)
-    parseDatasetFolders(
+    folderReader(
         subFoldersTest, 
         testOutFolder, 
         parserFunction, 
@@ -95,34 +96,7 @@ def main(limit=None):
         mode="test", 
         tokenizer=tokenizer)
 
-def plotCounterCountsLineplot(counter, outfile):
-    import matplotlib.pyplot as plt
-    import numpy as np
-    counts = [x[1] for x in counter.most_common()]
-    
-    plt.figure(figsize=(12,6))
-    plt.plot(np.arange(len(counts)), counts)
-    plt.yscale("log")
-    # add ticks and grid to plot
-    plt.grid(which="both")
-    # save to file
-    plt.savefig(outfile)
-
-def dumpTokenizerFiles(tokenizer, outFolder):
-    file = f"{outFolder}\\speakeasy_VocabSize_{VOCAB_SIZE}.pkl"
-    tokenizer.dumpVocab(file)
-    print("Dumped vocab to {}".format(file))
-    
-    file = f"{outFolder}\\speakeasy_counter.pkl"
-    print("Dumped vocab counter to {}".format(file))
-    with open(file, "wb") as f:
-        pickle.dump(tokenizer.counter, f)
-
-    file = f"{outFolder}\\speakeasy_counter_plot.png"
-    plotCounterCountsLineplot(tokenizer.counter, file)
-    print("Dumped vocab counter plot to {}".format(file))
-
-def parseDatasetFolders(subFolders, outFolder, parserFunction, tokenizerFunction, encodingFunction, limit=None, mode=None, tokenizer=None):
+def folderReader(subFolders, outFolder, parserFunction, tokenizerFunction, encodingFunction, limit=None, mode=None, tokenizer=None):
     if not mode in ["train", "test"] or not tokenizer:
         raise Exception("Invalid arguments -- mode or tokenizer or extractor")
     
@@ -145,7 +119,7 @@ def parseDatasetFolders(subFolders, outFolder, parserFunction, tokenizerFunction
             jsonEventRecords = parserFunction(entryPoints)
             events.append(jsonEventRecords)
 
-            if subFolder in BENIGN_FOLDERS:
+            if os.path.basename(subFolder) in BENIGN_FOLDERS:
                 y.append(0)
             else:
                 y.append(1)
@@ -153,7 +127,7 @@ def parseDatasetFolders(subFolders, outFolder, parserFunction, tokenizerFunction
         timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
         timenowEnd = time.time()
         print(f"{timenow}: Finished... Took: {timenowEnd - timenowStart:.2f}s", " "*100)
-    
+
     timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
     print(f"{timenow}: Tokenizing...")
     eventsTokenized = tokenizerFunction(events)
@@ -162,7 +136,7 @@ def parseDatasetFolders(subFolders, outFolder, parserFunction, tokenizerFunction
         timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
         print(f"{timenow}: Building vocab...")
         tokenizer.buildVocab(eventsTokenized, vocabSize=VOCAB_SIZE)
-        dumpTokenizerFiles(tokenizer, outFolder)
+        dumpTokenizerFiles(tokenizer, outFolder, VOCAB_SIZE)
 
     timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
     print(f"{timenow}: Encoding...")
