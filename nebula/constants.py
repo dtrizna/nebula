@@ -1,4 +1,7 @@
-from .misc import flattenList
+from nebula.misc import flattenList
+from pefile import PEFormatError
+from unicorn import UcError
+from speakeasy import errors
 
 AUDITD_FIELDS = [
     'TimeStamp',
@@ -92,3 +95,4 @@ VARIABLE_MAP.update({
     r"%cache%": VARIABLE_MAP[r"%userprofile%"] + r"\appdata\local\microsoft\windows\temporary internet files"
 })    
 
+SPEAKEASY_EXCEPTIONS = (PEFormatError, UcError, IndexError, errors.NotSupportedError, errors.SpeakeasyError)
