@@ -1,34 +1,67 @@
 import math
-from typing import Tuple
+from typing import Optional
 
 import torch
 from torch import nn, Tensor
-import torch.nn.functional as F
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
-from torch.utils.data import dataset
 
-class TransformerModel(nn.Module):
 
-    def __init__(self, ntoken: int, d_model: int, nhead: int, d_hid: int,
-                 nlayers: int, dropout: float = 0.5):
+class TransformerEncoderModel(nn.Module):
+
+    def __init__(self, 
+                    nTokens: int, # size of vocabulary
+                    dModel: int, # embedding & transformer dimension
+                    nHeads: int, # number of heads in nn.MultiheadAttention
+                    dHidden: int, # dimension of the feedforward network model in nn.TransformerEncoder
+                    nLayers: int, # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+                    numClasses: int = 1, # 1 ==> binary classification 
+                    hiddenNeurons: list = [32], # decoder's classifier FFNN complexity
+                    layerNorm: bool = False, # whether to normalize decoder's FFNN layers
+                    dropout: float = 0.5):
         super().__init__()
-        self.model_type = 'Transformer'
-        self.pos_encoder = PositionalEncoding(d_model, dropout)
-        encoder_layers = TransformerEncoderLayer(d_model, nhead, d_hid, dropout)
-        self.transformer_encoder = TransformerEncoder(encoder_layers, nlayers)
-        self.encoder = nn.Embedding(ntoken, d_model)
-        self.d_model = d_model
-        self.decoder = nn.Linear(d_model, ntoken)
+        assert dModel % nHeads == 0, "nheads must divide evenly into d_model"
+        self.__name__ = 'Transformer'
+        self.encoder = nn.Embedding(nTokens, dModel)
+        self.pos_encoder = PositionalEncoding(dModel, dropout)
+        encoder_layers = TransformerEncoderLayer(dModel, nHeads, dHidden, dropout)
+        self.transformer_encoder = TransformerEncoder(encoder_layers, nLayers)
+        self.d_model = dModel
+        
+        self.ffnn = []
+        for i,h in enumerate(hiddenNeurons):
+            self.ffnnBlock = []
+            if i == 0:
+                self.ffnnBlock.append(nn.Linear(self.d_model, h))
+            else:
+                self.ffnnBlock.append(nn.Linear(hiddenNeurons[i-1], h))
+
+            # add BatchNorm to every layer except last
+            if layerNorm and i < len(hiddenNeurons)-1:
+                self.ffnnBlock.append(nn.LayerNorm(h))
+
+            self.ffnnBlock.append(nn.ReLU())
+
+            if dropout:
+                self.ffnnBlock.append(nn.Dropout(dropout))
+            
+            self.ffnn.append(nn.Sequential(*self.ffnnBlock))
+        self.ffnn = nn.Sequential(*self.ffnn)
+        
+        self.fcOutput = nn.Linear(hiddenNeurons[-1], numClasses)
 
         self.init_weights()
 
     def init_weights(self) -> None:
         initrange = 0.1
         self.encoder.weight.data.uniform_(-initrange, initrange)
-        self.decoder.bias.data.zero_()
-        self.decoder.weight.data.uniform_(-initrange, initrange)
+        # also set the bias to zero for the linear layers in self.ffnn
+        for block in self.ffnn:
+            for layer in block:
+                if isinstance(layer, nn.Linear):
+                    layer.bias.data.zero_()
+                    layer.weight.data.uniform_(-initrange, initrange)
 
-    def forward(self, src: Tensor, src_mask: Tensor) -> Tensor:
+    def forward(self, src: Tensor, src_mask: Optional[Tensor] = None) -> Tensor:
         """
         Args:
             src: Tensor, shape [seq_len, batch_size]
@@ -39,9 +72,11 @@ class TransformerModel(nn.Module):
         """
         src = self.encoder(src) * math.sqrt(self.d_model)
         src = self.pos_encoder(src)
-        output = self.transformer_encoder(src, src_mask)
-        output = self.decoder(output)
-        return output
+        x = self.transformer_encoder(src, src_mask)
+        x = x.mean(dim=1)
+        x = self.ffnn(x)
+        out = self.fcOutput(x)
+        return out
 
 
 def generate_square_subsequent_mask(sz: int) -> Tensor:

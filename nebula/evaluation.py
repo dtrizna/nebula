@@ -37,8 +37,8 @@ def getCrossValidationMetrics(modelClass, modelConfig, X, y, folds=3, epochs=3, 
 
         # Train the model
         model.fit(X_train, y_train, epochs=epochs)
-        # [seconds_epoch1, seconds_epoch2, ...]
         try: # might error out if model training is interrupted
+            # [seconds_epoch1, seconds_epoch2, ...]
             trainingTime[i,:] = model.trainingTime
         except ValueError:
             pass

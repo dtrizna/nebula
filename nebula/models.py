@@ -39,7 +39,7 @@ class ModelAPI(object):
         self.model.load_state_dict(torch.load(stateDict))
 
     def dumpResults(self):
-        prefix = os.path.join(self.outputFolder, f"{int(time.time())}")
+        prefix = os.path.join(self.outputFolder, f"trainingFiles_{int(time.time())}")
         os.makedirs(self.outputFolder, exist_ok=True)
 
         modelFile = f"{prefix}-model.torch"
@@ -216,10 +216,9 @@ class Cnn1DLinear(nn.Module):
                                     out_channels=numFilters[i],
                                     kernel_size=filterSizes[i])
                 self.conv1dModule.append(module)
-
         convOut = np.sum(numFilters)
+        
         self.ffnn = []
-
         for i,h in enumerate(hiddenNeurons):
             self.ffnnBlock = []
             if i == 0:
@@ -237,8 +236,8 @@ class Cnn1DLinear(nn.Module):
                 self.ffnnBlock.append(nn.Dropout(dropout))
             
             self.ffnn.append(nn.Sequential(*self.ffnnBlock))
-
         self.ffnn = nn.Sequential(*self.ffnn)
+        
         self.fcOutput = nn.Linear(hiddenNeurons[-1], numClasses)
         self.relu = nn.ReLU()
 
