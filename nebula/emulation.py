@@ -10,6 +10,8 @@ from pathlib import Path
 from numpy import sum
 from time import time
 
+EXCEPTIONS = (PEFormatError, UcError, IndexError, speakeasy.errors.NotSupportedError, speakeasy.errors.SpeakeasyError)
+
 def write_error(errfile):
     # just creating an empty file to incdicate failure
     Path(errfile).touch()
@@ -24,7 +26,7 @@ def emulate(file=None, data=None, report_folder=".", i=0, l=0,
         if not os.path.exists(file):
             raise ValueError(f"File {file} does not exist.")
         sampleName = os.path.basename(file)
-        fileBase = f"{report_folder}/{sampleName}"
+        fileBase = os.path.join(report_folder, sampleName)
 
         analyze = False
         if not forceEmulation and os.path.exists(fileBase+".json"):
@@ -34,7 +36,7 @@ def emulate(file=None, data=None, report_folder=".", i=0, l=0,
         else:
             analyze = True
     if data:
-        fileBase = f"{report_folder}/{time()}"
+        fileBase = os.path.join(report_folder, int(time()))
     if not analyze:
         return None
     else:
@@ -70,25 +72,8 @@ def emulate(file=None, data=None, report_folder=".", i=0, l=0,
 
             logging.warning(f" [+] {i}/{l} Finished emulation {file}, took: {took:.2f}s, API calls acquired: {api_seq_len}")
             return success
-
-        except PEFormatError as ex:
-            logging.error(f" [-] {i}/{l} Failed emulation, PEFormatError: {file}\n{ex}\n")
-            write_error(fileBase+".err")
-            return success
-        except UcError as ex:
-            logging.error(f" [-] {i}/{l} Failed emulation, UcError: {file}\n{ex}\n")
-            write_error(fileBase+".err")
-            return success
-        except IndexError as ex:
-            logging.error(f" [-] {i}/{l} Failed emulation, IndexError: {file}\n{ex}\n")
-            write_error(fileBase+".err")
-            return success
-        except speakeasy.errors.NotSupportedError as ex:
-            logging.error(f" [-] {i}/{l} Failed emulation, NotSupportedError: {file}\n{ex}\n")
-            write_error(fileBase+".err")
-            return success
-        except speakeasy.errors.SpeakeasyError as ex:
-            logging.error(f" [-] {i}/{l} Failed emulation, SpeakEasyError: {file}\n{ex}\n")
+        except EXCEPTIONS as ex:
+            logging.error(f" [-] {i}/{l} Failed emulation of {file}\nException: {ex}\n")
             write_error(fileBase+".err")
             return success
         except Exception as ex:

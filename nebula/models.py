@@ -8,6 +8,7 @@ import os
 import pickle
 
 from sklearn.metrics import f1_score, accuracy_score
+from .evaluation import get_tpr_at_fpr
 import logging
 
 
@@ -36,7 +37,7 @@ class ModelAPI(object):
         self.model.load_state_dict(torch.load(stateDict))
 
     def dumpResults(self):
-        prefix = f"{self.outputFolder}\\{int(time.time())}"
+        prefix = os.path.join(self.outputFolder, f"{int(time.time())}")
         os.makedirs(self.outputFolder, exist_ok=True)
 
         modelFile = f"{prefix}-model.torch"
@@ -76,7 +77,11 @@ class ModelAPI(object):
             loss.backward() # derivatives
             self.optimizer.step() # parameter update  
 
-            preds = (torch.sigmoid(logits).clone().detach().numpy() > 0.5).astype(np.int_)
+            predProbs = torch.sigmoid(logits).clone().detach().numpy()
+            preds = (predProbs > 0.5).astype(np.int_)
+
+            # might be expensive to compute every batch?
+            # tpr = get_tpr_at_fpr(predProbs, target.cpu().numpy(), 0.1)
             accuracy = accuracy_score(target, preds)
             f1 = f1_score(target, preds)
             trainMetrics.append([accuracy, f1])
@@ -159,6 +164,7 @@ class ModelAPI(object):
         with torch.no_grad():
             logits = self.model.predict_proba(arr)
         return (logits > threshold).astype(np.int_)
+
 
 class Cnn1DLinear(nn.Module):
     def __init__(self, 

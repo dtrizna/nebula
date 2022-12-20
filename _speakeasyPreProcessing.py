@@ -108,7 +108,7 @@ def folderReader(subFolders, outFolder, parserFunction, tokenizerFunction, encod
         timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
         print(f"{timenow}: Filtering and normalizing {subFolder.strip()}...")
 
-        files = [f"{subFolder}\\{x}" for x in os.listdir(subFolder)[:limit] if x.endswith(".json")]
+        files = [os.path.join(subFolder,x) for x in os.listdir(subFolder)[:limit] if x.endswith(".json")]
         l = len(files)
         for i,file in enumerate(files):
             print(f"{subFolder:>20}: {i+1}/{l} {' '*30}".strip(), end="\r")
