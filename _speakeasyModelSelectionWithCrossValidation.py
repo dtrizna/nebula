@@ -80,7 +80,7 @@ for embeddingDim in [96, 128, 192]:
     modelArch["embeddingDim"] = embeddingDim
 
     configStr = dictToString(modelArch)
-    metricFilename = f"metrics_{model.__name__}_ep_{epochs}_cv_{nFolds}_{configStr}.json"
+    metricFilename = f"metrics_limit_{train_limit}_{model.__name__}_ep_{epochs}_cv_{nFolds}_{configStr}.json"
     metricFileFullpath = os.path.join(outputFolder, metricFilename)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
