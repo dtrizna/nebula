@@ -10,7 +10,7 @@ from nebula.misc import dictToString
 from sklearn.utils import shuffle
 
 outputFolder = rf"C:\Users\dtrizna\Code\nebula\tests\speakeasy_3_CV_ArchSelection"
-logFile = "speakeasy_3_CV_ArchSelection_Embeddings_32_64_96.log"
+logFile = "speakeasy_3_CV_ArchSelection_HiddenLayers.log"
 if logFile:
     logging.basicConfig(filename=os.path.join(outputFolder, logFile), level=logging.WARNING)
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
@@ -35,12 +35,14 @@ if train_limit:
 logging.warning(f" [!] Dataset size: {len(x_train)}")
 
 # =============== DEFINE MODEL & ITS CONFIG
-for embeddingDim in [32, 64, 96]:
+hiddenLayers = [[128], [256, 128], [512, 256], [1024, 512, 256]]
+#for embeddingDim in [32, 64, 96]:
+for layers in hiddenLayers:
     VOCAB_SIZE = 1500
     modelArch = {
         "vocabSize": VOCAB_SIZE,
-        "embeddingDim": embeddingDim,
-        "hiddenNeurons": [256, 128],
+        "embeddingDim": 64,
+        "hiddenNeurons": layers,
         "batchNormConv": False,
         "batchNormFFNN": False,
         "filterSizes": [2, 3, 4, 5]
