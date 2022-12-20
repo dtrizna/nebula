@@ -183,7 +183,7 @@ class Cnn1DLinear(nn.Module):
     def __init__(self, 
                 # embedding params
                 vocabSize = None,
-                embeddingDim = 32,
+                embeddingDim = 64,
                 paddingIdx = 0,
                 # conv params
                 filterSizes = [2, 3, 4, 5],
