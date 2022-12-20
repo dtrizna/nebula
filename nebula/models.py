@@ -8,7 +8,7 @@ import os
 import pickle
 
 from sklearn.metrics import f1_score, accuracy_score
-from .evaluation import get_tpr_at_fpr
+#from .evaluation import get_tpr_at_fpr
 import logging
 
 
@@ -17,7 +17,8 @@ class ModelAPI(object):
                     device, 
                     model,
                     lossFunction,
-                    optimizer, 
+                    optimizer,
+                    batchSize=64,
                     verbosityBatches = 100,
                     outputFolder=None,
                     stateDict = None):
@@ -25,6 +26,7 @@ class ModelAPI(object):
         self.optimizer = optimizer
         self.lossFunction = lossFunction
         self.verbosityBatches = verbosityBatches
+        self.batchSize = batchSize
 
         self.device = device
         self.model.to(self.device)
@@ -77,29 +79,29 @@ class ModelAPI(object):
             loss.backward() # derivatives
             self.optimizer.step() # parameter update  
 
-            predProbs = torch.sigmoid(logits).clone().detach().numpy()
+            predProbs = torch.sigmoid(logits).clone().detach().cpu().numpy()
             preds = (predProbs > 0.5).astype(np.int_)
 
             # might be expensive to compute every batch?
             # tpr = get_tpr_at_fpr(predProbs, target.cpu().numpy(), 0.1)
-            accuracy = accuracy_score(target, preds)
-            f1 = f1_score(target, preds)
+            accuracy = accuracy_score(target.cpu(), preds)
+            f1 = f1_score(target.cpu(), preds)
             trainMetrics.append([accuracy, f1])
             
             if batchIdx % self.verbosityBatches == 0:
-                logging.warning(" [*] {}: Train Epoch: {} [{:^5}/{:^5} ({:^2.0f}%)]\tLoss: {:.4f}e-3 | F1-score: {:.2f} | Elapsed: {:.2f}s".format(
+                logging.warning(" [*] {}: Train Epoch: {} [{:^5}/{:^5} ({:^2.0f}%)]\tLoss: {:.6f} | F1-score: {:.2f} | Elapsed: {:.2f}s".format(
                     time.ctime(), epochId, batchIdx * len(data), len(trainLoader.dataset),
-                100. * batchIdx / len(trainLoader), loss.item()*1e3, np.mean([x[1] for x in trainMetrics]), time.time()-now))
+                100. * batchIdx / len(trainLoader), loss.item(), np.mean([x[1] for x in trainMetrics]), time.time()-now))
                 now = time.time()
         
         trainMetrics = np.array(trainMetrics).mean(axis=0).reshape(-1,2)
         return trainLoss, trainMetrics
 
 
-    def fit(self, X, y, epochs=10, batchSize=32):
+    def fit(self, X, y, epochs=10):
         trainLoader = torch.utils.data.DataLoader(
             torch.utils.data.TensorDataset(torch.from_numpy(X).long(), torch.from_numpy(y).float()),
-            batch_size=batchSize,
+            batch_size=self.batchSize,
             shuffle=True
         )
         
@@ -119,17 +121,17 @@ class ModelAPI(object):
 
                 timeElapsed = time.time() - epochStartTime
                 self.trainingTime.append(timeElapsed)
-                logging.warning(f" [*] {time.ctime()}: {epochIdx + 1:^7} | Tr.loss: {np.mean(epochTrainLoss)*1e3:.4f}e-3 | Tr.F1.: {np.mean([x[1] for x in epochTrainMetric]):^9.2f} | {timeElapsed:^9.2f}s")
+                logging.warning(f" [*] {time.ctime()}: {epochIdx:^7} | Tr.loss: {np.mean(epochTrainLoss):.6f} | Tr.F1.: {np.mean([x[1] for x in epochTrainMetric]):^9.2f} | {timeElapsed:^9.2f}s")
             if self.outputFolder:
                 self.dumpResults()
         except KeyboardInterrupt:
             if self.outputFolder:
                 self.dumpResults()
 
-    def evaluate(self, X, y, batchSize=32):
+    def evaluate(self, X, y):
         testLoader = torch.utils.data.DataLoader(
             torch.utils.data.TensorDataset(torch.from_numpy(X).long(), torch.from_numpy(y).float()),
-            batch_size=batchSize,
+            batch_size=self.batchSize,
             shuffle=True
         )
         self.model.eval()
@@ -145,19 +147,30 @@ class ModelAPI(object):
             loss = self.lossFunction(logits, target.float().reshape(-1,1))
             self.testLoss.append(loss.item())
 
-            preds = (torch.sigmoid(logits).clone().detach().numpy() > 0.5).astype(np.int_)
-            accuracy = accuracy_score(target, preds)
-            f1 = f1_score(target, preds)
+            predProbs = torch.sigmoid(logits).clone().detach().cpu().numpy()
+            preds = (predProbs > 0.5).astype(np.int_)
+            accuracy = accuracy_score(target.cpu(), preds)
+            f1 = f1_score(target.cpu(), preds)
             self.testMetrics.append([accuracy, f1])
 
         self.testMetrics = np.array(self.testMetrics).mean(axis=0).reshape(-1,2)
         return self.testLoss, self.testMetrics
 
     def predict_proba(self, arr):
+        out = torch.empty((0,1)).to(self.device)
+        loader = torch.utils.data.DataLoader(
+            torch.utils.data.TensorDataset(torch.from_numpy(arr).long()),
+            batch_size=self.batchSize,
+            shuffle=False
+        )
+
         self.model.eval()
-        with torch.no_grad():
-            logits = self.model(torch.Tensor(arr).long().to(self.device))
-        return torch.sigmoid(logits).clone().detach().numpy()
+        for data in loader:
+            with torch.no_grad():
+                logits = self.model(torch.Tensor(data[0]).long().to(self.device))
+                out = torch.vstack([out, logits])
+        
+        return torch.sigmoid(out).clone().detach().cpu().numpy()
     
     def predict(self, arr, threshold=0.5):
         self.model.eval()
@@ -182,7 +195,7 @@ class Cnn1DLinear(nn.Module):
                 dropout = 0.5,
                 numClasses = 1): # binary classification
         super().__init__()
-
+        self.__name__ = "Cnn1DLinear"
         # embdding
         self.embedding = nn.Embedding(vocabSize, 
                                   embeddingDim, 

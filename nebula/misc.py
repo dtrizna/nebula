@@ -21,6 +21,9 @@ def flatten(l):
 def flattenList(l):
     return [item for sublist in l for item in sublist]
 
+def dictToString(dictionary):
+    return str(dictionary).replace(' ', '_').replace('\'', '').replace('{', '').replace('}', '').replace(':', '').replace(',', '').replace('[', '').replace(']', '')
+
 def fix_random_seed(seed_value=1763):
     """Set seed for reproducibility."""
     import random

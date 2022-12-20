@@ -1,31 +1,27 @@
 import numpy as np
 import torch
 import logging
+import os
 import sys
 sys.path.extend(['..', '.'])
 from nebula.models import Cnn1DLinear, ModelAPI
 from nebula.evaluation import getCrossValidationMetrics
-
+from nebula.misc import dictToString
 from sklearn.utils import shuffle
 
-train_limit = 500
+outputFolder = rf"C:\Users\dtrizna\Code\nebula\tests\speakeasy_3_CV_ArchSelection"
+logFile = "speakeasy_3_CV_ArchSelection_Embeddings_32_64_96.log"
+if logFile:
+    logging.basicConfig(filename=os.path.join(outputFolder, logFile), level=logging.WARNING)
+    logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+
+# =============== Cross-Valiation CONFIG
+train_limit = None
 nFolds = 3
-epochs = 2
-fprValues = [0.01, 0.1, 0.2]
+epochs = 5
+fprValues = [0.0001, 0.001, 0.01, 0.1]
 
-VOCAB_SIZE = 1500
-model = Cnn1DLinear(vocabSize=VOCAB_SIZE)
-modelConfig = {
-    "device": torch.device("cuda:0" if torch.cuda.is_available() else "cpu"),
-    "model": model,
-    "lossFunction": torch.nn.BCEWithLogitsLoss(),
-    "optimizer": torch.optim.Adam(model.parameters(), lr=0.001),
-    "outputFolder": None, #r".\tests\speakeasy_2_Modeling\Cnn1DLinear",
-    "verbosityBatches": 10
-}
-
-
-# LOAD DATA
+# =============== LOAD DATA
 x_train = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset\speakeasy_VocabSize_1500_maxLen_2048.npy"
 x_train = np.load(x_train)
 y_train = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset\speakeasy_VocabSize_1500_maxLen_2048_y.npy"
@@ -38,12 +34,43 @@ if train_limit:
 
 logging.warning(f" [!] Dataset size: {len(x_train)}")
 
-# DO Cross Validation
-metrics = getCrossValidationMetrics(ModelAPI, modelConfig, x_train, y_train, 
-                                epochs=epochs, folds=nFolds, fprs=fprValues, mean=True)
+# =============== DEFINE MODEL & ITS CONFIG
+for embeddingDim in [32, 64, 96]:
+    VOCAB_SIZE = 1500
+    modelArch = {
+        "vocabSize": VOCAB_SIZE,
+        "embeddingDim": embeddingDim,
+        "hiddenNeurons": [256, 128],
+        "batchNormConv": False,
+        "batchNormFFNN": False,
+        "filterSizes": [2, 3, 4, 5]
+    }
+    model = Cnn1DLinear(**modelArch)
 
-# metrics -- {fpr1: [mean_tpr, mean_f1], fpr2: [mean_tpr, mean_f1], ...]}
-msg = f" [!] Mean values over {nFolds} folds:\n"
-for fpr in metrics:
-    msg += f"\tFPR: {fpr:>6} -- TPR: {metrics[fpr][0]:.4f} -- F1: {metrics[fpr][1]:.4f}\n"
-logging.warning(msg)
+    configStr = dictToString(modelArch)
+    metricFilename = f"metrics_{model.__name__}_ep_{epochs}_cv_{nFolds}_{configStr}.json"
+    metricFileFullpath = os.path.join(outputFolder, metricFilename)
+
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    modelConfig = {
+        "device": device,
+        "model": model,
+        "lossFunction": torch.nn.BCEWithLogitsLoss(),
+        "optimizer": torch.optim.Adam(model.parameters(), lr=0.001),
+        "outputFolder": None,
+        "verbosityBatches": 100
+    }
+
+    # =============== DO Cross Validation
+    logging.warning(f" [!] Epochs per fold: {epochs} | Model config: {modelArch}")
+    
+    metrics = getCrossValidationMetrics(ModelAPI, modelConfig, x_train, y_train, 
+                                    epochs=epochs, folds=nFolds, fprs=fprValues, 
+                                    mean=True, metricFile=metricFileFullpath)
+
+    # metrics -- {fpr1: [mean_tpr, mean_f1], fpr2: [mean_tpr, mean_f1], ...]}
+    msg = f" [!] Average epoch time: {metrics['avg_epoch_time']:.2f}s | Mean values over {nFolds} folds:\n"
+    for fpr in fprValues:
+        msg += f"\tFPR: {fpr:>6} -- TPR: {metrics[fpr][0]:.4f} -- F1: {metrics[fpr][1]:.4f}\n"
+
+    logging.warning(msg)
