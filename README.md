@@ -18,17 +18,27 @@
 - ~~generate filtered dataset suitable for SSL pre-training~~
 - ~~add clean samples from windows syswow64 folder~~
 - ~~perform tokenization and encoding~~
-- try different models: (0) Transformer (1) 1D-CNN-Transformer (2) Reformer (3) start transformer (4) 1D-CNN + Linear
+- ~~prepare extractor and tokenizer classes~~
+- ~~preprocess train and test sets~~
+- try different models with labeled dataset:
+  - (4) 1D-CNN + Linear
+  - (0) Transformer
+  - (2) Reformer
+  - (1) 1D-CNN-Transformer (?)
+  - (3) star transformer (?)
+- try pre-training models with SSL: (1) MLM (2) GPT-style LM
 
 ### `auditd` **commandLine** work - dataset and dowstream tasks
 
-- generate augmented reverse shells as malicious samples: (a) train -- one set of reverse shell binaries (b) val -- another binaries
-- random split of unique legitimate commands to train/val
-  > NOTE: Be sure that both generated commands resemble as close as possible to auditd telemetry!
+- reverse shell dataset:
+  - generate augmented reverse shells as malicious samples: (a) train -- one set of reverse shell binaries (b) val -- another binaries
+  - random split of unique legitimate commands to train/val
+    > NOTE: Be sure that both generated commands resemble as close as possible to auditd telemetry!
 
-- A/B tests:
-  - test with traditional pipeline and different tokenizers: (1) sentencePiece (2) wordPiece (3) wordPunct
-  - (TF-IDF | HashingVectorizer) vs FastText
+- `auditd` dataset:
+  - prepare samples for Cartesian bootstraping
+  - write classes for preprocessing
+  - build train and test datasets
   
 ### Contextual embeddings
 

@@ -1,2 +1,6 @@
 sentencepiece
 speakeasy
+torch
+reformer_pytorch
+pandas
+numpy

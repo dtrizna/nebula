@@ -17,3 +17,4 @@ data_raw/*7z
 
 # models
 FastText*model
+*torch
