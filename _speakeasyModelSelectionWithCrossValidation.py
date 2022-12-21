@@ -14,17 +14,16 @@ import time
 #RUN_NAME = "Cnn1DLinearHiddenLayers"
 RUN_NAME = "TransformerEmbeddingDim"
 
+VOCAB_SIZE = 1500
 # modelArch = {
 #     "vocabSize": VOCAB_SIZE,
 #     "embeddingDim": 64,
-#     "hiddenNeurons": layers,
+#     "hiddenNeurons": None,
 #     "batchNormConv": False,
 #     "batchNormFFNN": False,
 #     "filterSizes": [2, 3, 4, 5]
 # }
-# model = Cnn1DLinear(**modelArch)
 
-VOCAB_SIZE = 1500
 modelArch = {
     "nTokens": VOCAB_SIZE,  # size of vocabulary
     "dModel": 192,  # embedding & transformer dimension
@@ -36,13 +35,12 @@ modelArch = {
     "layerNorm": False,
     "dropout": 0.5
 }
-model = TransformerEncoderModel(**modelArch)
 
 
 # =============== Cross-Valiation CONFIG
 train_limit = None # 500
 nFolds = 3
-epochs = 5
+epochs = 3
 fprValues = [0.0001, 0.001, 0.01, 0.1]
 rest = 60*5 # 5 minutes to rest between folds (to cool down)
 
@@ -59,7 +57,7 @@ if logFile:
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 # =============== LOAD DATA
-x_train = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset\speakeasy_VocabSize_1500_maxLen_2048.npy"
+x_train = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset\speakeasy_VocabSize_1500_maxLen_2048_x.npy"
 x_train = np.load(x_train)
 y_train = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset\speakeasy_VocabSize_1500_maxLen_2048_y.npy"
 y_train = np.load(y_train)
@@ -72,24 +70,28 @@ if train_limit:
 logging.warning(f" [!] Dataset size: {len(x_train)}")
 
 # =============== DEFINE MODEL & ITS CONFIG
-# hiddenNeurons = [[128], [256, 128], [512, 256], [1024, 512, 256]]
-for embeddingDim in [96, 128, 192]:
-# for layers in hiddenNeurons:
-    
+#hiddenNeurons = [[128], [256, 128]]
+for embeddingDim in [128, 192, 256]:
+#for layers in hiddenNeurons:
+    folder = f"trainingFiles"
+
     #modelArch["hiddenNeurons"] = layers
-    modelArch["embeddingDim"] = embeddingDim
+    modelArch["dModel"] = embeddingDim
+    #model = Cnn1DLinear(**modelArch)
+    model = TransformerEncoderModel(**modelArch)
 
     configStr = dictToString(modelArch)
-    metricFilename = f"metrics_limit_{train_limit}_{model.__name__}_ep_{epochs}_cv_{nFolds}_{configStr}.json"
+    metricFilename = f"metrics_{model.__name__}_limit_{train_limit}_ep_{epochs}_cv_{nFolds}_{configStr}.json"
     metricFileFullpath = os.path.join(outputFolder, metricFilename)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    logging.warning(f" [!] Using device: {device}")
     modelConfig = {
         "device": device,
         "model": model,
         "lossFunction": torch.nn.BCEWithLogitsLoss(),
         "optimizer": torch.optim.Adam(model.parameters(), lr=0.001),
-        "outputFolder": outputFolder,
+        "outputFolder": os.path.join(outputFolder, folder),
         "verbosityBatches": 100
     }
 
@@ -100,12 +102,12 @@ for embeddingDim in [96, 128, 192]:
                                     epochs=epochs, folds=nFolds, fprs=fprValues, 
                                     mean=False, metricFile=metricFileFullpath)
 
+    # if mean=True, can use this to print the results
     # metrics -- {fpr1: [mean_tpr, mean_f1], fpr2: [mean_tpr, mean_f1], ...]}
-    msg = f" [!] Average epoch time: {metrics['avg_epoch_time']:.2f}s | Mean values over {nFolds} folds:\n"
-    for fpr in fprValues:
-        msg += f"\tFPR: {fpr:>6} -- TPR: {metrics[fpr][0]:.4f} -- F1: {metrics[fpr][1]:.4f}\n"
-
-    logging.warning(msg)
+    # msg = f" [!] Average epoch time: {metrics['avg_epoch_time']:.2f}s | Mean values over {nFolds} folds:\n"
+    # for fpr in fprValues:
+    #     msg += f"\tFPR: {fpr:>6} -- TPR: {metrics[fpr][0]:.4f} -- F1: {metrics[fpr][1]:.4f}\n"
+    # logging.warning(msg)
 
     if rest:
         time.sleep(rest)
