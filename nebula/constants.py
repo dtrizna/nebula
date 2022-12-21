@@ -36,7 +36,8 @@ AUDITD_TYPES = [
 
 JSON_CLEANUP_SYMBOLS = ['"', "'", ":", ",", "[", "]", "{", "}", "\\", "/"]
 
-SPEAKEASY_RECORDS = ["apis", "registry_access", "file_access", 'network_events.traffic']
+# this defines an order in which events occur in final sequence
+SPEAKEASY_RECORDS = ["registry_access", "file_access", "network_events.traffic", "apis"]
 
 SPEAKEASY_RECORD_LIMITS = {"network_events.traffic": 256}
 

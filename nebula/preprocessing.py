@@ -6,6 +6,7 @@ from copy import deepcopy
 from collections import Counter
 from collections.abc import Iterable
 from nltk import WhitespaceTokenizer
+from tqdm import tqdm
 from nebula.constants import *
 
 
@@ -56,7 +57,7 @@ class JSONTokenizer(object):
     # methods related to vocab
     def buildVocab(self, tokenListSequence, vocabSize=10000):
         counter = Counter()
-        for tokenList in tokenListSequence:
+        for tokenList in tqdm(tokenListSequence):
             counter.update(tokenList)
         
         idx = len(self.specialTokens)

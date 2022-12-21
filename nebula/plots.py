@@ -19,7 +19,8 @@ def tSneReductionTo3D(arr):
     return tsne_results
 
 def plotCounterCountsLineplot(
-        counter, xlim=None,
+        counter, 
+        xlim=None,
         mostCommon=None, 
         outfile=None,
         figSize=(12,8)
