@@ -1,8 +1,10 @@
 import os
 import time
-import pickle
+import logging
 import orjson
+import json
 import numpy as np
+from tqdm import tqdm
 
 import sys
 sys.path.extend([".", ".."])
@@ -15,11 +17,13 @@ from nebula import PEDynamicFeatureExtractor, JSONTokenizer
 
 SPEAKEASY_CONFIG = r"C:\Users\dtrizna\Code\nebula\emulation\_speakeasyConfig.json"
 
-SPEAKEASY_RECORDS = ["apis", "registry_access", "file_access", 'network_events.traffic']
+SPEAKEASY_RECORDS = ["registry_access", "file_access", "network_events.traffic", "apis"]
 
-SPEAKEASY_RECORD_SUBFILTER = {'apis': ['api_name', 'ret_val'],
-                                    'file_access': ['event', 'path'],
-                                    'network_events.traffic': ['server', 'port']}
+SPEAKEASY_RECORD_SUBFILTER = {
+                                'apis': ['api_name', 'ret_val'],
+                                'file_access': ['event', 'path'],
+                                'network_events.traffic': ['server', 'port']
+                            }
 
 SPEAKEASY_RECORD_LIMITS = {"network_events.traffic": 256}
 
@@ -29,10 +33,8 @@ JSON_CLEANUP_SYMBOLS = ['"', "'", ":", ",", "[", "]", "{", "}", "\\", "/"]
 
 SPEAKEASY_TOKEN_STOPWORDS = flattenList([SPEAKEASY_RECORD_SUBFILTER[x] for x in SPEAKEASY_RECORD_SUBFILTER])
 
-# ENCODING PARAMETERS AND DATA PATHS
-
-VOCAB_SIZE = 1500
-MAX_SEQ_LEN = 2048
+VOCAB_SIZES = [500, 1500, 1000, 2000]
+MAX_SEQ_LENGTHS = [512, 1024, 2048]
 
 SCRIPT_PATH = getRealPath(type="script")
 
@@ -43,7 +45,7 @@ BENIGN_FOLDERS = ["report_clean", "report_windows_syswow64"]
 
 # =========================
 
-def main(limit=None):
+def main(limit=None, mode="run", y=True):
 
     extractor = PEDynamicFeatureExtractor(
         speakeasyConfig=SPEAKEASY_CONFIG,
@@ -58,61 +60,116 @@ def main(limit=None):
         stopwords=SPEAKEASY_TOKEN_STOPWORDS
     )
 
+    # === PARSING PE FILES ===
+
     # for PE path or PE bytes you can use
     #jsonEventRecords = extractor.emulate(path=path)
     #jsonEventRecords = extractor.emulate(data=bytez)
 
     # for JSON report use ('entry_points' only)
     parserFunction = extractor.parseReportEntryPoints
+    # jsonEventRecords = parserFunction(entryPoints)
+
+    # === TOKENIZATION FUNCTIONS ===
 
     tokenizerFunction = tokenizer.tokenize
     encodingFunction = tokenizer.convertTokenListToIds
 
-    print("Initialized ...")
+    # ==== ACTUAL PROCESSING ====
 
-    subFoldersTrain = [os.path.join(EMULATION_TRAINSET_PATH, x) for x in os.listdir(EMULATION_TRAINSET_PATH) if x.startswith("report_")]
+    logging.warning("Initialized ...")
+
     trainOutFolder = SCRIPT_PATH + r"\data\data_filtered\speakeasy_trainset"
     os.makedirs(trainOutFolder, exist_ok=True)
-    folderReader(
-        subFoldersTrain, 
-        trainOutFolder, 
-        parserFunction, 
-        tokenizerFunction, 
-        encodingFunction, 
-        limit=limit, 
-        mode="train", 
-        tokenizer=tokenizer)
-
-    subFoldersTest = [os.path.join(EMULATION_TESTSET_PATH, x) for x in os.listdir(EMULATION_TESTSET_PATH) if x.startswith("report_")]
     testOutFolder = SCRIPT_PATH + r"\data\data_filtered\speakeasy_testset"
     os.makedirs(testOutFolder, exist_ok=True)
-    folderReader(
-        subFoldersTest, 
-        testOutFolder, 
-        parserFunction, 
-        tokenizerFunction, 
-        encodingFunction, 
-        limit=limit, 
-        mode="test", 
-        tokenizer=tokenizer)
-
-def folderReader(subFolders, outFolder, parserFunction, tokenizerFunction, encodingFunction, limit=None, mode=None, tokenizer=None):
-    if not mode in ["train", "test"] or not tokenizer:
-        raise Exception("Invalid arguments -- mode or tokenizer or extractor")
     
+    if mode == "run":
+        subFoldersTrain = [os.path.join(EMULATION_TRAINSET_PATH, x) for x in os.listdir(EMULATION_TRAINSET_PATH) if x.startswith("report_")]
+        eventsTrain, yTrain = readAndFilterFolders(
+            subFoldersTrain, 
+            parserFunction, 
+            limit=limit)
+
+        subFoldersTest = [os.path.join(EMULATION_TESTSET_PATH, x) for x in os.listdir(EMULATION_TESTSET_PATH) if x.startswith("report_")]
+        eventsTest, yTest = readAndFilterFolders(
+            subFoldersTest,  
+            parserFunction, 
+            limit=limit)
+
+        timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+        logging.warning(f"{timenow}: Tokenizing...")
+        eventsTokenizedTrain = tokenizerFunction(eventsTrain)
+        eventsTokenizedTest = tokenizerFunction(eventsTest)
+
+        with open(f"{trainOutFolder}\\speakeasy_tokenized.json", "w") as f:
+            json.dump(eventsTokenizedTrain, f, indent=4)
+        with open(f"{testOutFolder}\\speakeasy_tokenized.json", "w") as f:
+            json.dump(eventsTokenizedTest, f, indent=4)
+
+        timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+        logging.warning(f"{timenow}: Dumped tokenized files to {trainOutFolder} and {testOutFolder}")
+
+    elif mode == "load":
+        with open(f"{trainOutFolder}\\speakeasy_tokenized.json", "r") as f:
+            eventsTokenizedTrain = json.load(f)
+        with open(f"{testOutFolder}\\speakeasy_tokenized.json", "r") as f:
+            eventsTokenizedTest = json.load(f)
+
+    for vocabSize in VOCAB_SIZES:
+        for maxSeqLen in MAX_SEQ_LENGTHS:
+            # if maxSeqLen < 2048:
+            #     SPEAKEASY_RECORD_LIMITS = {"network_events.traffic": 256, 'apis': 256}
+            # else:
+            #     SPEAKEASY_RECORD_LIMITS = {"network_events.traffic": 256}
+                
+            timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+            logging.warning(f"{timenow}: Starting Preprocessing: VocabSize: {vocabSize}, MaxSeqLen: {maxSeqLen}")
+
+            buildVocab(eventsTokenizedTrain, tokenizer, vocabSize=vocabSize, outFolder=trainOutFolder)
+
+            timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+            logging.warning(f"{timenow}: Encoding...")
+            eventsEncodedTrain = encodingFunction(eventsTokenizedTrain)
+            eventsEncodedTest = encodingFunction(eventsTokenizedTest)
+            
+            timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+            logging.warning(f"{timenow}: Padding...")
+            eventsEncodedPaddedTrain = tokenizer.padSequenceList(eventsEncodedTrain, maxLen=maxSeqLen)
+            eventsEncodedPaddedTest = tokenizer.padSequenceList(eventsEncodedTest, maxLen=maxSeqLen)
+            
+
+            timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+            logging.warning(f"{timenow}: Saving files with prefix: speakeasy_VocabSize_{vocabSize}_maxLen_{maxSeqLen}")
+            np.save(f"{trainOutFolder}\\speakeasy_VocabSize_{vocabSize}_maxLen_{maxSeqLen}_x.npy", eventsEncodedPaddedTrain)
+            np.save(f"{testOutFolder}\\speakeasy_VocabSize_{vocabSize}_maxLen_{maxSeqLen}_x.npy", eventsEncodedPaddedTest)
+            
+            if y:
+                yTrain = np.array(yTrain, dtype=np.int8)
+                yTest = np.array(yTest, dtype=np.int8)
+                np.save(f"{trainOutFolder}\\speakeasy_VocabSize_{vocabSize}_maxLen_{maxSeqLen}_y.npy", yTrain)
+                np.save(f"{testOutFolder}\\speakeasy_VocabSize_{vocabSize}_maxLen_{maxSeqLen}_y.npy", yTest)
+
+
+def buildVocab(eventsTokenized, tokenizer, vocabSize, outFolder):
+    
+    timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+    logging.warning(f"{timenow}: Building vocab with vocab size: {vocabSize}...")
+    tokenizer.buildVocab(eventsTokenized, vocabSize=vocabSize)
+    dumpTokenizerFiles(tokenizer, outFolder, vocabSize)
+
+
+def readAndFilterFolders(subFolders, parserFunction, limit=None):
     events = []
     y = []
     for subFolder in subFolders:
 
         timenowStart = time.time()
         timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-        print(f"{timenow}: Filtering and normalizing {subFolder.strip()}...")
+        logging.warning(f"{timenow}: Filtering and normalizing {subFolder.strip()}...")
 
         files = [os.path.join(subFolder,x) for x in os.listdir(subFolder)[:limit] if x.endswith(".json")]
-        l = len(files)
-        for i,file in enumerate(files):
-            print(f"{subFolder:>20}: {i+1}/{l} {' '*30}".strip(), end="\r")
-            
+        for file in tqdm(files):
             with open(file, "r") as f:
                 entryPoints = orjson.loads(f.read())
 
@@ -126,30 +183,23 @@ def folderReader(subFolders, outFolder, parserFunction, tokenizerFunction, encod
             
         timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
         timenowEnd = time.time()
-        print(f"{timenow}: Finished... Took: {timenowEnd - timenowStart:.2f}s", " "*100)
-
-    timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-    print(f"{timenow}: Tokenizing...")
-    eventsTokenized = tokenizerFunction(events)
-
-    if mode == "train":
-        timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-        print(f"{timenow}: Building vocab...")
-        tokenizer.buildVocab(eventsTokenized, vocabSize=VOCAB_SIZE)
-        dumpTokenizerFiles(tokenizer, outFolder, VOCAB_SIZE)
-
-    timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-    print(f"{timenow}: Encoding...")
-    eventsEncoded = encodingFunction(eventsTokenized)
+        logging.warning(f"{timenow}: Finished... Took: {timenowEnd - timenowStart:.2f}s")
+    return events, y
     
-    timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-    print(f"{timenow}: Padding...")
-    eventsEncodedPadded = tokenizer.padSequenceList(eventsEncoded, maxLen=MAX_SEQ_LEN)
-    y = np.array(y, dtype=np.int8)
-    print(eventsEncodedPadded.shape)
-    print(y.shape)
-    np.save(f"{outFolder}\\speakeasy_VocabSize_{VOCAB_SIZE}_maxLen_{MAX_SEQ_LEN}.npy", eventsEncodedPadded)
-    np.save(f"{outFolder}\\speakeasy_VocabSize_{VOCAB_SIZE}_maxLen_{MAX_SEQ_LEN}_y.npy", y)
 
 if __name__ == "__main__":
+
+    outputRootFolder = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_parsing_logs"
+    outputFolder = os.path.join(outputRootFolder)
+    os.makedirs(outputFolder, exist_ok=True)
+
+    logFile = f"PreProcessing_{int(time.time())}.log"
+
+    if logFile:
+        logging.basicConfig(filename=os.path.join(outputFolder, logFile), level=logging.WARNING)
+        logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+
+    # ===============
+
+    #main(limit=None, mode="load", y=False)
     main()
