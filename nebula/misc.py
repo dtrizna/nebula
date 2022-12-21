@@ -1,5 +1,6 @@
 import os
 import sys
+import logging
 from pandas import to_datetime
 from collections.abc import Iterable
 from .plots import plotCounterCountsLineplot
@@ -43,16 +44,16 @@ def dumpTokenizerFiles(tokenizer, outFolder, vocabSize=""):
     import pickle
     file = f"{outFolder}\\speakeasy_VocabSize_{vocabSize}.pkl"
     tokenizer.dumpVocab(file)
-    print("Dumped vocab to {}".format(file))
+    logging.warning("Dumped vocab to {}".format(file))
     
     file = f"{outFolder}\\speakeasy_counter.pkl"
-    print("Dumped vocab counter to {}".format(file))
+    logging.warning("Dumped vocab counter to {}".format(file))
     with open(file, "wb") as f:
         pickle.dump(tokenizer.counter, f)
 
     file = f"{outFolder}\\speakeasy_counter_plot.png"
-    plotCounterCountsLineplot(tokenizer.counter, file)
-    print("Dumped vocab counter plot to {}".format(file))
+    plotCounterCountsLineplot(tokenizer.counter, outfile=file)
+    logging.warning("Dumped vocab counter plot to {}".format(file))
 
 def isolationForestAnomalyDetctions(arr):
     from sklearn.ensemble import IsolationForest

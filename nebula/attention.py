@@ -5,6 +5,7 @@ import torch
 from torch import nn, Tensor
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
 
+from reformer_pytorch import LSHAttention
 
 class TransformerEncoderModel(nn.Module):
 
@@ -104,3 +105,52 @@ class PositionalEncoding(nn.Module):
         """
         x = x + self.pe[:x.size(0)]
         return self.dropout(x)
+
+
+import torch
+import torch.nn as nn
+
+class Reformer(nn.Module):
+  def __init__(self, input_size, hidden_size, num_layers, num_heads, lsh_depth, num_buckets, max_seq_len, causal=False, num_classes=None, dropout=0.1):
+    super(Reformer, self).__init__()
+
+    self.input_size = input_size
+    self.hidden_size = hidden_size
+    self.num_layers = num_layers
+    self.num_heads = num_heads
+    self.lsh_depth = lsh_depth
+    self.num_buckets = num_buckets
+    self.causal = causal
+    self.num_classes = num_classes
+    self.dropout = dropout
+    self.max_seq_len = max_seq_len
+
+    self.lsh_attention = LSHAttention(input_size, hidden_size, num_heads, lsh_depth, num_buckets, dropout=dropout)
+    self.layer_norm = nn.LayerNorm(hidden_size)
+    self.ffn = nn.Sequential(
+      nn.Linear(hidden_size, 4 * hidden_size),
+      nn.ReLU(),
+      nn.Linear(4 * hidden_size, hidden_size)
+    )
+
+    self.position_embedding = nn.Parameter(torch.Tensor(self.max_seq_len, hidden_size))
+    nn.init.normal_(self.position_embedding)
+
+    self.output_projection = nn.Linear(hidden_size, num_classes) if num_classes is not None else None
+
+  def forward(self, input_tensor, input_mask=None):
+    batch_size, seq_len, input_size = input_tensor.size()
+
+    position_embedding = self.position_embedding[:seq_len]
+    input_tensor = input_tensor + position_embedding
+
+    for i in range(self.num_layers):
+      input_tensor = self.lsh_attention(input_tensor, input_mask=input_mask)
+      input_tensor = self.layer_norm(input_tensor)
+      input_tensor = self.ffn(input_tensor)
+      input_tensor = self.layer_norm(input_tensor)
+
+    if self.output_projection is not None:
+      input_tensor = self.output_projection(input_tensor)
+
+    return input_tensor
