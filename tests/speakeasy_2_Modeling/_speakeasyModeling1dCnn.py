@@ -3,7 +3,7 @@ import torch
 import pickle
 import sys
 sys.path.extend(['..', '.'])
-from nebula.models import Cnn1DLinear, ModelAPI
+from nebula.models import Cnn1DLinear, ModelInterface
 
 from sklearn.utils import shuffle
 
@@ -45,7 +45,7 @@ print("Testset size: ", len(x_test))
 model = Cnn1DLinear(vocabSize=VOCAB_SIZE)
 lossFunction = torch.nn.BCEWithLogitsLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-trainer = ModelAPI(device, model, lossFunction, optimizer, outputFolder=outFolder, verbosityBatches=verbosity)
+trainer = ModelInterface(device, model, lossFunction, optimizer, outputFolder=outFolder, verbosityBatches=verbosity)
 
 # ===============
 print("Training...")
