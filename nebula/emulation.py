@@ -84,6 +84,7 @@ class PEDynamicFeatureExtractor(object):
         # normalize
         recordDict['network_events.traffic'] = normalizeTableIP(recordDict['network_events.traffic'], col='server')
         recordDict['file_access'] = normalizeTablePath(recordDict['file_access'], col='path')
+        # replace return values with <ret_val> if not in whitelist
         retValMask = recordDict['apis']['ret_val'].isin(self.returnValues)
         recordDict['apis']['ret_val'][~retValMask] = "<ret_val>"
         

@@ -12,6 +12,8 @@ from nebula.misc import getRealPath, flattenList
 from nebula.misc import dumpTokenizerFiles
 from nebula import PEDynamicFeatureExtractor, JSONTokenizer
 
+OUTFOLDER_SUFFIX = "_TEST" # ""
+
 # PREPROCESSING CONFIG AS DEFINED IN nebula.constants
 # from nebula.constants import *
 
@@ -79,9 +81,9 @@ def main(limit=None, mode="run", y=True):
 
     logging.warning("Initialized ...")
 
-    trainOutFolder = SCRIPT_PATH + r"\data\data_filtered\speakeasy_trainset"
+    trainOutFolder = SCRIPT_PATH + rf"\data\data_filtered\speakeasy_trainset{OUTFOLDER_SUFFIX}"
     os.makedirs(trainOutFolder, exist_ok=True)
-    testOutFolder = SCRIPT_PATH + r"\data\data_filtered\speakeasy_testset"
+    testOutFolder = SCRIPT_PATH + rf"\data\data_filtered\speakeasy_testset{OUTFOLDER_SUFFIX}"
     os.makedirs(testOutFolder, exist_ok=True)
     
     if mode == "run":
