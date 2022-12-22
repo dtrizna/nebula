@@ -12,18 +12,19 @@ from sklearn.metrics import f1_score, accuracy_score
 import logging
 
 
-class ModelAPI(object):
+class ModelInterface(object):
     def __init__(self, 
                     device, 
                     model,
                     lossFunction,
-                    optimizer,
+                    optimizerClass,
+                    optimizerConfig,
                     batchSize=64,
                     verbosityBatches = 100,
                     outputFolder=None,
                     stateDict = None):
         self.model = model
-        self.optimizer = optimizer
+        self.optimizer = optimizerClass(self.model.parameters(), **optimizerConfig)
         self.lossFunction = lossFunction
         self.verbosityBatches = verbosityBatches
         self.batchSize = batchSize
