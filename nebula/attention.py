@@ -10,11 +10,11 @@ from reformer_pytorch import LSHAttention
 class TransformerEncoderModel(nn.Module):
 
     def __init__(self, 
-                    nTokens: int, # size of vocabulary
-                    dModel: int, # embedding & transformer dimension
-                    nHeads: int, # number of heads in nn.MultiheadAttention
-                    dHidden: int, # dimension of the feedforward network model in nn.TransformerEncoder
-                    nLayers: int, # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+                    vocabSize: int, # size of vocabulary
+                    dModel: int = 32, # embedding & transformer dimension
+                    nHeads: int = 8, # number of heads in nn.MultiheadAttention
+                    dHidden: int = 200, # dimension of the feedforward network model in nn.TransformerEncoder
+                    nLayers: int = 2, # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
                     numClasses: int = 1, # 1 ==> binary classification 
                     hiddenNeurons: list = [32], # decoder's classifier FFNN complexity
                     layerNorm: bool = False, # whether to normalize decoder's FFNN layers
@@ -22,7 +22,7 @@ class TransformerEncoderModel(nn.Module):
         super().__init__()
         assert dModel % nHeads == 0, "nheads must divide evenly into d_model"
         self.__name__ = 'Transformer'
-        self.encoder = nn.Embedding(nTokens, dModel)
+        self.encoder = nn.Embedding(vocabSize, dModel)
         self.pos_encoder = PositionalEncoding(dModel, dropout)
         encoder_layers = TransformerEncoderLayer(dModel, nHeads, dHidden, dropout)
         self.transformer_encoder = TransformerEncoder(encoder_layers, nLayers)

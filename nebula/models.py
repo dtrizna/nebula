@@ -1,184 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
 import numpy as np
-import time
-import os
-import pickle
-
-from sklearn.metrics import f1_score, accuracy_score
-#from .evaluation import get_tpr_at_fpr
-import logging
-
-
-class ModelInterface(object):
-    def __init__(self, 
-                    device, 
-                    model,
-                    lossFunction,
-                    optimizerClass,
-                    optimizerConfig,
-                    batchSize=64,
-                    verbosityBatches = 100,
-                    outputFolder=None,
-                    stateDict = None):
-        self.model = model
-        self.optimizer = optimizerClass(self.model.parameters(), **optimizerConfig)
-        self.lossFunction = lossFunction
-        self.verbosityBatches = verbosityBatches
-        self.batchSize = batchSize
-
-        self.device = device
-        self.model.to(self.device)
-
-        self.outputFolder = outputFolder
-        if stateDict:
-            self.model.load_state_dict(torch.load(stateDict))
-
-    def loadState(self, stateDict):
-        self.model.load_state_dict(torch.load(stateDict))
-
-    def dumpResults(self):
-        prefix = os.path.join(self.outputFolder, f"trainingFiles_{int(time.time())}")
-        os.makedirs(self.outputFolder, exist_ok=True)
-
-        modelFile = f"{prefix}-model.torch"
-        torch.save(self.model.state_dict(), modelFile)
-
-        with open(f"{prefix}-trainLosses.pickle", "wb") as f:
-            pickle.dump(self.trainLosses, f)
-        
-        # in form [accuracy, f1-score]
-        np.save(f"{prefix}-trainMetrics.npy", self.trainMetrics)
-        
-        with open(f"{prefix}-trainingTime.pickle", "wb") as f:
-            pickle.dump(self.trainingTime, f)
-
-        dumpString = f"""
-        [!] {time.ctime()}: Dumped results:
-                model: {modelFile}
-                train loss list: {prefix}-train_losses.pickle
-                train metrics : {prefix}-train_metrics.pickle
-                duration: {prefix}-duration.pickle"""
-        logging.warning(dumpString)
-
-    def trainEpoch(self, trainLoader, epochId):
-        trainMetrics = []
-        trainLoss = []
-        now = time.time()
-
-        for batchIdx, (data, target) in enumerate(trainLoader):
-            data, target = data.to(self.device), target.to(self.device)
-            self.optimizer.zero_grad()
-
-            logits = self.model(data)
-            loss = self.lossFunction(logits, target.reshape(-1,1))
-
-            trainLoss.append(loss.item())
-
-            loss.backward() # derivatives
-            self.optimizer.step() # parameter update  
-
-            predProbs = torch.sigmoid(logits).clone().detach().cpu().numpy()
-            preds = (predProbs > 0.5).astype(np.int_)
-
-            # might be expensive to compute every batch?
-            # tpr = get_tpr_at_fpr(predProbs, target.cpu().numpy(), 0.1)
-            accuracy = accuracy_score(target.cpu(), preds)
-            f1 = f1_score(target.cpu(), preds)
-            trainMetrics.append([accuracy, f1])
-            
-            if batchIdx % self.verbosityBatches == 0:
-                logging.warning(" [*] {}: Train Epoch: {} [{:^5}/{:^5} ({:^2.0f}%)]\tLoss: {:.6f} | F1-score: {:.2f} | Elapsed: {:.2f}s".format(
-                    time.ctime(), epochId, batchIdx * len(data), len(trainLoader.dataset),
-                100. * batchIdx / len(trainLoader), loss.item(), np.mean([x[1] for x in trainMetrics]), time.time()-now))
-                now = time.time()
-        
-        trainMetrics = np.array(trainMetrics).mean(axis=0).reshape(-1,2)
-        return trainLoss, trainMetrics
-
-
-    def fit(self, X, y, epochs=10):
-        trainLoader = torch.utils.data.DataLoader(
-            torch.utils.data.TensorDataset(torch.from_numpy(X).long(), torch.from_numpy(y).float()),
-            batch_size=self.batchSize,
-            shuffle=True
-        )
-        
-        self.model.train()
-        
-        self.trainLosses = []
-        self.trainMetrics = []
-        self.trainingTime = []
-        try:
-            for epochIdx in range(1, epochs + 1):
-                epochStartTime = time.time()
-                logging.warning(f" [*] Started epoch: {epochIdx}")
-
-                epochTrainLoss, epochTrainMetric = self.trainEpoch(trainLoader, epochIdx)
-                self.trainLosses.extend(epochTrainLoss)
-                self.trainMetrics.append(epochTrainMetric)
-
-                timeElapsed = time.time() - epochStartTime
-                self.trainingTime.append(timeElapsed)
-                logging.warning(f" [*] {time.ctime()}: {epochIdx:^7} | Tr.loss: {np.mean(epochTrainLoss):.6f} | Tr.F1.: {np.mean([x[1] for x in epochTrainMetric]):^9.2f} | {timeElapsed:^9.2f}s")
-            if self.outputFolder:
-                self.dumpResults()
-        except KeyboardInterrupt:
-            if self.outputFolder:
-                self.dumpResults()
-
-    def evaluate(self, X, y):
-        testLoader = torch.utils.data.DataLoader(
-            torch.utils.data.TensorDataset(torch.from_numpy(X).long(), torch.from_numpy(y).float()),
-            batch_size=self.batchSize,
-            shuffle=True
-        )
-        self.model.eval()
-
-        self.testLoss = []
-        self.testMetrics = []
-        for data, target in testLoader:
-            data, target = data.to(self.device), target.to(self.device)
-
-            with torch.no_grad():
-                logits = self.model(data)
-
-            loss = self.lossFunction(logits, target.float().reshape(-1,1))
-            self.testLoss.append(loss.item())
-
-            predProbs = torch.sigmoid(logits).clone().detach().cpu().numpy()
-            preds = (predProbs > 0.5).astype(np.int_)
-            accuracy = accuracy_score(target.cpu(), preds)
-            f1 = f1_score(target.cpu(), preds)
-            self.testMetrics.append([accuracy, f1])
-
-        self.testMetrics = np.array(self.testMetrics).mean(axis=0).reshape(-1,2)
-        return self.testLoss, self.testMetrics
-
-    def predict_proba(self, arr):
-        out = torch.empty((0,1)).to(self.device)
-        loader = torch.utils.data.DataLoader(
-            torch.utils.data.TensorDataset(torch.from_numpy(arr).long()),
-            batch_size=self.batchSize,
-            shuffle=False
-        )
-
-        self.model.eval()
-        for data in loader:
-            with torch.no_grad():
-                logits = self.model(torch.Tensor(data[0]).long().to(self.device))
-                out = torch.vstack([out, logits])
-        
-        return torch.sigmoid(out).clone().detach().cpu().numpy()
-    
-    def predict(self, arr, threshold=0.5):
-        self.model.eval()
-        with torch.no_grad():
-            logits = self.model.predict_proba(arr)
-        return (logits > threshold).astype(np.int_)
-
 
 class Cnn1DLinear(nn.Module):
     def __init__(self, 
@@ -190,6 +13,7 @@ class Cnn1DLinear(nn.Module):
                 filterSizes = [2, 3, 4, 5],
                 numFilters = [128, 128, 128, 128],
                 batchNormConv = False,
+                convPadding = 0, # default
                 # ffnn params
                 hiddenNeurons = [256, 128],
                 batchNormFFNN = False,
@@ -215,7 +39,10 @@ class Cnn1DLinear(nn.Module):
                 else:
                     module = nn.Conv1d(in_channels=embeddingDim,
                                     out_channels=numFilters[i],
-                                    kernel_size=filterSizes[i])
+                                    kernel_size=filterSizes[i],
+                                    #padding=filterSizes[i]//2
+                                    padding=convPadding
+                                )
                 self.conv1dModule.append(module)
         convOut = np.sum(numFilters)
         
@@ -253,3 +80,63 @@ class Cnn1DLinear(nn.Module):
         x_fc = self.ffnn(torch.cat(x_conv, dim=1))
         out = self.fcOutput(x_fc)
         return out
+
+
+class Cnn1DLSTM(nn.Module):
+    def __init__(self, 
+                    vocabSize = None, 
+                    embeddingDim = 64,
+                    hiddenDim = 128,
+                    cnnFilterSizes = [2,3,4,5],
+                    lstmLayers = 1,
+                    convPadding = 0, # default
+                    bidirectionalLSTM = True,
+                    outputDim = 1): # binary classification
+        super(Cnn1DLSTM, self).__init__()
+
+        self.embedding = nn.Embedding(vocabSize, embeddingDim)
+        # convPadding = k//2 # if k%2==1 else k//2-1 -- evaluate different padding!
+        self.convs = nn.ModuleList([nn.Conv1d(embeddingDim, hiddenDim, kernel_size=k, padding=convPadding) for k in cnnFilterSizes])
+        self.lstm = nn.LSTM(len(cnnFilterSizes) * hiddenDim, hiddenDim, lstmLayers, bidirectional=bidirectionalLSTM)
+        self.linear = nn.Linear(hiddenDim * 2 if bidirectionalLSTM else hiddenDim, outputDim)
+        
+    def forward(self, input, hidden=None):
+        # input is of shape (batch_size, sequence_length)
+        embedded = self.embedding(input)
+        # embedded is of shape (batch_size, sequence_length, embedding_size)
+        convolved = [conv(embedded.permute(0, 2, 1)).permute(0, 2, 1) for conv in self.convs]
+        # each element in convolved is of shape (batch_size, sequence_length, hidden_size)
+        concatenated = torch.cat(convolved, dim=2)
+        # concatenated is of shape (batch_size, sequence_length, hidden_size * len(kernel_sizes))
+        output, hidden = self.lstm(concatenated, hidden)
+        # output is of shape (batch_size, sequence_length, hidden_size * 2 if bidirectional else hidden_size)
+        logits = self.linear(output)
+        # logits is of shape (batch_size, sequence_length, output_size)
+        logits = logits.mean(dim=1)
+        # logits is now of shape (batch_size, output_size)
+        return logits
+
+
+class LSTM(nn.Module):
+    def __init__(self, 
+                    vocabSize = None, 
+                    embeddingDim = 64, 
+                    hiddenDim = 128, 
+                    lstmLayers = 1,
+                    bidirectionalLSTM = True,
+                    outputDim = 1):
+        super(LSTM, self).__init__()
+
+        self.embedding = nn.Embedding(vocabSize, embeddingDim)
+        self.lstm = nn.LSTM(embeddingDim, hiddenDim, lstmLayers, bidirectional=bidirectionalLSTM)
+        self.linear = nn.Linear(hiddenDim * 2 if bidirectionalLSTM else hiddenDim, outputDim)
+        
+    def forward(self, input, hidden=None):
+        # input is of shape (batch_size, sequence_length)
+        embedded = self.embedding(input)
+        # embedded is of shape (batch_size, sequence_length, embedding_size)
+        output, hidden = self.lstm(embedded, hidden)
+        # output is of shape (batch_size, sequence_length, hidden_size * 2 if bidirectional else hidden_size)
+        logits = self.linear(output).mean(dim=1)
+        return logits
+
