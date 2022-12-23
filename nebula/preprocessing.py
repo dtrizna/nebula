@@ -8,7 +8,7 @@ from collections.abc import Iterable
 from nltk import WhitespaceTokenizer
 from tqdm import tqdm
 from nebula.constants import *
-
+from nebula.plots import plotCounterCountsLineplot
 
 class JSONTokenizer(object):
     def __init__(self, 
@@ -138,3 +138,17 @@ class JSONTokenizer(object):
             return decodedSequence
         else:
             raise Exception("detokenize(): " + self.vocabError)
+
+    def dumpTokenizerFiles(self, outFolder):
+        file = f"{outFolder}\\speakeasy_VocabSize_{self.vocabSize}.pkl"
+        self.dumpVocab(file)
+        logging.warning("Dumped vocab to {}".format(file))
+        
+        file = f"{outFolder}\\speakeasy_counter.pkl"
+        logging.warning("Dumped vocab counter to {}".format(file))
+        with open(file, "wb") as f:
+            pickle.dump(self.counter, f)
+
+        file = f"{outFolder}\\speakeasy_counter_plot.png"
+        plotCounterCountsLineplot(self.counter, outfile=file)
+        logging.warning("Dumped vocab counter plot to {}".format(file))

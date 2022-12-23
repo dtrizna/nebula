@@ -16,7 +16,7 @@ class TransformerEncoderModel(nn.Module):
                     dHidden: int = 200, # dimension of the feedforward network model in nn.TransformerEncoder
                     nLayers: int = 2, # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
                     numClasses: int = 1, # 1 ==> binary classification 
-                    hiddenNeurons: list = [32], # decoder's classifier FFNN complexity
+                    hiddenNeurons: list = [64], # decoder's classifier FFNN complexity
                     layerNorm: bool = False, # whether to normalize decoder's FFNN layers
                     dropout: float = 0.5):
         super().__init__()
@@ -107,9 +107,6 @@ class PositionalEncoding(nn.Module):
         return self.dropout(x)
 
 
-import torch
-import torch.nn as nn
-
 class Reformer(nn.Module):
   def __init__(self, input_size, hidden_size, num_layers, num_heads, lsh_depth, num_buckets, max_seq_len, causal=False, num_classes=None, dropout=0.1):
     super(Reformer, self).__init__()
@@ -124,7 +121,7 @@ class Reformer(nn.Module):
     self.num_classes = num_classes
     self.dropout = dropout
     self.max_seq_len = max_seq_len
-
+    # TODO: LSHAAttention is not correctly alligned here
     self.lsh_attention = LSHAttention(input_size, hidden_size, num_heads, lsh_depth, num_buckets, dropout=dropout)
     self.layer_norm = nn.LayerNorm(hidden_size)
     self.ffn = nn.Sequential(

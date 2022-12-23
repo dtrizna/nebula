@@ -6,6 +6,8 @@ import json
 import os
 import logging
 from nebula.misc import dictToString
+import json
+from pandas import DataFrame
 
 class CrossValidation(object):
     def __init__(self,
@@ -24,13 +26,6 @@ class CrossValidation(object):
         self.outputFolderTrainingFiles = os.path.join(self.outputRootFolder, "trainingFiles")
 
         self.metrics = defaultdict(lambda: defaultdict(list))
-
-    @staticmethod
-    def get_tpr_at_fpr(predicted_probs, true_labels, fprNeeded):
-        fpr, tpr, thresholds = roc_curve(true_labels, predicted_probs)
-        tpr_at_fpr = tpr[fpr <= fprNeeded][-1]
-        threshold_at_fpr = thresholds[fpr <= fprNeeded][-1]
-        return tpr_at_fpr, threshold_at_fpr
 
     def run_folds(self, X, y, folds=3, epochs=5, fprValues=[0.0001, 0.001, 0.01, 0.1], random_state=42):
         """
@@ -70,7 +65,7 @@ class CrossValidation(object):
             predicted_probs = modelTrainer.predict_proba(X_test)
 
             for fpr in self.fprValues:
-                tpr, threshold = self.get_tpr_at_fpr(predicted_probs, y_test, fpr)
+                tpr, threshold = get_tpr_at_fpr(predicted_probs, y_test, fpr)
                 f1 = f1_score(y[test_index], predicted_probs >= threshold)
                 self.metrics[fpr]["tpr"].append(tpr)
                 self.metrics[fpr]["f1"].append(f1)
@@ -99,3 +94,56 @@ class CrossValidation(object):
         for fpr in self.fprValues:
             msg += f"\tFPR: {fpr:>6} -- TPR: {self.metrics[fpr]['tpr_avg']:.4f} -- F1: {self.metrics[fpr]['f1_avg']:.4f}\n"
         logging.warning(msg)
+
+def get_tpr_at_fpr(predicted_probs, true_labels, fprNeeded):
+        fpr, tpr, thresholds = roc_curve(true_labels, predicted_probs)
+        tpr_at_fpr = tpr[fpr <= fprNeeded][-1]
+        threshold_at_fpr = thresholds[fpr <= fprNeeded][-1]
+        return tpr_at_fpr, threshold_at_fpr
+
+def readCrossValidationMetricFile(file):
+    with open(file, "r") as f:
+            metrics = json.load(f)
+    cols = ["tpr_avg", "tpr_std", "f1_avg", "f1_std"]
+    dfMetrics = DataFrame(columns=cols)
+    for fpr in metrics:
+        if fpr in ("avg_epoch_time", "epoch_time_avg"):
+            timeValue = metrics[fpr]
+        else:
+            if isinstance(metrics[fpr], dict):
+                tpr_avg = metrics[fpr]["tpr_avg"]
+                tpr_std = np.std(metrics[fpr]["tpr"])
+                f1_avg = metrics[fpr]["f1_avg"]
+                f1_std = np.std(metrics[fpr]["f1"])
+            else:
+                arr = np.array(metrics[fpr]).squeeze()
+                if arr.ndim == 1:
+                    tpr_avg = arr[0]
+                    tpr_std = 0
+                    f1_avg = arr[1]
+                    f1_std = 0
+                elif arr.ndim == 2:
+                    tpr_avg = arr[:, 0].mean()
+                    tpr_std = arr[:, 0].std()
+                    f1_avg = arr[:, 1].mean()
+                    f1_std = arr[:, 1].std()
+            dfMetrics.loc[fpr] = [tpr_avg, tpr_std, f1_avg, f1_std]
+    return dfMetrics, timeValue
+
+def readCrossValidationFolder(folder, diffExtractor, extraFileFilter=None):
+    if extraFileFilter:
+        metricFiles = [x for x in os.listdir(folder) if x.endswith(".json") and extraFileFilter(x)]
+    else:
+        metricFiles = [x for x in os.listdir(folder) if x.endswith(".json")]
+    fileToField = dict(zip(metricFiles, [diffExtractor(x) for x in metricFiles]))
+    # sort fileToFiel based on values
+    fileToField = {k: v for k, v in sorted(fileToField.items(), key=lambda item: int(item[1]))}
+
+    dfDict = dict()
+    timeDict = dict()
+    for file in fileToField:
+        dfMetrics, avgEpochTime = readCrossValidationMetricFile(os.path.join(folder, file))
+        dfDict[fileToField[file]] = dfMetrics
+        timeDict[fileToField[file]] = avgEpochTime
+        
+    return dfDict, timeDict

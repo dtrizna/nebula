@@ -11,9 +11,9 @@ from nebula.models import Cnn1DLinear, Cnn1DLSTM, LSTM
 from nebula.attention import TransformerEncoderModel
 from nebula.evaluation import CrossValidation
 
-runName = f"TransformerHiddenLayers"
-vocabSize = 2000
-maxLen = 512
+runName = f"Cnn1DLSTM_VocabSize_maxLen"
+# vocabSize = 2000
+# maxLen = 512
 
 outputFolder = os.path.join(r"C:\Users\dtrizna\Code\nebula\evaluation\crossValidation", runName)
 os.makedirs(outputFolder, exist_ok=True)
@@ -42,17 +42,30 @@ metricFilePrefix = ""
 #     "batchNormFFNN": False,
 #     "filterSizes": [2, 3, 4, 5]
 # }
-modelClass = TransformerEncoderModel
+# modelClass = TransformerEncoderModel
+# modelArch = {
+#     "vocabSize": vocabSize,  # size of vocabulary
+#     "dModel": 32,  # embedding & transformer dimension
+#     "nHeads": 8,  # number of heads in nn.MultiheadAttention
+#     "dHidden": 128,  # dimension of the feedforward network model in nn.TransformerEncoder
+#     "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+#     "numClasses": 1, # binary classification
+#     "hiddenNeurons": [64],
+#     "layerNorm": False,
+#     "dropout": 0.5
+# }
+
+modelClass = Cnn1DLSTM
 modelArch = {
-    "vocabSize": vocabSize,  # size of vocabulary
-    "dModel": 32,  # embedding & transformer dimension
-    "nHeads": 8,  # number of heads in nn.MultiheadAttention
-    "dHidden": 128,  # dimension of the feedforward network model in nn.TransformerEncoder
-    "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
-    "numClasses": 1, # binary classification
-    "hiddenNeurons": [64],
-    "layerNorm": False,
-    "dropout": 0.5
+    "vocabSize": None,
+    "embeddingDim": 64,
+    "lstmHidden": 128,
+    "lstmLayers": 1,
+    "lstmDropout": 0, # if > 0, need lstmLayers > 1
+    "lstmBidirectional": True,
+    "batchNormConv": False,
+    "hiddenNeurons": [256, 128],
+    "batchNormFFNN": False,
 }
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -69,21 +82,23 @@ modelInterfaceConfig = {
 }
 
 # =============== CROSS-VALIDATION LOOP
-# trainSetPath = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset"
-# trainSetsFiles = sorted([x for x in os.listdir(trainSetPath) if x.endswith("_x.npy")])
-# y_train = np.load(os.path.join(trainSetPath, "speakeasy_y.npy"))
+trainSetPath = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset"
+trainSetsFiles = sorted([x for x in os.listdir(trainSetPath) if x.endswith("_x.npy")])
+y_train = np.load(os.path.join(trainSetPath, "speakeasy_y.npy"))
 
-# for file in trainSetsFiles:
-#     x_train = np.load(os.path.join(trainSetPath, file))
+for file in trainSetsFiles:
+    x_train = np.load(os.path.join(trainSetPath, file))
 
-#     vocabSize = int(file.split("_")[2])
-#     modelArch["vocabSize"] = vocabSize
-#     maxLen = int(file.split("_")[4])
-#     metricFilePrefix = f"maxLen_{maxLen}_"
-#     logging.warning(f" [!] Using vocabSize: {vocabSize} | maxLen: {maxLen}")
+    vocabSize = int(file.split("_")[2])
+    modelArch["vocabSize"] = vocabSize
+    maxLen = int(file.split("_")[4])
+    metricFilePrefix = f"maxLen_{maxLen}_"
+    if maxLen == 1024 and vocabSize == 1000:
+        continue
+    logging.warning(f" [!] Using vocabSize: {vocabSize} | maxLen: {maxLen}")
 
-x_train = np.load(rf"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset\speakeasy_VocabSize_{vocabSize}_maxLen_{maxLen}_x.npy")
-y_train = np.load(r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset\speakeasy_y.npy")
+# x_train = np.load(rf"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset\speakeasy_VocabSize_{vocabSize}_maxLen_{maxLen}_x.npy")
+# y_train = np.load(r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset\speakeasy_y.npy")
 
 # for heads in [2, 4, 8, 16]:
 #     modelArch["nHeads"] = heads
@@ -93,8 +108,8 @@ y_train = np.load(r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_tr
 #     modelArch["dHidden"] = dHidden
 # for nLayers in [1, 2, 4, 8]:
 #     modelArch["nLayers"] = nLayers
-for hiddenLayer in [[32], [64], [128], [32, 16], [64, 32, 16]]:
-    modelArch["hiddenNeurons"] = hiddenLayer
+# for hiddenLayer in [[32], [64], [128], [32, 16], [64, 32, 16]]:
+#     modelArch["hiddenNeurons"] = hiddenLayer
 
     if train_limit:
         x_train, y_train = shuffle(x_train, y_train, random_state=42)
