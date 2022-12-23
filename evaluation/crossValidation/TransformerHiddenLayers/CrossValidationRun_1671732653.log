@@ -50,3 +50,641 @@ WARNING:root: [*] Thu Dec 22 19:13:22 2022: Train Epoch: 1 [6400 /60731 (11%)]	L
 WARNING:root: [*] Thu Dec 22 19:13:27 2022: Train Epoch: 1 [12800/60731 (21%)]	Loss: 0.500091 | F1-score: 0.86 | Elapsed: 4.75s
 WARNING:root: [*] Thu Dec 22 19:13:31 2022: Train Epoch: 1 [19200/60731 (32%)]	Loss: 0.431078 | F1-score: 0.87 | Elapsed: 4.78s
 WARNING:root: [*] Thu Dec 22 19:13:36 2022: Train Epoch: 1 [25600/60731 (42%)]	Loss: 0.592497 | F1-score: 0.87 | Elapsed: 4.74s
+WARNING:root: [*] Thu Dec 22 19:13:41 2022: Train Epoch: 1 [32000/60731 (53%)]	Loss: 0.447272 | F1-score: 0.88 | Elapsed: 4.91s
+WARNING:root: [*] Thu Dec 22 19:13:46 2022: Train Epoch: 1 [38400/60731 (63%)]	Loss: 0.525725 | F1-score: 0.88 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:13:50 2022: Train Epoch: 1 [44800/60731 (74%)]	Loss: 0.396412 | F1-score: 0.88 | Elapsed: 4.73s
+WARNING:root: [*] Thu Dec 22 19:13:55 2022: Train Epoch: 1 [51200/60731 (84%)]	Loss: 0.330568 | F1-score: 0.88 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:14:00 2022: Train Epoch: 1 [57600/60731 (95%)]	Loss: 0.426355 | F1-score: 0.88 | Elapsed: 4.84s
+WARNING:root: [*] Thu Dec 22 19:14:02 2022:    1    | Tr.loss: 0.433679 | Tr.F1.:   0.88    |   45.42  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Thu Dec 22 19:14:02 2022: Train Epoch: 2 [  0  /60731 (0 %)]	Loss: 0.471334 | F1-score: 0.86 | Elapsed: 0.07s
+WARNING:root: [*] Thu Dec 22 19:14:07 2022: Train Epoch: 2 [6400 /60731 (11%)]	Loss: 0.411933 | F1-score: 0.90 | Elapsed: 4.86s
+WARNING:root: [*] Thu Dec 22 19:14:12 2022: Train Epoch: 2 [12800/60731 (21%)]	Loss: 0.402506 | F1-score: 0.90 | Elapsed: 4.84s
+WARNING:root: [*] Thu Dec 22 19:14:17 2022: Train Epoch: 2 [19200/60731 (32%)]	Loss: 0.316526 | F1-score: 0.91 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:14:22 2022: Train Epoch: 2 [25600/60731 (42%)]	Loss: 0.270197 | F1-score: 0.90 | Elapsed: 5.03s
+WARNING:root: [*] Thu Dec 22 19:14:27 2022: Train Epoch: 2 [32000/60731 (53%)]	Loss: 0.387643 | F1-score: 0.91 | Elapsed: 5.01s
+WARNING:root: [*] Thu Dec 22 19:14:32 2022: Train Epoch: 2 [38400/60731 (63%)]	Loss: 0.367991 | F1-score: 0.91 | Elapsed: 5.03s
+WARNING:root: [*] Thu Dec 22 19:14:37 2022: Train Epoch: 2 [44800/60731 (74%)]	Loss: 0.394989 | F1-score: 0.91 | Elapsed: 5.04s
+WARNING:root: [*] Thu Dec 22 19:14:42 2022: Train Epoch: 2 [51200/60731 (84%)]	Loss: 0.266565 | F1-score: 0.91 | Elapsed: 5.03s
+WARNING:root: [*] Thu Dec 22 19:14:47 2022: Train Epoch: 2 [57600/60731 (95%)]	Loss: 0.356039 | F1-score: 0.91 | Elapsed: 4.97s
+WARNING:root: [*] Thu Dec 22 19:14:49 2022:    2    | Tr.loss: 0.341761 | Tr.F1.:   0.91    |   47.05  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Thu Dec 22 19:14:50 2022: Train Epoch: 3 [  0  /60731 (0 %)]	Loss: 0.265268 | F1-score: 0.92 | Elapsed: 0.06s
+WARNING:root: [*] Thu Dec 22 19:14:55 2022: Train Epoch: 3 [6400 /60731 (11%)]	Loss: 0.235402 | F1-score: 0.92 | Elapsed: 4.96s
+WARNING:root: [*] Thu Dec 22 19:15:00 2022: Train Epoch: 3 [12800/60731 (21%)]	Loss: 0.344082 | F1-score: 0.92 | Elapsed: 5.00s
+WARNING:root: [*] Thu Dec 22 19:15:04 2022: Train Epoch: 3 [19200/60731 (32%)]	Loss: 0.252234 | F1-score: 0.92 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:15:09 2022: Train Epoch: 3 [25600/60731 (42%)]	Loss: 0.247788 | F1-score: 0.92 | Elapsed: 4.96s
+WARNING:root: [*] Thu Dec 22 19:15:14 2022: Train Epoch: 3 [32000/60731 (53%)]	Loss: 0.231664 | F1-score: 0.92 | Elapsed: 4.87s
+WARNING:root: [*] Thu Dec 22 19:15:19 2022: Train Epoch: 3 [38400/60731 (63%)]	Loss: 0.300544 | F1-score: 0.92 | Elapsed: 4.92s
+WARNING:root: [*] Thu Dec 22 19:15:24 2022: Train Epoch: 3 [44800/60731 (74%)]	Loss: 0.263447 | F1-score: 0.93 | Elapsed: 4.94s
+WARNING:root: [*] Thu Dec 22 19:15:29 2022: Train Epoch: 3 [51200/60731 (84%)]	Loss: 0.310570 | F1-score: 0.93 | Elapsed: 4.87s
+WARNING:root: [*] Thu Dec 22 19:15:34 2022: Train Epoch: 3 [57600/60731 (95%)]	Loss: 0.298535 | F1-score: 0.93 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:15:36 2022:    3    | Tr.loss: 0.288890 | Tr.F1.:   0.93    |   46.41  s
+WARNING:root:
+        [!] Thu Dec 22 19:15:36 2022: Dumped results:
+                model: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671732936-model.torch
+                train loss list: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671732936-train_losses.pickle
+                train metrics : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671732936-train_metrics.pickle
+                duration: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671732936-duration.pickle
+WARNING:root: [!] Fold 3/3 | Train set size: 60731, Validation set size: 30365
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Thu Dec 22 19:15:42 2022: Train Epoch: 1 [  0  /60731 (0 %)]	Loss: 0.752064 | F1-score: 0.00 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:15:47 2022: Train Epoch: 1 [6400 /60731 (11%)]	Loss: 0.700720 | F1-score: 0.80 | Elapsed: 4.88s
+WARNING:root: [*] Thu Dec 22 19:15:52 2022: Train Epoch: 1 [12800/60731 (21%)]	Loss: 0.497992 | F1-score: 0.83 | Elapsed: 4.83s
+WARNING:root: [*] Thu Dec 22 19:15:57 2022: Train Epoch: 1 [19200/60731 (32%)]	Loss: 0.481383 | F1-score: 0.85 | Elapsed: 4.88s
+WARNING:root: [*] Thu Dec 22 19:16:02 2022: Train Epoch: 1 [25600/60731 (42%)]	Loss: 0.419551 | F1-score: 0.86 | Elapsed: 4.84s
+WARNING:root: [*] Thu Dec 22 19:16:06 2022: Train Epoch: 1 [32000/60731 (53%)]	Loss: 0.294050 | F1-score: 0.87 | Elapsed: 4.83s
+WARNING:root: [*] Thu Dec 22 19:16:11 2022: Train Epoch: 1 [38400/60731 (63%)]	Loss: 0.384884 | F1-score: 0.87 | Elapsed: 4.74s
+WARNING:root: [*] Thu Dec 22 19:16:16 2022: Train Epoch: 1 [44800/60731 (74%)]	Loss: 0.405994 | F1-score: 0.87 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:16:21 2022: Train Epoch: 1 [51200/60731 (84%)]	Loss: 0.358953 | F1-score: 0.87 | Elapsed: 4.86s
+WARNING:root: [*] Thu Dec 22 19:16:26 2022: Train Epoch: 1 [57600/60731 (95%)]	Loss: 0.446118 | F1-score: 0.88 | Elapsed: 4.92s
+WARNING:root: [*] Thu Dec 22 19:16:28 2022:    1    | Tr.loss: 0.454653 | Tr.F1.:   0.88    |   45.99  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Thu Dec 22 19:16:28 2022: Train Epoch: 2 [  0  /60731 (0 %)]	Loss: 0.393966 | F1-score: 0.95 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:16:33 2022: Train Epoch: 2 [6400 /60731 (11%)]	Loss: 0.294213 | F1-score: 0.90 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:16:38 2022: Train Epoch: 2 [12800/60731 (21%)]	Loss: 0.322772 | F1-score: 0.90 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:16:42 2022: Train Epoch: 2 [19200/60731 (32%)]	Loss: 0.421277 | F1-score: 0.90 | Elapsed: 4.73s
+WARNING:root: [*] Thu Dec 22 19:16:47 2022: Train Epoch: 2 [25600/60731 (42%)]	Loss: 0.568897 | F1-score: 0.90 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:16:52 2022: Train Epoch: 2 [32000/60731 (53%)]	Loss: 0.268433 | F1-score: 0.90 | Elapsed: 4.72s
+WARNING:root: [*] Thu Dec 22 19:16:57 2022: Train Epoch: 2 [38400/60731 (63%)]	Loss: 0.426879 | F1-score: 0.90 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:17:01 2022: Train Epoch: 2 [44800/60731 (74%)]	Loss: 0.307065 | F1-score: 0.90 | Elapsed: 4.74s
+WARNING:root: [*] Thu Dec 22 19:17:06 2022: Train Epoch: 2 [51200/60731 (84%)]	Loss: 0.342621 | F1-score: 0.90 | Elapsed: 4.74s
+WARNING:root: [*] Thu Dec 22 19:17:11 2022: Train Epoch: 2 [57600/60731 (95%)]	Loss: 0.356189 | F1-score: 0.91 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:17:13 2022:    2    | Tr.loss: 0.359676 | Tr.F1.:   0.91    |   45.11  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Thu Dec 22 19:17:13 2022: Train Epoch: 3 [  0  /60731 (0 %)]	Loss: 0.386617 | F1-score: 0.91 | Elapsed: 0.06s
+WARNING:root: [*] Thu Dec 22 19:17:18 2022: Train Epoch: 3 [6400 /60731 (11%)]	Loss: 0.265369 | F1-score: 0.92 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:17:23 2022: Train Epoch: 3 [12800/60731 (21%)]	Loss: 0.340164 | F1-score: 0.92 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:17:27 2022: Train Epoch: 3 [19200/60731 (32%)]	Loss: 0.218512 | F1-score: 0.92 | Elapsed: 4.72s
+WARNING:root: [*] Thu Dec 22 19:17:32 2022: Train Epoch: 3 [25600/60731 (42%)]	Loss: 0.340168 | F1-score: 0.92 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:17:37 2022: Train Epoch: 3 [32000/60731 (53%)]	Loss: 0.250171 | F1-score: 0.92 | Elapsed: 4.74s
+WARNING:root: [*] Thu Dec 22 19:17:42 2022: Train Epoch: 3 [38400/60731 (63%)]	Loss: 0.243480 | F1-score: 0.92 | Elapsed: 4.73s
+WARNING:root: [*] Thu Dec 22 19:17:46 2022: Train Epoch: 3 [44800/60731 (74%)]	Loss: 0.334744 | F1-score: 0.92 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:17:51 2022: Train Epoch: 3 [51200/60731 (84%)]	Loss: 0.526584 | F1-score: 0.92 | Elapsed: 4.74s
+WARNING:root: [*] Thu Dec 22 19:17:56 2022: Train Epoch: 3 [57600/60731 (95%)]	Loss: 0.364078 | F1-score: 0.92 | Elapsed: 4.74s
+WARNING:root: [*] Thu Dec 22 19:17:58 2022:    3    | Tr.loss: 0.307498 | Tr.F1.:   0.92    |   45.05  s
+WARNING:root:
+        [!] Thu Dec 22 19:17:58 2022: Dumped results:
+                model: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733078-model.torch
+                train loss list: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733078-train_losses.pickle
+                train metrics : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733078-train_metrics.pickle
+                duration: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733078-duration.pickle
+WARNING:root: [!] Metrics saved to C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\metrics_trainSize_91096_ep_3_cv_3_vocabSize_2000_dModel_32_nHeads_8_dHidden_128_nLayers_2_numClasses_1_hiddenNeurons_32_layerNorm_False_dropout_0.5.json
+WARNING:root: [!] Average epoch time: 45.84s | Mean values over 3 folds:
+	FPR: 0.0001 -- TPR: 0.0049 -- F1: 0.0098
+	FPR:  0.001 -- TPR: 0.0588 -- F1: 0.1109
+	FPR:   0.01 -- TPR: 0.1059 -- F1: 0.1901
+	FPR:    0.1 -- TPR: 0.2944 -- F1: 0.4271
+
+WARNING:root: [!] Using device: cuda:0 | Dataset size: 91096
+WARNING:root: [!] Epochs per fold: 3 | Model config: {'vocabSize': 2000, 'dModel': 32, 'nHeads': 8, 'dHidden': 128, 'nLayers': 2, 'numClasses': 1, 'hiddenNeurons': [64], 'layerNorm': False, 'dropout': 0.5}
+WARNING:root: [!] Fold 1/3 | Train set size: 60730, Validation set size: 30366
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Thu Dec 22 19:18:35 2022: Train Epoch: 1 [  0  /60730 (0 %)]	Loss: 0.702004 | F1-score: 0.48 | Elapsed: 0.24s
+WARNING:root: [*] Thu Dec 22 19:18:39 2022: Train Epoch: 1 [6400 /60730 (11%)]	Loss: 0.632930 | F1-score: 0.84 | Elapsed: 4.84s
+WARNING:root: [*] Thu Dec 22 19:18:44 2022: Train Epoch: 1 [12800/60730 (21%)]	Loss: 0.494939 | F1-score: 0.86 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:18:49 2022: Train Epoch: 1 [19200/60730 (32%)]	Loss: 0.421032 | F1-score: 0.87 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:18:54 2022: Train Epoch: 1 [25600/60730 (42%)]	Loss: 0.417425 | F1-score: 0.88 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:18:59 2022: Train Epoch: 1 [32000/60730 (53%)]	Loss: 0.368083 | F1-score: 0.88 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:19:03 2022: Train Epoch: 1 [38400/60730 (63%)]	Loss: 0.361667 | F1-score: 0.88 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:19:08 2022: Train Epoch: 1 [44800/60730 (74%)]	Loss: 0.389381 | F1-score: 0.88 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:19:13 2022: Train Epoch: 1 [51200/60730 (84%)]	Loss: 0.337072 | F1-score: 0.89 | Elapsed: 4.88s
+WARNING:root: [*] Thu Dec 22 19:19:18 2022: Train Epoch: 1 [57600/60730 (95%)]	Loss: 0.355509 | F1-score: 0.89 | Elapsed: 5.01s
+WARNING:root: [*] Thu Dec 22 19:19:20 2022:    1    | Tr.loss: 0.418803 | Tr.F1.:   0.89    |   46.01  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Thu Dec 22 19:19:20 2022: Train Epoch: 2 [  0  /60730 (0 %)]	Loss: 0.432330 | F1-score: 0.89 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:19:25 2022: Train Epoch: 2 [6400 /60730 (11%)]	Loss: 0.348082 | F1-score: 0.91 | Elapsed: 4.89s
+WARNING:root: [*] Thu Dec 22 19:19:30 2022: Train Epoch: 2 [12800/60730 (21%)]	Loss: 0.291294 | F1-score: 0.91 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:19:35 2022: Train Epoch: 2 [19200/60730 (32%)]	Loss: 0.313826 | F1-score: 0.91 | Elapsed: 5.12s
+WARNING:root: [*] Thu Dec 22 19:19:40 2022: Train Epoch: 2 [25600/60730 (42%)]	Loss: 0.311910 | F1-score: 0.91 | Elapsed: 4.95s
+WARNING:root: [*] Thu Dec 22 19:19:45 2022: Train Epoch: 2 [32000/60730 (53%)]	Loss: 0.334283 | F1-score: 0.91 | Elapsed: 4.90s
+WARNING:root: [*] Thu Dec 22 19:19:50 2022: Train Epoch: 2 [38400/60730 (63%)]	Loss: 0.168301 | F1-score: 0.92 | Elapsed: 4.87s
+WARNING:root: [*] Thu Dec 22 19:19:55 2022: Train Epoch: 2 [44800/60730 (74%)]	Loss: 0.313584 | F1-score: 0.92 | Elapsed: 4.91s
+WARNING:root: [*] Thu Dec 22 19:20:00 2022: Train Epoch: 2 [51200/60730 (84%)]	Loss: 0.327454 | F1-score: 0.92 | Elapsed: 4.86s
+WARNING:root: [*] Thu Dec 22 19:20:04 2022: Train Epoch: 2 [57600/60730 (95%)]	Loss: 0.270561 | F1-score: 0.92 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:20:07 2022:    2    | Tr.loss: 0.308861 | Tr.F1.:   0.92    |   46.39  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Thu Dec 22 19:20:07 2022: Train Epoch: 3 [  0  /60730 (0 %)]	Loss: 0.338830 | F1-score: 0.90 | Elapsed: 0.06s
+WARNING:root: [*] Thu Dec 22 19:20:12 2022: Train Epoch: 3 [6400 /60730 (11%)]	Loss: 0.225555 | F1-score: 0.93 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:20:16 2022: Train Epoch: 3 [12800/60730 (21%)]	Loss: 0.210575 | F1-score: 0.93 | Elapsed: 4.83s
+WARNING:root: [*] Thu Dec 22 19:20:21 2022: Train Epoch: 3 [19200/60730 (32%)]	Loss: 0.307936 | F1-score: 0.93 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:20:26 2022: Train Epoch: 3 [25600/60730 (42%)]	Loss: 0.328975 | F1-score: 0.93 | Elapsed: 4.87s
+WARNING:root: [*] Thu Dec 22 19:20:31 2022: Train Epoch: 3 [32000/60730 (53%)]	Loss: 0.269997 | F1-score: 0.93 | Elapsed: 4.97s
+WARNING:root: [*] Thu Dec 22 19:20:36 2022: Train Epoch: 3 [38400/60730 (63%)]	Loss: 0.328820 | F1-score: 0.93 | Elapsed: 5.00s
+WARNING:root: [*] Thu Dec 22 19:20:41 2022: Train Epoch: 3 [44800/60730 (74%)]	Loss: 0.220048 | F1-score: 0.93 | Elapsed: 4.98s
+WARNING:root: [*] Thu Dec 22 19:20:46 2022: Train Epoch: 3 [51200/60730 (84%)]	Loss: 0.332341 | F1-score: 0.93 | Elapsed: 4.96s
+WARNING:root: [*] Thu Dec 22 19:20:51 2022: Train Epoch: 3 [57600/60730 (95%)]	Loss: 0.263097 | F1-score: 0.94 | Elapsed: 5.23s
+WARNING:root: [*] Thu Dec 22 19:20:54 2022:    3    | Tr.loss: 0.258766 | Tr.F1.:   0.94    |   47.03  s
+WARNING:root:
+        [!] Thu Dec 22 19:20:54 2022: Dumped results:
+                model: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733254-model.torch
+                train loss list: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733254-train_losses.pickle
+                train metrics : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733254-train_metrics.pickle
+                duration: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733254-duration.pickle
+WARNING:root: [!] Fold 2/3 | Train set size: 60731, Validation set size: 30365
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Thu Dec 22 19:21:00 2022: Train Epoch: 1 [  0  /60731 (0 %)]	Loss: 0.686866 | F1-score: 0.60 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:21:05 2022: Train Epoch: 1 [6400 /60731 (11%)]	Loss: 0.471552 | F1-score: 0.84 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:21:10 2022: Train Epoch: 1 [12800/60731 (21%)]	Loss: 0.422609 | F1-score: 0.86 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:21:14 2022: Train Epoch: 1 [19200/60731 (32%)]	Loss: 0.363306 | F1-score: 0.87 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:21:19 2022: Train Epoch: 1 [25600/60731 (42%)]	Loss: 0.373796 | F1-score: 0.88 | Elapsed: 4.87s
+WARNING:root: [*] Thu Dec 22 19:21:24 2022: Train Epoch: 1 [32000/60731 (53%)]	Loss: 0.325784 | F1-score: 0.88 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:21:29 2022: Train Epoch: 1 [38400/60731 (63%)]	Loss: 0.351956 | F1-score: 0.88 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:21:34 2022: Train Epoch: 1 [44800/60731 (74%)]	Loss: 0.377437 | F1-score: 0.89 | Elapsed: 4.74s
+WARNING:root: [*] Thu Dec 22 19:21:38 2022: Train Epoch: 1 [51200/60731 (84%)]	Loss: 0.336321 | F1-score: 0.89 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:21:43 2022: Train Epoch: 1 [57600/60731 (95%)]	Loss: 0.280303 | F1-score: 0.89 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:21:46 2022:    1    | Tr.loss: 0.408653 | Tr.F1.:   0.89    |   45.48  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Thu Dec 22 19:21:46 2022: Train Epoch: 2 [  0  /60731 (0 %)]	Loss: 0.469555 | F1-score: 0.90 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:21:50 2022: Train Epoch: 2 [6400 /60731 (11%)]	Loss: 0.357314 | F1-score: 0.92 | Elapsed: 4.86s
+WARNING:root: [*] Thu Dec 22 19:21:55 2022: Train Epoch: 2 [12800/60731 (21%)]	Loss: 0.307694 | F1-score: 0.92 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:22:00 2022: Train Epoch: 2 [19200/60731 (32%)]	Loss: 0.295211 | F1-score: 0.92 | Elapsed: 4.89s
+WARNING:root: [*] Thu Dec 22 19:22:05 2022: Train Epoch: 2 [25600/60731 (42%)]	Loss: 0.302463 | F1-score: 0.92 | Elapsed: 4.90s
+WARNING:root: [*] Thu Dec 22 19:22:10 2022: Train Epoch: 2 [32000/60731 (53%)]	Loss: 0.224906 | F1-score: 0.92 | Elapsed: 4.83s
+WARNING:root: [*] Thu Dec 22 19:22:15 2022: Train Epoch: 2 [38400/60731 (63%)]	Loss: 0.283784 | F1-score: 0.92 | Elapsed: 4.96s
+WARNING:root: [*] Thu Dec 22 19:22:20 2022: Train Epoch: 2 [44800/60731 (74%)]	Loss: 0.333949 | F1-score: 0.92 | Elapsed: 5.06s
+WARNING:root: [*] Thu Dec 22 19:22:25 2022: Train Epoch: 2 [51200/60731 (84%)]	Loss: 0.298562 | F1-score: 0.92 | Elapsed: 4.89s
+WARNING:root: [*] Thu Dec 22 19:22:30 2022: Train Epoch: 2 [57600/60731 (95%)]	Loss: 0.373049 | F1-score: 0.93 | Elapsed: 4.96s
+WARNING:root: [*] Thu Dec 22 19:22:32 2022:    2    | Tr.loss: 0.292933 | Tr.F1.:   0.93    |   46.59  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Thu Dec 22 19:22:32 2022: Train Epoch: 3 [  0  /60731 (0 %)]	Loss: 0.300989 | F1-score: 0.91 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:22:37 2022: Train Epoch: 3 [6400 /60731 (11%)]	Loss: 0.322790 | F1-score: 0.94 | Elapsed: 4.85s
+WARNING:root: [*] Thu Dec 22 19:22:42 2022: Train Epoch: 3 [12800/60731 (21%)]	Loss: 0.252614 | F1-score: 0.94 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:22:47 2022: Train Epoch: 3 [19200/60731 (32%)]	Loss: 0.166447 | F1-score: 0.94 | Elapsed: 4.86s
+WARNING:root: [*] Thu Dec 22 19:22:52 2022: Train Epoch: 3 [25600/60731 (42%)]	Loss: 0.239986 | F1-score: 0.94 | Elapsed: 4.92s
+WARNING:root: [*] Thu Dec 22 19:22:57 2022: Train Epoch: 3 [32000/60731 (53%)]	Loss: 0.190613 | F1-score: 0.94 | Elapsed: 4.94s
+WARNING:root: [*] Thu Dec 22 19:23:01 2022: Train Epoch: 3 [38400/60731 (63%)]	Loss: 0.156931 | F1-score: 0.94 | Elapsed: 4.89s
+WARNING:root: [*] Thu Dec 22 19:23:06 2022: Train Epoch: 3 [44800/60731 (74%)]	Loss: 0.313327 | F1-score: 0.94 | Elapsed: 4.92s
+WARNING:root: [*] Thu Dec 22 19:23:11 2022: Train Epoch: 3 [51200/60731 (84%)]	Loss: 0.230498 | F1-score: 0.94 | Elapsed: 4.87s
+WARNING:root: [*] Thu Dec 22 19:23:16 2022: Train Epoch: 3 [57600/60731 (95%)]	Loss: 0.223307 | F1-score: 0.94 | Elapsed: 4.88s
+WARNING:root: [*] Thu Dec 22 19:23:18 2022:    3    | Tr.loss: 0.257234 | Tr.F1.:   0.94    |   46.37  s
+WARNING:root:
+        [!] Thu Dec 22 19:23:18 2022: Dumped results:
+                model: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733398-model.torch
+                train loss list: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733398-train_losses.pickle
+                train metrics : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733398-train_metrics.pickle
+                duration: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733398-duration.pickle
+WARNING:root: [!] Fold 3/3 | Train set size: 60731, Validation set size: 30365
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Thu Dec 22 19:23:25 2022: Train Epoch: 1 [  0  /60731 (0 %)]	Loss: 0.707260 | F1-score: 0.55 | Elapsed: 0.06s
+WARNING:root: [*] Thu Dec 22 19:23:30 2022: Train Epoch: 1 [6400 /60731 (11%)]	Loss: 0.551170 | F1-score: 0.83 | Elapsed: 4.91s
+WARNING:root: [*] Thu Dec 22 19:23:35 2022: Train Epoch: 1 [12800/60731 (21%)]	Loss: 0.366068 | F1-score: 0.86 | Elapsed: 4.94s
+WARNING:root: [*] Thu Dec 22 19:23:40 2022: Train Epoch: 1 [19200/60731 (32%)]	Loss: 0.397107 | F1-score: 0.87 | Elapsed: 4.89s
+WARNING:root: [*] Thu Dec 22 19:23:44 2022: Train Epoch: 1 [25600/60731 (42%)]	Loss: 0.462517 | F1-score: 0.87 | Elapsed: 4.90s
+WARNING:root: [*] Thu Dec 22 19:23:49 2022: Train Epoch: 1 [32000/60731 (53%)]	Loss: 0.298838 | F1-score: 0.88 | Elapsed: 4.91s
+WARNING:root: [*] Thu Dec 22 19:23:54 2022: Train Epoch: 1 [38400/60731 (63%)]	Loss: 0.401119 | F1-score: 0.88 | Elapsed: 4.87s
+WARNING:root: [*] Thu Dec 22 19:23:59 2022: Train Epoch: 1 [44800/60731 (74%)]	Loss: 0.414654 | F1-score: 0.88 | Elapsed: 4.90s
+WARNING:root: [*] Thu Dec 22 19:24:04 2022: Train Epoch: 1 [51200/60731 (84%)]	Loss: 0.544428 | F1-score: 0.89 | Elapsed: 4.89s
+WARNING:root: [*] Thu Dec 22 19:24:09 2022: Train Epoch: 1 [57600/60731 (95%)]	Loss: 0.226679 | F1-score: 0.89 | Elapsed: 4.97s
+WARNING:root: [*] Thu Dec 22 19:24:11 2022:    1    | Tr.loss: 0.411406 | Tr.F1.:   0.89    |   46.59  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Thu Dec 22 19:24:11 2022: Train Epoch: 2 [  0  /60731 (0 %)]	Loss: 0.334476 | F1-score: 0.91 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:24:16 2022: Train Epoch: 2 [6400 /60731 (11%)]	Loss: 0.352682 | F1-score: 0.91 | Elapsed: 4.90s
+WARNING:root: [*] Thu Dec 22 19:24:21 2022: Train Epoch: 2 [12800/60731 (21%)]	Loss: 0.408304 | F1-score: 0.92 | Elapsed: 4.91s
+WARNING:root: [*] Thu Dec 22 19:24:26 2022: Train Epoch: 2 [19200/60731 (32%)]	Loss: 0.268529 | F1-score: 0.92 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:24:31 2022: Train Epoch: 2 [25600/60731 (42%)]	Loss: 0.223174 | F1-score: 0.92 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:24:35 2022: Train Epoch: 2 [32000/60731 (53%)]	Loss: 0.346413 | F1-score: 0.92 | Elapsed: 4.72s
+WARNING:root: [*] Thu Dec 22 19:24:40 2022: Train Epoch: 2 [38400/60731 (63%)]	Loss: 0.168041 | F1-score: 0.92 | Elapsed: 4.72s
+WARNING:root: [*] Thu Dec 22 19:24:45 2022: Train Epoch: 2 [44800/60731 (74%)]	Loss: 0.203437 | F1-score: 0.93 | Elapsed: 4.73s
+WARNING:root: [*] Thu Dec 22 19:24:50 2022: Train Epoch: 2 [51200/60731 (84%)]	Loss: 0.170478 | F1-score: 0.93 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:24:54 2022: Train Epoch: 2 [57600/60731 (95%)]	Loss: 0.172295 | F1-score: 0.93 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:24:57 2022:    2    | Tr.loss: 0.290165 | Tr.F1.:   0.93    |   45.45  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Thu Dec 22 19:24:57 2022: Train Epoch: 3 [  0  /60731 (0 %)]	Loss: 0.287894 | F1-score: 0.93 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:25:02 2022: Train Epoch: 3 [6400 /60731 (11%)]	Loss: 0.170474 | F1-score: 0.93 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:25:06 2022: Train Epoch: 3 [12800/60731 (21%)]	Loss: 0.252336 | F1-score: 0.94 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:25:11 2022: Train Epoch: 3 [19200/60731 (32%)]	Loss: 0.153700 | F1-score: 0.94 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:25:16 2022: Train Epoch: 3 [25600/60731 (42%)]	Loss: 0.310590 | F1-score: 0.94 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:25:21 2022: Train Epoch: 3 [32000/60731 (53%)]	Loss: 0.169026 | F1-score: 0.94 | Elapsed: 4.73s
+WARNING:root: [*] Thu Dec 22 19:25:25 2022: Train Epoch: 3 [38400/60731 (63%)]	Loss: 0.201505 | F1-score: 0.94 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:25:30 2022: Train Epoch: 3 [44800/60731 (74%)]	Loss: 0.424807 | F1-score: 0.94 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:25:35 2022: Train Epoch: 3 [51200/60731 (84%)]	Loss: 0.148864 | F1-score: 0.94 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:25:40 2022: Train Epoch: 3 [57600/60731 (95%)]	Loss: 0.253517 | F1-score: 0.94 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:25:42 2022:    3    | Tr.loss: 0.251154 | Tr.F1.:   0.94    |   45.34  s
+WARNING:root:
+        [!] Thu Dec 22 19:25:42 2022: Dumped results:
+                model: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733542-model.torch
+                train loss list: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733542-train_losses.pickle
+                train metrics : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733542-train_metrics.pickle
+                duration: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733542-duration.pickle
+WARNING:root: [!] Metrics saved to C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\metrics_trainSize_91096_ep_3_cv_3_vocabSize_2000_dModel_32_nHeads_8_dHidden_128_nLayers_2_numClasses_1_hiddenNeurons_64_layerNorm_False_dropout_0.5.json
+WARNING:root: [!] Average epoch time: 46.14s | Mean values over 3 folds:
+	FPR: 0.0001 -- TPR: 0.0396 -- F1: 0.0732
+	FPR:  0.001 -- TPR: 0.1159 -- F1: 0.2037
+	FPR:   0.01 -- TPR: 0.3591 -- F1: 0.5263
+	FPR:    0.1 -- TPR: 0.6116 -- F1: 0.7398
+
+WARNING:root: [!] Using device: cuda:0 | Dataset size: 91096
+WARNING:root: [!] Epochs per fold: 3 | Model config: {'vocabSize': 2000, 'dModel': 32, 'nHeads': 8, 'dHidden': 128, 'nLayers': 2, 'numClasses': 1, 'hiddenNeurons': [128], 'layerNorm': False, 'dropout': 0.5}
+WARNING:root: [!] Fold 1/3 | Train set size: 60730, Validation set size: 30366
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Thu Dec 22 19:26:19 2022: Train Epoch: 1 [  0  /60730 (0 %)]	Loss: 0.713147 | F1-score: 0.39 | Elapsed: 0.22s
+WARNING:root: [*] Thu Dec 22 19:26:23 2022: Train Epoch: 1 [6400 /60730 (11%)]	Loss: 0.399328 | F1-score: 0.85 | Elapsed: 4.86s
+WARNING:root: [*] Thu Dec 22 19:26:28 2022: Train Epoch: 1 [12800/60730 (21%)]	Loss: 0.352070 | F1-score: 0.87 | Elapsed: 4.91s
+WARNING:root: [*] Thu Dec 22 19:26:33 2022: Train Epoch: 1 [19200/60730 (32%)]	Loss: 0.309822 | F1-score: 0.87 | Elapsed: 4.86s
+WARNING:root: [*] Thu Dec 22 19:26:38 2022: Train Epoch: 1 [25600/60730 (42%)]	Loss: 0.449177 | F1-score: 0.88 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:26:43 2022: Train Epoch: 1 [32000/60730 (53%)]	Loss: 0.385377 | F1-score: 0.88 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:26:47 2022: Train Epoch: 1 [38400/60730 (63%)]	Loss: 0.445086 | F1-score: 0.89 | Elapsed: 4.69s
+WARNING:root: [*] Thu Dec 22 19:26:52 2022: Train Epoch: 1 [44800/60730 (74%)]	Loss: 0.331175 | F1-score: 0.89 | Elapsed: 4.72s
+WARNING:root: [*] Thu Dec 22 19:26:57 2022: Train Epoch: 1 [51200/60730 (84%)]	Loss: 0.318203 | F1-score: 0.89 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:27:02 2022: Train Epoch: 1 [57600/60730 (95%)]	Loss: 0.389556 | F1-score: 0.89 | Elapsed: 4.73s
+WARNING:root: [*] Thu Dec 22 19:27:04 2022:    1    | Tr.loss: 0.402209 | Tr.F1.:   0.89    |   45.62  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Thu Dec 22 19:27:04 2022: Train Epoch: 2 [  0  /60730 (0 %)]	Loss: 0.293124 | F1-score: 0.94 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:27:09 2022: Train Epoch: 2 [6400 /60730 (11%)]	Loss: 0.293592 | F1-score: 0.92 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:27:14 2022: Train Epoch: 2 [12800/60730 (21%)]	Loss: 0.287026 | F1-score: 0.92 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:27:18 2022: Train Epoch: 2 [19200/60730 (32%)]	Loss: 0.290059 | F1-score: 0.92 | Elapsed: 4.74s
+WARNING:root: [*] Thu Dec 22 19:27:23 2022: Train Epoch: 2 [25600/60730 (42%)]	Loss: 0.277826 | F1-score: 0.92 | Elapsed: 4.73s
+WARNING:root: [*] Thu Dec 22 19:27:28 2022: Train Epoch: 2 [32000/60730 (53%)]	Loss: 0.205429 | F1-score: 0.92 | Elapsed: 4.74s
+WARNING:root: [*] Thu Dec 22 19:27:32 2022: Train Epoch: 2 [38400/60730 (63%)]	Loss: 0.205903 | F1-score: 0.92 | Elapsed: 4.73s
+WARNING:root: [*] Thu Dec 22 19:27:37 2022: Train Epoch: 2 [44800/60730 (74%)]	Loss: 0.403456 | F1-score: 0.92 | Elapsed: 4.72s
+WARNING:root: [*] Thu Dec 22 19:27:42 2022: Train Epoch: 2 [51200/60730 (84%)]	Loss: 0.291427 | F1-score: 0.92 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:27:47 2022: Train Epoch: 2 [57600/60730 (95%)]	Loss: 0.237589 | F1-score: 0.92 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:27:49 2022:    2    | Tr.loss: 0.289052 | Tr.F1.:   0.92    |   45.15  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Thu Dec 22 19:27:49 2022: Train Epoch: 3 [  0  /60730 (0 %)]	Loss: 0.202638 | F1-score: 0.95 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:27:54 2022: Train Epoch: 3 [6400 /60730 (11%)]	Loss: 0.373531 | F1-score: 0.94 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:27:59 2022: Train Epoch: 3 [12800/60730 (21%)]	Loss: 0.399958 | F1-score: 0.93 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:28:03 2022: Train Epoch: 3 [19200/60730 (32%)]	Loss: 0.199384 | F1-score: 0.93 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:28:08 2022: Train Epoch: 3 [25600/60730 (42%)]	Loss: 0.613849 | F1-score: 0.93 | Elapsed: 4.72s
+WARNING:root: [*] Thu Dec 22 19:28:13 2022: Train Epoch: 3 [32000/60730 (53%)]	Loss: 0.217048 | F1-score: 0.93 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:28:18 2022: Train Epoch: 3 [38400/60730 (63%)]	Loss: 0.180811 | F1-score: 0.93 | Elapsed: 4.72s
+WARNING:root: [*] Thu Dec 22 19:28:22 2022: Train Epoch: 3 [44800/60730 (74%)]	Loss: 0.212701 | F1-score: 0.93 | Elapsed: 4.74s
+WARNING:root: [*] Thu Dec 22 19:28:27 2022: Train Epoch: 3 [51200/60730 (84%)]	Loss: 0.193009 | F1-score: 0.93 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:28:32 2022: Train Epoch: 3 [57600/60730 (95%)]	Loss: 0.214446 | F1-score: 0.93 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:28:34 2022:    3    | Tr.loss: 0.251879 | Tr.F1.:   0.94    |   45.22  s
+WARNING:root:
+        [!] Thu Dec 22 19:28:34 2022: Dumped results:
+                model: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733714-model.torch
+                train loss list: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733714-train_losses.pickle
+                train metrics : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733714-train_metrics.pickle
+                duration: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733714-duration.pickle
+WARNING:root: [!] Fold 2/3 | Train set size: 60731, Validation set size: 30365
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Thu Dec 22 19:28:40 2022: Train Epoch: 1 [  0  /60731 (0 %)]	Loss: 0.714300 | F1-score: 0.30 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:28:45 2022: Train Epoch: 1 [6400 /60731 (11%)]	Loss: 0.602957 | F1-score: 0.83 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:28:50 2022: Train Epoch: 1 [12800/60731 (21%)]	Loss: 0.471542 | F1-score: 0.86 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:28:55 2022: Train Epoch: 1 [19200/60731 (32%)]	Loss: 0.439014 | F1-score: 0.87 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:29:00 2022: Train Epoch: 1 [25600/60731 (42%)]	Loss: 0.397871 | F1-score: 0.87 | Elapsed: 4.74s
+WARNING:root: [*] Thu Dec 22 19:29:04 2022: Train Epoch: 1 [32000/60731 (53%)]	Loss: 0.333297 | F1-score: 0.88 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:29:09 2022: Train Epoch: 1 [38400/60731 (63%)]	Loss: 0.523813 | F1-score: 0.88 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:29:14 2022: Train Epoch: 1 [44800/60731 (74%)]	Loss: 0.329040 | F1-score: 0.88 | Elapsed: 4.86s
+WARNING:root: [*] Thu Dec 22 19:29:19 2022: Train Epoch: 1 [51200/60731 (84%)]	Loss: 0.309378 | F1-score: 0.89 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:29:23 2022: Train Epoch: 1 [57600/60731 (95%)]	Loss: 0.311596 | F1-score: 0.89 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:29:26 2022:    1    | Tr.loss: 0.408035 | Tr.F1.:   0.89    |   45.37  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Thu Dec 22 19:29:26 2022: Train Epoch: 2 [  0  /60731 (0 %)]	Loss: 0.231798 | F1-score: 0.96 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:29:31 2022: Train Epoch: 2 [6400 /60731 (11%)]	Loss: 0.514719 | F1-score: 0.92 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:29:35 2022: Train Epoch: 2 [12800/60731 (21%)]	Loss: 0.334692 | F1-score: 0.92 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:29:40 2022: Train Epoch: 2 [19200/60731 (32%)]	Loss: 0.220982 | F1-score: 0.92 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:29:45 2022: Train Epoch: 2 [25600/60731 (42%)]	Loss: 0.300247 | F1-score: 0.92 | Elapsed: 4.74s
+WARNING:root: [*] Thu Dec 22 19:29:50 2022: Train Epoch: 2 [32000/60731 (53%)]	Loss: 0.313654 | F1-score: 0.92 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:29:54 2022: Train Epoch: 2 [38400/60731 (63%)]	Loss: 0.166968 | F1-score: 0.92 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:29:59 2022: Train Epoch: 2 [44800/60731 (74%)]	Loss: 0.318201 | F1-score: 0.93 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:30:04 2022: Train Epoch: 2 [51200/60731 (84%)]	Loss: 0.374681 | F1-score: 0.93 | Elapsed: 4.73s
+WARNING:root: [*] Thu Dec 22 19:30:08 2022: Train Epoch: 2 [57600/60731 (95%)]	Loss: 0.249346 | F1-score: 0.93 | Elapsed: 4.73s
+WARNING:root: [*] Thu Dec 22 19:30:11 2022:    2    | Tr.loss: 0.286854 | Tr.F1.:   0.93    |   45.00  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Thu Dec 22 19:30:11 2022: Train Epoch: 3 [  0  /60731 (0 %)]	Loss: 0.328401 | F1-score: 0.91 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:30:16 2022: Train Epoch: 3 [6400 /60731 (11%)]	Loss: 0.311411 | F1-score: 0.94 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:30:20 2022: Train Epoch: 3 [12800/60731 (21%)]	Loss: 0.426177 | F1-score: 0.93 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:30:25 2022: Train Epoch: 3 [19200/60731 (32%)]	Loss: 0.285943 | F1-score: 0.93 | Elapsed: 4.72s
+WARNING:root: [*] Thu Dec 22 19:30:30 2022: Train Epoch: 3 [25600/60731 (42%)]	Loss: 0.278643 | F1-score: 0.94 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:30:34 2022: Train Epoch: 3 [32000/60731 (53%)]	Loss: 0.248614 | F1-score: 0.94 | Elapsed: 4.70s
+WARNING:root: [*] Thu Dec 22 19:30:39 2022: Train Epoch: 3 [38400/60731 (63%)]	Loss: 0.269001 | F1-score: 0.94 | Elapsed: 4.70s
+WARNING:root: [*] Thu Dec 22 19:30:44 2022: Train Epoch: 3 [44800/60731 (74%)]	Loss: 0.213589 | F1-score: 0.94 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:30:49 2022: Train Epoch: 3 [51200/60731 (84%)]	Loss: 0.329446 | F1-score: 0.94 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:30:53 2022: Train Epoch: 3 [57600/60731 (95%)]	Loss: 0.233009 | F1-score: 0.94 | Elapsed: 4.72s
+WARNING:root: [*] Thu Dec 22 19:30:56 2022:    3    | Tr.loss: 0.251537 | Tr.F1.:   0.94    |   44.79  s
+WARNING:root:
+        [!] Thu Dec 22 19:30:56 2022: Dumped results:
+                model: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733856-model.torch
+                train loss list: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733856-train_losses.pickle
+                train metrics : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733856-train_metrics.pickle
+                duration: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733856-duration.pickle
+WARNING:root: [!] Fold 3/3 | Train set size: 60731, Validation set size: 30365
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Thu Dec 22 19:31:02 2022: Train Epoch: 1 [  0  /60731 (0 %)]	Loss: 0.732694 | F1-score: 0.15 | Elapsed: 0.06s
+WARNING:root: [*] Thu Dec 22 19:31:06 2022: Train Epoch: 1 [6400 /60731 (11%)]	Loss: 0.467584 | F1-score: 0.82 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:31:11 2022: Train Epoch: 1 [12800/60731 (21%)]	Loss: 0.551428 | F1-score: 0.85 | Elapsed: 4.72s
+WARNING:root: [*] Thu Dec 22 19:31:16 2022: Train Epoch: 1 [19200/60731 (32%)]	Loss: 0.437164 | F1-score: 0.87 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:31:21 2022: Train Epoch: 1 [25600/60731 (42%)]	Loss: 0.314154 | F1-score: 0.87 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:31:25 2022: Train Epoch: 1 [32000/60731 (53%)]	Loss: 0.462411 | F1-score: 0.88 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:31:30 2022: Train Epoch: 1 [38400/60731 (63%)]	Loss: 0.434373 | F1-score: 0.88 | Elapsed: 4.70s
+WARNING:root: [*] Thu Dec 22 19:31:35 2022: Train Epoch: 1 [44800/60731 (74%)]	Loss: 0.395040 | F1-score: 0.88 | Elapsed: 4.70s
+WARNING:root: [*] Thu Dec 22 19:31:39 2022: Train Epoch: 1 [51200/60731 (84%)]	Loss: 0.275358 | F1-score: 0.89 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:31:44 2022: Train Epoch: 1 [57600/60731 (95%)]	Loss: 0.306357 | F1-score: 0.89 | Elapsed: 4.70s
+WARNING:root: [*] Thu Dec 22 19:31:46 2022:    1    | Tr.loss: 0.403234 | Tr.F1.:   0.89    |   44.71  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Thu Dec 22 19:31:46 2022: Train Epoch: 2 [  0  /60731 (0 %)]	Loss: 0.305854 | F1-score: 0.92 | Elapsed: 0.06s
+WARNING:root: [*] Thu Dec 22 19:31:51 2022: Train Epoch: 2 [6400 /60731 (11%)]	Loss: 0.315809 | F1-score: 0.92 | Elapsed: 4.72s
+WARNING:root: [*] Thu Dec 22 19:31:56 2022: Train Epoch: 2 [12800/60731 (21%)]	Loss: 0.263625 | F1-score: 0.92 | Elapsed: 4.72s
+WARNING:root: [*] Thu Dec 22 19:32:01 2022: Train Epoch: 2 [19200/60731 (32%)]	Loss: 0.324739 | F1-score: 0.92 | Elapsed: 4.70s
+WARNING:root: [*] Thu Dec 22 19:32:05 2022: Train Epoch: 2 [25600/60731 (42%)]	Loss: 0.227686 | F1-score: 0.92 | Elapsed: 4.72s
+WARNING:root: [*] Thu Dec 22 19:32:10 2022: Train Epoch: 2 [32000/60731 (53%)]	Loss: 0.411986 | F1-score: 0.92 | Elapsed: 4.72s
+WARNING:root: [*] Thu Dec 22 19:32:15 2022: Train Epoch: 2 [38400/60731 (63%)]	Loss: 0.274388 | F1-score: 0.92 | Elapsed: 4.70s
+WARNING:root: [*] Thu Dec 22 19:32:19 2022: Train Epoch: 2 [44800/60731 (74%)]	Loss: 0.245706 | F1-score: 0.92 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:32:24 2022: Train Epoch: 2 [51200/60731 (84%)]	Loss: 0.205787 | F1-score: 0.93 | Elapsed: 4.72s
+WARNING:root: [*] Thu Dec 22 19:32:29 2022: Train Epoch: 2 [57600/60731 (95%)]	Loss: 0.373250 | F1-score: 0.93 | Elapsed: 4.70s
+WARNING:root: [*] Thu Dec 22 19:32:31 2022:    2    | Tr.loss: 0.284350 | Tr.F1.:   0.93    |   44.71  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Thu Dec 22 19:32:31 2022: Train Epoch: 3 [  0  /60731 (0 %)]	Loss: 0.253236 | F1-score: 0.93 | Elapsed: 0.06s
+WARNING:root: [*] Thu Dec 22 19:32:36 2022: Train Epoch: 3 [6400 /60731 (11%)]	Loss: 0.242616 | F1-score: 0.94 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:32:41 2022: Train Epoch: 3 [12800/60731 (21%)]	Loss: 0.225235 | F1-score: 0.94 | Elapsed: 4.72s
+WARNING:root: [*] Thu Dec 22 19:32:45 2022: Train Epoch: 3 [19200/60731 (32%)]	Loss: 0.256656 | F1-score: 0.94 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:32:50 2022: Train Epoch: 3 [25600/60731 (42%)]	Loss: 0.361956 | F1-score: 0.94 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:32:55 2022: Train Epoch: 3 [32000/60731 (53%)]	Loss: 0.257802 | F1-score: 0.94 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:32:59 2022: Train Epoch: 3 [38400/60731 (63%)]	Loss: 0.200736 | F1-score: 0.94 | Elapsed: 4.70s
+WARNING:root: [*] Thu Dec 22 19:33:04 2022: Train Epoch: 3 [44800/60731 (74%)]	Loss: 0.311183 | F1-score: 0.94 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:33:09 2022: Train Epoch: 3 [51200/60731 (84%)]	Loss: 0.233929 | F1-score: 0.94 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:33:14 2022: Train Epoch: 3 [57600/60731 (95%)]	Loss: 0.268155 | F1-score: 0.94 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:33:16 2022:    3    | Tr.loss: 0.246143 | Tr.F1.:   0.94    |   44.74  s
+WARNING:root:
+        [!] Thu Dec 22 19:33:16 2022: Dumped results:
+                model: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733996-model.torch
+                train loss list: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733996-train_losses.pickle
+                train metrics : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733996-train_metrics.pickle
+                duration: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671733996-duration.pickle
+WARNING:root: [!] Metrics saved to C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\metrics_trainSize_91096_ep_3_cv_3_vocabSize_2000_dModel_32_nHeads_8_dHidden_128_nLayers_2_numClasses_1_hiddenNeurons_128_layerNorm_False_dropout_0.5.json
+WARNING:root: [!] Average epoch time: 45.04s | Mean values over 3 folds:
+	FPR: 0.0001 -- TPR: 0.0063 -- F1: 0.0124
+	FPR:  0.001 -- TPR: 0.1190 -- F1: 0.2096
+	FPR:   0.01 -- TPR: 0.2930 -- F1: 0.4517
+	FPR:    0.1 -- TPR: 0.5931 -- F1: 0.7138
+
+WARNING:root: [!] Using device: cuda:0 | Dataset size: 91096
+WARNING:root: [!] Epochs per fold: 3 | Model config: {'vocabSize': 2000, 'dModel': 32, 'nHeads': 8, 'dHidden': 128, 'nLayers': 2, 'numClasses': 1, 'hiddenNeurons': [32, 16], 'layerNorm': False, 'dropout': 0.5}
+WARNING:root: [!] Fold 1/3 | Train set size: 60730, Validation set size: 30366
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Thu Dec 22 19:33:52 2022: Train Epoch: 1 [  0  /60730 (0 %)]	Loss: 0.764014 | F1-score: 0.00 | Elapsed: 0.22s
+WARNING:root: [*] Thu Dec 22 19:33:57 2022: Train Epoch: 1 [6400 /60730 (11%)]	Loss: 0.565502 | F1-score: 0.71 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:34:02 2022: Train Epoch: 1 [12800/60730 (21%)]	Loss: 0.519251 | F1-score: 0.78 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:34:07 2022: Train Epoch: 1 [19200/60730 (32%)]	Loss: 0.404420 | F1-score: 0.81 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:34:11 2022: Train Epoch: 1 [25600/60730 (42%)]	Loss: 0.508446 | F1-score: 0.83 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:34:16 2022: Train Epoch: 1 [32000/60730 (53%)]	Loss: 0.418540 | F1-score: 0.84 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:34:21 2022: Train Epoch: 1 [38400/60730 (63%)]	Loss: 0.394198 | F1-score: 0.85 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:34:26 2022: Train Epoch: 1 [44800/60730 (74%)]	Loss: 0.391176 | F1-score: 0.86 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:34:31 2022: Train Epoch: 1 [51200/60730 (84%)]	Loss: 0.304728 | F1-score: 0.86 | Elapsed: 4.86s
+WARNING:root: [*] Thu Dec 22 19:34:35 2022: Train Epoch: 1 [57600/60730 (95%)]	Loss: 0.250082 | F1-score: 0.87 | Elapsed: 4.83s
+WARNING:root: [*] Thu Dec 22 19:34:38 2022:    1    | Tr.loss: 0.456881 | Tr.F1.:   0.87    |   45.79  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Thu Dec 22 19:34:38 2022: Train Epoch: 2 [  0  /60730 (0 %)]	Loss: 0.423080 | F1-score: 0.89 | Elapsed: 0.07s
+WARNING:root: [*] Thu Dec 22 19:34:43 2022: Train Epoch: 2 [6400 /60730 (11%)]	Loss: 0.278452 | F1-score: 0.91 | Elapsed: 4.83s
+WARNING:root: [*] Thu Dec 22 19:34:47 2022: Train Epoch: 2 [12800/60730 (21%)]	Loss: 0.353070 | F1-score: 0.91 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:34:52 2022: Train Epoch: 2 [19200/60730 (32%)]	Loss: 0.326184 | F1-score: 0.91 | Elapsed: 4.73s
+WARNING:root: [*] Thu Dec 22 19:34:57 2022: Train Epoch: 2 [25600/60730 (42%)]	Loss: 0.382493 | F1-score: 0.92 | Elapsed: 4.74s
+WARNING:root: [*] Thu Dec 22 19:35:02 2022: Train Epoch: 2 [32000/60730 (53%)]	Loss: 0.293399 | F1-score: 0.92 | Elapsed: 4.73s
+WARNING:root: [*] Thu Dec 22 19:35:06 2022: Train Epoch: 2 [38400/60730 (63%)]	Loss: 0.165096 | F1-score: 0.92 | Elapsed: 4.71s
+WARNING:root: [*] Thu Dec 22 19:35:11 2022: Train Epoch: 2 [44800/60730 (74%)]	Loss: 0.291709 | F1-score: 0.92 | Elapsed: 4.74s
+WARNING:root: [*] Thu Dec 22 19:35:16 2022: Train Epoch: 2 [51200/60730 (84%)]	Loss: 0.409020 | F1-score: 0.92 | Elapsed: 4.87s
+WARNING:root: [*] Thu Dec 22 19:35:21 2022: Train Epoch: 2 [57600/60730 (95%)]	Loss: 0.201059 | F1-score: 0.92 | Elapsed: 4.89s
+WARNING:root: [*] Thu Dec 22 19:35:23 2022:    2    | Tr.loss: 0.320863 | Tr.F1.:   0.92    |   45.39  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Thu Dec 22 19:35:23 2022: Train Epoch: 3 [  0  /60730 (0 %)]	Loss: 0.168635 | F1-score: 0.95 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:35:28 2022: Train Epoch: 3 [6400 /60730 (11%)]	Loss: 0.333115 | F1-score: 0.93 | Elapsed: 4.88s
+WARNING:root: [*] Thu Dec 22 19:35:33 2022: Train Epoch: 3 [12800/60730 (21%)]	Loss: 0.264240 | F1-score: 0.93 | Elapsed: 4.86s
+WARNING:root: [*] Thu Dec 22 19:35:38 2022: Train Epoch: 3 [19200/60730 (32%)]	Loss: 0.418586 | F1-score: 0.93 | Elapsed: 4.86s
+WARNING:root: [*] Thu Dec 22 19:35:43 2022: Train Epoch: 3 [25600/60730 (42%)]	Loss: 0.440757 | F1-score: 0.93 | Elapsed: 4.88s
+WARNING:root: [*] Thu Dec 22 19:35:48 2022: Train Epoch: 3 [32000/60730 (53%)]	Loss: 0.297835 | F1-score: 0.93 | Elapsed: 4.89s
+WARNING:root: [*] Thu Dec 22 19:35:52 2022: Train Epoch: 3 [38400/60730 (63%)]	Loss: 0.193108 | F1-score: 0.93 | Elapsed: 4.85s
+WARNING:root: [*] Thu Dec 22 19:35:57 2022: Train Epoch: 3 [44800/60730 (74%)]	Loss: 0.196227 | F1-score: 0.93 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:36:02 2022: Train Epoch: 3 [51200/60730 (84%)]	Loss: 0.405466 | F1-score: 0.93 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:36:07 2022: Train Epoch: 3 [57600/60730 (95%)]	Loss: 0.246642 | F1-score: 0.93 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:36:09 2022:    3    | Tr.loss: 0.279489 | Tr.F1.:   0.93    |   45.85  s
+WARNING:root:
+        [!] Thu Dec 22 19:36:09 2022: Dumped results:
+                model: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734169-model.torch
+                train loss list: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734169-train_losses.pickle
+                train metrics : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734169-train_metrics.pickle
+                duration: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734169-duration.pickle
+WARNING:root: [!] Fold 2/3 | Train set size: 60731, Validation set size: 30365
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Thu Dec 22 19:36:15 2022: Train Epoch: 1 [  0  /60731 (0 %)]	Loss: 0.717655 | F1-score: 0.00 | Elapsed: 0.06s
+WARNING:root: [*] Thu Dec 22 19:36:20 2022: Train Epoch: 1 [6400 /60731 (11%)]	Loss: 0.566471 | F1-score: 0.78 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:36:25 2022: Train Epoch: 1 [12800/60731 (21%)]	Loss: 0.425801 | F1-score: 0.82 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:36:29 2022: Train Epoch: 1 [19200/60731 (32%)]	Loss: 0.403693 | F1-score: 0.84 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:36:34 2022: Train Epoch: 1 [25600/60731 (42%)]	Loss: 0.463649 | F1-score: 0.85 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:36:39 2022: Train Epoch: 1 [32000/60731 (53%)]	Loss: 0.379870 | F1-score: 0.86 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:36:44 2022: Train Epoch: 1 [38400/60731 (63%)]	Loss: 0.370259 | F1-score: 0.86 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:36:48 2022: Train Epoch: 1 [44800/60731 (74%)]	Loss: 0.369341 | F1-score: 0.87 | Elapsed: 4.74s
+WARNING:root: [*] Thu Dec 22 19:36:53 2022: Train Epoch: 1 [51200/60731 (84%)]	Loss: 0.461110 | F1-score: 0.87 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:36:58 2022: Train Epoch: 1 [57600/60731 (95%)]	Loss: 0.435846 | F1-score: 0.87 | Elapsed: 4.73s
+WARNING:root: [*] Thu Dec 22 19:37:00 2022:    1    | Tr.loss: 0.464339 | Tr.F1.:   0.87    |   45.23  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Thu Dec 22 19:37:00 2022: Train Epoch: 2 [  0  /60731 (0 %)]	Loss: 0.441035 | F1-score: 0.85 | Elapsed: 0.06s
+WARNING:root: [*] Thu Dec 22 19:37:05 2022: Train Epoch: 2 [6400 /60731 (11%)]	Loss: 0.276951 | F1-score: 0.90 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:37:10 2022: Train Epoch: 2 [12800/60731 (21%)]	Loss: 0.337726 | F1-score: 0.90 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:37:15 2022: Train Epoch: 2 [19200/60731 (32%)]	Loss: 0.369890 | F1-score: 0.90 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:37:19 2022: Train Epoch: 2 [25600/60731 (42%)]	Loss: 0.367291 | F1-score: 0.90 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:37:24 2022: Train Epoch: 2 [32000/60731 (53%)]	Loss: 0.243790 | F1-score: 0.90 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:37:29 2022: Train Epoch: 2 [38400/60731 (63%)]	Loss: 0.325520 | F1-score: 0.91 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:37:34 2022: Train Epoch: 2 [44800/60731 (74%)]	Loss: 0.331174 | F1-score: 0.91 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:37:38 2022: Train Epoch: 2 [51200/60731 (84%)]	Loss: 0.205915 | F1-score: 0.91 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:37:43 2022: Train Epoch: 2 [57600/60731 (95%)]	Loss: 0.309910 | F1-score: 0.91 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:37:45 2022:    2    | Tr.loss: 0.363937 | Tr.F1.:   0.91    |   45.23  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Thu Dec 22 19:37:46 2022: Train Epoch: 3 [  0  /60731 (0 %)]	Loss: 0.281294 | F1-score: 0.94 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:37:50 2022: Train Epoch: 3 [6400 /60731 (11%)]	Loss: 0.252439 | F1-score: 0.92 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:37:55 2022: Train Epoch: 3 [12800/60731 (21%)]	Loss: 0.224110 | F1-score: 0.92 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:38:00 2022: Train Epoch: 3 [19200/60731 (32%)]	Loss: 0.337811 | F1-score: 0.92 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:38:05 2022: Train Epoch: 3 [25600/60731 (42%)]	Loss: 0.327313 | F1-score: 0.92 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:38:09 2022: Train Epoch: 3 [32000/60731 (53%)]	Loss: 0.202471 | F1-score: 0.92 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:38:14 2022: Train Epoch: 3 [38400/60731 (63%)]	Loss: 0.233245 | F1-score: 0.92 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:38:19 2022: Train Epoch: 3 [44800/60731 (74%)]	Loss: 0.204026 | F1-score: 0.92 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:38:24 2022: Train Epoch: 3 [51200/60731 (84%)]	Loss: 0.326938 | F1-score: 0.92 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:38:28 2022: Train Epoch: 3 [57600/60731 (95%)]	Loss: 0.285342 | F1-score: 0.93 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:38:31 2022:    3    | Tr.loss: 0.305030 | Tr.F1.:   0.93    |   45.23  s
+WARNING:root:
+        [!] Thu Dec 22 19:38:31 2022: Dumped results:
+                model: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734311-model.torch
+                train loss list: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734311-train_losses.pickle
+                train metrics : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734311-train_metrics.pickle
+                duration: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734311-duration.pickle
+WARNING:root: [!] Fold 3/3 | Train set size: 60731, Validation set size: 30365
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Thu Dec 22 19:38:37 2022: Train Epoch: 1 [  0  /60731 (0 %)]	Loss: 0.693935 | F1-score: 0.63 | Elapsed: 0.06s
+WARNING:root: [*] Thu Dec 22 19:38:42 2022: Train Epoch: 1 [6400 /60731 (11%)]	Loss: 0.582533 | F1-score: 0.83 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:38:46 2022: Train Epoch: 1 [12800/60731 (21%)]	Loss: 0.461525 | F1-score: 0.84 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:38:51 2022: Train Epoch: 1 [19200/60731 (32%)]	Loss: 0.320814 | F1-score: 0.85 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:38:56 2022: Train Epoch: 1 [25600/60731 (42%)]	Loss: 0.431783 | F1-score: 0.86 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:39:01 2022: Train Epoch: 1 [32000/60731 (53%)]	Loss: 0.321310 | F1-score: 0.87 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:39:06 2022: Train Epoch: 1 [38400/60731 (63%)]	Loss: 0.382745 | F1-score: 0.87 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:39:10 2022: Train Epoch: 1 [44800/60731 (74%)]	Loss: 0.345936 | F1-score: 0.87 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:39:15 2022: Train Epoch: 1 [51200/60731 (84%)]	Loss: 0.374087 | F1-score: 0.88 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:39:20 2022: Train Epoch: 1 [57600/60731 (95%)]	Loss: 0.507590 | F1-score: 0.88 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:39:22 2022:    1    | Tr.loss: 0.461404 | Tr.F1.:   0.88    |   45.24  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Thu Dec 22 19:39:22 2022: Train Epoch: 2 [  0  /60731 (0 %)]	Loss: 0.342365 | F1-score: 0.89 | Elapsed: 0.06s
+WARNING:root: [*] Thu Dec 22 19:39:27 2022: Train Epoch: 2 [6400 /60731 (11%)]	Loss: 0.266937 | F1-score: 0.90 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:39:32 2022: Train Epoch: 2 [12800/60731 (21%)]	Loss: 0.427760 | F1-score: 0.90 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:39:36 2022: Train Epoch: 2 [19200/60731 (32%)]	Loss: 0.278675 | F1-score: 0.90 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:39:41 2022: Train Epoch: 2 [25600/60731 (42%)]	Loss: 0.561803 | F1-score: 0.90 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:39:46 2022: Train Epoch: 2 [32000/60731 (53%)]	Loss: 0.317578 | F1-score: 0.91 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:39:51 2022: Train Epoch: 2 [38400/60731 (63%)]	Loss: 0.254669 | F1-score: 0.91 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:39:55 2022: Train Epoch: 2 [44800/60731 (74%)]	Loss: 0.315293 | F1-score: 0.91 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:40:00 2022: Train Epoch: 2 [51200/60731 (84%)]	Loss: 0.325741 | F1-score: 0.91 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:40:05 2022: Train Epoch: 2 [57600/60731 (95%)]	Loss: 0.353857 | F1-score: 0.91 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:40:07 2022:    2    | Tr.loss: 0.349629 | Tr.F1.:   0.91    |   45.22  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Thu Dec 22 19:40:07 2022: Train Epoch: 3 [  0  /60731 (0 %)]	Loss: 0.227359 | F1-score: 0.96 | Elapsed: 0.07s
+WARNING:root: [*] Thu Dec 22 19:40:12 2022: Train Epoch: 3 [6400 /60731 (11%)]	Loss: 0.295846 | F1-score: 0.93 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:40:17 2022: Train Epoch: 3 [12800/60731 (21%)]	Loss: 0.288126 | F1-score: 0.93 | Elapsed: 4.74s
+WARNING:root: [*] Thu Dec 22 19:40:22 2022: Train Epoch: 3 [19200/60731 (32%)]	Loss: 0.350721 | F1-score: 0.93 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:40:26 2022: Train Epoch: 3 [25600/60731 (42%)]	Loss: 0.258114 | F1-score: 0.93 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:40:31 2022: Train Epoch: 3 [32000/60731 (53%)]	Loss: 0.361784 | F1-score: 0.93 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:40:36 2022: Train Epoch: 3 [38400/60731 (63%)]	Loss: 0.308235 | F1-score: 0.93 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:40:41 2022: Train Epoch: 3 [44800/60731 (74%)]	Loss: 0.293867 | F1-score: 0.93 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:40:45 2022: Train Epoch: 3 [51200/60731 (84%)]	Loss: 0.413209 | F1-score: 0.93 | Elapsed: 4.76s
+WARNING:root: [*] Thu Dec 22 19:40:50 2022: Train Epoch: 3 [57600/60731 (95%)]	Loss: 0.233925 | F1-score: 0.93 | Elapsed: 4.75s
+WARNING:root: [*] Thu Dec 22 19:40:52 2022:    3    | Tr.loss: 0.288372 | Tr.F1.:   0.93    |   45.20  s
+WARNING:root:
+        [!] Thu Dec 22 19:40:52 2022: Dumped results:
+                model: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734452-model.torch
+                train loss list: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734452-train_losses.pickle
+                train metrics : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734452-train_metrics.pickle
+                duration: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734452-duration.pickle
+WARNING:root: [!] Metrics saved to C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\metrics_trainSize_91096_ep_3_cv_3_vocabSize_2000_dModel_32_nHeads_8_dHidden_128_nLayers_2_numClasses_1_hiddenNeurons_32_16_layerNorm_False_dropout_0.5.json
+WARNING:root: [!] Average epoch time: 45.37s | Mean values over 3 folds:
+	FPR: 0.0001 -- TPR: 0.0148 -- F1: 0.0284
+	FPR:  0.001 -- TPR: 0.0846 -- F1: 0.1543
+	FPR:   0.01 -- TPR: 0.1994 -- F1: 0.3260
+	FPR:    0.1 -- TPR: 0.4312 -- F1: 0.5735
+
+WARNING:root: [!] Using device: cuda:0 | Dataset size: 91096
+WARNING:root: [!] Epochs per fold: 3 | Model config: {'vocabSize': 2000, 'dModel': 32, 'nHeads': 8, 'dHidden': 128, 'nLayers': 2, 'numClasses': 1, 'hiddenNeurons': [64, 32, 16], 'layerNorm': False, 'dropout': 0.5}
+WARNING:root: [!] Fold 1/3 | Train set size: 60730, Validation set size: 30366
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Thu Dec 22 19:41:29 2022: Train Epoch: 1 [  0  /60730 (0 %)]	Loss: 0.744426 | F1-score: 0.00 | Elapsed: 0.29s
+WARNING:root: [*] Thu Dec 22 19:41:34 2022: Train Epoch: 1 [6400 /60730 (11%)]	Loss: 0.574022 | F1-score: 0.69 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:41:38 2022: Train Epoch: 1 [12800/60730 (21%)]	Loss: 0.533113 | F1-score: 0.78 | Elapsed: 4.77s
+WARNING:root: [*] Thu Dec 22 19:41:43 2022: Train Epoch: 1 [19200/60730 (32%)]	Loss: 0.461895 | F1-score: 0.81 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:41:48 2022: Train Epoch: 1 [25600/60730 (42%)]	Loss: 0.507022 | F1-score: 0.83 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:41:53 2022: Train Epoch: 1 [32000/60730 (53%)]	Loss: 0.449193 | F1-score: 0.84 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:41:58 2022: Train Epoch: 1 [38400/60730 (63%)]	Loss: 0.539825 | F1-score: 0.85 | Elapsed: 4.83s
+WARNING:root: [*] Thu Dec 22 19:42:03 2022: Train Epoch: 1 [44800/60730 (74%)]	Loss: 0.605729 | F1-score: 0.86 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:42:07 2022: Train Epoch: 1 [51200/60730 (84%)]	Loss: 0.582301 | F1-score: 0.86 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:42:12 2022: Train Epoch: 1 [57600/60730 (95%)]	Loss: 0.422513 | F1-score: 0.86 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:42:14 2022:    1    | Tr.loss: 0.474915 | Tr.F1.:   0.87    |   45.89  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Thu Dec 22 19:42:15 2022: Train Epoch: 2 [  0  /60730 (0 %)]	Loss: 0.440614 | F1-score: 0.88 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:42:19 2022: Train Epoch: 2 [6400 /60730 (11%)]	Loss: 0.391248 | F1-score: 0.89 | Elapsed: 4.84s
+WARNING:root: [*] Thu Dec 22 19:42:24 2022: Train Epoch: 2 [12800/60730 (21%)]	Loss: 0.407758 | F1-score: 0.90 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:42:29 2022: Train Epoch: 2 [19200/60730 (32%)]	Loss: 0.404464 | F1-score: 0.90 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:42:34 2022: Train Epoch: 2 [25600/60730 (42%)]	Loss: 0.257472 | F1-score: 0.91 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:42:39 2022: Train Epoch: 2 [32000/60730 (53%)]	Loss: 0.258979 | F1-score: 0.91 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:42:43 2022: Train Epoch: 2 [38400/60730 (63%)]	Loss: 0.361378 | F1-score: 0.91 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:42:48 2022: Train Epoch: 2 [44800/60730 (74%)]	Loss: 0.228366 | F1-score: 0.91 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:42:53 2022: Train Epoch: 2 [51200/60730 (84%)]	Loss: 0.272396 | F1-score: 0.91 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:42:58 2022: Train Epoch: 2 [57600/60730 (95%)]	Loss: 0.265898 | F1-score: 0.91 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:43:00 2022:    2    | Tr.loss: 0.359534 | Tr.F1.:   0.91    |   45.63  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Thu Dec 22 19:43:00 2022: Train Epoch: 3 [  0  /60730 (0 %)]	Loss: 0.375423 | F1-score: 0.89 | Elapsed: 0.07s
+WARNING:root: [*] Thu Dec 22 19:43:05 2022: Train Epoch: 3 [6400 /60730 (11%)]	Loss: 0.294775 | F1-score: 0.93 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:43:10 2022: Train Epoch: 3 [12800/60730 (21%)]	Loss: 0.457825 | F1-score: 0.93 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:43:15 2022: Train Epoch: 3 [19200/60730 (32%)]	Loss: 0.304455 | F1-score: 0.93 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:43:19 2022: Train Epoch: 3 [25600/60730 (42%)]	Loss: 0.297246 | F1-score: 0.93 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:43:24 2022: Train Epoch: 3 [32000/60730 (53%)]	Loss: 0.311938 | F1-score: 0.93 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:43:29 2022: Train Epoch: 3 [38400/60730 (63%)]	Loss: 0.305681 | F1-score: 0.93 | Elapsed: 4.78s
+WARNING:root: [*] Thu Dec 22 19:43:34 2022: Train Epoch: 3 [44800/60730 (74%)]	Loss: 0.204056 | F1-score: 0.93 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:43:39 2022: Train Epoch: 3 [51200/60730 (84%)]	Loss: 0.357120 | F1-score: 0.93 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:43:43 2022: Train Epoch: 3 [57600/60730 (95%)]	Loss: 0.324104 | F1-score: 0.93 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:43:46 2022:    3    | Tr.loss: 0.290003 | Tr.F1.:   0.93    |   45.57  s
+WARNING:root:
+        [!] Thu Dec 22 19:43:46 2022: Dumped results:
+                model: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734626-model.torch
+                train loss list: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734626-train_losses.pickle
+                train metrics : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734626-train_metrics.pickle
+                duration: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734626-duration.pickle
+WARNING:root: [!] Fold 2/3 | Train set size: 60731, Validation set size: 30365
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Thu Dec 22 19:43:52 2022: Train Epoch: 1 [  0  /60731 (0 %)]	Loss: 0.657431 | F1-score: 0.84 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:43:57 2022: Train Epoch: 1 [6400 /60731 (11%)]	Loss: 0.616108 | F1-score: 0.83 | Elapsed: 4.83s
+WARNING:root: [*] Thu Dec 22 19:44:01 2022: Train Epoch: 1 [12800/60731 (21%)]	Loss: 0.619173 | F1-score: 0.84 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:44:06 2022: Train Epoch: 1 [19200/60731 (32%)]	Loss: 0.564532 | F1-score: 0.84 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:44:11 2022: Train Epoch: 1 [25600/60731 (42%)]	Loss: 0.318085 | F1-score: 0.85 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:44:16 2022: Train Epoch: 1 [32000/60731 (53%)]	Loss: 0.360952 | F1-score: 0.85 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:44:21 2022: Train Epoch: 1 [38400/60731 (63%)]	Loss: 0.304056 | F1-score: 0.86 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:44:25 2022: Train Epoch: 1 [44800/60731 (74%)]	Loss: 0.591222 | F1-score: 0.86 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:44:30 2022: Train Epoch: 1 [51200/60731 (84%)]	Loss: 0.631760 | F1-score: 0.86 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:44:35 2022: Train Epoch: 1 [57600/60731 (95%)]	Loss: 0.518515 | F1-score: 0.86 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:44:37 2022:    1    | Tr.loss: 0.473901 | Tr.F1.:   0.86    |   45.59  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Thu Dec 22 19:44:37 2022: Train Epoch: 2 [  0  /60731 (0 %)]	Loss: 0.463419 | F1-score: 0.82 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:44:42 2022: Train Epoch: 2 [6400 /60731 (11%)]	Loss: 0.316421 | F1-score: 0.89 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:44:47 2022: Train Epoch: 2 [12800/60731 (21%)]	Loss: 0.451759 | F1-score: 0.88 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:44:52 2022: Train Epoch: 2 [19200/60731 (32%)]	Loss: 0.386657 | F1-score: 0.89 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:44:57 2022: Train Epoch: 2 [25600/60731 (42%)]	Loss: 0.189199 | F1-score: 0.89 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:45:01 2022: Train Epoch: 2 [32000/60731 (53%)]	Loss: 0.306832 | F1-score: 0.89 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:45:06 2022: Train Epoch: 2 [38400/60731 (63%)]	Loss: 0.399962 | F1-score: 0.89 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:45:11 2022: Train Epoch: 2 [44800/60731 (74%)]	Loss: 0.314585 | F1-score: 0.90 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:45:16 2022: Train Epoch: 2 [51200/60731 (84%)]	Loss: 0.304734 | F1-score: 0.90 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:45:21 2022: Train Epoch: 2 [57600/60731 (95%)]	Loss: 0.322952 | F1-score: 0.90 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:45:23 2022:    2    | Tr.loss: 0.366005 | Tr.F1.:   0.90    |   45.61  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Thu Dec 22 19:45:23 2022: Train Epoch: 3 [  0  /60731 (0 %)]	Loss: 0.418165 | F1-score: 0.92 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:45:28 2022: Train Epoch: 3 [6400 /60731 (11%)]	Loss: 0.263963 | F1-score: 0.93 | Elapsed: 4.83s
+WARNING:root: [*] Thu Dec 22 19:45:33 2022: Train Epoch: 3 [12800/60731 (21%)]	Loss: 0.396665 | F1-score: 0.93 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:45:37 2022: Train Epoch: 3 [19200/60731 (32%)]	Loss: 0.428111 | F1-score: 0.93 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:45:42 2022: Train Epoch: 3 [25600/60731 (42%)]	Loss: 0.268268 | F1-score: 0.93 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:45:47 2022: Train Epoch: 3 [32000/60731 (53%)]	Loss: 0.324959 | F1-score: 0.93 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:45:52 2022: Train Epoch: 3 [38400/60731 (63%)]	Loss: 0.280830 | F1-score: 0.93 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:45:57 2022: Train Epoch: 3 [44800/60731 (74%)]	Loss: 0.245198 | F1-score: 0.93 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:46:02 2022: Train Epoch: 3 [51200/60731 (84%)]	Loss: 0.290127 | F1-score: 0.93 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:46:06 2022: Train Epoch: 3 [57600/60731 (95%)]	Loss: 0.273137 | F1-score: 0.93 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:46:09 2022:    3    | Tr.loss: 0.306488 | Tr.F1.:   0.93    |   45.65  s
+WARNING:root:
+        [!] Thu Dec 22 19:46:09 2022: Dumped results:
+                model: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734769-model.torch
+                train loss list: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734769-train_losses.pickle
+                train metrics : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734769-train_metrics.pickle
+                duration: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734769-duration.pickle
+WARNING:root: [!] Fold 3/3 | Train set size: 60731, Validation set size: 30365
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Thu Dec 22 19:46:15 2022: Train Epoch: 1 [  0  /60731 (0 %)]	Loss: 0.684565 | F1-score: 0.84 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:46:20 2022: Train Epoch: 1 [6400 /60731 (11%)]	Loss: 0.598405 | F1-score: 0.84 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:46:24 2022: Train Epoch: 1 [12800/60731 (21%)]	Loss: 0.655674 | F1-score: 0.84 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:46:29 2022: Train Epoch: 1 [19200/60731 (32%)]	Loss: 0.453480 | F1-score: 0.85 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:46:34 2022: Train Epoch: 1 [25600/60731 (42%)]	Loss: 0.501393 | F1-score: 0.86 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:46:39 2022: Train Epoch: 1 [32000/60731 (53%)]	Loss: 0.330309 | F1-score: 0.86 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:46:44 2022: Train Epoch: 1 [38400/60731 (63%)]	Loss: 0.501373 | F1-score: 0.87 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:46:48 2022: Train Epoch: 1 [44800/60731 (74%)]	Loss: 0.511184 | F1-score: 0.87 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:46:53 2022: Train Epoch: 1 [51200/60731 (84%)]	Loss: 0.421954 | F1-score: 0.87 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:46:58 2022: Train Epoch: 1 [57600/60731 (95%)]	Loss: 0.381885 | F1-score: 0.87 | Elapsed: 4.85s
+WARNING:root: [*] Thu Dec 22 19:47:00 2022:    1    | Tr.loss: 0.466737 | Tr.F1.:   0.87    |   45.64  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Thu Dec 22 19:47:00 2022: Train Epoch: 2 [  0  /60731 (0 %)]	Loss: 0.436345 | F1-score: 0.87 | Elapsed: 0.06s
+WARNING:root: [*] Thu Dec 22 19:47:05 2022: Train Epoch: 2 [6400 /60731 (11%)]	Loss: 0.402407 | F1-score: 0.90 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:47:10 2022: Train Epoch: 2 [12800/60731 (21%)]	Loss: 0.393008 | F1-score: 0.90 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:47:15 2022: Train Epoch: 2 [19200/60731 (32%)]	Loss: 0.429675 | F1-score: 0.90 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:47:20 2022: Train Epoch: 2 [25600/60731 (42%)]	Loss: 0.418123 | F1-score: 0.90 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:47:24 2022: Train Epoch: 2 [32000/60731 (53%)]	Loss: 0.336253 | F1-score: 0.90 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:47:29 2022: Train Epoch: 2 [38400/60731 (63%)]	Loss: 0.358195 | F1-score: 0.90 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:47:34 2022: Train Epoch: 2 [44800/60731 (74%)]	Loss: 0.255936 | F1-score: 0.90 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:47:39 2022: Train Epoch: 2 [51200/60731 (84%)]	Loss: 0.336835 | F1-score: 0.91 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:47:44 2022: Train Epoch: 2 [57600/60731 (95%)]	Loss: 0.394584 | F1-score: 0.91 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:47:46 2022:    2    | Tr.loss: 0.352446 | Tr.F1.:   0.91    |   45.63  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Thu Dec 22 19:47:46 2022: Train Epoch: 3 [  0  /60731 (0 %)]	Loss: 0.336118 | F1-score: 0.92 | Elapsed: 0.05s
+WARNING:root: [*] Thu Dec 22 19:47:51 2022: Train Epoch: 3 [6400 /60731 (11%)]	Loss: 0.337767 | F1-score: 0.92 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:47:56 2022: Train Epoch: 3 [12800/60731 (21%)]	Loss: 0.312335 | F1-score: 0.92 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:48:00 2022: Train Epoch: 3 [19200/60731 (32%)]	Loss: 0.350649 | F1-score: 0.92 | Elapsed: 4.79s
+WARNING:root: [*] Thu Dec 22 19:48:05 2022: Train Epoch: 3 [25600/60731 (42%)]	Loss: 0.279762 | F1-score: 0.92 | Elapsed: 4.83s
+WARNING:root: [*] Thu Dec 22 19:48:10 2022: Train Epoch: 3 [32000/60731 (53%)]	Loss: 0.363078 | F1-score: 0.93 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:48:15 2022: Train Epoch: 3 [38400/60731 (63%)]	Loss: 0.283468 | F1-score: 0.93 | Elapsed: 4.80s
+WARNING:root: [*] Thu Dec 22 19:48:20 2022: Train Epoch: 3 [44800/60731 (74%)]	Loss: 0.160644 | F1-score: 0.93 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:48:25 2022: Train Epoch: 3 [51200/60731 (84%)]	Loss: 0.186597 | F1-score: 0.93 | Elapsed: 4.81s
+WARNING:root: [*] Thu Dec 22 19:48:29 2022: Train Epoch: 3 [57600/60731 (95%)]	Loss: 0.261314 | F1-score: 0.93 | Elapsed: 4.82s
+WARNING:root: [*] Thu Dec 22 19:48:32 2022:    3    | Tr.loss: 0.292681 | Tr.F1.:   0.93    |   45.64  s
+WARNING:root:
+        [!] Thu Dec 22 19:48:32 2022: Dumped results:
+                model: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734912-model.torch
+                train loss list: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734912-train_losses.pickle
+                train metrics : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734912-train_metrics.pickle
+                duration: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\trainingFiles\trainingFiles_1671734912-duration.pickle
+WARNING:root: [!] Metrics saved to C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\TransformerHiddenLayers\metrics_trainSize_91096_ep_3_cv_3_vocabSize_2000_dModel_32_nHeads_8_dHidden_128_nLayers_2_numClasses_1_hiddenNeurons_64_32_16_layerNorm_False_dropout_0.5.json
+WARNING:root: [!] Average epoch time: 45.65s | Mean values over 3 folds:
+	FPR: 0.0001 -- TPR: 0.0000 -- F1: 0.0000
+	FPR:  0.001 -- TPR: 0.0843 -- F1: 0.1551
+	FPR:   0.01 -- TPR: 0.1732 -- F1: 0.2942
+	FPR:    0.1 -- TPR: 0.5274 -- F1: 0.6675
+
