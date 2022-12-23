@@ -9,7 +9,6 @@ from tqdm import tqdm
 import sys
 sys.path.extend([".", ".."])
 from nebula.misc import getRealPath, flattenList
-from nebula.misc import dumpTokenizerFiles
 from nebula import PEDynamicFeatureExtractor, JSONTokenizer
 
 OUTFOLDER_SUFFIX = "_TEST" # ""
@@ -158,7 +157,7 @@ def buildVocab(eventsTokenized, tokenizer, vocabSize, outFolder):
     timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
     logging.warning(f"{timenow}: Building vocab with vocab size: {vocabSize}...")
     tokenizer.buildVocab(eventsTokenized, vocabSize=vocabSize)
-    dumpTokenizerFiles(tokenizer, outFolder, vocabSize)
+    tokenizer.dumpTokenizerFiles(outFolder)
 
 
 def readAndFilterFolders(subFolders, parserFunction, limit=None):
