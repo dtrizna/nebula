@@ -21,11 +21,44 @@
 - ~~prepare extractor and tokenizer classes~~
 - ~~preprocess train and test sets~~
 - try different models with labeled dataset:
-  - (4) 1D-CNN + Linear
-  - (0) Transformer
-  - (2) Reformer
-  - (1) 1D-CNN-Transformer (?)
-  - (3) star transformer (?)
+  - ~~1D-CNN + Linear~~
+  - ~~Transformer~~
+  - ~~LSTM~~
+  - ~~1D-CNN + LSTM~~
+  - Reformer
+  - 1D-CNN-Transformer (?)
+  - star transformer (?)
+- cross-validate models to find best hyperparameters
+  - ~~1D CNN + Linear~~
+  - ~~Transformer~~
+  - 1D CNN + LSTM
+  > NOTE: Plot vocabSize and maxLen CV as heatmap!
+- cross-validate preprocessing to find best data structure
+  - clean dataset (w/o api_seq_len==1 of ordinal APIs)
+    > NOTE: `MSVBVM60.ordinal_100` is in 15192 files, including 874 benignware files.
+    > NOTE2: There are lots of another examples with 1 or 2 API calls only -- especially in clean folder:
+
+    ```text
+       pc                  api_name         args ret_val
+
+    0  0x407c96  KERNEL32.GetCommandLineA   []  0x45f0
+
+    0  0x41808b  OLEAUT32.GetModuleHandleA   [0x418190, 0x400000, 0x0, 0x0]     0x0
+    1  0x41809f    OLEAUT32.GetProcAddress  [0x0, 0x418181, 0x0, 0x1212000]     0x0
+
+    0  0x40119a         kernel32.ShowConsoleCursor  [0x4037d3, 0x40153e, 0x0, 0x0]     0x0
+    1  0x40128f  kernel32.GetUserDefaultUILanguage                              []  0xffff}
+    ```
+
+  - more verbose dataset -- include additional fields
+  - 3D dataset: (batch_size, seq_len, features) where each sequence represent:
+    - API call tokens: name, ret_val, args
+    - network request tokens
+    - featurized registry modification
+    - featurized file modification
+    > NOTE: models should be adjusted to parse 3D structure, if transformer, might need positional encoding twice
+  - consider in-memory data processing
+    > NOTE: need to rerun SpeakEasy on raw PEs to get this data
 - try pre-training models with SSL: (1) MLM (2) GPT-style LM
 
 ### `auditd` **commandLine** work - dataset and dowstream tasks
@@ -39,6 +72,7 @@
   - prepare samples for Cartesian bootstraping
   - write classes for preprocessing
   - build train and test datasets
+  - sequence processing -- based on: (a) time (b) nr. of events ?
   
 ### Contextual embeddings
 

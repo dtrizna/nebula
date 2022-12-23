@@ -8,11 +8,11 @@ from collections.abc import Iterable
 from nltk import WhitespaceTokenizer
 from tqdm import tqdm
 from nebula.constants import *
-from nebula.plots import plotCounterCountsLineplot
+from nebula.plots import plotCounterCountsLineplot, plotListElementLengths
 
 class JSONTokenizer(object):
     def __init__(self, 
-                patternCleanup=JSON_CLEANUP_SYMBOLS,
+                patternCleanup = JSON_CLEANUP_SYMBOLS,
                 stopwords = SPEAKEASY_TOKEN_STOPWORDS,
                 specialTokens = ["<pad>", "<unk>", "<mask>"]):
         self.tokenizer = WhitespaceTokenizer()
@@ -33,6 +33,12 @@ class JSONTokenizer(object):
         self.vocabError = "Vocabulary not initialized! Use buildVocab() first or load it using loadVocab()!"
 
     # methods related to tokenization
+    def clearJsonEvent(self, jsonEvent):
+        jsonEvent = str(jsonEvent).lower()
+        for x in self.patternCleanup:
+            jsonEvent = jsonEvent.replace(x, " ")
+        return jsonEvent
+
     def tokenizeEvent(self, jsonEvent):
         jsonEventClean = self.clearJsonEvent(jsonEvent)
         tokenizedJsonEvent = self.tokenizer.tokenize(jsonEventClean)
@@ -48,14 +54,8 @@ class JSONTokenizer(object):
         else:
             raise TypeError("tokenize(): Input must be a string, bytes, or Iterable!")
     
-    def clearJsonEvent(self, jsonEvent):
-        jsonEvent = str(jsonEvent).lower()
-        for x in self.patternCleanup:
-            jsonEvent = jsonEvent.replace(x, " ")
-        return jsonEvent
-
     # methods related to vocab
-    def buildVocab(self, tokenListSequence, vocabSize=10000):
+    def buildVocab(self, tokenListSequence, vocabSize=2500):
         counter = Counter()
         for tokenList in tqdm(tokenListSequence):
             counter.update(tokenList)
@@ -74,6 +74,9 @@ class JSONTokenizer(object):
             msg += f"'vocabSize' is set to {self.vocabSize} to represent tokens in corpus!"
             logging.warning(msg)
     
+    def train(self, tokenizedListSequence, vocabSize=2500):
+        self.buildVocab(tokenizedListSequence, vocabSize)
+
     def dumpVocab(self, vocabPickleFile):
         with open(vocabPickleFile, "wb") as f:
             pickle.dump(self.vocab, f)
@@ -86,6 +89,9 @@ class JSONTokenizer(object):
                 self.vocab = pickle.load(f)
         self.vocabSize = len(self.vocab)
         self.reverseVocab = {v:k for k,v in self.vocab.items()}
+
+    def load_from_pretrained(self, vocab):
+        self.loadVocab(vocab)
 
     # methods related to encoding
     def convertTokenListToIds(self, tokenList):
@@ -139,7 +145,7 @@ class JSONTokenizer(object):
         else:
             raise Exception("detokenize(): " + self.vocabError)
 
-    def dumpTokenizerFiles(self, outFolder):
+    def dumpTokenizerFiles(self, outFolder, tokenListSequence=None):
         file = f"{outFolder}\\speakeasy_VocabSize_{self.vocabSize}.pkl"
         self.dumpVocab(file)
         logging.warning("Dumped vocab to {}".format(file))
@@ -152,3 +158,6 @@ class JSONTokenizer(object):
         file = f"{outFolder}\\speakeasy_counter_plot.png"
         plotCounterCountsLineplot(self.counter, outfile=file)
         logging.warning("Dumped vocab counter plot to {}".format(file))
+
+        if tokenListSequence:
+            _ = plotListElementLengths(tokenListSequence, outfile=f"{outFolder}\\speakeasy_tokenListLengths.png")
