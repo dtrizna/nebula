@@ -1,9 +1,7 @@
 import os
 import sys
-import logging
 from pandas import to_datetime
 from collections.abc import Iterable
-from .plots import plotCounterCountsLineplot
 
 def getRealPath(type="script"):
     idx = 1 if type == "notebook" else 0
@@ -39,21 +37,6 @@ def splitDataFrameTimeStampToChunks(df, timeFieldName='TimeStamp', chunkSize='5m
     df[timeFieldName] = to_datetime(df[timeFieldName])
     df[timeFieldName] = df[timeFieldName].dt.floor(chunkSize)
     return df
-
-def dumpTokenizerFiles(tokenizer, outFolder, vocabSize=""):
-    import pickle
-    file = f"{outFolder}\\speakeasy_VocabSize_{vocabSize}.pkl"
-    tokenizer.dumpVocab(file)
-    logging.warning("Dumped vocab to {}".format(file))
-    
-    file = f"{outFolder}\\speakeasy_counter.pkl"
-    logging.warning("Dumped vocab counter to {}".format(file))
-    with open(file, "wb") as f:
-        pickle.dump(tokenizer.counter, f)
-
-    file = f"{outFolder}\\speakeasy_counter_plot.png"
-    plotCounterCountsLineplot(tokenizer.counter, outfile=file)
-    logging.warning("Dumped vocab counter plot to {}".format(file))
 
 def isolationForestAnomalyDetctions(arr):
     from sklearn.ensemble import IsolationForest
