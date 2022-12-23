@@ -51,7 +51,9 @@ def plotListElementLengths(list_of_strings, xlim=None, outfile=None):
         plt.xlim(xlim)
     plt.yscale("log")
     plt.ylabel("Count (log)")
+    plt.grid(which="both")
     if outfile:
+        plt.tight_layout()
         plt.savefig(outfile)
     else:
         plt.show()
