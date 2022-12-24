@@ -31,8 +31,10 @@ class CNNLinearTransformerWithPositionalEmbeddings(nn.Module):
   def __init__(self, input_dim, hidden_dim, num_heads, transformer_dim, kernel_sizes, vocab_size, embedding_dim, max_seq_len):
     super().__init__()
 
-    # 
     self.embedding = nn.Embedding(vocab_size, embedding_dim)
+    # NOTE: The positional embedding is not really needed here, 
+    # since after Conv1d the output is not sequential, 
+    # but sequential inferences is learned by Conv1d kernels
     self.positional_embedding = nn.Embedding(max_seq_len, embedding_dim)
     
     # Define the 1D convolutional layers
