@@ -99,7 +99,7 @@ for file in trainSetsFiles:
     maxLen = int(file.split("_")[4])
     metricFilePrefix = f"maxLen_{maxLen}_"
     
-    existingRunPrefix = f"maxLen_{maxLen}_vocabSize_{vocabSize}"
+    existingRunPrefix = f"maxLen_{maxLen}_vocabSize_{vocabSize}_"
     if any([x for x in existingRuns if existingRunPrefix in x]):
         logging.warning(f" [!] Skipping {existingRunPrefix} as it already exists")
         continue

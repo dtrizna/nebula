@@ -215,7 +215,6 @@ def readAndFilterFolders(subFolders, parserFunction, limit=None):
         timenowEnd = time.time()
         logging.warning(f"{timenow}: Finished... Took: {timenowEnd - timenowStart:.2f}s")
     return events, y, yHashes
-    
 
 if __name__ == "__main__":
 
