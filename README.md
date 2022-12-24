@@ -3,16 +3,27 @@
 <!-- scaled image from web -->
 <center><img src="https://cdn.eso.org/images/screen/eso1205ec.jpg" width="400"></center>
 
-## Modelling
+## Future work
 
-- `modeling/fastText`: code for self-supervised embeddings (`fastText`) from system logs
-- `modeling/traditionNLP`: code for traditional NLP modeling of bash process titles
-- `modeling/tokenizer`: code for tokenizing bash process titles with sentencePiece
-- `modeling/mlm`: code for masked language modelling CNN-Transformer model
+### Short ToDo list
 
-## To Be Done
+0. Build malware classifier class suitable for sharing
+   - Add ember feature extraction to sequential emulation model.
+1. Try efficient long-sequence attention models:
+   - Reformer
+   - Start transformer
+2. Pre-training routines on unlabeled data according to CEF-SSL framework:
+   - naive methods like expectation minimization
+   - language modeling:
+     - MLM
+     - GPT like $p(x_{t+1}|x_{t}\ ...\ x_{0})$
+   - embedding pretraining:
+     - fastText
+3. 3D dataset `(batch_size, seq_len, features)` -- first learn representation for event (`features`), then for sequence of events (`seq_len`)
 
-### `SpeakEasy` dynamic analysis modelling
+### Detailed ToDo list
+
+#### `SpeakEasy` dynamic analysis modelling
 
 - ~~assess preprocessing: filtering and normalization~~
 - ~~generate filtered dataset suitable for SSL pre-training~~
@@ -25,18 +36,20 @@
   - ~~Transformer~~
   - ~~LSTM~~
   - ~~1D-CNN + LSTM~~
-  - Reformer
-  - 1D-CNN-Transformer (?)
+  - Reformer (!)
   - star transformer (?)
+  - 1D-CNN-Transformer (?)
 - cross-validate models to find best hyperparameters
   - ~~1D CNN + Linear~~
   - ~~Transformer~~
   - 1D CNN + LSTM
-  > NOTE: Plot vocabSize and maxLen CV as heatmap!
 - cross-validate preprocessing to find best data structure
-  - clean dataset (w/o api_seq_len==1 of ordinal APIs)
-    > NOTE: `MSVBVM60.ordinal_100` is in 15192 files, including 874 benignware files.
-    > NOTE2: There are lots of another examples with 1 or 2 API calls only -- especially in clean folder:
+  - ~~Plot vocabSize and maxLen as heatmap!~~
+  - ~~clean dataset (w/o api_seq_len==1 of ordinal APIs)~~ DONE: Training set size dropped from `91096` to `76126`.
+
+    > NOTE: Excluded `MSVBVM60.ordinal_100` which was in 15192 training files, including 874 benignware files.  
+
+    > NOTE2: There are lots of another examples with 1 or 2 API calls only -- especially in clean folder -- decided to keep them:
 
     ```text
        pc                  api_name         args ret_val
@@ -51,102 +64,88 @@
     ```
 
   - more verbose dataset -- include additional fields
-  - 3D dataset: (batch_size, seq_len, features) where each sequence represent:
+    - ~~include API call 'args'~~ DONE: See training set under `data/data_filtered/speakeasy_trainset_WithArgs/`
+
+  - 3D dataset: `(batch_size, seq_len, features)` where each sequence represent:
     - API call tokens: name, ret_val, args
     - network request tokens
     - featurized registry modification
     - featurized file modification
+
     > NOTE: models should be adjusted to parse 3D structure, if transformer, might need positional encoding twice
+
+    > NOTE2! This will build ground for future work on loging data (auditd, sysmon).
+
   - consider in-memory data processing
-    > NOTE: need to rerun SpeakEasy on raw PEs to get this data
-- try pre-training models with SSL: (1) MLM (2) GPT-style LM
+    > NOTE: Need to rerun SpeakEasy on raw PEs to get this data!
+- Pre-training routines on unlabeled data according to CEF-SSL framework:
+  - naive methods like expectation minimization
+  - pretraining embeddings:
+    - fastText
+    - language modelling with `nn.Embedding()`
+  - language modeling:
+    - MLM
+    - GPT like $p(x_{t+1}|x_{t}\ ...\ x_{0})$
 
-### `auditd` **commandLine** work - dataset and dowstream tasks
+### `auditd` dataset and dowstream tasks
 
-- reverse shell dataset:
+- reverse shell dataset with `process.title` content only:
   - generate augmented reverse shells as malicious samples: (a) train -- one set of reverse shell binaries (b) val -- another binaries
   - random split of unique legitimate commands to train/val
-    > NOTE: Be sure that both generated commands resemble as close as possible to auditd telemetry!
+  
+  > NOTE: Be sure that generated commands resemble as close as possible to auditd telemetry (i.e. normalization)!
 
-- `auditd` dataset:
-  - prepare samples for Cartesian bootstraping
+- `auditd` JSON dataset:
   - write classes for preprocessing
+  - prepare samples for Cartesian bootstraping
   - build train and test datasets
   - sequence processing -- based on: (a) time (b) nr. of events ?
   
 ### Contextual embeddings
 
-- adjust preprocessing:
-  - remove artificial separator
-  - include only the minimal set of fields
-  - `fasttext`: any chance to use sentencePiece tokenizer instead of default one?
+- cross validation of `fasttext`:
+  - `fasttext` as embeddings with models instead of `nn.Embedding()` - tokenization & embeddings setup:
+    - for SpeakEasy reports:
+      - custom whitespace + embeddings + model
+      - custom whitespace + fastText + model
+    - for `auditd` data (e.g. reverse shell dataset):
+      - sentencePiece + embeddings + model
+      - sentencePiece + fastText + model
+        > Note: is it possible to define custom tokenizer for fastText?
+  - with default hyperparameters:
+    - embedding weights setup:
+      - with trainable from scratch, random initialization
+      - pre-trained `fasttext` model, frozen (not updated)
+      - pre-trained `fasttext` model, but updated during supervised phase
+  - fasttext `MAX_LINE_SIZE` analysis?
+    - is it a problem at all? test on speakeasy reports
+  - `get_word_vector()` (sequence of vectors) vs `get_sentence_vector()`
+  - hyperparameter tests: epochs, dimension, ngrams, etc.
 
 - `fasttext` intrinstic evaluation: `get_nearest_neighbors()` | `get_analogies()`  
   see: <https://fasttext.cc/docs/en/unsupervised-tutorial.html#nearest-neighbor-queries>
 
-- downstream tasks for malicious classification
-  - *Speakeasy reports*: define pipeline for emulation logs from Quo.Vadis
-  - *Windows logs*:
-    - using public repos with Windows telemetry:  
-  (a) mordor (redirects here: <https://github.com/OTRF/Security-Datasets>)  
-  (b) <https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES>  
-  (c) <https://github.com/NextronSystems/evtx-baseline>  
-    - ask for `attackbot` data on windows?
-  - *Linux logs*:
-    - using logs from pentest machines?
-    - simulate your own TTPs in validation environments?
-      - automate it?
+### Dataset improvements
 
-### A/B tests
+- *Speakeasy reports*:
+  - ~~with Quo.vadis dataset~~
+  - with SOREL (?)
+- *Windows logs*:
+  - using public repos with Windows telemetry:  
+    - <https://github.com/OTRF/Security-Datasets>
+    - <https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES>
+    - <https://github.com/NextronSystems/evtx-baseline>
+  - `attackbot` data on windows?
+- *Linux logs*:
+  - using logs from pentest machines?
+  - simulate your own TTPs in validation environments?
+    - automate it?
 
-- preprocessing for MLM training:
-  - minimalistic setup -- preserves only the most important fields
-  - raw JSON
+## Past Work
 
-- tokenization & embeddings setup:
-  - wordpunct + embeddings + transformer
-  - sentencePiece + embeddings + transformer
-  - wordpunct + fastText + transformer
-  - sentencePiece + fastText + transformer
-    > Note: is it possible to define custom tokenizer for fastText?
-
-- `fasttext` with default hyperparameters:
-  - sequence of vectors (`get_word_vector()`) vs `get_sentence_vector()`
-  - modeling -- embeddings:
-    - with trainable from scratch, random initialization
-    - pre-trained `fasttext` model, frozen (not updated)
-    - pre-trained `fasttext` model, but updated during supervised phase
-  - hyperparameter tests: epochs, dimension, ngrams, etc.
-  - fasttext `MAX_LINE_SIZE` analysis?
-    - is it a problem at all? if yes -- limit size:
-      - chunk smaller windows -- 5 min vs 1 min
-      - chunk the same window to multiple inputs
-
-- sequence modelling:
-  - LSTM
-  - 1D-CNN + LSTM
-  - tranformer
-  - 1D-CNN + transformer
-  - reformer
-      > NOTE!  
-      > (a) use the same time for training, e.g. one day  
-      > (b) plot mean epoch time with boxplots
-
-## Done
-
-- test speeds (DONE in `_auditd_b_preprocess.ipynb`)
+- ~~test normalization and JSON filter speeds~~ (DONE, see `tests/auditd_1_Preprocessing/_auditd_json_benchmarks.ipynb` and `tests/speakeasy_1_Preprocessing/_speakeasyTicks.ipynb`)
   - ~~any ways to optimize pandas involvement?~~
     - ~~replace pandas whatsoever -- do plain `json` or `koalas`?~~
     - ~~what takes the most time -- loading? groupby?~~
-- write pipeline for fastText training
-  - check tokenization
-    - ~~Will it be a problem that title after tokenization will screw number of tokens in single event?~~ YES
-    - ~~Try with different column separator, e.g. `\s,` pr `\s,\s` (if `,` makes incorrect tokens)?~~  
-      See `utils.contants.FIELD_SEPARATOR`, settled on `" , "`
-  intrinstic evalution:
-  - network events tokens are close by?
-  - ~~anomaly detection on red team host~~ see `_auditd_c_fasttext.ipynb`
-- ~~consider unification of pre-processing to represent same/similar data as Sysmon/Speakeasy/(what Win telemetry uses Vanquish)?~~  
-  Sort of done -- removed all non-essential stuff, left only fields, that can be replicated in case of Sysmon. See `utils.contants.AUDITD_FIELDS`
-- ~~check what telemetry we have on Windows machines~~  
-  Standard structure, but unusual EventIDs...
+- ~~write pipeline for fastText training~~ (DONE, see `tests/modeling/fastText/_auditd_d_fasttext_full.ipynb`)
+  - ~~anomaly detection on red team host~~ (DONE, see `tests/modeling/fastText/_auditd_c_fasttext.ipynb`
