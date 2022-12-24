@@ -115,6 +115,7 @@ def plotCrossValidation_TPR_F1_Time(dfDict, timeDict, title=None, legentTitle=No
     if savePath:
         plt.tight_layout()
         plt.savefig(savePath)
+    return fig, ax
 
 def plotCrossValidationFolder(folder, field, diffExtractor, extraFileFilter=None, savePath=None, title=None, figSize=(18, 6)):
     dfDict, timeDict = readCrossValidationFolder(folder, diffExtractor, extraFileFilter=extraFileFilter)
@@ -135,11 +136,11 @@ def plotCrossValidationFieldvsKeys(dfDict, field, keyName, fpr, ax=None):
     # add grid
     ax.grid()
 
-def plotVocabSizeMaxLenTests(inFolder, plotOutFolder):
+def plotVocabSizeMaxLenTests(inFolder, plotOutFolder, maxLen=1024, vocabSize=2000):
     field = "vocabSize"
     diffExtractor = lambda x: x.split(field)[1].split("_")[1]
 
-    myFilter = "maxLen_1024_"
+    myFilter = f"maxLen_{maxLen}_"
     extraFileFilter = lambda x: myFilter in x
 
     title = f"{inFolder.split('_')[0]} {field}; {'='.join(myFilter.split('_')[:-1])}"
@@ -149,16 +150,14 @@ def plotVocabSizeMaxLenTests(inFolder, plotOutFolder):
     field = "maxLen"
     diffExtractor = lambda x: x.split(field)[1].split("_")[1]
 
-    myFilter = "vocabSize_2000_"
+    myFilter = f"vocabSize_{vocabSize}_"
     extraFileFilter = lambda x: myFilter in x
 
     title = f"{inFolder.split('_')[0]} {field}; {'='.join(myFilter.split('_')[:-1])}"
     pngPath = plotOutFolder + title.replace(" ", "_").replace("=", "_").replace(";", "")+".png"
     plotCrossValidationFolder(inFolder, field, diffExtractor, extraFileFilter, title=title, savePath=pngPath)
 
-def plotVocabSizeMaxLenArchComparison(maxLen=512, vocabSize=2000, savePath=None, legendTitle=None, figSize=(18, 6)):
-    vmFolders = [x for x in os.listdir() if "VocabSize_maxLen" in x]
-
+def plotVocabSizeMaxLenArchComparison(vmFolders, maxLen=512, vocabSize=2000, savePath=None, legendTitle=None, figSize=(18, 6)):
     metricDict = dict()
     timeDict = dict()
     for folder in vmFolders:
@@ -169,8 +168,8 @@ def plotVocabSizeMaxLenArchComparison(maxLen=512, vocabSize=2000, savePath=None,
         metricDict[key] = dfDict
         timeDict[key] = timeValue
     title = f"Architecture Comparison; maxLen={maxLen}, vocabSize={vocabSize}"
-    plotCrossValidation_TPR_F1_Time(metricDict, timeDict, legentTitle=legendTitle, savePath=savePath, title=title, figSize=figSize)
-    return metricDict, timeDict
+    fig, ax = plotCrossValidation_TPR_F1_Time(metricDict, timeDict, legentTitle=legendTitle, savePath=savePath, title=title, figSize=figSize)
+    return metricDict, timeDict, fig, ax
 
 def plotHeatmap(df, title, rangeL=None, xlabel=None, ylabel=None, savePath=None, figSize=(12, 4), ax=None, cmap=None):
     if ax is None:
@@ -189,10 +188,10 @@ def plotHeatmap(df, title, rangeL=None, xlabel=None, ylabel=None, savePath=None,
     ax.set_ylabel(ylabel)
 
     if savePath:
-        plt.tight_layout()
+        #plt.tight_layout()
         plt.savefig(savePath)
 
-def plotVocabSizeMaxLenHeatmap(inFolder, fpr, savePath=None, rangeL=None, figSize=(14, 5)):
+def plotVocabSizeMaxLenHeatmap(inFolder, fpr, savePath=None, rangeL=None, figSize=(14, 5), supTitle=None, vocabSizes=None, maxLens=None):
     metricFiles = [file for file in os.listdir(inFolder) if file.endswith(".json")]
 
     dfHeatTPR = DataFrame()
@@ -200,7 +199,11 @@ def plotVocabSizeMaxLenHeatmap(inFolder, fpr, savePath=None, rangeL=None, figSiz
     for file in metricFiles:
         vocabSize = int(file.split("vocabSize")[1].split("_")[1])
         maxLen = int(file.split("maxLen")[1].split("_")[1])
-        dfMetric, timeDict = readCrossValidationMetricFile(os.path.join(inFolder, file))
+        if vocabSizes and vocabSize not in vocabSizes:
+            continue
+        if maxLens and maxLen not in maxLens:
+            continue
+        dfMetric, _ = readCrossValidationMetricFile(os.path.join(inFolder, file))
         dfHeatTPR.loc[vocabSize, maxLen] = dfMetric["tpr_avg"][fpr]
         dfHeatF1.loc[vocabSize, maxLen] = dfMetric["f1_avg"][fpr]
     dfHeatF1 = dfHeatF1.sort_index().transpose().sort_index(ascending=False)
@@ -211,8 +214,14 @@ def plotVocabSizeMaxLenHeatmap(inFolder, fpr, savePath=None, rangeL=None, figSiz
 
     plotHeatmap(dfHeatTPR, f"True-Positive Rate", rangeL=rangeL, xlabel="vocabSize", ylabel="sequence length", ax=ax[0])
     plotHeatmap(dfHeatF1, f"F1-score", rangeL=rangeL, xlabel="vocabSize", ylabel="sequence length", ax=ax[1], cmap="Blues")
-    _ = fig.suptitle(f"{inFolder.split('_')[0]} with FPR={fpr} for different vocabSize and sequence length", fontsize=14)
+    
+    if not supTitle:
+        fig.suptitle(f"{inFolder.split('_')[0]} with FPR={fpr} for different vocabSize and sequence length", fontsize=14)
+    else:
+        fig.suptitle(f"{supTitle} with FPR={fpr} for different vocabSize and sequence length", fontsize=14)
 
     if savePath:
         plt.tight_layout()
         plt.savefig(savePath)
+
+    return fig, ax
