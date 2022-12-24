@@ -11,11 +11,15 @@ from nebula.models import Cnn1DLinear, Cnn1DLSTM, LSTM
 from nebula.attention import TransformerEncoderModel
 from nebula.evaluation import CrossValidation
 
-runName = f"Cnn1DLSTM_VocabSize_maxLen"
+# SCRIPT CONFIG
+train_limit = None
+runName = f"Cnn1DLinear_VocabSize_maxLen"
 # vocabSize = 2000
 # maxLen = 512
 
-outputFolder = os.path.join(r"C:\Users\dtrizna\Code\nebula\evaluation\crossValidation", runName)
+outputFolder = r"C:\Users\dtrizna\Code\nebula\evaluation\crossValidation_WithAPIargs"
+os.makedirs(outputFolder, exist_ok=True)
+outputFolder = os.path.join(outputFolder, runName)
 os.makedirs(outputFolder, exist_ok=True)
 
 # loging setup
@@ -24,24 +28,23 @@ logging.basicConfig(filename=os.path.join(outputFolder, logFile), level=logging.
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 # =============== Cross-Valiation CONFIG
-train_limit = None # 5000
 nFolds = 3
 epochs = 3
 fprValues = [0.0001, 0.001, 0.01, 0.1]
 rest = 30 # seconds to rest between folds (to cool down)
-metricFilePrefix = ""
+metricFilePrefix = "" # is set later, within the loop
 
 # ================ MODEL CONFIG
 
-# modelClass = Cnn1DLinear
-# modelArch = {
-#     "vocabSize": None,
-#     "embeddingDim": 64,
-#     "hiddenNeurons": [512, 256, 128],
-#     "batchNormConv": False,
-#     "batchNormFFNN": False,
-#     "filterSizes": [2, 3, 4, 5]
-# }
+modelClass = Cnn1DLinear
+modelArch = {
+    "vocabSize": None,
+    "embeddingDim": 64,
+    "hiddenNeurons": [512, 256, 128],
+    "batchNormConv": False,
+    "batchNormFFNN": False,
+    "filterSizes": [2, 3, 4, 5]
+}
 # modelClass = TransformerEncoderModel
 # modelArch = {
 #     "vocabSize": vocabSize,  # size of vocabulary
@@ -55,18 +58,18 @@ metricFilePrefix = ""
 #     "dropout": 0.5
 # }
 
-modelClass = Cnn1DLSTM
-modelArch = {
-    "vocabSize": None,
-    "embeddingDim": 64,
-    "lstmHidden": 128,
-    "lstmLayers": 1,
-    "lstmDropout": 0, # if > 0, need lstmLayers > 1
-    "lstmBidirectional": True,
-    "batchNormConv": False,
-    "hiddenNeurons": [256, 128],
-    "batchNormFFNN": False,
-}
+# modelClass = Cnn1DLSTM
+# modelArch = {
+#     "vocabSize": None,
+#     "embeddingDim": 64,
+#     "lstmHidden": 128,
+#     "lstmLayers": 1,
+#     "lstmDropout": 0, # if > 0, need lstmLayers > 1
+#     "lstmBidirectional": True,
+#     "batchNormConv": False,
+#     "hiddenNeurons": [256, 128],
+#     "batchNormFFNN": False,
+# }
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -82,9 +85,11 @@ modelInterfaceConfig = {
 }
 
 # =============== CROSS-VALIDATION LOOP
-trainSetPath = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset"
+trainSetPath = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset_WithAPIargs"
 trainSetsFiles = sorted([x for x in os.listdir(trainSetPath) if x.endswith("_x.npy")])
 y_train = np.load(os.path.join(trainSetPath, "speakeasy_y.npy"))
+
+existingRuns = [x for x in os.listdir(outputFolder) if x.endswith(".json")]
 
 for file in trainSetsFiles:
     x_train = np.load(os.path.join(trainSetPath, file))
@@ -93,9 +98,13 @@ for file in trainSetsFiles:
     modelArch["vocabSize"] = vocabSize
     maxLen = int(file.split("_")[4])
     metricFilePrefix = f"maxLen_{maxLen}_"
-    if maxLen == 1024 and vocabSize == 1000:
+    
+    existingRunPrefix = f"maxLen_{maxLen}_vocabSize_{vocabSize}"
+    if any([x for x in existingRuns if existingRunPrefix in x]):
+        logging.warning(f" [!] Skipping {existingRunPrefix} as it already exists")
         continue
-    logging.warning(f" [!] Using vocabSize: {vocabSize} | maxLen: {maxLen}")
+    
+    logging.warning(f" [!] Running Cross Validation with vocabSize: {vocabSize} | maxLen: {maxLen}")
 
 # x_train = np.load(rf"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset\speakeasy_VocabSize_{vocabSize}_maxLen_{maxLen}_x.npy")
 # y_train = np.load(r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset\speakeasy_y.npy")
