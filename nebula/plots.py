@@ -182,7 +182,7 @@ def plotHeatmap(df, title, rangeL=None, xlabel=None, ylabel=None, savePath=None,
         vmin = None
         vmax = None
     # heatmap with blue colormap
-    sns.heatmap(df, ax=ax, annot=True, fmt=".2f", vmin=vmin, vmax=vmax, cmap=cmap)    
+    sns.heatmap(df, ax=ax, annot=True, fmt=".3f", vmin=vmin, vmax=vmax, cmap=cmap)    
     ax.set_title(title)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
@@ -191,7 +191,7 @@ def plotHeatmap(df, title, rangeL=None, xlabel=None, ylabel=None, savePath=None,
         #plt.tight_layout()
         plt.savefig(savePath)
 
-def plotVocabSizeMaxLenHeatmap(inFolder, fpr, savePath=None, rangeL=None, figSize=(14, 5), supTitle=None, vocabSizes=None, maxLens=None):
+def plotVocabSizeMaxLenHeatmap(inFolder, fpr, savePath=None, rangeL=None, figSize=(14, 5), supTitle=None, vocabSizes=None, maxLens=None, axs=None):
     metricFiles = [file for file in os.listdir(inFolder) if file.endswith(".json")]
 
     dfHeatTPR = DataFrame()
@@ -210,18 +210,18 @@ def plotVocabSizeMaxLenHeatmap(inFolder, fpr, savePath=None, rangeL=None, figSiz
     dfHeatTPR = dfHeatTPR.sort_index().transpose().sort_index(ascending=False)
 
     # create 2 plots
-    fig, ax = plt.subplots(1, 2, figsize=figSize)
+    if axs is None:
+        _, axs = plt.subplots(1, 2, figsize=figSize)
+        if not supTitle:
+            plt.suptitle(f"{inFolder.split('_')[0]} with FPR={fpr} for different vocabSize and sequence length", fontsize=14)
+        else:
+            plt.suptitle(f"{supTitle} with FPR={fpr} for different vocabSize and sequence length", fontsize=14)
 
-    plotHeatmap(dfHeatTPR, f"True-Positive Rate", rangeL=rangeL, xlabel="vocabSize", ylabel="sequence length", ax=ax[0])
-    plotHeatmap(dfHeatF1, f"F1-score", rangeL=rangeL, xlabel="vocabSize", ylabel="sequence length", ax=ax[1], cmap="Blues")
-    
-    if not supTitle:
-        fig.suptitle(f"{inFolder.split('_')[0]} with FPR={fpr} for different vocabSize and sequence length", fontsize=14)
-    else:
-        fig.suptitle(f"{supTitle} with FPR={fpr} for different vocabSize and sequence length", fontsize=14)
+    plotHeatmap(dfHeatTPR, f"True-Positive Rate", rangeL=rangeL, xlabel="vocabSize", ylabel="sequence length", ax=axs[0])
+    plotHeatmap(dfHeatF1, f"F1-score", rangeL=rangeL, xlabel="vocabSize", ylabel="sequence length", cmap="Blues", ax=axs[1])
 
     if savePath:
         plt.tight_layout()
         plt.savefig(savePath)
 
-    return fig, ax
+    return axs
