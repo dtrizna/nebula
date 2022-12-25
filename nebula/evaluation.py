@@ -65,7 +65,7 @@ class CrossValidation(object):
             predicted_probs = modelTrainer.predict_proba(X_test)
 
             for fpr in self.fprValues:
-                tpr, threshold = get_tpr_at_fpr(predicted_probs, y_test, fpr)
+                tpr, threshold = get_tpr_at_fpr(y_test, predicted_probs, fpr)
                 f1 = f1_score(y[test_index], predicted_probs >= threshold)
                 self.metrics[fpr]["tpr"].append(tpr)
                 self.metrics[fpr]["f1"].append(f1)
@@ -95,7 +95,7 @@ class CrossValidation(object):
             msg += f"\tFPR: {fpr:>6} -- TPR: {self.metrics[fpr]['tpr_avg']:.4f} -- F1: {self.metrics[fpr]['f1_avg']:.4f}\n"
         logging.warning(msg)
 
-def get_tpr_at_fpr(predicted_probs, true_labels, fprNeeded):
+def get_tpr_at_fpr(true_labels, predicted_probs, fprNeeded):
         fpr, tpr, thresholds = roc_curve(true_labels, predicted_probs)
         tpr_at_fpr = tpr[fpr <= fprNeeded][-1]
         threshold_at_fpr = thresholds[fpr <= fprNeeded][-1]
