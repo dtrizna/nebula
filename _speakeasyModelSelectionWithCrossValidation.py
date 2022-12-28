@@ -12,12 +12,22 @@ from nebula.attention import TransformerEncoderModel
 from nebula.evaluation import CrossValidation
 
 # SCRIPT CONFIG
-train_limit = None
+train_limit = 1000 # None
 runName = f"Cnn1DLinear_VocabSize_maxLen"
 # vocabSize = 2000
 # maxLen = 512
+# =============== Cross-Valiation CONFIG
 
-outputFolder = r"C:\Users\dtrizna\Code\nebula\evaluation\crossValidation_WithAPIargs"
+nFolds = 3
+epochs = 3
+fprValues = [0.0001, 0.001, 0.01, 0.1]
+rest = 0 #30 # seconds to rest between folds (to cool down)
+metricFilePrefix = "" # is set later, within the loop
+random_state = 42
+
+# ===========================
+
+outputFolder = r"C:\Users\dtrizna\Code\nebula\evaluation\crossValidation_TEST"#WithAPIargs"
 os.makedirs(outputFolder, exist_ok=True)
 outputFolder = os.path.join(outputFolder, runName)
 os.makedirs(outputFolder, exist_ok=True)
@@ -26,13 +36,6 @@ os.makedirs(outputFolder, exist_ok=True)
 logFile = f"CrossValidationRun_{int(time.time())}.log"
 logging.basicConfig(filename=os.path.join(outputFolder, logFile), level=logging.WARNING)
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
-
-# =============== Cross-Valiation CONFIG
-nFolds = 3
-epochs = 3
-fprValues = [0.0001, 0.001, 0.01, 0.1]
-rest = 30 # seconds to rest between folds (to cool down)
-metricFilePrefix = "" # is set later, within the loop
 
 # ================ MODEL CONFIG
 
@@ -87,7 +90,7 @@ modelInterfaceConfig = {
 # =============== CROSS-VALIDATION LOOP
 trainSetPath = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset_WithAPIargs"
 trainSetsFiles = sorted([x for x in os.listdir(trainSetPath) if x.endswith("_x.npy")])
-y_train = np.load(os.path.join(trainSetPath, "speakeasy_y.npy"))
+y_train_orig = np.load(os.path.join(trainSetPath, "speakeasy_y.npy"))
 
 existingRuns = [x for x in os.listdir(outputFolder) if x.endswith(".json")]
 
@@ -121,9 +124,11 @@ for file in trainSetsFiles:
 #     modelArch["hiddenNeurons"] = hiddenLayer
 
     if train_limit:
-        x_train, y_train = shuffle(x_train, y_train, random_state=42)
+        x_train, y_train = shuffle(x_train, y_train_orig, random_state=random_state)
         x_train = x_train[:train_limit]
         y_train = y_train[:train_limit]
+    else:
+        y_train = y_train_orig
 
     logging.warning(f" [!] Using device: {device} | Dataset size: {len(x_train)}")
     
