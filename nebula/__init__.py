@@ -4,30 +4,35 @@ from nebula.models import Cnn1DLinear
 
 import os
 import time
-import pickle
 import logging
 import numpy as np
+from pandas import DataFrame
 
 import torch
-from sklearn.metrics import f1_score, accuracy_score
-
+from sklearn.metrics import f1_score
+from nebula.evaluation import get_tpr_at_fpr
 
 class ModelInterface(object):
     def __init__(self, 
-                    device, 
                     model,
+                    device, 
                     lossFunction,
                     optimizerClass,
                     optimizerConfig,
                     batchSize=64,
                     verbosityBatches = 100,
                     outputFolder=None,
+                    falsePositiveRates=[0.0001, 0.001, 0.01, 0.1],
+                    modelForwardPass=None,
                     stateDict = None):
-        self.model = model
+        self.model = model    
         self.optimizer = optimizerClass(self.model.parameters(), **optimizerConfig)
         self.lossFunction = lossFunction
         self.verbosityBatches = verbosityBatches
         self.batchSize = batchSize
+
+        self.falsePositiveRates = falsePositiveRates
+        self.fprReportingIdx = 1 # what FPR stats to report every epoch
 
         self.device = device
         self.model.to(self.device)
@@ -35,6 +40,10 @@ class ModelInterface(object):
         self.outputFolder = outputFolder
         if stateDict:
             self.model.load_state_dict(torch.load(stateDict))
+        if modelForwardPass:
+            self.model.forwardPass = modelForwardPass
+        else:
+            self.model.forwardPass = self.model.forward
 
     def loadState(self, stateDict):
         self.model.load_state_dict(torch.load(stateDict))
@@ -45,59 +54,73 @@ class ModelInterface(object):
 
         modelFile = f"{prefix}-model.torch"
         torch.save(self.model.state_dict(), modelFile)
+        np.save(f"{prefix}-trainTime.npy", np.array(self.trainingTime))
+        np.save(f"{prefix}-trainLosses.npy", np.array(self.trainLosses))
+        dumpString = f"""[!] {time.ctime()}: Dumped results:
+                model     : {modelFile}
+                losses    : {prefix}-train_losses.npy
+                duration  : {prefix}-trainTime.npy"""
 
-        with open(f"{prefix}-trainLosses.pickle", "wb") as f:
-            pickle.dump(self.trainLosses, f)
-        
-        # in form [accuracy, f1-score]
-        np.save(f"{prefix}-trainMetrics.npy", self.trainMetrics)
-        
-        with open(f"{prefix}-trainingTime.pickle", "wb") as f:
-            pickle.dump(self.trainingTime, f)
+        if not np.isnan(self.trainF1s).all():
+            np.save(f"{prefix}-trainF1s.npy", self.trainF1s)
+            dumpString += f"\n\t\ttrain F1s : {prefix}-trainF1s.npy"
+        if not np.isnan(self.trainTruePositiveRates).all():
+            np.save(f"{prefix}-trainTPRs.npy", self.trainTruePositiveRates)
+            dumpString += f"\n\t\ttrain TPRs: {prefix}-trainTPRs.npy"
 
-        dumpString = f"""
-        [!] {time.ctime()}: Dumped results:
-                model: {modelFile}
-                train loss list: {prefix}-train_losses.pickle
-                train metrics : {prefix}-train_metrics.pickle
-                duration: {prefix}-duration.pickle"""
         logging.warning(dumpString)
+    
+    def getMetrics(self, target, predProbs):
+        metrics = []
+        for fpr in self.falsePositiveRates:
+            tpr, threshold = get_tpr_at_fpr(target, predProbs, fpr)
+            f1_at_fpr = f1_score(target, predProbs >= threshold)
+            metrics.append([tpr, f1_at_fpr])        
+        return np.array(metrics)
 
     def trainEpoch(self, trainLoader, epochId):
-        trainMetrics = []
-        trainLoss = []
+        epochMetrics = []
+        epochLosses = []
         now = time.time()
 
         for batchIdx, (data, target) in enumerate(trainLoader):
             data, target = data.to(self.device), target.to(self.device)
             self.optimizer.zero_grad()
+            logits = self.model.forwardPass(data)
+            # if dimension of target is 1, reshape to (-1,1)
+            if target.dim() == 1:
+                target = target.reshape(-1, 1)
+            loss = self.lossFunction(logits, target)
 
-            logits = self.model(data)
-            loss = self.lossFunction(logits, target.reshape(-1,1))
-
-            trainLoss.append(loss.item())
+            epochLosses.append(loss.item())
 
             loss.backward() # derivatives
             self.optimizer.step() # parameter update  
 
             predProbs = torch.sigmoid(logits).clone().detach().cpu().numpy()
-            preds = (predProbs > 0.5).astype(np.int_)
-
-            # might be expensive to compute every batch?
-            # tpr = get_tpr_at_fpr(predProbs, target.cpu().numpy(), 0.1)
-            accuracy = accuracy_score(target.cpu(), preds)
-            f1 = f1_score(target.cpu(), preds)
-            trainMetrics.append([accuracy, f1])
+            if target.shape[1] == 1:
+                batchMetrics = self.getMetrics(target.cpu().numpy(), predProbs)
+                epochMetrics.append(batchMetrics)
             
             if batchIdx % self.verbosityBatches == 0:
-                logging.warning(" [*] {}: Train Epoch: {} [{:^5}/{:^5} ({:^2.0f}%)]\tLoss: {:.6f} | F1-score: {:.2f} | Elapsed: {:.2f}s".format(
+                if target.shape[1] == 1:
+                    metricsReport = f"FPR {self.falsePositiveRates[self.fprReportingIdx]} -- "
+                    metricsReport += f"TPR {batchMetrics[self.fprReportingIdx, 0]:.4f} | F1 {batchMetrics[self.fprReportingIdx, 1]:.4f}"
+                else:
+                    metricsReport = "Not computing TPR and F1"
+                logging.warning(" [*] {}: Train Epoch: {} [{:^5}/{:^5} ({:^2.0f}%)]\tLoss: {:.6f} | {} | Elapsed: {:.2f}s".format(
                     time.ctime(), epochId, batchIdx * len(data), len(trainLoader.dataset),
-                100. * batchIdx / len(trainLoader), loss.item(), np.mean([x[1] for x in trainMetrics]), time.time()-now))
+                100. * batchIdx / len(trainLoader), loss.item(), metricsReport, time.time() - now))
                 now = time.time()
         
-        trainMetrics = np.array(trainMetrics).mean(axis=0).reshape(-1,2)
-        return trainLoss, trainMetrics
-
+        if epochMetrics: # we do not collect metrics if target is not binary
+            # taking mean across all batches
+            epochMetrics = np.array(epochMetrics).mean(axis=0).reshape(-1,2)
+            epochTPRs, epochF1s = epochMetrics[:,0], epochMetrics[:,1]
+            # shape of each metrics array: (len(falsePositiveRates), )
+            return epochLosses, epochTPRs, epochF1s
+        else:
+            return epochLosses, None, None
 
     def fit(self, X, y, epochs=10):
         trainLoader = torch.utils.data.DataLoader(
@@ -105,24 +128,29 @@ class ModelInterface(object):
             batch_size=self.batchSize,
             shuffle=True
         )
-        
         self.model.train()
-        
+        self.trainTruePositiveRates = np.empty(shape=(epochs, len(self.falsePositiveRates)))
+        self.trainF1s = np.empty(shape=(epochs, len(self.falsePositiveRates)))
         self.trainLosses = []
-        self.trainMetrics = []
         self.trainingTime = []
         try:
             for epochIdx in range(1, epochs + 1):
                 epochStartTime = time.time()
                 logging.warning(f" [*] Started epoch: {epochIdx}")
 
-                epochTrainLoss, epochTrainMetric = self.trainEpoch(trainLoader, epochIdx)
+                epochTrainLoss, epochTPRs, epochF1s = self.trainEpoch(trainLoader, epochIdx)
+                self.trainTruePositiveRates[epochIdx-1] = epochTPRs
+                self.trainF1s[epochIdx-1] = epochF1s
                 self.trainLosses.extend(epochTrainLoss)
-                self.trainMetrics.append(epochTrainMetric)
-
                 timeElapsed = time.time() - epochStartTime
                 self.trainingTime.append(timeElapsed)
-                logging.warning(f" [*] {time.ctime()}: {epochIdx:^7} | Tr.loss: {np.mean(epochTrainLoss):.6f} | Tr.F1.: {np.mean([x[1] for x in epochTrainMetric]):^9.2f} | {timeElapsed:^9.2f}s")
+                
+                if epochTPRs is not None and epochF1s is not None:
+                    metricsReport = f"FPR {self.falsePositiveRates[self.fprReportingIdx]} -- "
+                    metricsReport += f"TPR: {epochTPRs[self.fprReportingIdx]:.2f} |  F1: {epochF1s[self.fprReportingIdx]:.2f}"
+                else:
+                    metricsReport = "Not computing TPR and F1"
+                logging.warning(f" [*] {time.ctime()}: {epochIdx:^7} | Tr.loss: {np.mean(epochTrainLoss):.6f} | {metricsReport} | Elapsed: {timeElapsed:^9.2f}s")
             if self.outputFolder:
                 self.dumpResults()
         except KeyboardInterrupt:
@@ -132,7 +160,7 @@ class ModelInterface(object):
     def train(self, X, y, epochs=10):
         self.fit(self, X, y, epochs=epochs)
 
-    def evaluate(self, X, y):
+    def evaluate(self, X, y, metrics="array"):
         testLoader = torch.utils.data.DataLoader(
             torch.utils.data.TensorDataset(torch.from_numpy(X).long(), torch.from_numpy(y).float()),
             batch_size=self.batchSize,
@@ -141,24 +169,32 @@ class ModelInterface(object):
         self.model.eval()
 
         self.testLoss = []
-        self.testMetrics = []
+        self.testTruePositiveRates = []
+        self.testF1s = []
         for data, target in testLoader:
             data, target = data.to(self.device), target.to(self.device)
 
             with torch.no_grad():
-                logits = self.model(data)
+                logits = self.model.forwardPass(data)
 
             loss = self.lossFunction(logits, target.float().reshape(-1,1))
             self.testLoss.append(loss.item())
 
             predProbs = torch.sigmoid(logits).clone().detach().cpu().numpy()
-            preds = (predProbs > 0.5).astype(np.int_)
-            accuracy = accuracy_score(target.cpu(), preds)
-            f1 = f1_score(target.cpu(), preds)
-            self.testMetrics.append([accuracy, f1])
-
-        self.testMetrics = np.array(self.testMetrics).mean(axis=0).reshape(-1,2)
-        return self.testLoss, self.testMetrics
+            batchMetrics = self.getMetrics(target.cpu().numpy(), predProbs)
+            self.testTruePositiveRates.append(batchMetrics[:,0])
+            self.testF1s.append(batchMetrics[:,1])
+            
+        # take mean across all batches for each metric
+        # resulting shape of each metric: (len(falsePositiveRates), )
+        self.testTruePositiveRates = np.array(self.testTruePositiveRates).mean(axis=0)
+        self.testF1s = np.array(self.testF1s).mean(axis=0)
+        if metrics == "array":
+            return self.testLoss, self.testTruePositiveRates, self.testF1s
+        elif metrics == "json":
+            return self.metricsToJSON([self.testLoss, self.testTruePositiveRates, self.testF1s])
+        else:
+            raise ValueError("evaluate(): Inappropriate metrics value, must be in: ['array', 'json']")
 
     def predict_proba(self, arr):
         out = torch.empty((0,1)).to(self.device)
@@ -181,3 +217,10 @@ class ModelInterface(object):
         with torch.no_grad():
             logits = self.model.predict_proba(arr)
         return (logits > threshold).astype(np.int_)
+    
+    def metricsToJSON(self, metrics):
+        tprs = dict(zip(["fpr_"+str(x) for x in self.falsePositiveRates], metrics[1]))
+        f1s = dict(zip(["fpr_"+str(x) for x in self.falsePositiveRates], metrics[2]))
+        metricDict = DataFrame([tprs, f1s], index=["tpr", "f1"]).to_dict()
+        metricDict['loss'] = metrics[0]
+        return metricDict

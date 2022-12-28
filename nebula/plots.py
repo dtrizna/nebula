@@ -157,7 +157,7 @@ def plotVocabSizeMaxLenTests(inFolder, plotOutFolder, maxLen=1024, vocabSize=200
     pngPath = plotOutFolder + title.replace(" ", "_").replace("=", "_").replace(";", "")+".png"
     plotCrossValidationFolder(inFolder, field, diffExtractor, extraFileFilter, title=title, savePath=pngPath)
 
-def plotVocabSizeMaxLenArchComparison(vmFolders, maxLen=512, vocabSize=2000, savePath=None, legendTitle=None, figSize=(18, 6)):
+def plotVocabSizeMaxLenArchComparison(vmFolders, maxLen=512, vocabSize=2000, savePath=None, legendTitle=None, title="Architecture", figSize=(18, 6)):
     metricDict = dict()
     timeDict = dict()
     for folder in vmFolders:
@@ -167,7 +167,7 @@ def plotVocabSizeMaxLenArchComparison(vmFolders, maxLen=512, vocabSize=2000, sav
         dfDict, timeValue = readCrossValidationMetricFile(metricFile)
         metricDict[key] = dfDict
         timeDict[key] = timeValue
-    title = f"Architecture Comparison; maxLen={maxLen}, vocabSize={vocabSize}"
+    title = f"{title} Comparison; maxLen={maxLen}, vocabSize={vocabSize}"
     fig, ax = plotCrossValidation_TPR_F1_Time(metricDict, timeDict, legentTitle=legendTitle, savePath=savePath, title=title, figSize=figSize)
     return metricDict, timeDict, fig, ax
 

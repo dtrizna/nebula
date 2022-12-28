@@ -9,6 +9,12 @@ from nebula.misc import dictToString
 import json
 from pandas import DataFrame
 
+def get_tpr_at_fpr(true_labels, predicted_probs, fprNeeded):
+        fpr, tpr, thresholds = roc_curve(true_labels, predicted_probs)
+        tpr_at_fpr = tpr[fpr <= fprNeeded][-1]
+        threshold_at_fpr = thresholds[fpr <= fprNeeded][-1]
+        return tpr_at_fpr, threshold_at_fpr
+
 class CrossValidation(object):
     def __init__(self,
                  modelInterfaceClass,
@@ -63,7 +69,6 @@ class CrossValidation(object):
 
             # Evaluate the model
             predicted_probs = modelTrainer.predict_proba(X_test)
-
             for fpr in self.fprValues:
                 tpr, threshold = get_tpr_at_fpr(y_test, predicted_probs, fpr)
                 f1 = f1_score(y[test_index], predicted_probs >= threshold)
@@ -94,12 +99,6 @@ class CrossValidation(object):
         for fpr in self.fprValues:
             msg += f"\tFPR: {fpr:>6} -- TPR: {self.metrics[fpr]['tpr_avg']:.4f} -- F1: {self.metrics[fpr]['f1_avg']:.4f}\n"
         logging.warning(msg)
-
-def get_tpr_at_fpr(true_labels, predicted_probs, fprNeeded):
-        fpr, tpr, thresholds = roc_curve(true_labels, predicted_probs)
-        tpr_at_fpr = tpr[fpr <= fprNeeded][-1]
-        threshold_at_fpr = thresholds[fpr <= fprNeeded][-1]
-        return tpr_at_fpr, threshold_at_fpr
 
 def readCrossValidationMetricFile(file):
     with open(file, "r") as f:
