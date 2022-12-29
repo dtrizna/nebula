@@ -9,16 +9,24 @@
 
 0. Build malware classifier class suitable for sharing
    - Add ember feature extraction to sequential emulation model.
+   - Provide it as `pip` package.
 1. Try efficient long-sequence attention models:
    - Reformer
    - Start transformer
 2. Pre-training routines on unlabeled data according to CEF-SSL framework:
-   - naive methods like expectation minimization
+   - naive methods:
+     - expectation minimization (?)
    - language modeling:
-     - MLM
+     - ~~MLM~~ (see `nebula/pretraining/MaskedLanguageModel` class)
      - GPT like $p(x_{t+1}|x_{t}\ ...\ x_{0})$
    - embedding pretraining:
+     - CBOW embedding langauge modeling
      - fastText
+   - evaluate:
+     - ~~pre-trained vs non-pretrained: TPR, F1, LOSS~~
+       - different pretraining methods for these
+     - pre-training epochs
+     - unlabeled/labeled data ratio
 3. 3D dataset `(batch_size, seq_len, features)` -- first learn representation for event (`features`), then for sequence of events (`seq_len`)
 
 ### Detailed ToDo list

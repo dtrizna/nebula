@@ -45,6 +45,10 @@ SPEAKEASY_RECORD_SUBFILTER = {'apis': ['api_name', 'args', 'ret_val'],
                        'file_access': ['event', 'path', 'open_flags', 'access_flags', 'size'],
                        'network_events.traffic': ['server', 'proto', 'port', 'method']}
 
+SPEAKEASY_RECORD_SUBFILTER_OPTIMAL = {'apis': ['api_name', 'args', 'ret_val'],
+                                    'file_access': ['event', 'path'],
+                                    'network_events.traffic': ['server', 'port']}
+
 SPEAKEASY_RECORD_SUBFILTER_MINIMALISTIC = {'apis': ['api_name', 'ret_val'],
                                     'file_access': ['event', 'path'],
                                     'network_events.traffic': ['server', 'port']}
@@ -97,3 +101,5 @@ VARIABLE_MAP.update({
 })    
 
 SPEAKEASY_EXCEPTIONS = (PEFormatError, UcError, IndexError, errors.NotSupportedError, errors.SpeakeasyError)
+
+STATIC_FEATURE_VECTOR_LENGTH = 2381

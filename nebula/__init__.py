@@ -1,6 +1,5 @@
-from nebula.preprocessing import JSONTokenizer
-from nebula.emulation import PEDynamicFeatureExtractor
-from nebula.models import Cnn1DLinear
+from nebula.preprocessing import JSONTokenizer, PEDynamicFeatureExtractor, PEStaticFeatureExtractor
+from nebula.models import Cnn1DLinearLM, MLP
 
 import os
 import time
@@ -9,6 +8,7 @@ import numpy as np
 from pandas import DataFrame
 
 import torch
+from torch import nn
 from sklearn.metrics import f1_score
 from nebula.evaluation import get_tpr_at_fpr
 
@@ -224,3 +224,79 @@ class ModelInterface(object):
         metricDict = DataFrame([tprs, f1s], index=["tpr", "f1"]).to_dict()
         metricDict['loss'] = metrics[0]
         return metricDict
+
+
+class PEHybridClassifier(nn.Module):
+    def __init__(self,
+                    vocabFile,
+                    speakeasyConfig,
+                    outputFolder=None,
+                    malwareHeadLayers = [128, 64],
+                    representationSize = 256,
+                    dropout=0.5
+        ):
+        super(PEHybridClassifier, self).__init__()
+        
+        # preprocessing
+        # TODO: add configuration for each of those classes through init of this class?
+        self.staticExtractor = PEStaticFeatureExtractor()
+        self.dynamicExtractor = PEDynamicFeatureExtractor(
+            speakeasyConfig=speakeasyConfig,
+            emulationOutputFolder=outputFolder,
+        )
+        self.tokenizer = JSONTokenizer()
+        self.tokenizer.load_from_pretrained(vocabFile)
+        
+        # models
+        self.staticModel = MLP(
+            layer_sizes=[1024, 512, representationSize],
+            dropout=dropout,
+        )
+        self.dynamicModel = Cnn1DLinearLM(
+            vocabSize=len(self.tokenizer.vocab),
+            hiddenNeurons=[512, representationSize],
+            dropout=dropout,
+        )
+
+        # malware head
+        layers = []
+        for i,ls in enumerate(malwareHeadLayers):
+            if i == 0:
+                layers.append(nn.Linear(representationSize, ls))
+            else:
+                layers.append(nn.Linear(malwareHeadLayers[i-1], ls))
+            layers.append(nn.LayerNorm(ls))
+            layers.append(nn.ReLU())
+            layers.append(nn.Dropout(dropout))
+
+        layers.append(nn.Linear(malwareHeadLayers[-1], 1))
+        self.malware_head = nn.Sequential(*layers)
+
+        if not os.path.exists(outputFolder):
+            os.makedirs(outputFolder, exist_ok=True)
+        self.outputFolder = outputFolder
+
+    def preprocess(self, data):
+        if isinstance(data, str):
+            with open(data, "rb") as f:
+                bytez = f.read()
+        elif isinstance(data, bytes):
+            bytez = data
+        else:
+            raise ValueError("preprocess(): data must be a path to a PE file or a bytes object")
+        print("here")
+        staticFeatures = None # self.staticExtractor.feature_vector(bytez)
+        # TODO: fails -- why doesn't go to next line!?
+        print("here 2")
+        dynamicFeaturesJson = self.dynamicExtractor.emulate(data=bytez)
+        import pdb;pdb.set_trace()
+        dynamicFeatures = self.tokenizer.encode(dynamicFeaturesJson)
+        # TODO: dynamic feature shape is weird: (13, 2048) for single PE
+        return staticFeatures, dynamicFeatures
+    
+    def forwardPass(self, staticFeatures, dynamicFeatures):
+        staticFeatures = self.staticModel(staticFeatures)
+        dynamicFeatures = self.dynamicModel(dynamicFeatures)
+        # sum static and dynamic features
+        features = staticFeatures + dynamicFeatures
+        return self.malware_head(features)

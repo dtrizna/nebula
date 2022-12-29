@@ -13,16 +13,21 @@ from nebula.pretraining import SelfSupervisedPretraining, MaskedLanguageModel
 
 # =========== SCRIPT CONFIG ===========
 
-outputFolder = rf"evaluation\MaskedLanguageModeling\output_{int(time.time())}"
-train_limit = None #13000
+train_limit = None # 13000
 random_state = 42
+logFile = f"PreTrainingEvaluation_randomState_{random_state}_limit_{train_limit}.log"
+
 nSplits = 3
+downStreamEpochs = 3
+preTrainEpochs = 7
+unlabeledDataSize = 0.8
+falsePositiveRates = [0.003, 0.01, 0.03, 0.1]
+outputFolder = rf"evaluation\MaskedLanguageModeling\deeperCnn_unlabeledDataSize_{unlabeledDataSize}_preTrain_{preTrainEpochs}_downStream_{downStreamEpochs}_nSplits_{nSplits}_{int(time.time())}"
 
 # ===== LOGGING SETUP =====
 
 os.makedirs(outputFolder, exist_ok=True)
 # loging setup
-logFile = f"PreTrainingEvaluation_randomState_{random_state}_nSplits_{nSplits}_limit_{train_limit}.log"
 logging.basicConfig(filename=os.path.join(outputFolder, logFile), level=logging.WARNING)
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
@@ -54,6 +59,9 @@ logging.warning(f" [!] Loaded data and vocab. X train size: {xTrain.shape}, X te
 
 modelConfig = {
     "vocabSize": len(vocab),
+    "filterSizes": [2, 3, 4, 5],
+    "numFilters": [192, 192, 192, 192],
+    "hiddenNeurons": [768, 512, 256, 128]
 }
 modelClass = Cnn1DLinearLM # only difference is that .pretrain() is implemented
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -62,7 +70,7 @@ languageModelClass = MaskedLanguageModel
 languageModelClassConfig = {
     "vocab": vocab,
     "mask_probability": 0.15,
-    "random_state": random_state
+    "random_state": random_state,
 }
 pretrainingConfig = {
     "vocab": vocab,
@@ -71,12 +79,13 @@ pretrainingConfig = {
     "pretrainingTaskClass": languageModelClass,
     "pretrainingTaskConfig": languageModelClassConfig,
     "device": device,
-    "unlabeledDataSize": 0.8,
-    "pretraingEpochs": 5,
-    "downstreamEpochs": 3,
+    "unlabeledDataSize": unlabeledDataSize,
+    "pretraingEpochs": preTrainEpochs,
+    "downstreamEpochs": downStreamEpochs,
     "verbosityBatches": 50,
     "batchSize": 256,
     "randomState": random_state,
+    "falsePositiveRates": falsePositiveRates,
 }
 
 # =========== PRETRAINING RUN ===========
