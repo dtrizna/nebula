@@ -187,7 +187,7 @@ class Cnn1DLinearLM(nn.Module):
         return x_fc
 
     def get_representations(self, inputs):
-        return self.core(inputs)
+        return self.core(inputs).reshape(1, -1)
 
     def classify_representations(self, representations):
         return self.fcOutput(representations)
@@ -359,7 +359,7 @@ class MLP(nn.Module):
         return self.malware_head(base_result)
     
     def get_representations(self, x):
-        return self.model_base(torch.Tensor(x)).reshape(-1,1)
+        return self.model_base(torch.Tensor(x)).reshape(1,-1)
     
     def classify_representations(self, representations):
         return self.malware_head(representations)

@@ -13,33 +13,35 @@ from nebula import PEDynamicFeatureExtractor, JSONTokenizer
 
 # SCRIPT CONFIG
 
-OUTFOLDER_SUFFIX = "_WithAPIargs"
-LOGFILE = f"PreProcessing_WithAPIargs_extra_vocabSizes_{int(time.time())}.log"
-VOCAB_SIZES = [500, 1000, 1500, 2000, 2500, 5000, 10000, 15000, 20000, 25000]
-MAX_SEQ_LENGTHS = [512, 1024, 2048, 4096, 6144]
+OUTFOLDER_SUFFIX = "_APIonly"
+LOGFILE = f"PreProcessing{OUTFOLDER_SUFFIX}_{int(time.time())}.log"
+VOCAB_SIZES = [500, 1000, 1500, 2000]
+MAX_SEQ_LENGTHS = [256, 512, 1024, 2048]
 
 # PREPROCESSING CONFIG AS DEFINED IN nebula.constants
 # from nebula.constants import *
 
 SPEAKEASY_CONFIG = r"C:\Users\dtrizna\Code\nebula\emulation\_speakeasyConfig.json"
 
-SPEAKEASY_RECORDS = ["registry_access", "file_access", "network_events.traffic", "apis"]
+SPEAKEASY_RECORDS = ["apis"]
+SPEAKEASY_RECORD_SUBFILTER_APIONLY = {'apis': ['api_name']}
 
-SPEAKEASY_RECORD_SUBFILTER = {
+#SPEAKEASY_RECORDS = ["registry_access", "file_access", "network_events.traffic", "apis"]
+SPEAKEASY_RECORD_SUBFILTER_OPTIMAL = {
                                 'apis': ['api_name', 'args', 'ret_val'],
-                                #'apis': ['api_name', 'ret_val'],
                                 'file_access': ['event', 'path'],
                                 'network_events.traffic': ['server', 'port']
                                 # 'registry_access' is not described here, 
                                 # since does not requires subfiltering, since included fully 
                             }
+SPEAKEASY_RECORD_SUBFILTER_FINAL = SPEAKEASY_RECORD_SUBFILTER_APIONLY
 
-SPEAKEASY_RECORD_LIMITS = {"network_events.traffic": 256}
+SPEAKEASY_RECORD_LIMITS = {}#"network_events.traffic": 256}
 
 JSON_CLEANUP_SYMBOLS = ['"', "'", ":", ",", "[", "]", "{", "}", "\\", "/"]
 
 # exclude all speakeasy JSON keys from tokenized sequence
-SPEAKEASY_TOKEN_STOPWORDS = flattenList([SPEAKEASY_RECORD_SUBFILTER[x] for x in SPEAKEASY_RECORD_SUBFILTER])
+SPEAKEASY_TOKEN_STOPWORDS = flattenList([SPEAKEASY_RECORD_SUBFILTER_FINAL[x] for x in SPEAKEASY_RECORD_SUBFILTER_FINAL])
 
 SCRIPT_PATH = getRealPath(type="script")
 
@@ -55,7 +57,7 @@ def main(limit=None, mode="readAndFilter"):
     extractor = PEDynamicFeatureExtractor(
         speakeasyConfig=SPEAKEASY_CONFIG,
         speakeasyRecords=SPEAKEASY_RECORDS,
-        recordSubFilter=SPEAKEASY_RECORD_SUBFILTER,
+        recordSubFilter=SPEAKEASY_RECORD_SUBFILTER_FINAL,
         recordLimits=SPEAKEASY_RECORD_LIMITS
     )
 
@@ -174,8 +176,9 @@ def main(limit=None, mode="readAndFilter"):
             # padding
             timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
             logging.warning(f"{timenow}: Padding...")
-            eventsEncodedPaddedTrain = tokenizer.padSequenceList(eventsEncodedTrain, maxLen=maxSeqLen)
-            eventsEncodedPaddedTest = tokenizer.padSequenceList(eventsEncodedTest, maxLen=maxSeqLen)
+            tokenizer.sequenceLength = maxSeqLen
+            eventsEncodedPaddedTrain = tokenizer.padSequenceList(eventsEncodedTrain)
+            eventsEncodedPaddedTest = tokenizer.padSequenceList(eventsEncodedTest)
             
             # saving processed arrays
             timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))

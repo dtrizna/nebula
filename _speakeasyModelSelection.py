@@ -25,7 +25,7 @@ random_state = 42
 
 # ============== REPORTING CONFIG
 
-outputFolder = r"C:\Users\dtrizna\Code\nebula\evaluation\crossValidation_TEST"#WithAPIargs"
+outputFolder = r"C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\APIonly"
 os.makedirs(outputFolder, exist_ok=True)
 outputFolder = os.path.join(outputFolder, runName)
 os.makedirs(outputFolder, exist_ok=True)
@@ -86,13 +86,14 @@ modelInterfaceConfig = {
 # =============== CROSS-VALIDATION LOOP
 
 # 1. CROSS VALIDATING OVER DIFFERENT VOCABULARY AND PADDING SIZES
-trainSetPath = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset_WithAPIargs"
+trainSetPath = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset_APIonly"
 trainSetsFiles = sorted([x for x in os.listdir(trainSetPath) if x.endswith("_x.npy")])
 y_train_orig = np.load(os.path.join(trainSetPath, "speakeasy_y.npy"))
 
 existingRuns = [x for x in os.listdir(outputFolder) if x.endswith(".json")]
 
-for file in trainSetsFiles:
+for i, file in enumerate(trainSetsFiles):
+    logging.warning(f" [!] Starting valiation of file {i}/{len(trainSetsFiles)}")
     x_train = np.load(os.path.join(trainSetPath, file))
 
     vocabSize = int(file.split("_")[2])
