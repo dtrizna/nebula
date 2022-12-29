@@ -268,11 +268,14 @@ class PEDynamicFeatureExtractor(object):
                 return None
 
         # normalize
-        if 'network_events.traffic' in self.speakeasyRecords:
-            recordDict['network_events.traffic'] = normalizeTableIP(recordDict['network_events.traffic'], col='server')
         if 'file_access' in self.speakeasyRecords:
             recordDict['file_access'] = normalizeTablePath(recordDict['file_access'], col='path')
-        
+        if 'network_events.traffic' in self.speakeasyRecords \
+            and 'server' in recordDict['network_events.traffic'].columns:
+                recordDict['network_events.traffic'] = normalizeTableIP(recordDict['network_events.traffic'], col='server')
+        if 'network_events.dns' in self.speakeasyRecords \
+            and 'query' in recordDict['network_events.dns'].columns:
+            recordDict['network_events.dns']['query'] = recordDict['network_events.dns']['query'].apply(lambda x: ' '.join(x.split('.')))
         # normalize args to exclude any non-alphanumeric characters
         if 'args' in recordDict['apis'].columns:
             # filter unicode '\uXXXX' values from args which is list of strings using re.sub
@@ -290,8 +293,20 @@ class PEDynamicFeatureExtractor(object):
     def getRecordsFromReport(self, entryPoints):
         records = dict()
         for recordField in self.speakeasyRecords:
-            recordList = [json_normalize(x, record_path=[recordField.split('.')]) for x in entryPoints if recordField.split('.')[0] in x]
-            records[recordField] = concat(recordList) if recordList else DataFrame()
+            fieldRoot = recordField.split('.')[0]
+            matchEntryPoints = [x for x in entryPoints if fieldRoot in x]
+            if not matchEntryPoints:
+                records[recordField] = DataFrame()
+                continue
+            # 'record_path=' is used in cases when recordField is a list of dictionaries, e.g. 'apis' or 'network_events.traffic'
+            if isinstance(matchEntryPoints[0][fieldRoot], list) or recordField != fieldRoot:
+                recordList = [json_normalize(x, record_path=[recordField.split('.')]) for x in matchEntryPoints]
+            # this is used in all other cases when recordField has its own dictionary, e.g. 'error'
+            elif isinstance(matchEntryPoints[0][fieldRoot], dict):
+                recordList = [json_normalize(x[fieldRoot]) for x in matchEntryPoints]
+            else:
+                raise ValueError(f" [-] Unexpected 'recordField' {recordField} type: {type(matchEntryPoints[0][recordField])}")
+            records[recordField] = concat(recordList)
         return records
 
     def joinRecordsToJSON(self, recordDict):
@@ -300,7 +315,9 @@ class PEDynamicFeatureExtractor(object):
             if recordDict[key].empty:
                 continue
             if key in self.recordSubFilter.keys():
-                jsonVal = recordDict[key][self.recordSubFilter[key]].to_json(orient='records', indent=4)
+                # filter only columns from self.recordSubFilter[key] present in recordDict[key] dataframe
+                cols = recordDict[key].columns[recordDict[key].columns.isin(self.recordSubFilter[key])]
+                jsonVal = recordDict[key][cols].to_json(orient='records', indent=4)
             else:
                 jsonVal = recordDict[key].to_json(orient='records', indent=4)
             jsonEvent += f"\n\"{key}\":\n{jsonVal}"

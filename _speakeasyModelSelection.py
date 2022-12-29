@@ -14,6 +14,7 @@ from nebula.evaluation import CrossValidation
 # ============== SCRIPT CONFIG
 train_limit = None
 runName = f"Cnn1DLinear_VocabSize_maxLen"
+runType = "WithDns"
 
 # ============== Cross-Valiation CONFIG
 nFolds = 3
@@ -25,7 +26,7 @@ random_state = 42
 
 # ============== REPORTING CONFIG
 
-outputFolder = r"C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\APIonly"
+outputFolder = rf"C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\{runType}"
 os.makedirs(outputFolder, exist_ok=True)
 outputFolder = os.path.join(outputFolder, runName)
 os.makedirs(outputFolder, exist_ok=True)
@@ -86,7 +87,7 @@ modelInterfaceConfig = {
 # =============== CROSS-VALIDATION LOOP
 
 # 1. CROSS VALIDATING OVER DIFFERENT VOCABULARY AND PADDING SIZES
-trainSetPath = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset_APIonly"
+trainSetPath = rf"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset_{runType}"
 trainSetsFiles = sorted([x for x in os.listdir(trainSetPath) if x.endswith("_x.npy")])
 y_train_orig = np.load(os.path.join(trainSetPath, "speakeasy_y.npy"))
 
@@ -101,6 +102,10 @@ for i, file in enumerate(trainSetsFiles):
     maxLen = int(file.split("_")[4])
     metricFilePrefix = f"maxLen_{maxLen}_"
     
+    # TEMP: skip all if not maxLen 1024 and vocabSize 2000
+    if maxLen != 1024 or vocabSize != 2000:
+        continue
+
     # skip if already exists
     existingRunPrefix = f"maxLen_{maxLen}_vocabSize_{vocabSize}_"
     if any([x for x in existingRuns if existingRunPrefix in x]):

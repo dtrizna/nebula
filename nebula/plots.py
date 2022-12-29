@@ -25,18 +25,20 @@ def plotCounterCountsLineplot(
         xlim=None,
         mostCommon=None, 
         outfile=None,
-        figSize=(12,8)
+        figSize=(12,8),
+        ax=None
     ):
     counts = [x[1] for x in counter.most_common(mostCommon)]
-    
-    plt.figure(figsize=figSize)
-    plt.plot(np.arange(len(counts)), counts)
-    plt.yscale("log")
+
+    if ax is None:
+        fig, ax = plt.subplots(1, 1, figsize=figSize)
+    ax.plot(np.arange(len(counts)), counts)
+    ax.set_yscale("log")
     # add ticks and grid to plot
-    plt.grid(which="both")
+    ax.grid(which="both")
     # save to file
     if xlim:
-        plt.xlim(xlim)
+        ax.set_xlim(xlim)
     if outfile:
         plt.savefig(outfile)
     else:
@@ -157,7 +159,7 @@ def plotVocabSizeMaxLenTests(inFolder, plotOutFolder, maxLen=1024, vocabSize=200
     pngPath = plotOutFolder + title.replace(" ", "_").replace("=", "_").replace(";", "")+".png"
     plotCrossValidationFolder(inFolder, field, diffExtractor, extraFileFilter, title=title, savePath=pngPath)
 
-def plotVocabSizeMaxLenArchComparison(vmFolders, maxLen=512, vocabSize=2000, savePath=None, legendTitle=None, title="Architecture", figSize=(18, 6)):
+def plotVocabSizeMaxLenArchComparison(vmFolders, maxLen=512, vocabSize=2000, savePath=None, legendTitle=None, title="Architecture", figSize=(18, 6), legendValues=None):
     metricDict = dict()
     timeDict = dict()
     for folder in vmFolders:
@@ -167,8 +169,20 @@ def plotVocabSizeMaxLenArchComparison(vmFolders, maxLen=512, vocabSize=2000, sav
         dfDict, timeValue = readCrossValidationMetricFile(metricFile)
         metricDict[key] = dfDict
         timeDict[key] = timeValue
-    title = f"{title} Comparison; maxLen={maxLen}, vocabSize={vocabSize}"
-    fig, ax = plotCrossValidation_TPR_F1_Time(metricDict, timeDict, legentTitle=legendTitle, savePath=savePath, title=title, figSize=figSize)
+    plotTitle = f"{title} Comparison; maxLen={maxLen}, vocabSize={vocabSize}"
+    fig, ax = plotCrossValidation_TPR_F1_Time(metricDict, timeDict, legentTitle=legendTitle, savePath=savePath, title=plotTitle, figSize=figSize)
+    if legendValues:
+                # modify legend for first plot
+        handles, _ = ax[0].get_legend_handles_labels()
+        ax[0].legend(handles, legendValues[0], title=title)
+        # do the saame for ax[1]
+        handles, _ = ax[1].get_legend_handles_labels()
+        ax[1].legend(handles, legendValues[0], title=title)
+        # set basePaths as xticklabels for ax[2]
+        ax[2].set_xticks(ax[2].get_xticks())
+        # wrap labels to fit correctly in plot
+        ax[2].set_xlabel("")
+        _ = ax[2].set_xticklabels(legendValues[1])
     return metricDict, timeDict, fig, ax
 
 def plotHeatmap(df, title, rangeL=None, xlabel=None, ylabel=None, savePath=None, figSize=(12, 4), ax=None, cmap=None):
