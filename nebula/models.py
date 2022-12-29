@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+from nebula.constants import *
 
 class Cnn1DLinear(nn.Module):
     def __init__(self, 
@@ -185,6 +186,12 @@ class Cnn1DLinearLM(nn.Module):
         x_fc = self.ffnn(torch.cat(x_conv, dim=1))
         return x_fc
 
+    def get_representations(self, inputs):
+        return self.core(inputs)
+
+    def classify_representations(self, representations):
+        return self.fcOutput(representations)
+
     def pretrain(self, inputs):
         x_core = self.core(inputs)
         return self.preTrainLayers(x_core)
@@ -324,3 +331,35 @@ class LSTM(nn.Module):
         logits = self.linear(output).mean(dim=1)
         return logits
 
+
+class MLP(nn.Module):
+    def __init__(self, 
+                feature_dimension=STATIC_FEATURE_VECTOR_LENGTH, 
+                layer_sizes = [1024, 512, 256],
+                dropout=0.5):
+        super(MLP,self).__init__()
+        layers = []
+        for i,ls in enumerate(layer_sizes):
+            if i == 0:
+                layers.append(nn.Linear(feature_dimension, ls))
+            else:
+                layers.append(nn.Linear(layer_sizes[i-1], ls))
+            layers.append(nn.LayerNorm(ls))
+            layers.append(nn.ReLU())
+            layers.append(nn.Dropout(dropout))
+        
+        self.model_base = nn.Sequential(*tuple(layers))
+        self.malware_head = nn.Sequential(
+                                nn.Linear(layer_sizes[-1], 64), 
+                                nn.Linear(64, 1)
+                            )
+        
+    def forward(self, data):
+        base_result = self.model_base(data)
+        return self.malware_head(base_result)
+    
+    def get_representations(self, x):
+        return self.model_base(torch.Tensor(x)).reshape(-1,1)
+    
+    def classify_representations(self, representations):
+        return self.malware_head(representations)

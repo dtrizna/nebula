@@ -6,7 +6,6 @@ from nebula import ModelInterface
 import os
 import logging
 import numpy as np
-from pandas import DataFrame
 from tqdm import tqdm
 from torch.optim import Adam
 from torch.nn import BCEWithLogitsLoss, CrossEntropyLoss
@@ -112,7 +111,7 @@ class SelfSupervisedPretraining:
                     pretrainingTaskClass,
                     pretrainingTaskConfig,
                     device,
-                    falsePositiveRates=[0.0001, 0.001, 0.01, 0.1],
+                    falsePositiveRates=[0.001, 0.003, 0.01, 0.03, 0.1],
                     unlabeledDataSize=0.8,
                     randomState=None,
                     pretraingEpochs=5,
@@ -136,6 +135,7 @@ class SelfSupervisedPretraining:
 
     def run(self, x, y, x_test, y_test, outputFolder=None):
         models = {k: None for k in self.trainingTypes}
+        modelInterfaces = {k: None for k in self.trainingTypes}
         metrics = {k: None for k in self.trainingTypes}
         
         # split x and y into train and validation sets
@@ -143,9 +143,7 @@ class SelfSupervisedPretraining:
 
         # create a pretraining model and task
         logging.warning(' [!] Pre-training model...')
-        models['pretrained'] = self.modelClass(**self.modelConfig)
-        models['pretrained'].to(self.device)
-        
+        models['pretrained'] = self.modelClass(**self.modelConfig).to(self.device)
         modelInterfaceConfig = {
             "device": self.device,
             "model": models['pretrained'],
@@ -160,52 +158,41 @@ class SelfSupervisedPretraining:
         if outputFolder:
             modelInterfaceConfig["outputFolder"] = os.path.join(outputFolder, "preTraining")
         self.pretrainingTask.pretrain(U, modelInterfaceConfig, pretrainEpochs=self.pretrainingEpochs)
-
+        
         # downstream task for pretrained model
-        logging.warning(' [!] Training pre-trained model on downstream task...')
         modelInterfaceConfig['lossFunction'] = BCEWithLogitsLoss()
         modelInterfaceConfig['modelForwardPass'] = None
-        if outputFolder:
-            modelInterfaceConfig["outputFolder"] = os.path.join(outputFolder, "donstreamTask_PreTrained")
-        #self.downstream(L_x, L_y, model_Pretrained, batchSize, downstreamEpochs, device, verbosityBatches)
-        models['pretrained'] = ModelInterface(**modelInterfaceConfig)
-        models['pretrained'].fit(L_x, L_y, self.downstreamEpochs)
+        # print torch models parameters
+
+        for model in self.trainingTypes:
+            logging.warning(f' [!] Training {model} model on downstream task...')
+            if model != 'pretrained':
+                models[model] = self.modelClass(**self.modelConfig).to(self.device)
+                modelInterfaceConfig['model'] = models[model]
+            
+            if outputFolder:
+                modelInterfaceConfig["outputFolder"] = os.path.join(outputFolder, "downstreamTask_{}".format(model))
+            
+            modelInterfaces[model] = ModelInterface(**modelInterfaceConfig)
+            if model == 'full_data':
+                modelInterfaces[model].fit(x, y, self.downstreamEpochs)
+            else:
+                modelInterfaces[model].fit(L_x, L_y, self.downstreamEpochs)
         
-        # downstream task for new model
-        logging.warning('[!] Training model on downstream task without pre-training...')
-        model_NonPretrained = self.modelClass(**self.modelConfig)
-        model_NonPretrained.to(self.device)
-        modelInterfaceConfig['model'] = model_NonPretrained
-        if outputFolder:
-            modelInterfaceConfig["outputFolder"] = os.path.join(outputFolder, "donstreamTask_NonPreTrained")
-        models['non_pretrained'] = ModelInterface(**modelInterfaceConfig)
-        models['non_pretrained'].fit(L_x, L_y, self.downstreamEpochs)
-
-        # downstream task for new model on full dataset suitable for benchmarking
-        logging.warning(' [!] Training new model on downstream task on full dataset (as benchmark)...')
-        model_Full = self.modelClass(**self.modelConfig)
-        model_Full.to(self.device)
-        modelInterfaceConfig['model'] = model_Full
-        if outputFolder:
-            modelInterfaceConfig["outputFolder"] = os.path.join(outputFolder, "donstreamTask_Full")
-        models['full_data'] = ModelInterface(**modelInterfaceConfig)
-        models['full_data'].fit(x, y, self.downstreamEpochs)
-
         for model in models:
             logging.warning(f' [*] Evaluating {model} model on test set...')
-            metrics[model] = models[model].evaluate(x_test, y_test, metrics="json")
-            reportingFPR = self.falsePositiveRates[models[model].fprReportingIdx]
+            metrics[model] = modelInterfaces[model].evaluate(x_test, y_test, metrics="json")
+            reportingFPR = self.falsePositiveRates[modelInterfaces[model].fprReportingIdx]
             logging.warning(f' [!] Test F1 score for {model} model at {reportingFPR} FPR : {metrics[model]["fpr_"+str(reportingFPR)]["f1"]:.4f}')
             logging.warning(f' [!] Test TPR score for {model} model at {reportingFPR} FPR: {metrics[model]["fpr_"+str(reportingFPR)]["tpr"]:.4f}')
-        del models # cleanup to not accidentaly reuse 
+        del models, modelInterfaces # cleanup to not accidentaly reuse 
         return metrics
 
     def runSplits(self, x, y, x_test, y_test, outputFolder=None, nSplits=5):
-        # create object with json structure: {"pretrained": {{x:[] for self.falsePositiveRates]}, "non_pretrained": {}, "full_data": {..}, ...}
         metrics = {k: {"fpr_"+str(fpr): {"f1": [], "tpr": []} for fpr in self.falsePositiveRates} for k in self.trainingTypes}
-
         # collect metrics for number of iterations
         for i in range(nSplits):
+            self.randomState += i # to get different splits
             logging.warning(f' [!] Running pre-training split {i+1}/{nSplits}')
             splitMetrics = self.run(x, y, x_test, y_test, outputFolder=outputFolder)
             for trainingType in self.trainingTypes:
