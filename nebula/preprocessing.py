@@ -9,7 +9,7 @@ from time import time
 from pathlib import Path
 from copy import deepcopy
 from collections import Counter
-from collections.abc import Iterable
+from typing import Iterable
 from nltk import WhitespaceTokenizer
 from pandas import json_normalize, concat, DataFrame
 
@@ -17,10 +17,9 @@ from nebula.constants import *
 from nebula.misc import getAlphaNumChars
 from nebula.plots import plotCounterCountsLineplot, plotListElementLengths
 from nebula.normalization import normalizeTableIP, normalizeTablePath
+from nebula.ember import PEFeatureExtractor
 
 import speakeasy
-from ember import PEFeatureExtractor
-
 
 class JSONTokenizer(object):
     def __init__(self, 
@@ -133,10 +132,11 @@ class JSONTokenizer(object):
 
     def encode(self, jsonInput, pad=True):
         tokenized = self.tokenize(jsonInput)
-        if isinstance(tokenized[0], Iterable):
-            encoded = self.convertTokenListToIds(tokenized)
-        else:
+        if isinstance(tokenized[0], str):
+            # means we got a single example for encoding
             encoded = [self.convertTokensToIds(tokenized)]
+        else:
+            encoded = self.convertTokenListToIds(tokenized)
         # apply padding to each element in list
         if pad:
             return self.padSequenceList(encoded)
@@ -262,13 +262,16 @@ class PEDynamicFeatureExtractor(object):
         
         # filter out events with uninformative API sequences
         # i.e. emulation failed extract valuable info
-        if recordDict['apis'].shape[0] == 1 and \
-           recordDict['apis'].iloc[0].api_name == 'MSVBVM60.ordinal_100':
-            return None
+        if 'apis' in self.speakeasyRecords and \
+            recordDict['apis'].shape[0] == 1 and \
+            recordDict['apis'].iloc[0].api_name == 'MSVBVM60.ordinal_100':
+                return None
 
         # normalize
-        recordDict['network_events.traffic'] = normalizeTableIP(recordDict['network_events.traffic'], col='server')
-        recordDict['file_access'] = normalizeTablePath(recordDict['file_access'], col='path')
+        if 'network_events.traffic' in self.speakeasyRecords:
+            recordDict['network_events.traffic'] = normalizeTableIP(recordDict['network_events.traffic'], col='server')
+        if 'file_access' in self.speakeasyRecords:
+            recordDict['file_access'] = normalizeTablePath(recordDict['file_access'], col='path')
         
         # normalize args to exclude any non-alphanumeric characters
         if 'args' in recordDict['apis'].columns:

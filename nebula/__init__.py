@@ -12,6 +12,7 @@ from torch import nn
 from sklearn.metrics import f1_score
 from nebula.evaluation import get_tpr_at_fpr
 
+
 class ModelInterface(object):
     def __init__(self, 
                     model,
@@ -228,8 +229,8 @@ class ModelInterface(object):
 
 class PEHybridClassifier(nn.Module):
     def __init__(self,
-                    vocabFile,
                     speakeasyConfig,
+                    vocabFile=None,
                     outputFolder=None,
                     malwareHeadLayers = [128, 64],
                     representationSize = 256,
@@ -237,15 +238,20 @@ class PEHybridClassifier(nn.Module):
         ):
         super(PEHybridClassifier, self).__init__()
         
-        # preprocessing
         # TODO: add configuration for each of those classes through init of this class?
+        # or perform feature extraction through a separate class?
         self.staticExtractor = PEStaticFeatureExtractor()
         self.dynamicExtractor = PEDynamicFeatureExtractor(
             speakeasyConfig=speakeasyConfig,
             emulationOutputFolder=outputFolder,
         )
         self.tokenizer = JSONTokenizer()
-        self.tokenizer.load_from_pretrained(vocabFile)
+        if vocabFile:
+            self.tokenizer.load_from_pretrained(vocabFile)
+        else:
+            msg = "[!] No 'vocabFile' was provided, the tokenizer has to be pre-trained on your data."
+            msg += " Please use the 'build_vocabulary()' method of this class to train the tokenizer."
+            logging.warning(msg)
         
         # models
         self.staticModel = MLP(
@@ -284,19 +290,26 @@ class PEHybridClassifier(nn.Module):
             bytez = data
         else:
             raise ValueError("preprocess(): data must be a path to a PE file or a bytes object")
-        print("here")
-        staticFeatures = None # self.staticExtractor.feature_vector(bytez)
-        # TODO: fails -- why doesn't go to next line!?
-        print("here 2")
+        staticFeatures = self.staticExtractor.feature_vector(bytez).reshape(1,-1)
         dynamicFeaturesJson = self.dynamicExtractor.emulate(data=bytez)
-        import pdb;pdb.set_trace()
         dynamicFeatures = self.tokenizer.encode(dynamicFeaturesJson)
-        # TODO: dynamic feature shape is weird: (13, 2048) for single PE
-        return staticFeatures, dynamicFeatures
+        return torch.Tensor(staticFeatures), torch.Tensor(dynamicFeatures)
     
-    def forwardPass(self, staticFeatures, dynamicFeatures):
-        staticFeatures = self.staticModel(staticFeatures)
-        dynamicFeatures = self.dynamicModel(dynamicFeatures)
+    def forward(self, staticFeatures, dynamicFeatures):
+        staticFeatures = self.staticModel.get_representations(staticFeatures.float())
+        dynamicFeatures = self.dynamicModel.get_representations(dynamicFeatures.long())
         # sum static and dynamic features
         features = staticFeatures + dynamicFeatures
         return self.malware_head(features)
+
+    def build_vocabulary(self, folderBenign, folderMalicious, vocabSize=10000):
+        raise NotImplementedError("build_vocabulary(): Not implemented yet")
+
+    def train(
+        self, 
+        folderBenign, 
+        folderMalicious, 
+        epochs=10
+    ):
+        # TODO: train classifier using raw PE files in benign an malicious folders
+        raise NotImplementedError("train(): Not implemented yet")
