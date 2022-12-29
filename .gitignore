@@ -13,7 +13,10 @@ wazuh_*
 *kubeaudit_msft_*
 reverse_shell_dataset.cm
 *zip
-data_raw/*7z
+data/data_raw/*7z
+data/data_filtered/*_WithAPIargs.7z
+evaluation/MaskedLanguageModeling/*/downstreamTask*
+evaluation/MaskedLanguageModeling/*/preTraining/
 
 # models
 FastText*model
