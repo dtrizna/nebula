@@ -5,8 +5,8 @@ __pycache__/
 
 # data
 windows_emulation*
-speakeasy_testset*/
-speakeasy_trainset*/
+data/data_filtered/speakeasy_testset*/
+data/data_filtered/speakeasy_trainset*/
 wazuh_*
 *windows_msft_*
 *auditd_msft_*
