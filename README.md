@@ -3,17 +3,19 @@
 <!-- scaled image from web -->
 <center><img src="https://cdn.eso.org/images/screen/eso1205ec.jpg" width="400"></center>
 
+Beahavioral intrusion detection system based on neural networks.
+
 ## Future work
 
 ### Short ToDo list
 
-0. Build malware classifier class suitable for sharing
-   - Add ember feature extraction to sequential emulation model.
+1. Build malware classifier class with convenient API
+   - ~~Add ember feature extraction to sequential emulation model.~~
    - Provide it as `pip` package.
-1. Try efficient long-sequence attention models:
+2. Try efficient long-sequence attention models:
    - Reformer
    - Start transformer
-2. Pre-training routines on unlabeled data according to CEF-SSL framework:
+3. Pre-training routines on unlabeled data according to CEF-SSL framework:
    - naive methods:
      - expectation minimization (?)
    - language modeling:
@@ -27,7 +29,7 @@
        - different pretraining methods for these
      - pre-training epochs
      - unlabeled/labeled data ratio
-3. 3D dataset `(batch_size, seq_len, features)` -- first learn representation for event (`features`), then for sequence of events (`seq_len`)
+4. 3D dataset `(batch_size, seq_len, features)` -- first learn representation for event (`features`), then for sequence of events (`seq_len`)
 
 ### Detailed ToDo list
 
