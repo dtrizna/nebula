@@ -13,30 +13,38 @@ from nebula import PEDynamicFeatureExtractor, JSONTokenizer
 
 # SCRIPT CONFIG
 
-OUTFOLDER_SUFFIX = "_APIonly"
+#OUTFOLDER_SUFFIX = "_WithError"
+OUTFOLDER_SUFFIX = "_WithDns"
 LOGFILE = f"PreProcessing{OUTFOLDER_SUFFIX}_{int(time.time())}.log"
-VOCAB_SIZES = [500, 1000, 1500, 2000]
-MAX_SEQ_LENGTHS = [256, 512, 1024, 2048]
+VOCAB_SIZES = [500, 1000, 1500, 2000, 10000, 15000]
+MAX_SEQ_LENGTHS = [512, 1024, 2048, 4096]
 
 # PREPROCESSING CONFIG AS DEFINED IN nebula.constants
 # from nebula.constants import *
 
 SPEAKEASY_CONFIG = r"C:\Users\dtrizna\Code\nebula\emulation\_speakeasyConfig.json"
 
-SPEAKEASY_RECORDS = ["apis"]
-SPEAKEASY_RECORD_SUBFILTER_APIONLY = {'apis': ['api_name']}
-
+# this defines sequence in intput JSON, it is better to keep 'apis'
+# at the end so if trimming happens, it will be drop last API calls only
 #SPEAKEASY_RECORDS = ["registry_access", "file_access", "network_events.traffic", "apis"]
+#SPEAKEASY_RECORDS = ["registry_access", "file_access", "network_events.traffic", "error", "apis"]
+SPEAKEASY_RECORDS = ["registry_access", "file_access", "network_events.traffic", "network_events.dns", "apis"]
 SPEAKEASY_RECORD_SUBFILTER_OPTIMAL = {
+                                # records not described here will be included fully, w/o subfilter
                                 'apis': ['api_name', 'args', 'ret_val'],
                                 'file_access': ['event', 'path'],
                                 'network_events.traffic': ['server', 'port']
-                                # 'registry_access' is not described here, 
-                                # since does not requires subfiltering, since included fully 
                             }
-SPEAKEASY_RECORD_SUBFILTER_FINAL = SPEAKEASY_RECORD_SUBFILTER_APIONLY
+SPEAKEASY_RECORD_SUBFILTER_OPTIMAL_WITH_DNS = {
+                                'apis': ['api_name', 'args', 'ret_val'],
+                                'file_access': ['event', 'path'],
+                                'network_events.traffic': ['server', 'port'],
+                                'network_events.dns': ['query'],
+                                #'error': ['type', 'instr', 'api_name']
+}
+SPEAKEASY_RECORD_SUBFILTER_FINAL = SPEAKEASY_RECORD_SUBFILTER_OPTIMAL_WITH_DNS
 
-SPEAKEASY_RECORD_LIMITS = {}#"network_events.traffic": 256}
+SPEAKEASY_RECORD_LIMITS = {"network_events.traffic": 256}
 
 JSON_CLEANUP_SYMBOLS = ['"', "'", ":", ",", "[", "]", "{", "}", "\\", "/"]
 
@@ -231,5 +239,5 @@ if __name__ == "__main__":
 
     # ===============
 
-    main(limit=None, mode="load")
-    #main(limit=None)
+    #main(limit=None, mode="load")
+    main(limit=None)
