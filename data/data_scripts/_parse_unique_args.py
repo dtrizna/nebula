@@ -18,7 +18,7 @@ if __name__ == "__main__":
     l = len(files)
     for i in range(l):
         print(f"[*] Parsing files in ./{AUDITD_FOLDER}/: {i}/{l}", end="\r")
-        with open(f"{AUDITD_FOLDER}/{files[i]}", "r") as f:
+        with open(os.path.join(AUDITD_FOLDER, files[i]), "r") as f:
             data = f.readlines()
         args = [x for x in data if "process.args" in x]
         args = [x.split('"')[3] for x in args]

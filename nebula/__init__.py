@@ -1,254 +1,315 @@
+from nebula.preprocessing import JSONTokenizer, PEDynamicFeatureExtractor, PEStaticFeatureExtractor
+from nebula.models import Cnn1DLinearLM, MLP
+
 import os
-# TODO: think about more secure alternative to pickle
-import pickle
-from time import time
-from nltk import WhitespaceTokenizer
-from pandas import json_normalize, concat, DataFrame
-import numpy as np
-
-from .constants import *
-from .misc import flattenList
-from .normalization import normalizeTableIP, normalizeTablePath
-
-import speakeasy
-from pefile import PEFormatError
-from unicorn import UcError
-
+import time
 import logging
-from pathlib import Path
-from collections.abc import Iterable
-from collections import Counter
+import numpy as np
+from pandas import DataFrame
+
+import torch
+from torch import nn
+from sklearn.metrics import f1_score
+from nebula.evaluation import get_tpr_at_fpr
 
 
-class JSONTokenizer():
+class ModelInterface(object):
     def __init__(self, 
-                patternCleanup=JSON_CLEANUP_SYMBOLS,
-                stopwords = SPEAKEASY_TOKEN_STOPWORDS):
-        self.tokenizer = WhitespaceTokenizer()
-        self.patternCleanup = patternCleanup
-        self.stopwords = stopwords
-        
-        self.specialTokens = {"<pad>": 0, "<unk>": 1, "<mask>": 2}
-        self.pad_token = "<pad>"
-        self.unk_token = "<unk>"
-        self.mask_token = "<mask>"
-        self.pad_token_id = self.specialTokens[self.pad_token]
-        self.unk_token_id = self.specialTokens[self.unk_token]
-        self.mask_token_id = self.specialTokens[self.mask_token]
+                    model,
+                    device, 
+                    lossFunction,
+                    optimizerClass,
+                    optimizerConfig,
+                    batchSize=64,
+                    verbosityBatches = 100,
+                    outputFolder=None,
+                    falsePositiveRates=[0.0001, 0.001, 0.01, 0.1],
+                    modelForwardPass=None,
+                    stateDict = None):
+        self.model = model    
+        self.optimizer = optimizerClass(self.model.parameters(), **optimizerConfig)
+        self.lossFunction = lossFunction
+        self.verbosityBatches = verbosityBatches
+        self.batchSize = batchSize
 
-        self.vocab = None
-        self.counter = None
+        self.falsePositiveRates = falsePositiveRates
+        self.fprReportingIdx = 1 # what FPR stats to report every epoch
 
-    # methods related to tokenization
-    def tokenizeEvent(self, jsonEvent):
-        jsonEventClean = self.clearJsonEvent(jsonEvent)
-        tokenizedJsonEvent = self.tokenizer.tokenize(jsonEventClean)
-        if self.stopwords:
-            tokenizedJsonEvent = [x for x in tokenizedJsonEvent if x not in self.stopwords]
-        return tokenizedJsonEvent
+        self.device = device
+        self.model.to(self.device)
 
-    def tokenize(self, jsonInput):
-        if isinstance(jsonInput, (str, bytes)):
-            return self.tokenizeEvent(jsonInput)
-        elif isinstance(jsonInput, Iterable):
-            return [self.tokenizeEvent(x) for x in jsonInput]
+        self.outputFolder = outputFolder
+        if stateDict:
+            self.model.load_state_dict(torch.load(stateDict))
+        if modelForwardPass:
+            self.model.forwardPass = modelForwardPass
         else:
-            raise TypeError("tokenize(): Input must be a string, bytes, or Iterable!")
+            self.model.forwardPass = self.model.forward
+
+    def loadState(self, stateDict):
+        self.model.load_state_dict(torch.load(stateDict))
+
+    def dumpResults(self):
+        prefix = os.path.join(self.outputFolder, f"trainingFiles_{int(time.time())}")
+        os.makedirs(self.outputFolder, exist_ok=True)
+
+        modelFile = f"{prefix}-model.torch"
+        torch.save(self.model.state_dict(), modelFile)
+        np.save(f"{prefix}-trainTime.npy", np.array(self.trainingTime))
+        np.save(f"{prefix}-trainLosses.npy", np.array(self.trainLosses))
+        dumpString = f"""[!] {time.ctime()}: Dumped results:
+                model     : {modelFile}
+                losses    : {prefix}-train_losses.npy
+                duration  : {prefix}-trainTime.npy"""
+
+        if not np.isnan(self.trainF1s).all():
+            np.save(f"{prefix}-trainF1s.npy", self.trainF1s)
+            dumpString += f"\n\t\ttrain F1s : {prefix}-trainF1s.npy"
+        if not np.isnan(self.trainTruePositiveRates).all():
+            np.save(f"{prefix}-trainTPRs.npy", self.trainTruePositiveRates)
+            dumpString += f"\n\t\ttrain TPRs: {prefix}-trainTPRs.npy"
+
+        logging.warning(dumpString)
     
-    def clearJsonEvent(self, jsonEvent):
-        jsonEvent = str(jsonEvent).lower()
-        for x in self.patternCleanup:
-            jsonEvent = jsonEvent.replace(x, " ")
-        return jsonEvent
+    def getMetrics(self, target, predProbs):
+        metrics = []
+        for fpr in self.falsePositiveRates:
+            tpr, threshold = get_tpr_at_fpr(target, predProbs, fpr)
+            f1_at_fpr = f1_score(target, predProbs >= threshold)
+            metrics.append([tpr, f1_at_fpr])        
+        return np.array(metrics)
 
-    # methods related to vocab
-    def buildVocab(self, tokenListSequence, vocabSize=10000):
-        counter = Counter()
-        for tokenList in tokenListSequence:
-            counter.update(tokenList)
-        
-        idx = len(self.specialTokens)
-        vocab = self.specialTokens
-        vocab.update({x[0]:i+idx for i,x in enumerate(counter.most_common(vocabSize-idx))})
-        self.vocab = vocab
-        self.counter = counter
-        self.vocabSize = len(self.vocab) if vocabSize > len(self.vocab) else vocabSize
-        if vocabSize > len(self.vocab):
-            msg = " Provided 'vocabSize' is larger than number of tokens in corpus:"
-            msg += f" {vocabSize} > {len(self.vocab)}. "
-            msg += f"'vocabSize' is set to {self.vocabSize} to represent tokens in corpus!"
-            logging.warning(msg)
-    
-    def dumpVocab(self, vocabPickleFile):
-        with open(vocabPickleFile, "wb") as f:
-            pickle.dump(self.vocab, f)
+    def trainEpoch(self, trainLoader, epochId):
+        epochMetrics = []
+        epochLosses = []
+        now = time.time()
 
-    def loadVocab(self, vocabPickleFile):
-        with open(vocabPickleFile, "rb") as f:
-            self.vocab = pickle.load(f)
-        self.vocabSize = len(self.vocab)
+        for batchIdx, (data, target) in enumerate(trainLoader):
+            data, target = data.to(self.device), target.to(self.device)
+            self.optimizer.zero_grad()
+            logits = self.model.forwardPass(data)
+            # if dimension of target is 1, reshape to (-1,1)
+            if target.dim() == 1:
+                target = target.reshape(-1, 1)
+            loss = self.lossFunction(logits, target)
 
-    # methods related to encoding
-    def convertTokenListToIds(self, tokenList):
-        tokenizedListEncoded = []
-        for tokenized in tokenList:
-            tokenizedEncoded = self.convertTokensToIds(tokenized)
-            tokenizedListEncoded.append(tokenizedEncoded)
-        return tokenizedListEncoded
+            epochLosses.append(loss.item())
 
-    def convertTokensToIds(self, tokenList):
-        if self.vocab:
-            return [self.vocab[x] if x in self.vocab else self.vocab["<unk>"] for x in tokenList]
-        else:
-            raise Exception("Vocabulary not initialized! Use buildVocab() first or load it using loadVocab()!")
-    
-    def padSequence(self, encodedSequence, maxLen=None):
-        self.maxLen = maxLen if maxLen else self.maxLen
-        if len(encodedSequence) > self.maxLen:
-            return encodedSequence[:self.maxLen]
-        else:
-            return encodedSequence + [self.pad_token_id] * (self.maxLen - len(encodedSequence))
-    
-    def padSequenceList(self, encodedSequenceList, maxLen=None):
-        self.maxLen = maxLen if maxLen else self.maxLen
-        return np.array([self.padSequence(x) for x in encodedSequenceList], dtype=np.int8)
+            loss.backward() # derivatives
+            self.optimizer.step() # parameter update  
 
-    def encode(self, jsonInput, pad=True, maxLen=512):
-        tokenized = self.tokenize(jsonInput)
-        if isinstance(tokenized[0], Iterable):
-            encoded = self.convertTokenListToIds(tokenized)
-        else:
-            encoded = [self.convertTokensToIds(tokenized)]
-        # apply padding to each element in list
-        if pad:
-            self.maxLen = maxLen
-            return self.padSequenceList(encoded)
-        else:
-            return encoded
-
-
-class PEDynamicFeatureExtractor():
-    def __init__(self, 
-                    emulationOutputFolder=None, 
-                    speakeasyConfig=None, 
-                    speakeasyRecords=SPEAKEASY_RECORDS,
-                    recordSubFilter=SPEAKEASY_RECORD_SUBFILTER_MINIMALISTIC,
-                    recordLimits=SPEAKEASY_RECORD_LIMITS,
-                    returnValues=RETURN_VALUES_TOKEEP
-                ):
-        self.outputFolder = emulationOutputFolder
-        if self.outputFolder:
-            os.makedirs(self.outputFolder, exist_ok=True)
-        
-        self.speakeasyConfig = speakeasyConfig
-        if self.speakeasyConfig and not os.path.exists(speakeasyConfig):
-            raise Exception(f"Speakeasy config file not found: {self.speakeasyConfig}")
-        
-        self.speakeasyRecords = speakeasyRecords
-        self.recordSubFilter = recordSubFilter
-        self.recordLimits = recordLimits
-        self.returnValues = returnValues
-
-    def _createErrorFile(self, errfile):
-        # just creating an empty file to incdicate failure
-        Path(errfile).touch()
-    
-    def _emulation(self, config, path, data):
-        try:
-            file = path if path else str(data[0:15])
-            se = speakeasy.Speakeasy(config=config)
-            if path:
-                module = se.load_module(path=path)
-            if data:
-                module = se.load_module(data=data)
-            se.run_module(module)
-            return se.get_report()
-        
-        except PEFormatError as ex:
-            logging.error(f" [-] Failed emulation, PEFormatError: {file}\n{ex}\n")
-            return None
-        except UcError as ex:
-            logging.error(f" [-] Failed emulation, UcError: {file}\n{ex}\n")
-            return None
-        except IndexError as ex:
-            logging.error(f" [-] Failed emulation, IndexError: {file}\n{ex}\n")
-            return None
-        except speakeasy.errors.NotSupportedError as ex:
-            logging.error(f" [-] Failed emulation, NotSupportedError: {file}\n{ex}\n")
-            return None
-        except speakeasy.errors.SpeakeasyError as ex:
-            logging.error(f" [-] Failed emulation, SpeakEasyError: {file}\n{ex}\n")
-            return None
-        except Exception as ex:
-            logging.error(f" [-] Failed emulation, general Exception: {file}\n{ex}\n")
-            return None
-    
-    def emulate(self, path=None, data=None):
-        if path is None and data is None:
-            raise ValueError("Either 'file' or 'data' must be specified.")
-        if path:
-            if not os.path.exists(path):
-                raise ValueError(f"File {path} does not exist.")
-            self.sampleName = os.path.basename(path).replace(".exe", "")
-        else:
-            self.sampleName = f"{time()}"
-        report = self._emulation(self.speakeasyConfig, path, data)
-        
-        if self.outputFolder:
-            if report:
-                with open(os.path.join(self.outputFolder, f"{self.sampleName}.json"), "w") as f:
-                    f.write(report["entry_points"])
-            else:
-                self._createErrorFile(os.path.join(self.outputFolder, f"{self.sampleName}.err"))
-
-        api_seq_len = sum([len(x["apis"]) for x in report["entry_points"]]) if report else 0
-        if api_seq_len == 0:
-            return None
-        else:
-            return self.parseReportEntryPoints(report["entry_points"])
-    
-    def parseReportEntryPoints(self, entryPoints):
-        # clean up report
-        recordDict = self.getRecordsFromReport(entryPoints)
-        
-        # normalize
-        recordDict['network_events.traffic'] = normalizeTableIP(recordDict['network_events.traffic'], col='server')
-        recordDict['file_access'] = normalizeTablePath(recordDict['file_access'], col='path')
-        retValMask = recordDict['apis']['ret_val'].isin(self.returnValues)
-        recordDict['apis']['ret_val'][~retValMask] = "<ret_val>"
-        
-        # limit verbose fields to a certain number of records
-        if self.recordLimits:
-            for field in self.recordLimits.keys():
-                if field in recordDict.keys():
-                    recordDict[field] = recordDict[field].head(self.recordLimits[field])
-        # join 
-        recordJson = self.joinRecordsToJSON(recordDict)
-        return recordJson
-    
-    def getRecordsFromReport(self, entryPoints):
-        records = dict()
-        for recordField in self.speakeasyRecords:
-            recordList = [json_normalize(x, record_path=[recordField.split('.')]) for x in entryPoints if recordField.split('.')[0] in x]
-            records[recordField] = concat(recordList) if recordList else DataFrame()
+            predProbs = torch.sigmoid(logits).clone().detach().cpu().numpy()
+            if target.shape[1] == 1:
+                batchMetrics = self.getMetrics(target.cpu().numpy(), predProbs)
+                epochMetrics.append(batchMetrics)
             
-        return records
+            if batchIdx % self.verbosityBatches == 0:
+                if target.shape[1] == 1:
+                    metricsReport = f"FPR {self.falsePositiveRates[self.fprReportingIdx]} -- "
+                    metricsReport += f"TPR {batchMetrics[self.fprReportingIdx, 0]:.4f} | F1 {batchMetrics[self.fprReportingIdx, 1]:.4f}"
+                else:
+                    metricsReport = "Not computing TPR and F1"
+                logging.warning(" [*] {}: Train Epoch: {} [{:^5}/{:^5} ({:^2.0f}%)]\tLoss: {:.6f} | {} | Elapsed: {:.2f}s".format(
+                    time.ctime(), epochId, batchIdx * len(data), len(trainLoader.dataset),
+                100. * batchIdx / len(trainLoader), loss.item(), metricsReport, time.time() - now))
+                now = time.time()
+        
+        if epochMetrics: # we do not collect metrics if target is not binary
+            # taking mean across all batches
+            epochMetrics = np.array(epochMetrics).mean(axis=0).reshape(-1,2)
+            epochTPRs, epochF1s = epochMetrics[:,0], epochMetrics[:,1]
+            # shape of each metrics array: (len(falsePositiveRates), )
+            return epochLosses, epochTPRs, epochF1s
+        else:
+            return epochLosses, None, None
 
-    def joinRecordsToJSON(self, recordDict):
-        jsonEvent = "{"
-        for i, key in enumerate(recordDict.keys()):
-            if recordDict[key].empty:
-                continue
-            if key in self.recordSubFilter.keys():
-                jsonVal = recordDict[key][self.recordSubFilter[key]].to_json(orient='records', indent=4)
+    def fit(self, X, y, epochs=10):
+        trainLoader = torch.utils.data.DataLoader(
+            torch.utils.data.TensorDataset(torch.from_numpy(X).long(), torch.from_numpy(y).float()),
+            batch_size=self.batchSize,
+            shuffle=True
+        )
+        self.model.train()
+        self.trainTruePositiveRates = np.empty(shape=(epochs, len(self.falsePositiveRates)))
+        self.trainF1s = np.empty(shape=(epochs, len(self.falsePositiveRates)))
+        self.trainLosses = []
+        self.trainingTime = []
+        try:
+            for epochIdx in range(1, epochs + 1):
+                epochStartTime = time.time()
+                logging.warning(f" [*] Started epoch: {epochIdx}")
+
+                epochTrainLoss, epochTPRs, epochF1s = self.trainEpoch(trainLoader, epochIdx)
+                self.trainTruePositiveRates[epochIdx-1] = epochTPRs
+                self.trainF1s[epochIdx-1] = epochF1s
+                self.trainLosses.extend(epochTrainLoss)
+                timeElapsed = time.time() - epochStartTime
+                self.trainingTime.append(timeElapsed)
+                
+                if epochTPRs is not None and epochF1s is not None:
+                    metricsReport = f"FPR {self.falsePositiveRates[self.fprReportingIdx]} -- "
+                    metricsReport += f"TPR: {epochTPRs[self.fprReportingIdx]:.2f} |  F1: {epochF1s[self.fprReportingIdx]:.2f}"
+                else:
+                    metricsReport = "Not computing TPR and F1"
+                logging.warning(f" [*] {time.ctime()}: {epochIdx:^7} | Tr.loss: {np.mean(epochTrainLoss):.6f} | {metricsReport} | Elapsed: {timeElapsed:^9.2f}s")
+            if self.outputFolder:
+                self.dumpResults()
+        except KeyboardInterrupt:
+            if self.outputFolder:
+                self.dumpResults()
+
+    def train(self, X, y, epochs=10):
+        self.fit(self, X, y, epochs=epochs)
+
+    def evaluate(self, X, y, metrics="array"):
+        testLoader = torch.utils.data.DataLoader(
+            torch.utils.data.TensorDataset(torch.from_numpy(X).long(), torch.from_numpy(y).float()),
+            batch_size=self.batchSize,
+            shuffle=True
+        )
+        self.model.eval()
+
+        self.testLoss = []
+        self.testTruePositiveRates = []
+        self.testF1s = []
+        for data, target in testLoader:
+            data, target = data.to(self.device), target.to(self.device)
+
+            with torch.no_grad():
+                logits = self.model.forwardPass(data)
+
+            loss = self.lossFunction(logits, target.float().reshape(-1,1))
+            self.testLoss.append(loss.item())
+
+            predProbs = torch.sigmoid(logits).clone().detach().cpu().numpy()
+            batchMetrics = self.getMetrics(target.cpu().numpy(), predProbs)
+            self.testTruePositiveRates.append(batchMetrics[:,0])
+            self.testF1s.append(batchMetrics[:,1])
+            
+        # take mean across all batches for each metric
+        # resulting shape of each metric: (len(falsePositiveRates), )
+        self.testTruePositiveRates = np.array(self.testTruePositiveRates).mean(axis=0)
+        self.testF1s = np.array(self.testF1s).mean(axis=0)
+        if metrics == "array":
+            return self.testLoss, self.testTruePositiveRates, self.testF1s
+        elif metrics == "json":
+            return self.metricsToJSON([self.testLoss, self.testTruePositiveRates, self.testF1s])
+        else:
+            raise ValueError("evaluate(): Inappropriate metrics value, must be in: ['array', 'json']")
+
+    def predict_proba(self, arr):
+        out = torch.empty((0,1)).to(self.device)
+        loader = torch.utils.data.DataLoader(
+            torch.utils.data.TensorDataset(torch.from_numpy(arr).long()),
+            batch_size=self.batchSize,
+            shuffle=False
+        )
+
+        self.model.eval()
+        for data in loader:
+            with torch.no_grad():
+                logits = self.model(torch.Tensor(data[0]).long().to(self.device))
+                out = torch.vstack([out, logits])
+        
+        return torch.sigmoid(out).clone().detach().cpu().numpy()
+    
+    def predict(self, arr, threshold=0.5):
+        self.model.eval()
+        with torch.no_grad():
+            logits = self.model.predict_proba(arr)
+        return (logits > threshold).astype(np.int_)
+    
+    def metricsToJSON(self, metrics):
+        tprs = dict(zip(["fpr_"+str(x) for x in self.falsePositiveRates], metrics[1]))
+        f1s = dict(zip(["fpr_"+str(x) for x in self.falsePositiveRates], metrics[2]))
+        metricDict = DataFrame([tprs, f1s], index=["tpr", "f1"]).to_dict()
+        metricDict['loss'] = metrics[0]
+        return metricDict
+
+
+class PEHybridClassifier(nn.Module):
+    def __init__(self,
+                    speakeasyConfig,
+                    vocabFile=None,
+                    outputFolder=None,
+                    malwareHeadLayers = [128, 64],
+                    representationSize = 256,
+                    dropout=0.5
+        ):
+        super(PEHybridClassifier, self).__init__()
+        
+        # TODO: add configuration for each of those classes through init of this class?
+        # or perform feature extraction through a separate class?
+        self.staticExtractor = PEStaticFeatureExtractor()
+        self.dynamicExtractor = PEDynamicFeatureExtractor(
+            speakeasyConfig=speakeasyConfig,
+            emulationOutputFolder=outputFolder,
+        )
+        self.tokenizer = JSONTokenizer()
+        if vocabFile:
+            self.tokenizer.load_from_pretrained(vocabFile)
+        else:
+            msg = "[!] No 'vocabFile' was provided, the tokenizer has to be pre-trained on your data."
+            msg += " Please use the 'build_vocabulary()' method of this class to train the tokenizer."
+            logging.warning(msg)
+        
+        # models
+        self.staticModel = MLP(
+            layer_sizes=[1024, 512, representationSize],
+            dropout=dropout,
+        )
+        self.dynamicModel = Cnn1DLinearLM(
+            vocabSize=len(self.tokenizer.vocab),
+            hiddenNeurons=[512, representationSize],
+            dropout=dropout,
+        )
+
+        # malware head
+        layers = []
+        for i,ls in enumerate(malwareHeadLayers):
+            if i == 0:
+                layers.append(nn.Linear(representationSize, ls))
             else:
-                jsonVal = recordDict[key].to_json(orient='records', indent=4)
-            jsonEvent += f"\n\"{key}\":\n{jsonVal}"
+                layers.append(nn.Linear(malwareHeadLayers[i-1], ls))
+            layers.append(nn.LayerNorm(ls))
+            layers.append(nn.ReLU())
+            layers.append(nn.Dropout(dropout))
 
-            if i != len(recordDict.keys())-1:
-                jsonEvent += ","
+        layers.append(nn.Linear(malwareHeadLayers[-1], 1))
+        self.malware_head = nn.Sequential(*layers)
 
-        if jsonEvent.endswith(","):
-            jsonEvent = jsonEvent[:-1]
-        jsonEvent += "}"
-        return jsonEvent
+        if not os.path.exists(outputFolder):
+            os.makedirs(outputFolder, exist_ok=True)
+        self.outputFolder = outputFolder
+
+    def preprocess(self, data):
+        if isinstance(data, str):
+            with open(data, "rb") as f:
+                bytez = f.read()
+        elif isinstance(data, bytes):
+            bytez = data
+        else:
+            raise ValueError("preprocess(): data must be a path to a PE file or a bytes object")
+        staticFeatures = self.staticExtractor.feature_vector(bytez).reshape(1,-1)
+        dynamicFeaturesJson = self.dynamicExtractor.emulate(data=bytez)
+        dynamicFeatures = self.tokenizer.encode(dynamicFeaturesJson)
+        return torch.Tensor(staticFeatures), torch.Tensor(dynamicFeatures)
+    
+    def forward(self, staticFeatures, dynamicFeatures):
+        staticFeatures = self.staticModel.get_representations(staticFeatures.float())
+        dynamicFeatures = self.dynamicModel.get_representations(dynamicFeatures.long())
+        # sum static and dynamic features
+        features = staticFeatures + dynamicFeatures
+        return self.malware_head(features)
+
+    def build_vocabulary(self, folderBenign, folderMalicious, vocabSize=10000):
+        raise NotImplementedError("build_vocabulary(): Not implemented yet")
+
+    def train(
+        self, 
+        folderBenign, 
+        folderMalicious, 
+        epochs=10
+    ):
+        # TODO: train classifier using raw PE files in benign an malicious folders
+        raise NotImplementedError("train(): Not implemented yet")
