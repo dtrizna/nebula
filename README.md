@@ -1,9 +1,60 @@
 # Project Nebula
 
-<!-- scaled image from web -->
 <center><img src="https://cdn.eso.org/images/screen/eso1205ec.jpg" width="400"></center>
 
-Beahavioral intrusion detection system based on neural networks.
+## Description
+
+Behavioral intrusion detection system that is capable of self-supervised learning from unlabeled data. **Work in progress.**
+
+Quasi-functional implementation:
+
+- Portable Executable (PE) classifier under `nebula.PEHybridClassifier` class. It uses:
+  - (1) 1D Convolutional Neural Network (CNN) for dynamic PE analysis. Behavior is obtained using *speakeasy* emulator (see `nebula.preprocessing.PEDynamicFeatureExtractor`), with analysis of:
+    - sequence of API calls, their arguments and return values;
+    - File system modifications;
+    - Registry modifications;
+    - Networ connections.
+  - (2) Fully connected neural network (FFNN) for analysis of static features as discussed in EMBER paper (Anderson and Roth, <https://arxiv.org/abs/1804.04637>).
+
+```python
+model = PEHybridClassifier(
+    vocabFile=vocabFile,
+    speakeasyConfig=speakeasyConfigFile
+)
+pe = r"C:\windows\syswow64\xcopy.exe"
+staticFeatures, dynamicFeatures = model.preprocess(pe)
+logits = model(staticFeatures, dynamicFeatures)
+```
+
+## PE classifier configuration evaluations
+
+<center><img src="evaluation\_crossValidationPlots\_modelArchitectureComparison.png" width=700>
+
+<img src="evaluation\_crossValidationPlots\_vocabularySizeComparison.png" width=700>
+
+<img src="evaluation\_crossValidationPlots\_fullVocabSizeMaxLenHeatmap_fpr_0_001.png" width=700>
+
+<img src="evaluation\_crossValidationPlots\_PreProcessingComparison.png" width=700></center>
+
+## Pre-training with self-supervised techniques
+
+### Masked Language Model
+
+Implementation is under `nebula.pretraining.MaskedLanguageModel` class.
+
+Evaluation done using `nebula.pretraining.SelfSupervisedPretraining` class that implements Cybersecurity Evaluation Framework for semisupervised learning (CEF-SSL) framework, introduced by Apruzzese et al. in <https://arxiv.org/pdf/2205.08944.pdf>. It suggests to perform data splits $N$ times as follows, where $\mathbb{U}$ is used for pre-training, $\mathbb{L}$ for downstream task, and $\mathbb{F}$ for final evaluation:
+
+<center><img src="work\speakeasy_3_SSL_Pretraining\datasetSplit.png" width=300></center>
+
+Results with even brief pre-training (5 epochs on single GPU laptop) are unclear. On trainig set (i.e. $\mathbb{L}$) metrics are improved:
+
+<center><img src="evaluation\_maskedLanguageModelPlots\unlabeledDataSize_0.9_preTrain_5_downStream_2_nSplits_5_1672239000_trainSetStats.png" width=700></center>
+
+Yet no significant benefit on test set (i.e. $\mathbb{F}$) are observed:
+
+<center><img src="evaluation\_maskedLanguageModelPlots\unlabeledDataSize_0.8_preTrain_10_downStream_3_nSplits_5_1672232495_testSetStats.png" width=700></center>
+
+Pre-training was brief, done on a single laptop, with futher tests required.
 
 ## Future work
 
@@ -12,6 +63,7 @@ Beahavioral intrusion detection system based on neural networks.
 1. Build malware classifier class with convenient API
    - ~~Add ember feature extraction to sequential emulation model.~~
    - Provide it as `pip` package.
+   - Download raw PE data, build dataset, and train classifier.
 2. Try efficient long-sequence attention models:
    - Reformer
    - Start transformer
@@ -53,6 +105,7 @@ Beahavioral intrusion detection system based on neural networks.
   - ~~1D CNN + Linear~~
   - ~~Transformer~~
   - 1D CNN + LSTM
+  - Reformer
 - cross-validate preprocessing to find best data structure
   - ~~Plot vocabSize and maxLen as heatmap!~~
   - ~~clean dataset (w/o api_seq_len==1 of ordinal APIs)~~ DONE: Training set size dropped from `91096` to `76126`.
@@ -74,15 +127,21 @@ Beahavioral intrusion detection system based on neural networks.
     ```
 
   - more verbose dataset -- include additional fields
-    - ~~include API call 'args'~~ DONE: See training set under `data/data_filtered/speakeasy_trainset_WithArgs/`
-
+    - ~~include API call 'args'~~
+    - ~~try extra preProcessing strategies:~~
+      - ~~include error: (1) preprocess dataset (2) run cross validation~~
+      - ~~include dns: (1) preprocess dataset (2) run cross validation~~
+    Results reported under `_speakeasyPreProcessingResults.ipynb` notebook.
+  - rewrite preprocessing:
+    - extract separate `JSONParser` class from `PEDynamicExtractor` class that will be suitable for `auditd` dataset
+    - input for `JSONParser` should be list of normalized fields, e.g.: `[api.name, api.args, ...]`. It should be able to find where JSON has list of values, pass it `json_normalize` and then filter all consequent fields
   - 3D dataset: `(batch_size, seq_len, features)` where each sequence represent:
     - API call tokens: name, ret_val, args
     - network request tokens
     - featurized registry modification
     - featurized file modification
 
-    > NOTE: models should be adjusted to parse 3D structure, if transformer, might need positional encoding twice
+    > NOTE: models should be adjusted to parse 3D structure. If transformer, might need positional encoding twice.
 
     > NOTE2! This will build ground for future work on loging data (auditd, sysmon).
 
@@ -99,6 +158,11 @@ Beahavioral intrusion detection system based on neural networks.
 
 ### `auditd` dataset and dowstream tasks
 
+- ~~test normalization and JSON filter speeds~~ (DONE, see `tests/auditd_1_Preprocessing/_auditd_json_benchmarks.ipynb` and `tests/speakeasy_1_Preprocessing/_speakeasyTicks.ipynb`)
+  - ~~any ways to optimize pandas involvement?~~
+    - ~~replace pandas whatsoever -- do plain `json` or `koalas`?~~
+    - ~~what takes the most time -- loading? groupby?~~
+
 - reverse shell dataset with `process.title` content only:
   - generate augmented reverse shells as malicious samples: (a) train -- one set of reverse shell binaries (b) val -- another binaries
   - random split of unique legitimate commands to train/val
@@ -112,6 +176,9 @@ Beahavioral intrusion detection system based on neural networks.
   - sequence processing -- based on: (a) time (b) nr. of events ?
   
 ### Contextual embeddings
+
+- ~~write pipeline for fastText training~~ (DONE, see `tests/modeling/fastText/_auditd_d_fasttext_full.ipynb`)
+  - ~~anomaly detection on red team host~~ (DONE, see `tests/modeling/fastText/_auditd_c_fasttext.ipynb`)
 
 - cross validation of `fasttext`:
   - `fasttext` as embeddings with models instead of `nn.Embedding()` - tokenization & embeddings setup:
@@ -150,12 +217,3 @@ Beahavioral intrusion detection system based on neural networks.
   - using logs from pentest machines?
   - simulate your own TTPs in validation environments?
     - automate it?
-
-## Past Work
-
-- ~~test normalization and JSON filter speeds~~ (DONE, see `tests/auditd_1_Preprocessing/_auditd_json_benchmarks.ipynb` and `tests/speakeasy_1_Preprocessing/_speakeasyTicks.ipynb`)
-  - ~~any ways to optimize pandas involvement?~~
-    - ~~replace pandas whatsoever -- do plain `json` or `koalas`?~~
-    - ~~what takes the most time -- loading? groupby?~~
-- ~~write pipeline for fastText training~~ (DONE, see `tests/modeling/fastText/_auditd_d_fasttext_full.ipynb`)
-  - ~~anomaly detection on red team host~~ (DONE, see `tests/modeling/fastText/_auditd_c_fasttext.ipynb`

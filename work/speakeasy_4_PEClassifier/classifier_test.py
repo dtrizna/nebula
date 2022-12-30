@@ -11,9 +11,8 @@ model = PEHybridClassifier(
     speakeasyConfig=speakeasyConfigFile,
     outputFolder=outEmulationReportFolder,
 )
-testFile = r"C:\windows\syswow64\xcopy.exe"
-static, dynamic = model.preprocess(testFile)
-
-logits = model(static, dynamic)
+pe = r"C:\windows\syswow64\xcopy.exe"
+staticFeatures, dynamicFeatures = model.preprocess(pe)
+logits = model(staticFeatures, dynamicFeatures)
 print(logits)
 import pdb;pdb.set_trace()
