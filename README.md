@@ -44,7 +44,7 @@ Implementation is under `nebula.pretraining.MaskedLanguageModel` class.
 
 Evaluation done using `nebula.pretraining.SelfSupervisedPretraining` class that implements Cybersecurity Evaluation Framework for semisupervised learning (CEF-SSL) framework, introduced by Apruzzese et al. in <https://arxiv.org/pdf/2205.08944.pdf>. It suggests to perform data splits $N$ times as follows, where $\mathbb{U}$ is used for pre-training, $\mathbb{L}$ for downstream task, and $\mathbb{F}$ for final evaluation:
 
-<center><img src="work\speakeasy_3_SSL_Pretraining\datasetSplit.png" width=300></center>
+<center><img src="evaluation\_maskedLanguageModelPlots\datasetSplit.png" width=300></center>
 
 Results with even brief pre-training (5 epochs on single GPU laptop) are unclear. On trainig set (i.e. $\mathbb{L}$) metrics are improved:
 
