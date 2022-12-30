@@ -2,10 +2,14 @@ import os
 import sys
 from pandas import to_datetime
 from collections.abc import Iterable
+import string
 
 def getRealPath(type="script"):
     idx = 1 if type == "notebook" else 0
     return os.path.dirname(os.path.realpath(sys.argv[idx]))
+
+def getAlphaNumChars(s):
+    return ''.join(filter(lambda x: x in string.ascii_letters + string.digits + string.punctuation, s))
 
 def filterDictByKeys(dict, key_list):
     return {k: dict[k] for k in key_list if k in dict}
@@ -19,6 +23,9 @@ def flatten(l):
 
 def flattenList(l):
     return [item for sublist in l for item in sublist]
+
+def dictToString(dictionary):
+    return str(dictionary).replace(' ', '_').replace('\'', '').replace('{', '').replace('}', '').replace(':', '').replace(',', '').replace('[', '').replace(']', '')
 
 def fix_random_seed(seed_value=1763):
     """Set seed for reproducibility."""

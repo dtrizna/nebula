@@ -4,15 +4,20 @@ __pycache__/
 .ipynb_checkpoints
 
 # data
-windows_emulationDataset/
-speakeasy_trainset/
+windows_emulation*
+data/data_filtered/speakeasy_testset*/
+data/data_filtered/speakeasy_trainset*/
 wazuh_*
 *windows_msft_*
 *auditd_msft_*
 *kubeaudit_msft_*
 reverse_shell_dataset.cm
 *zip
-*7z
+data/data_raw/*7z
+data/data_filtered/*_WithAPIargs.7z
+evaluation/MaskedLanguageModeling/*/downstreamTask*
+evaluation/MaskedLanguageModeling/*/preTraining/
 
 # models
 FastText*model
+*torch
