@@ -19,10 +19,7 @@ Quasi-functional implementation:
 ```python
 from nebula import PEHybridClassifier
 
-model = PEHybridClassifier(
-    vocabFile=vocabFile,
-    speakeasyConfig=speakeasyConfigFile
-)
+model = PEHybridClassifier()
 pe = r"C:\windows\syswow64\xcopy.exe"
 staticFeatures, dynamicFeatures = model.preprocess(pe)
 logits = model(staticFeatures, dynamicFeatures)
