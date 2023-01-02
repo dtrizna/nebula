@@ -1,0 +1,1387 @@
+WARNING:root: [!] Starting Masked Language Model evaluation over 2 splits!
+WARNING:root: [!] Loaded data and vocab. X train size: (76126, 2048), X test size: (17407, 2048), vocab size: 10000
+WARNING:root: [!] Initiating Self-Supervised Learning Pretraining
+     Language Modeling MaskedLanguageModel
+     Model Cnn1DLinearLM with config:
+	{'vocabSize': 10000, 'hiddenNeurons': [512, 256, 128]}
+
+WARNING:root: [!] Running pre-training split 1/2
+WARNING:root: [!] Pre-training model...
+WARNING:root: [*] Masking sequences...
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Sun Jan  1 10:04:46 2023: Train Epoch: 1 [  0  /57094 (0 %)]	Loss: 505.307220 | Not computing TPR and F1 | Elapsed: 3.04s
+WARNING:root: [*] Sun Jan  1 10:05:01 2023: Train Epoch: 1 [12800/57094 (22%)]	Loss: 413.412659 | Not computing TPR and F1 | Elapsed: 15.66s
+WARNING:root: [*] Sun Jan  1 10:05:17 2023: Train Epoch: 1 [25600/57094 (45%)]	Loss: 367.124939 | Not computing TPR and F1 | Elapsed: 15.68s
+WARNING:root: [*] Sun Jan  1 10:05:33 2023: Train Epoch: 1 [38400/57094 (67%)]	Loss: 346.325928 | Not computing TPR and F1 | Elapsed: 15.66s
+WARNING:root: [*] Sun Jan  1 10:05:48 2023: Train Epoch: 1 [51200/57094 (89%)]	Loss: 333.093140 | Not computing TPR and F1 | Elapsed: 15.35s
+WARNING:root: [*] Sun Jan  1 10:05:55 2023:    1    | Tr.loss: 354.860412 | Not computing TPR and F1 | Elapsed:   72.18  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Sun Jan  1 10:05:55 2023: Train Epoch: 2 [  0  /57094 (0 %)]	Loss: 296.797852 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:06:11 2023: Train Epoch: 2 [12800/57094 (22%)]	Loss: 306.437775 | Not computing TPR and F1 | Elapsed: 15.46s
+WARNING:root: [*] Sun Jan  1 10:06:26 2023: Train Epoch: 2 [25600/57094 (45%)]	Loss: 311.164795 | Not computing TPR and F1 | Elapsed: 15.53s
+WARNING:root: [*] Sun Jan  1 10:06:42 2023: Train Epoch: 2 [38400/57094 (67%)]	Loss: 304.516663 | Not computing TPR and F1 | Elapsed: 15.36s
+WARNING:root: [*] Sun Jan  1 10:06:57 2023: Train Epoch: 2 [51200/57094 (89%)]	Loss: 286.089844 | Not computing TPR and F1 | Elapsed: 15.51s
+WARNING:root: [*] Sun Jan  1 10:07:04 2023:    2    | Tr.loss: 305.976137 | Not computing TPR and F1 | Elapsed:   68.99  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Sun Jan  1 10:07:04 2023: Train Epoch: 3 [  0  /57094 (0 %)]	Loss: 304.611176 | Not computing TPR and F1 | Elapsed: 0.30s
+WARNING:root: [*] Sun Jan  1 10:07:20 2023: Train Epoch: 3 [12800/57094 (22%)]	Loss: 319.442139 | Not computing TPR and F1 | Elapsed: 15.45s
+WARNING:root: [*] Sun Jan  1 10:07:35 2023: Train Epoch: 3 [25600/57094 (45%)]	Loss: 296.175262 | Not computing TPR and F1 | Elapsed: 15.39s
+WARNING:root: [*] Sun Jan  1 10:07:51 2023: Train Epoch: 3 [38400/57094 (67%)]	Loss: 294.787842 | Not computing TPR and F1 | Elapsed: 15.50s
+WARNING:root: [*] Sun Jan  1 10:08:06 2023: Train Epoch: 3 [51200/57094 (89%)]	Loss: 271.386292 | Not computing TPR and F1 | Elapsed: 15.51s
+WARNING:root: [*] Sun Jan  1 10:08:15 2023:    3    | Tr.loss: 295.853181 | Not computing TPR and F1 | Elapsed:   71.01  s
+WARNING:root: [*] Started epoch: 4
+WARNING:root: [*] Sun Jan  1 10:08:15 2023: Train Epoch: 4 [  0  /57094 (0 %)]	Loss: 288.680969 | Not computing TPR and F1 | Elapsed: 0.36s
+WARNING:root: [*] Sun Jan  1 10:08:48 2023: Train Epoch: 4 [12800/57094 (22%)]	Loss: 285.707306 | Not computing TPR and F1 | Elapsed: 32.79s
+WARNING:root: [*] Sun Jan  1 10:09:04 2023: Train Epoch: 4 [25600/57094 (45%)]	Loss: 280.823669 | Not computing TPR and F1 | Elapsed: 15.74s
+WARNING:root: [*] Sun Jan  1 10:09:19 2023: Train Epoch: 4 [38400/57094 (67%)]	Loss: 293.104492 | Not computing TPR and F1 | Elapsed: 15.31s
+WARNING:root: [*] Sun Jan  1 10:09:34 2023: Train Epoch: 4 [51200/57094 (89%)]	Loss: 290.579956 | Not computing TPR and F1 | Elapsed: 15.28s
+WARNING:root: [*] Sun Jan  1 10:09:41 2023:    4    | Tr.loss: 291.526790 | Not computing TPR and F1 | Elapsed:   86.21  s
+WARNING:root: [*] Started epoch: 5
+WARNING:root: [*] Sun Jan  1 10:09:41 2023: Train Epoch: 5 [  0  /57094 (0 %)]	Loss: 291.727722 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:09:57 2023: Train Epoch: 5 [12800/57094 (22%)]	Loss: 264.090698 | Not computing TPR and F1 | Elapsed: 15.55s
+WARNING:root: [*] Sun Jan  1 10:10:12 2023: Train Epoch: 5 [25600/57094 (45%)]	Loss: 304.614441 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 10:10:27 2023: Train Epoch: 5 [38400/57094 (67%)]	Loss: 292.599548 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 10:10:43 2023: Train Epoch: 5 [51200/57094 (89%)]	Loss: 298.521301 | Not computing TPR and F1 | Elapsed: 15.36s
+WARNING:root: [*] Sun Jan  1 10:10:50 2023:    5    | Tr.loss: 288.686705 | Not computing TPR and F1 | Elapsed:   68.89  s
+WARNING:root: [*] Started epoch: 6
+WARNING:root: [*] Sun Jan  1 10:10:50 2023: Train Epoch: 6 [  0  /57094 (0 %)]	Loss: 298.923645 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:11:06 2023: Train Epoch: 6 [12800/57094 (22%)]	Loss: 276.832184 | Not computing TPR and F1 | Elapsed: 15.44s
+WARNING:root: [*] Sun Jan  1 10:11:21 2023: Train Epoch: 6 [25600/57094 (45%)]	Loss: 279.620972 | Not computing TPR and F1 | Elapsed: 15.30s
+WARNING:root: [*] Sun Jan  1 10:11:36 2023: Train Epoch: 6 [38400/57094 (67%)]	Loss: 308.935333 | Not computing TPR and F1 | Elapsed: 15.34s
+WARNING:root: [*] Sun Jan  1 10:11:52 2023: Train Epoch: 6 [51200/57094 (89%)]	Loss: 292.071198 | Not computing TPR and F1 | Elapsed: 15.30s
+WARNING:root: [*] Sun Jan  1 10:11:58 2023:    6    | Tr.loss: 286.082972 | Not computing TPR and F1 | Elapsed:   68.45  s
+WARNING:root: [*] Started epoch: 7
+WARNING:root: [*] Sun Jan  1 10:11:59 2023: Train Epoch: 7 [  0  /57094 (0 %)]	Loss: 295.063232 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:12:14 2023: Train Epoch: 7 [12800/57094 (22%)]	Loss: 311.390808 | Not computing TPR and F1 | Elapsed: 15.28s
+WARNING:root: [*] Sun Jan  1 10:12:29 2023: Train Epoch: 7 [25600/57094 (45%)]	Loss: 289.804810 | Not computing TPR and F1 | Elapsed: 15.41s
+WARNING:root: [*] Sun Jan  1 10:12:45 2023: Train Epoch: 7 [38400/57094 (67%)]	Loss: 284.111145 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:13:00 2023: Train Epoch: 7 [51200/57094 (89%)]	Loss: 294.621460 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 10:13:07 2023:    7    | Tr.loss: 284.880997 | Not computing TPR and F1 | Elapsed:   68.23  s
+WARNING:root: [*] Started epoch: 8
+WARNING:root: [*] Sun Jan  1 10:13:07 2023: Train Epoch: 8 [  0  /57094 (0 %)]	Loss: 283.066467 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:13:22 2023: Train Epoch: 8 [12800/57094 (22%)]	Loss: 282.932617 | Not computing TPR and F1 | Elapsed: 15.41s
+WARNING:root: [*] Sun Jan  1 10:13:38 2023: Train Epoch: 8 [25600/57094 (45%)]	Loss: 295.662750 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:13:53 2023: Train Epoch: 8 [38400/57094 (67%)]	Loss: 274.401184 | Not computing TPR and F1 | Elapsed: 15.72s
+WARNING:root: [*] Sun Jan  1 10:14:09 2023: Train Epoch: 8 [51200/57094 (89%)]	Loss: 267.866730 | Not computing TPR and F1 | Elapsed: 15.78s
+WARNING:root: [*] Sun Jan  1 10:14:16 2023:    8    | Tr.loss: 283.329960 | Not computing TPR and F1 | Elapsed:   69.22  s
+WARNING:root: [*] Started epoch: 9
+WARNING:root: [*] Sun Jan  1 10:14:16 2023: Train Epoch: 9 [  0  /57094 (0 %)]	Loss: 279.115112 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:14:32 2023: Train Epoch: 9 [12800/57094 (22%)]	Loss: 293.199890 | Not computing TPR and F1 | Elapsed: 15.31s
+WARNING:root: [*] Sun Jan  1 10:14:47 2023: Train Epoch: 9 [25600/57094 (45%)]	Loss: 303.637451 | Not computing TPR and F1 | Elapsed: 15.31s
+WARNING:root: [*] Sun Jan  1 10:15:03 2023: Train Epoch: 9 [38400/57094 (67%)]	Loss: 300.054077 | Not computing TPR and F1 | Elapsed: 15.70s
+WARNING:root: [*] Sun Jan  1 10:15:18 2023: Train Epoch: 9 [51200/57094 (89%)]	Loss: 283.264465 | Not computing TPR and F1 | Elapsed: 15.66s
+WARNING:root: [*] Sun Jan  1 10:15:25 2023:    9    | Tr.loss: 281.721751 | Not computing TPR and F1 | Elapsed:   69.05  s
+WARNING:root: [*] Started epoch: 10
+WARNING:root: [*] Sun Jan  1 10:15:25 2023: Train Epoch: 10 [  0  /57094 (0 %)]	Loss: 292.014923 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:15:40 2023: Train Epoch: 10 [12800/57094 (22%)]	Loss: 280.618958 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 10:15:56 2023: Train Epoch: 10 [25600/57094 (45%)]	Loss: 289.930176 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:16:11 2023: Train Epoch: 10 [38400/57094 (67%)]	Loss: 276.666992 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:16:26 2023: Train Epoch: 10 [51200/57094 (89%)]	Loss: 284.529633 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:16:33 2023:   10    | Tr.loss: 280.861026 | Not computing TPR and F1 | Elapsed:   67.99  s
+WARNING:root: [*] Started epoch: 11
+WARNING:root: [*] Sun Jan  1 10:16:33 2023: Train Epoch: 11 [  0  /57094 (0 %)]	Loss: 256.911926 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:16:49 2023: Train Epoch: 11 [12800/57094 (22%)]	Loss: 276.812744 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 10:17:04 2023: Train Epoch: 11 [25600/57094 (45%)]	Loss: 275.017395 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:17:19 2023: Train Epoch: 11 [38400/57094 (67%)]	Loss: 293.516205 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:17:34 2023: Train Epoch: 11 [51200/57094 (89%)]	Loss: 277.003021 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:17:41 2023:   11    | Tr.loss: 279.219878 | Not computing TPR and F1 | Elapsed:   68.02  s
+WARNING:root: [*] Started epoch: 12
+WARNING:root: [*] Sun Jan  1 10:17:41 2023: Train Epoch: 12 [  0  /57094 (0 %)]	Loss: 294.293549 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:17:57 2023: Train Epoch: 12 [12800/57094 (22%)]	Loss: 266.849457 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 10:18:12 2023: Train Epoch: 12 [25600/57094 (45%)]	Loss: 275.894257 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:18:27 2023: Train Epoch: 12 [38400/57094 (67%)]	Loss: 294.959930 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:18:42 2023: Train Epoch: 12 [51200/57094 (89%)]	Loss: 278.386414 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:18:49 2023:   12    | Tr.loss: 278.868199 | Not computing TPR and F1 | Elapsed:   68.01  s
+WARNING:root: [*] Started epoch: 13
+WARNING:root: [*] Sun Jan  1 10:18:49 2023: Train Epoch: 13 [  0  /57094 (0 %)]	Loss: 275.291290 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:19:04 2023: Train Epoch: 13 [12800/57094 (22%)]	Loss: 285.325256 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:19:20 2023: Train Epoch: 13 [25600/57094 (45%)]	Loss: 297.048889 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:19:35 2023: Train Epoch: 13 [38400/57094 (67%)]	Loss: 267.153137 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:19:50 2023: Train Epoch: 13 [51200/57094 (89%)]	Loss: 278.808197 | Not computing TPR and F1 | Elapsed: 15.35s
+WARNING:root: [*] Sun Jan  1 10:19:57 2023:   13    | Tr.loss: 279.265047 | Not computing TPR and F1 | Elapsed:   68.10  s
+WARNING:root: [*] Started epoch: 14
+WARNING:root: [*] Sun Jan  1 10:19:57 2023: Train Epoch: 14 [  0  /57094 (0 %)]	Loss: 271.182159 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:20:13 2023: Train Epoch: 14 [12800/57094 (22%)]	Loss: 262.664459 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:20:28 2023: Train Epoch: 14 [25600/57094 (45%)]	Loss: 285.059113 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:20:43 2023: Train Epoch: 14 [38400/57094 (67%)]	Loss: 282.026062 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 10:20:58 2023: Train Epoch: 14 [51200/57094 (89%)]	Loss: 274.641846 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 10:21:05 2023:   14    | Tr.loss: 276.722987 | Not computing TPR and F1 | Elapsed:   68.02  s
+WARNING:root: [*] Started epoch: 15
+WARNING:root: [*] Sun Jan  1 10:21:05 2023: Train Epoch: 15 [  0  /57094 (0 %)]	Loss: 268.747467 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:21:21 2023: Train Epoch: 15 [12800/57094 (22%)]	Loss: 293.282623 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 10:21:36 2023: Train Epoch: 15 [25600/57094 (45%)]	Loss: 296.179138 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:21:51 2023: Train Epoch: 15 [38400/57094 (67%)]	Loss: 287.431702 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 10:22:06 2023: Train Epoch: 15 [51200/57094 (89%)]	Loss: 252.462738 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:22:13 2023:   15    | Tr.loss: 276.821863 | Not computing TPR and F1 | Elapsed:   67.99  s
+WARNING:root: [*] Started epoch: 16
+WARNING:root: [*] Sun Jan  1 10:22:13 2023: Train Epoch: 16 [  0  /57094 (0 %)]	Loss: 294.361877 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:22:29 2023: Train Epoch: 16 [12800/57094 (22%)]	Loss: 268.053284 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:22:44 2023: Train Epoch: 16 [25600/57094 (45%)]	Loss: 268.334290 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:22:59 2023: Train Epoch: 16 [38400/57094 (67%)]	Loss: 291.392822 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:23:14 2023: Train Epoch: 16 [51200/57094 (89%)]	Loss: 274.551331 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:23:21 2023:   16    | Tr.loss: 276.646859 | Not computing TPR and F1 | Elapsed:   67.98  s
+WARNING:root: [*] Started epoch: 17
+WARNING:root: [*] Sun Jan  1 10:23:21 2023: Train Epoch: 17 [  0  /57094 (0 %)]	Loss: 296.035553 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:23:37 2023: Train Epoch: 17 [12800/57094 (22%)]	Loss: 285.695251 | Not computing TPR and F1 | Elapsed: 15.25s
+WARNING:root: [*] Sun Jan  1 10:23:52 2023: Train Epoch: 17 [25600/57094 (45%)]	Loss: 263.285034 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:24:07 2023: Train Epoch: 17 [38400/57094 (67%)]	Loss: 275.596130 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:24:23 2023: Train Epoch: 17 [51200/57094 (89%)]	Loss: 278.708496 | Not computing TPR and F1 | Elapsed: 15.47s
+WARNING:root: [*] Sun Jan  1 10:24:29 2023:   17    | Tr.loss: 275.599678 | Not computing TPR and F1 | Elapsed:   68.33  s
+WARNING:root: [*] Started epoch: 18
+WARNING:root: [*] Sun Jan  1 10:24:30 2023: Train Epoch: 18 [  0  /57094 (0 %)]	Loss: 272.145050 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:24:45 2023: Train Epoch: 18 [12800/57094 (22%)]	Loss: 271.761658 | Not computing TPR and F1 | Elapsed: 15.60s
+WARNING:root: [*] Sun Jan  1 10:25:01 2023: Train Epoch: 18 [25600/57094 (45%)]	Loss: 264.186249 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 10:25:16 2023: Train Epoch: 18 [38400/57094 (67%)]	Loss: 283.194397 | Not computing TPR and F1 | Elapsed: 15.33s
+WARNING:root: [*] Sun Jan  1 10:25:31 2023: Train Epoch: 18 [51200/57094 (89%)]	Loss: 261.194855 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 10:25:38 2023:   18    | Tr.loss: 273.869525 | Not computing TPR and F1 | Elapsed:   68.54  s
+WARNING:root: [*] Started epoch: 19
+WARNING:root: [*] Sun Jan  1 10:25:38 2023: Train Epoch: 19 [  0  /57094 (0 %)]	Loss: 287.014404 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:25:53 2023: Train Epoch: 19 [12800/57094 (22%)]	Loss: 278.032593 | Not computing TPR and F1 | Elapsed: 15.25s
+WARNING:root: [*] Sun Jan  1 10:26:09 2023: Train Epoch: 19 [25600/57094 (45%)]	Loss: 275.449951 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:26:24 2023: Train Epoch: 19 [38400/57094 (67%)]	Loss: 255.595093 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:26:39 2023: Train Epoch: 19 [51200/57094 (89%)]	Loss: 287.706421 | Not computing TPR and F1 | Elapsed: 15.39s
+WARNING:root: [*] Sun Jan  1 10:26:46 2023:   19    | Tr.loss: 273.168987 | Not computing TPR and F1 | Elapsed:   68.26  s
+WARNING:root: [*] Started epoch: 20
+WARNING:root: [*] Sun Jan  1 10:26:46 2023: Train Epoch: 20 [  0  /57094 (0 %)]	Loss: 274.492798 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:27:02 2023: Train Epoch: 20 [12800/57094 (22%)]	Loss: 276.479156 | Not computing TPR and F1 | Elapsed: 15.29s
+WARNING:root: [*] Sun Jan  1 10:27:17 2023: Train Epoch: 20 [25600/57094 (45%)]	Loss: 283.296997 | Not computing TPR and F1 | Elapsed: 15.28s
+WARNING:root: [*] Sun Jan  1 10:27:32 2023: Train Epoch: 20 [38400/57094 (67%)]	Loss: 281.122253 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:27:48 2023: Train Epoch: 20 [51200/57094 (89%)]	Loss: 265.095642 | Not computing TPR and F1 | Elapsed: 15.30s
+WARNING:root: [*] Sun Jan  1 10:27:54 2023:   20    | Tr.loss: 273.611350 | Not computing TPR and F1 | Elapsed:   68.19  s
+WARNING:root: [*] Started epoch: 21
+WARNING:root: [*] Sun Jan  1 10:27:55 2023: Train Epoch: 21 [  0  /57094 (0 %)]	Loss: 281.885803 | Not computing TPR and F1 | Elapsed: 0.35s
+WARNING:root: [*] Sun Jan  1 10:28:10 2023: Train Epoch: 21 [12800/57094 (22%)]	Loss: 266.604370 | Not computing TPR and F1 | Elapsed: 15.37s
+WARNING:root: [*] Sun Jan  1 10:28:25 2023: Train Epoch: 21 [25600/57094 (45%)]	Loss: 284.358795 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 10:28:41 2023: Train Epoch: 21 [38400/57094 (67%)]	Loss: 262.912506 | Not computing TPR and F1 | Elapsed: 15.29s
+WARNING:root: [*] Sun Jan  1 10:28:56 2023: Train Epoch: 21 [51200/57094 (89%)]	Loss: 256.542480 | Not computing TPR and F1 | Elapsed: 15.32s
+WARNING:root: [*] Sun Jan  1 10:29:03 2023:   21    | Tr.loss: 273.844139 | Not computing TPR and F1 | Elapsed:   68.36  s
+WARNING:root: [*] Started epoch: 22
+WARNING:root: [*] Sun Jan  1 10:29:03 2023: Train Epoch: 22 [  0  /57094 (0 %)]	Loss: 264.349243 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:29:18 2023: Train Epoch: 22 [12800/57094 (22%)]	Loss: 266.229675 | Not computing TPR and F1 | Elapsed: 15.40s
+WARNING:root: [*] Sun Jan  1 10:29:34 2023: Train Epoch: 22 [25600/57094 (45%)]	Loss: 281.132538 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 10:29:49 2023: Train Epoch: 22 [38400/57094 (67%)]	Loss: 272.063171 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:30:04 2023: Train Epoch: 22 [51200/57094 (89%)]	Loss: 276.272583 | Not computing TPR and F1 | Elapsed: 15.32s
+WARNING:root: [*] Sun Jan  1 10:30:11 2023:   22    | Tr.loss: 273.752973 | Not computing TPR and F1 | Elapsed:   68.31  s
+WARNING:root: [*] Started epoch: 23
+WARNING:root: [*] Sun Jan  1 10:30:11 2023: Train Epoch: 23 [  0  /57094 (0 %)]	Loss: 264.963867 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:30:27 2023: Train Epoch: 23 [12800/57094 (22%)]	Loss: 265.456238 | Not computing TPR and F1 | Elapsed: 15.40s
+WARNING:root: [*] Sun Jan  1 10:30:42 2023: Train Epoch: 23 [25600/57094 (45%)]	Loss: 286.950684 | Not computing TPR and F1 | Elapsed: 15.39s
+WARNING:root: [*] Sun Jan  1 10:30:57 2023: Train Epoch: 23 [38400/57094 (67%)]	Loss: 268.954803 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 10:31:13 2023: Train Epoch: 23 [51200/57094 (89%)]	Loss: 277.437683 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 10:31:19 2023:   23    | Tr.loss: 273.408490 | Not computing TPR and F1 | Elapsed:   68.35  s
+WARNING:root: [*] Started epoch: 24
+WARNING:root: [*] Sun Jan  1 10:31:20 2023: Train Epoch: 24 [  0  /57094 (0 %)]	Loss: 267.818451 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:31:35 2023: Train Epoch: 24 [12800/57094 (22%)]	Loss: 263.647614 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 10:31:50 2023: Train Epoch: 24 [25600/57094 (45%)]	Loss: 281.347229 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 10:32:05 2023: Train Epoch: 24 [38400/57094 (67%)]	Loss: 269.017029 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 10:32:21 2023: Train Epoch: 24 [51200/57094 (89%)]	Loss: 262.265991 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 10:32:27 2023:   24    | Tr.loss: 272.736243 | Not computing TPR and F1 | Elapsed:   68.10  s
+WARNING:root: [*] Started epoch: 25
+WARNING:root: [*] Sun Jan  1 10:32:28 2023: Train Epoch: 25 [  0  /57094 (0 %)]	Loss: 276.613647 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:32:43 2023: Train Epoch: 25 [12800/57094 (22%)]	Loss: 265.506042 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:32:58 2023: Train Epoch: 25 [25600/57094 (45%)]	Loss: 242.931519 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 10:33:14 2023: Train Epoch: 25 [38400/57094 (67%)]	Loss: 286.058502 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:33:29 2023: Train Epoch: 25 [51200/57094 (89%)]	Loss: 272.732086 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:33:35 2023:   25    | Tr.loss: 271.786646 | Not computing TPR and F1 | Elapsed:   68.02  s
+WARNING:root: [*] Started epoch: 26
+WARNING:root: [*] Sun Jan  1 10:33:36 2023: Train Epoch: 26 [  0  /57094 (0 %)]	Loss: 276.110474 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:33:51 2023: Train Epoch: 26 [12800/57094 (22%)]	Loss: 269.643768 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 10:34:06 2023: Train Epoch: 26 [25600/57094 (45%)]	Loss: 269.496033 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:34:22 2023: Train Epoch: 26 [38400/57094 (67%)]	Loss: 254.332825 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:34:37 2023: Train Epoch: 26 [51200/57094 (89%)]	Loss: 273.393127 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:34:43 2023:   26    | Tr.loss: 270.619674 | Not computing TPR and F1 | Elapsed:   68.01  s
+WARNING:root: [*] Started epoch: 27
+WARNING:root: [*] Sun Jan  1 10:34:44 2023: Train Epoch: 27 [  0  /57094 (0 %)]	Loss: 264.813232 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:34:59 2023: Train Epoch: 27 [12800/57094 (22%)]	Loss: 257.775787 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:35:14 2023: Train Epoch: 27 [25600/57094 (45%)]	Loss: 257.367035 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:35:30 2023: Train Epoch: 27 [38400/57094 (67%)]	Loss: 272.641052 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:35:45 2023: Train Epoch: 27 [51200/57094 (89%)]	Loss: 280.893799 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:35:51 2023:   27    | Tr.loss: 270.938340 | Not computing TPR and F1 | Elapsed:   67.97  s
+WARNING:root: [*] Started epoch: 28
+WARNING:root: [*] Sun Jan  1 10:35:52 2023: Train Epoch: 28 [  0  /57094 (0 %)]	Loss: 285.860168 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:36:07 2023: Train Epoch: 28 [12800/57094 (22%)]	Loss: 265.788422 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 10:36:22 2023: Train Epoch: 28 [25600/57094 (45%)]	Loss: 275.524658 | Not computing TPR and F1 | Elapsed: 15.35s
+WARNING:root: [*] Sun Jan  1 10:36:38 2023: Train Epoch: 28 [38400/57094 (67%)]	Loss: 299.224304 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 10:36:53 2023: Train Epoch: 28 [51200/57094 (89%)]	Loss: 285.486420 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:37:00 2023:   28    | Tr.loss: 272.069069 | Not computing TPR and F1 | Elapsed:   68.17  s
+WARNING:root: [*] Started epoch: 29
+WARNING:root: [*] Sun Jan  1 10:37:00 2023: Train Epoch: 29 [  0  /57094 (0 %)]	Loss: 255.655045 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:37:15 2023: Train Epoch: 29 [12800/57094 (22%)]	Loss: 300.883514 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:37:30 2023: Train Epoch: 29 [25600/57094 (45%)]	Loss: 269.611694 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:37:46 2023: Train Epoch: 29 [38400/57094 (67%)]	Loss: 264.461914 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:38:01 2023: Train Epoch: 29 [51200/57094 (89%)]	Loss: 278.622925 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:38:08 2023:   29    | Tr.loss: 270.607002 | Not computing TPR and F1 | Elapsed:   67.97  s
+WARNING:root: [*] Started epoch: 30
+WARNING:root: [*] Sun Jan  1 10:38:08 2023: Train Epoch: 30 [  0  /57094 (0 %)]	Loss: 276.791016 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:38:23 2023: Train Epoch: 30 [12800/57094 (22%)]	Loss: 277.517334 | Not computing TPR and F1 | Elapsed: 15.25s
+WARNING:root: [*] Sun Jan  1 10:38:38 2023: Train Epoch: 30 [25600/57094 (45%)]	Loss: 287.935425 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:38:54 2023: Train Epoch: 30 [38400/57094 (67%)]	Loss: 290.580811 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 10:39:09 2023: Train Epoch: 30 [51200/57094 (89%)]	Loss: 248.902802 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:39:16 2023:   30    | Tr.loss: 270.448138 | Not computing TPR and F1 | Elapsed:   68.01  s
+WARNING:root:[!] Sun Jan  1 10:39:16 2023: Dumped results:
+                model     : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\preTraining\trainingFiles_1672565956-model.torch
+                losses    : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\preTraining\trainingFiles_1672565956-train_losses.npy
+                duration  : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\preTraining\trainingFiles_1672565956-trainTime.npy
+WARNING:root: [!] Training pretrained model on downstream task...
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Sun Jan  1 10:39:16 2023: Train Epoch: 1 [  0  /19032 (0 %)]	Loss: 1.018483 | FPR 0.01 -- TPR 0.0000 | F1 0.0000 | Elapsed: 0.33s
+WARNING:root: [*] Sun Jan  1 10:39:31 2023: Train Epoch: 1 [12800/19032 (67%)]	Loss: 0.287375 | FPR 0.01 -- TPR 0.5491 | F1 0.7090 | Elapsed: 14.95s
+WARNING:root: [*] Sun Jan  1 10:39:38 2023:    1    | Tr.loss: 0.384138 | FPR 0.01 -- TPR: 0.33 |  F1: 0.48 | Elapsed:   22.40  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Sun Jan  1 10:39:39 2023: Train Epoch: 2 [  0  /19032 (0 %)]	Loss: 0.216857 | FPR 0.01 -- TPR 0.7841 | F1 0.8790 | Elapsed: 0.29s
+WARNING:root: [*] Sun Jan  1 10:39:54 2023: Train Epoch: 2 [12800/19032 (67%)]	Loss: 0.164719 | FPR 0.01 -- TPR 0.8343 | F1 0.9097 | Elapsed: 14.89s
+WARNING:root: [*] Sun Jan  1 10:40:01 2023:    2    | Tr.loss: 0.179437 | FPR 0.01 -- TPR: 0.69 |  F1: 0.80 | Elapsed:   22.13  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Sun Jan  1 10:40:01 2023: Train Epoch: 3 [  0  /19032 (0 %)]	Loss: 0.119966 | FPR 0.01 -- TPR 0.8588 | F1 0.9241 | Elapsed: 0.29s
+WARNING:root: [*] Sun Jan  1 10:40:16 2023: Train Epoch: 3 [12800/19032 (67%)]	Loss: 0.117756 | FPR 0.01 -- TPR 0.8914 | F1 0.9426 | Elapsed: 15.04s
+WARNING:root: [*] Sun Jan  1 10:40:23 2023:    3    | Tr.loss: 0.115315 | FPR 0.01 -- TPR: 0.85 |  F1: 0.92 | Elapsed:   22.38  s
+WARNING:root:[!] Sun Jan  1 10:40:23 2023: Dumped results:
+                model     : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_pretrained\trainingFiles_1672566023-model.torch
+                losses    : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_pretrained\trainingFiles_1672566023-train_losses.npy
+                duration  : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_pretrained\trainingFiles_1672566023-trainTime.npy
+		train F1s : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_pretrained\trainingFiles_1672566023-trainF1s.npy
+		train TPRs: evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_pretrained\trainingFiles_1672566023-trainTPRs.npy
+WARNING:root: [!] Training non_pretrained model on downstream task...
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Sun Jan  1 10:40:24 2023: Train Epoch: 1 [  0  /19032 (0 %)]	Loss: 0.700919 | FPR 0.01 -- TPR 0.0175 | F1 0.0345 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 10:40:38 2023: Train Epoch: 1 [12800/19032 (67%)]	Loss: 0.341633 | FPR 0.01 -- TPR 0.5683 | F1 0.7247 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 10:40:44 2023:    1    | Tr.loss: 0.383319 | FPR 0.01 -- TPR: 0.38 |  F1: 0.48 | Elapsed:   21.15  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Sun Jan  1 10:40:45 2023: Train Epoch: 2 [  0  /19032 (0 %)]	Loss: 0.124712 | FPR 0.01 -- TPR 0.9086 | F1 0.9521 | Elapsed: 0.28s
+WARNING:root: [*] Sun Jan  1 10:40:59 2023: Train Epoch: 2 [12800/19032 (67%)]	Loss: 0.087199 | FPR 0.01 -- TPR 0.9387 | F1 0.9684 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 10:41:05 2023:    2    | Tr.loss: 0.116253 | FPR 0.01 -- TPR: 0.88 |  F1: 0.93 | Elapsed:   21.12  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Sun Jan  1 10:41:06 2023: Train Epoch: 3 [  0  /19032 (0 %)]	Loss: 0.098149 | FPR 0.01 -- TPR 0.9059 | F1 0.9506 | Elapsed: 0.28s
+WARNING:root: [*] Sun Jan  1 10:41:20 2023: Train Epoch: 3 [12800/19032 (67%)]	Loss: 0.045195 | FPR 0.01 -- TPR 0.9766 | F1 0.9882 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 10:41:27 2023:    3    | Tr.loss: 0.080007 | FPR 0.01 -- TPR: 0.91 |  F1: 0.95 | Elapsed:   21.15  s
+WARNING:root:[!] Sun Jan  1 10:41:27 2023: Dumped results:
+                model     : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_non_pretrained\trainingFiles_1672566087-model.torch
+                losses    : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_non_pretrained\trainingFiles_1672566087-train_losses.npy
+                duration  : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_non_pretrained\trainingFiles_1672566087-trainTime.npy
+		train F1s : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_non_pretrained\trainingFiles_1672566087-trainF1s.npy
+		train TPRs: evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_non_pretrained\trainingFiles_1672566087-trainTPRs.npy
+WARNING:root: [!] Training full_data model on downstream task...
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Sun Jan  1 10:41:27 2023: Train Epoch: 1 [  0  /76126 (0 %)]	Loss: 0.679841 | FPR 0.01 -- TPR 0.0331 | F1 0.0642 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 10:41:42 2023: Train Epoch: 1 [12800/76126 (17%)]	Loss: 0.182077 | FPR 0.01 -- TPR 0.6879 | F1 0.8151 | Elapsed: 14.29s
+WARNING:root: [*] Sun Jan  1 10:41:56 2023: Train Epoch: 1 [25600/76126 (34%)]	Loss: 0.108292 | FPR 0.01 -- TPR 0.8049 | F1 0.8919 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 10:42:10 2023: Train Epoch: 1 [38400/76126 (50%)]	Loss: 0.068217 | FPR 0.01 -- TPR 0.9588 | F1 0.9790 | Elapsed: 14.21s
+WARNING:root: [*] Sun Jan  1 10:42:24 2023: Train Epoch: 1 [51200/76126 (67%)]	Loss: 0.116539 | FPR 0.01 -- TPR 0.9301 | F1 0.9638 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 10:42:38 2023: Train Epoch: 1 [64000/76126 (84%)]	Loss: 0.051273 | FPR 0.01 -- TPR 0.9181 | F1 0.9573 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 10:42:52 2023:    1    | Tr.loss: 0.156628 | FPR 0.01 -- TPR: 0.78 |  F1: 0.84 | Elapsed:   84.61  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Sun Jan  1 10:42:52 2023: Train Epoch: 2 [  0  /76126 (0 %)]	Loss: 0.025760 | FPR 0.01 -- TPR 0.9945 | F1 0.9973 | Elapsed: 0.29s
+WARNING:root: [*] Sun Jan  1 10:43:06 2023: Train Epoch: 2 [12800/76126 (17%)]	Loss: 0.060604 | FPR 0.01 -- TPR 0.9586 | F1 0.9789 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 10:43:20 2023: Train Epoch: 2 [25600/76126 (34%)]	Loss: 0.045765 | FPR 0.01 -- TPR 0.9831 | F1 0.9915 | Elapsed: 14.21s
+WARNING:root: [*] Sun Jan  1 10:43:34 2023: Train Epoch: 2 [38400/76126 (50%)]	Loss: 0.105929 | FPR 0.01 -- TPR 0.9571 | F1 0.9781 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 10:43:49 2023: Train Epoch: 2 [51200/76126 (67%)]	Loss: 0.051912 | FPR 0.01 -- TPR 0.9773 | F1 0.9885 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 10:44:03 2023: Train Epoch: 2 [64000/76126 (84%)]	Loss: 0.050954 | FPR 0.01 -- TPR 0.9884 | F1 0.9942 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 10:44:16 2023:    2    | Tr.loss: 0.059858 | FPR 0.01 -- TPR: 0.94 |  F1: 0.96 | Elapsed:   84.47  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Sun Jan  1 10:44:16 2023: Train Epoch: 3 [  0  /76126 (0 %)]	Loss: 0.018518 | FPR 0.01 -- TPR 0.9879 | F1 0.9939 | Elapsed: 0.29s
+WARNING:root: [*] Sun Jan  1 10:44:31 2023: Train Epoch: 3 [12800/76126 (17%)]	Loss: 0.068024 | FPR 0.01 -- TPR 0.9231 | F1 0.9600 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 10:44:45 2023: Train Epoch: 3 [25600/76126 (34%)]	Loss: 0.030261 | FPR 0.01 -- TPR 0.9886 | F1 0.9943 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 10:44:59 2023: Train Epoch: 3 [38400/76126 (50%)]	Loss: 0.056386 | FPR 0.01 -- TPR 0.9940 | F1 0.9970 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 10:45:13 2023: Train Epoch: 3 [51200/76126 (67%)]	Loss: 0.068292 | FPR 0.01 -- TPR 0.6250 | F1 0.7692 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 10:45:27 2023: Train Epoch: 3 [64000/76126 (84%)]	Loss: 0.047229 | FPR 0.01 -- TPR 0.9886 | F1 0.9943 | Elapsed: 14.21s
+WARNING:root: [*] Sun Jan  1 10:45:41 2023:    3    | Tr.loss: 0.050105 | FPR 0.01 -- TPR: 0.95 |  F1: 0.97 | Elapsed:   84.46  s
+WARNING:root:[!] Sun Jan  1 10:45:41 2023: Dumped results:
+                model     : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_full_data\trainingFiles_1672566341-model.torch
+                losses    : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_full_data\trainingFiles_1672566341-train_losses.npy
+                duration  : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_full_data\trainingFiles_1672566341-trainTime.npy
+		train F1s : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_full_data\trainingFiles_1672566341-trainF1s.npy
+		train TPRs: evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_full_data\trainingFiles_1672566341-trainTPRs.npy
+WARNING:root: [*] Evaluating pretrained model on test set...
+WARNING:root: [!] Test F1 score for pretrained model at 0.01 FPR : 0.8180
+WARNING:root: [!] Test TPR score for pretrained model at 0.01 FPR: 0.7017
+WARNING:root: [*] Evaluating non_pretrained model on test set...
+WARNING:root: [!] Test F1 score for non_pretrained model at 0.01 FPR : 0.8329
+WARNING:root: [!] Test TPR score for non_pretrained model at 0.01 FPR: 0.7236
+WARNING:root: [*] Evaluating full_data model on test set...
+WARNING:root: [!] Test F1 score for full_data model at 0.01 FPR : 0.8644
+WARNING:root: [!] Test TPR score for full_data model at 0.01 FPR: 0.7673
+WARNING:root: [!] Running pre-training split 2/2
+WARNING:root: [!] Pre-training model...
+WARNING:root: [*] Masking sequences...
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Sun Jan  1 10:46:45 2023: Train Epoch: 1 [  0  /57094 (0 %)]	Loss: 499.758179 | Not computing TPR and F1 | Elapsed: 0.57s
+WARNING:root: [*] Sun Jan  1 10:47:01 2023: Train Epoch: 1 [12800/57094 (22%)]	Loss: 395.804382 | Not computing TPR and F1 | Elapsed: 15.61s
+WARNING:root: [*] Sun Jan  1 10:47:17 2023: Train Epoch: 1 [25600/57094 (45%)]	Loss: 348.133606 | Not computing TPR and F1 | Elapsed: 15.52s
+WARNING:root: [*] Sun Jan  1 10:47:32 2023: Train Epoch: 1 [38400/57094 (67%)]	Loss: 322.011963 | Not computing TPR and F1 | Elapsed: 15.38s
+WARNING:root: [*] Sun Jan  1 10:47:47 2023: Train Epoch: 1 [51200/57094 (89%)]	Loss: 325.978485 | Not computing TPR and F1 | Elapsed: 15.32s
+WARNING:root: [*] Sun Jan  1 10:47:54 2023:    1    | Tr.loss: 354.957275 | Not computing TPR and F1 | Elapsed:   69.17  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Sun Jan  1 10:47:54 2023: Train Epoch: 2 [  0  /57094 (0 %)]	Loss: 326.426117 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:48:10 2023: Train Epoch: 2 [12800/57094 (22%)]	Loss: 325.749084 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 10:48:25 2023: Train Epoch: 2 [25600/57094 (45%)]	Loss: 290.767029 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:48:40 2023: Train Epoch: 2 [38400/57094 (67%)]	Loss: 305.096436 | Not computing TPR and F1 | Elapsed: 15.31s
+WARNING:root: [*] Sun Jan  1 10:48:55 2023: Train Epoch: 2 [51200/57094 (89%)]	Loss: 295.748444 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:49:02 2023:    2    | Tr.loss: 310.393301 | Not computing TPR and F1 | Elapsed:   68.10  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Sun Jan  1 10:49:02 2023: Train Epoch: 3 [  0  /57094 (0 %)]	Loss: 324.259979 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 10:49:18 2023: Train Epoch: 3 [12800/57094 (22%)]	Loss: 302.205444 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:49:33 2023: Train Epoch: 3 [25600/57094 (45%)]	Loss: 293.333710 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 10:49:48 2023: Train Epoch: 3 [38400/57094 (67%)]	Loss: 295.950806 | Not computing TPR and F1 | Elapsed: 15.25s
+WARNING:root: [*] Sun Jan  1 10:50:04 2023: Train Epoch: 3 [51200/57094 (89%)]	Loss: 286.838318 | Not computing TPR and F1 | Elapsed: 15.32s
+WARNING:root: [*] Sun Jan  1 10:50:10 2023:    3    | Tr.loss: 298.366605 | Not computing TPR and F1 | Elapsed:   68.11  s
+WARNING:root: [*] Started epoch: 4
+WARNING:root: [*] Sun Jan  1 10:50:11 2023: Train Epoch: 4 [  0  /57094 (0 %)]	Loss: 284.082977 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:50:26 2023: Train Epoch: 4 [12800/57094 (22%)]	Loss: 276.148132 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:50:41 2023: Train Epoch: 4 [25600/57094 (45%)]	Loss: 275.539001 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:50:56 2023: Train Epoch: 4 [38400/57094 (67%)]	Loss: 293.947571 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:51:12 2023: Train Epoch: 4 [51200/57094 (89%)]	Loss: 282.382202 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:51:18 2023:    4    | Tr.loss: 293.106196 | Not computing TPR and F1 | Elapsed:   67.97  s
+WARNING:root: [*] Started epoch: 5
+WARNING:root: [*] Sun Jan  1 10:51:19 2023: Train Epoch: 5 [  0  /57094 (0 %)]	Loss: 296.315735 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:51:34 2023: Train Epoch: 5 [12800/57094 (22%)]	Loss: 313.682861 | Not computing TPR and F1 | Elapsed: 15.25s
+WARNING:root: [*] Sun Jan  1 10:51:49 2023: Train Epoch: 5 [25600/57094 (45%)]	Loss: 302.741943 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:52:04 2023: Train Epoch: 5 [38400/57094 (67%)]	Loss: 295.334229 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:52:20 2023: Train Epoch: 5 [51200/57094 (89%)]	Loss: 277.497223 | Not computing TPR and F1 | Elapsed: 15.31s
+WARNING:root: [*] Sun Jan  1 10:52:26 2023:    5    | Tr.loss: 289.401076 | Not computing TPR and F1 | Elapsed:   68.09  s
+WARNING:root: [*] Started epoch: 6
+WARNING:root: [*] Sun Jan  1 10:52:27 2023: Train Epoch: 6 [  0  /57094 (0 %)]	Loss: 321.301514 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:52:42 2023: Train Epoch: 6 [12800/57094 (22%)]	Loss: 292.754395 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 10:52:57 2023: Train Epoch: 6 [25600/57094 (45%)]	Loss: 297.898773 | Not computing TPR and F1 | Elapsed: 15.25s
+WARNING:root: [*] Sun Jan  1 10:53:13 2023: Train Epoch: 6 [38400/57094 (67%)]	Loss: 301.048615 | Not computing TPR and F1 | Elapsed: 15.52s
+WARNING:root: [*] Sun Jan  1 10:53:28 2023: Train Epoch: 6 [51200/57094 (89%)]	Loss: 303.623138 | Not computing TPR and F1 | Elapsed: 15.34s
+WARNING:root: [*] Sun Jan  1 10:53:35 2023:    6    | Tr.loss: 287.132189 | Not computing TPR and F1 | Elapsed:   68.62  s
+WARNING:root: [*] Started epoch: 7
+WARNING:root: [*] Sun Jan  1 10:53:35 2023: Train Epoch: 7 [  0  /57094 (0 %)]	Loss: 273.003967 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:53:51 2023: Train Epoch: 7 [12800/57094 (22%)]	Loss: 273.646088 | Not computing TPR and F1 | Elapsed: 15.32s
+WARNING:root: [*] Sun Jan  1 10:54:06 2023: Train Epoch: 7 [25600/57094 (45%)]	Loss: 281.460083 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:54:21 2023: Train Epoch: 7 [38400/57094 (67%)]	Loss: 286.895294 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:54:36 2023: Train Epoch: 7 [51200/57094 (89%)]	Loss: 292.029663 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:54:43 2023:    7    | Tr.loss: 286.309882 | Not computing TPR and F1 | Elapsed:   68.08  s
+WARNING:root: [*] Started epoch: 8
+WARNING:root: [*] Sun Jan  1 10:54:43 2023: Train Epoch: 8 [  0  /57094 (0 %)]	Loss: 328.138916 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:54:59 2023: Train Epoch: 8 [12800/57094 (22%)]	Loss: 277.016541 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 10:55:14 2023: Train Epoch: 8 [25600/57094 (45%)]	Loss: 283.482788 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:55:29 2023: Train Epoch: 8 [38400/57094 (67%)]	Loss: 293.830902 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:55:44 2023: Train Epoch: 8 [51200/57094 (89%)]	Loss: 293.195648 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 10:55:51 2023:    8    | Tr.loss: 283.705084 | Not computing TPR and F1 | Elapsed:   68.04  s
+WARNING:root: [*] Started epoch: 9
+WARNING:root: [*] Sun Jan  1 10:55:51 2023: Train Epoch: 9 [  0  /57094 (0 %)]	Loss: 279.183105 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:56:07 2023: Train Epoch: 9 [12800/57094 (22%)]	Loss: 280.616699 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:56:22 2023: Train Epoch: 9 [25600/57094 (45%)]	Loss: 295.274963 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 10:56:37 2023: Train Epoch: 9 [38400/57094 (67%)]	Loss: 281.125671 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 10:56:52 2023: Train Epoch: 9 [51200/57094 (89%)]	Loss: 266.149719 | Not computing TPR and F1 | Elapsed: 15.36s
+WARNING:root: [*] Sun Jan  1 10:56:59 2023:    9    | Tr.loss: 281.942406 | Not computing TPR and F1 | Elapsed:   68.18  s
+WARNING:root: [*] Started epoch: 10
+WARNING:root: [*] Sun Jan  1 10:57:00 2023: Train Epoch: 10 [  0  /57094 (0 %)]	Loss: 287.936462 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:57:15 2023: Train Epoch: 10 [12800/57094 (22%)]	Loss: 282.506012 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 10:57:30 2023: Train Epoch: 10 [25600/57094 (45%)]	Loss: 276.227081 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 10:57:45 2023: Train Epoch: 10 [38400/57094 (67%)]	Loss: 289.503815 | Not computing TPR and F1 | Elapsed: 15.35s
+WARNING:root: [*] Sun Jan  1 10:58:01 2023: Train Epoch: 10 [51200/57094 (89%)]	Loss: 319.489136 | Not computing TPR and F1 | Elapsed: 15.31s
+WARNING:root: [*] Sun Jan  1 10:58:08 2023:   10    | Tr.loss: 282.143941 | Not computing TPR and F1 | Elapsed:   68.42  s
+WARNING:root: [*] Started epoch: 11
+WARNING:root: [*] Sun Jan  1 10:58:08 2023: Train Epoch: 11 [  0  /57094 (0 %)]	Loss: 277.072906 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:58:23 2023: Train Epoch: 11 [12800/57094 (22%)]	Loss: 290.239319 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 10:58:38 2023: Train Epoch: 11 [25600/57094 (45%)]	Loss: 281.246887 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 10:58:54 2023: Train Epoch: 11 [38400/57094 (67%)]	Loss: 273.241333 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 10:59:09 2023: Train Epoch: 11 [51200/57094 (89%)]	Loss: 263.358765 | Not computing TPR and F1 | Elapsed: 15.25s
+WARNING:root: [*] Sun Jan  1 10:59:16 2023:   11    | Tr.loss: 280.920009 | Not computing TPR and F1 | Elapsed:   68.05  s
+WARNING:root: [*] Started epoch: 12
+WARNING:root: [*] Sun Jan  1 10:59:16 2023: Train Epoch: 12 [  0  /57094 (0 %)]	Loss: 263.163177 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 10:59:31 2023: Train Epoch: 12 [12800/57094 (22%)]	Loss: 260.415466 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 10:59:47 2023: Train Epoch: 12 [25600/57094 (45%)]	Loss: 284.028137 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 11:00:02 2023: Train Epoch: 12 [38400/57094 (67%)]	Loss: 285.746552 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:00:17 2023: Train Epoch: 12 [51200/57094 (89%)]	Loss: 305.431519 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:00:24 2023:   12    | Tr.loss: 278.360540 | Not computing TPR and F1 | Elapsed:   68.02  s
+WARNING:root: [*] Started epoch: 13
+WARNING:root: [*] Sun Jan  1 11:00:24 2023: Train Epoch: 13 [  0  /57094 (0 %)]	Loss: 261.633362 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:00:39 2023: Train Epoch: 13 [12800/57094 (22%)]	Loss: 287.933472 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:00:55 2023: Train Epoch: 13 [25600/57094 (45%)]	Loss: 280.575470 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:01:10 2023: Train Epoch: 13 [38400/57094 (67%)]	Loss: 242.252548 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 11:01:25 2023: Train Epoch: 13 [51200/57094 (89%)]	Loss: 292.423523 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:01:32 2023:   13    | Tr.loss: 278.490731 | Not computing TPR and F1 | Elapsed:   68.02  s
+WARNING:root: [*] Started epoch: 14
+WARNING:root: [*] Sun Jan  1 11:01:32 2023: Train Epoch: 14 [  0  /57094 (0 %)]	Loss: 266.417084 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:01:47 2023: Train Epoch: 14 [12800/57094 (22%)]	Loss: 289.378479 | Not computing TPR and F1 | Elapsed: 15.33s
+WARNING:root: [*] Sun Jan  1 11:02:03 2023: Train Epoch: 14 [25600/57094 (45%)]	Loss: 270.146301 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 11:02:18 2023: Train Epoch: 14 [38400/57094 (67%)]	Loss: 271.374054 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:02:33 2023: Train Epoch: 14 [51200/57094 (89%)]	Loss: 267.033630 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:02:40 2023:   14    | Tr.loss: 277.024157 | Not computing TPR and F1 | Elapsed:   68.08  s
+WARNING:root: [*] Started epoch: 15
+WARNING:root: [*] Sun Jan  1 11:02:40 2023: Train Epoch: 15 [  0  /57094 (0 %)]	Loss: 277.680115 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:02:55 2023: Train Epoch: 15 [12800/57094 (22%)]	Loss: 277.722046 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:03:11 2023: Train Epoch: 15 [25600/57094 (45%)]	Loss: 262.140228 | Not computing TPR and F1 | Elapsed: 15.37s
+WARNING:root: [*] Sun Jan  1 11:03:26 2023: Train Epoch: 15 [38400/57094 (67%)]	Loss: 277.430786 | Not computing TPR and F1 | Elapsed: 15.31s
+WARNING:root: [*] Sun Jan  1 11:03:41 2023: Train Epoch: 15 [51200/57094 (89%)]	Loss: 265.890686 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:03:48 2023:   15    | Tr.loss: 275.643285 | Not computing TPR and F1 | Elapsed:   68.20  s
+WARNING:root: [*] Started epoch: 16
+WARNING:root: [*] Sun Jan  1 11:03:48 2023: Train Epoch: 16 [  0  /57094 (0 %)]	Loss: 275.573975 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:04:04 2023: Train Epoch: 16 [12800/57094 (22%)]	Loss: 282.288330 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 11:04:19 2023: Train Epoch: 16 [25600/57094 (45%)]	Loss: 263.692871 | Not computing TPR and F1 | Elapsed: 15.30s
+WARNING:root: [*] Sun Jan  1 11:04:34 2023: Train Epoch: 16 [38400/57094 (67%)]	Loss: 292.118011 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 11:04:49 2023: Train Epoch: 16 [51200/57094 (89%)]	Loss: 321.748657 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:04:56 2023:   16    | Tr.loss: 276.508428 | Not computing TPR and F1 | Elapsed:   68.09  s
+WARNING:root: [*] Started epoch: 17
+WARNING:root: [*] Sun Jan  1 11:04:56 2023: Train Epoch: 17 [  0  /57094 (0 %)]	Loss: 288.994049 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:05:12 2023: Train Epoch: 17 [12800/57094 (22%)]	Loss: 272.632416 | Not computing TPR and F1 | Elapsed: 15.28s
+WARNING:root: [*] Sun Jan  1 11:05:27 2023: Train Epoch: 17 [25600/57094 (45%)]	Loss: 268.973572 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:05:42 2023: Train Epoch: 17 [38400/57094 (67%)]	Loss: 285.551575 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:05:57 2023: Train Epoch: 17 [51200/57094 (89%)]	Loss: 254.039246 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:06:04 2023:   17    | Tr.loss: 275.673000 | Not computing TPR and F1 | Elapsed:   68.03  s
+WARNING:root: [*] Started epoch: 18
+WARNING:root: [*] Sun Jan  1 11:06:04 2023: Train Epoch: 18 [  0  /57094 (0 %)]	Loss: 282.205383 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:06:20 2023: Train Epoch: 18 [12800/57094 (22%)]	Loss: 270.316284 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:06:35 2023: Train Epoch: 18 [25600/57094 (45%)]	Loss: 261.311676 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 11:06:50 2023: Train Epoch: 18 [38400/57094 (67%)]	Loss: 281.073975 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:07:05 2023: Train Epoch: 18 [51200/57094 (89%)]	Loss: 256.882507 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:07:12 2023:   18    | Tr.loss: 274.761770 | Not computing TPR and F1 | Elapsed:   67.98  s
+WARNING:root: [*] Started epoch: 19
+WARNING:root: [*] Sun Jan  1 11:07:12 2023: Train Epoch: 19 [  0  /57094 (0 %)]	Loss: 262.543457 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:07:28 2023: Train Epoch: 19 [12800/57094 (22%)]	Loss: 281.751862 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:07:43 2023: Train Epoch: 19 [25600/57094 (45%)]	Loss: 276.572876 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 11:07:58 2023: Train Epoch: 19 [38400/57094 (67%)]	Loss: 283.389069 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:08:13 2023: Train Epoch: 19 [51200/57094 (89%)]	Loss: 269.959839 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:08:20 2023:   19    | Tr.loss: 274.712603 | Not computing TPR and F1 | Elapsed:   67.99  s
+WARNING:root: [*] Started epoch: 20
+WARNING:root: [*] Sun Jan  1 11:08:20 2023: Train Epoch: 20 [  0  /57094 (0 %)]	Loss: 273.811127 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:08:36 2023: Train Epoch: 20 [12800/57094 (22%)]	Loss: 266.376465 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 11:08:51 2023: Train Epoch: 20 [25600/57094 (45%)]	Loss: 262.944153 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 11:09:06 2023: Train Epoch: 20 [38400/57094 (67%)]	Loss: 291.171326 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:09:21 2023: Train Epoch: 20 [51200/57094 (89%)]	Loss: 297.928101 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:09:28 2023:   20    | Tr.loss: 274.298560 | Not computing TPR and F1 | Elapsed:   68.05  s
+WARNING:root: [*] Started epoch: 21
+WARNING:root: [*] Sun Jan  1 11:09:29 2023: Train Epoch: 21 [  0  /57094 (0 %)]	Loss: 285.526611 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:09:44 2023: Train Epoch: 21 [12800/57094 (22%)]	Loss: 272.755585 | Not computing TPR and F1 | Elapsed: 15.33s
+WARNING:root: [*] Sun Jan  1 11:09:59 2023: Train Epoch: 21 [25600/57094 (45%)]	Loss: 281.646027 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:10:14 2023: Train Epoch: 21 [38400/57094 (67%)]	Loss: 289.422943 | Not computing TPR and F1 | Elapsed: 15.25s
+WARNING:root: [*] Sun Jan  1 11:10:30 2023: Train Epoch: 21 [51200/57094 (89%)]	Loss: 278.861877 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:10:36 2023:   21    | Tr.loss: 274.055612 | Not computing TPR and F1 | Elapsed:   68.10  s
+WARNING:root: [*] Started epoch: 22
+WARNING:root: [*] Sun Jan  1 11:10:37 2023: Train Epoch: 22 [  0  /57094 (0 %)]	Loss: 246.201752 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:10:52 2023: Train Epoch: 22 [12800/57094 (22%)]	Loss: 266.515198 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:11:07 2023: Train Epoch: 22 [25600/57094 (45%)]	Loss: 274.094238 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:11:22 2023: Train Epoch: 22 [38400/57094 (67%)]	Loss: 275.185913 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:11:38 2023: Train Epoch: 22 [51200/57094 (89%)]	Loss: 242.125351 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:11:44 2023:   22    | Tr.loss: 274.283788 | Not computing TPR and F1 | Elapsed:   67.98  s
+WARNING:root: [*] Started epoch: 23
+WARNING:root: [*] Sun Jan  1 11:11:45 2023: Train Epoch: 23 [  0  /57094 (0 %)]	Loss: 280.215607 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:12:00 2023: Train Epoch: 23 [12800/57094 (22%)]	Loss: 264.357819 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:12:15 2023: Train Epoch: 23 [25600/57094 (45%)]	Loss: 276.006348 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:12:30 2023: Train Epoch: 23 [38400/57094 (67%)]	Loss: 286.927063 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:12:46 2023: Train Epoch: 23 [51200/57094 (89%)]	Loss: 273.414246 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:12:52 2023:   23    | Tr.loss: 273.662643 | Not computing TPR and F1 | Elapsed:   67.99  s
+WARNING:root: [*] Started epoch: 24
+WARNING:root: [*] Sun Jan  1 11:12:53 2023: Train Epoch: 24 [  0  /57094 (0 %)]	Loss: 256.583649 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:13:08 2023: Train Epoch: 24 [12800/57094 (22%)]	Loss: 280.126984 | Not computing TPR and F1 | Elapsed: 15.29s
+WARNING:root: [*] Sun Jan  1 11:13:23 2023: Train Epoch: 24 [25600/57094 (45%)]	Loss: 272.616882 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 11:13:38 2023: Train Epoch: 24 [38400/57094 (67%)]	Loss: 270.967560 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:13:54 2023: Train Epoch: 24 [51200/57094 (89%)]	Loss: 267.751404 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:14:00 2023:   24    | Tr.loss: 273.000061 | Not computing TPR and F1 | Elapsed:   68.04  s
+WARNING:root: [*] Started epoch: 25
+WARNING:root: [*] Sun Jan  1 11:14:01 2023: Train Epoch: 25 [  0  /57094 (0 %)]	Loss: 282.673615 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:14:16 2023: Train Epoch: 25 [12800/57094 (22%)]	Loss: 264.260712 | Not computing TPR and F1 | Elapsed: 15.35s
+WARNING:root: [*] Sun Jan  1 11:14:31 2023: Train Epoch: 25 [25600/57094 (45%)]	Loss: 273.942566 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:14:46 2023: Train Epoch: 25 [38400/57094 (67%)]	Loss: 280.888519 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:15:02 2023: Train Epoch: 25 [51200/57094 (89%)]	Loss: 285.450775 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:15:08 2023:   25    | Tr.loss: 274.690273 | Not computing TPR and F1 | Elapsed:   68.10  s
+WARNING:root: [*] Started epoch: 26
+WARNING:root: [*] Sun Jan  1 11:15:09 2023: Train Epoch: 26 [  0  /57094 (0 %)]	Loss: 276.520020 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:15:24 2023: Train Epoch: 26 [12800/57094 (22%)]	Loss: 268.734741 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:15:39 2023: Train Epoch: 26 [25600/57094 (45%)]	Loss: 262.194641 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 11:15:54 2023: Train Epoch: 26 [38400/57094 (67%)]	Loss: 269.054077 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:16:10 2023: Train Epoch: 26 [51200/57094 (89%)]	Loss: 268.236145 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:16:16 2023:   26    | Tr.loss: 272.577260 | Not computing TPR and F1 | Elapsed:   67.98  s
+WARNING:root: [*] Started epoch: 27
+WARNING:root: [*] Sun Jan  1 11:16:17 2023: Train Epoch: 27 [  0  /57094 (0 %)]	Loss: 291.700378 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:16:32 2023: Train Epoch: 27 [12800/57094 (22%)]	Loss: 287.949768 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:16:47 2023: Train Epoch: 27 [25600/57094 (45%)]	Loss: 288.088074 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 11:17:02 2023: Train Epoch: 27 [38400/57094 (67%)]	Loss: 285.810425 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:17:18 2023: Train Epoch: 27 [51200/57094 (89%)]	Loss: 268.500610 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:17:24 2023:   27    | Tr.loss: 271.534095 | Not computing TPR and F1 | Elapsed:   67.98  s
+WARNING:root: [*] Started epoch: 28
+WARNING:root: [*] Sun Jan  1 11:17:25 2023: Train Epoch: 28 [  0  /57094 (0 %)]	Loss: 266.599213 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:17:40 2023: Train Epoch: 28 [12800/57094 (22%)]	Loss: 265.014679 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:17:55 2023: Train Epoch: 28 [25600/57094 (45%)]	Loss: 277.096466 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 11:18:10 2023: Train Epoch: 28 [38400/57094 (67%)]	Loss: 292.329651 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:18:26 2023: Train Epoch: 28 [51200/57094 (89%)]	Loss: 277.856018 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:18:32 2023:   28    | Tr.loss: 270.170116 | Not computing TPR and F1 | Elapsed:   67.98  s
+WARNING:root: [*] Started epoch: 29
+WARNING:root: [*] Sun Jan  1 11:18:33 2023: Train Epoch: 29 [  0  /57094 (0 %)]	Loss: 286.273193 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:18:48 2023: Train Epoch: 29 [12800/57094 (22%)]	Loss: 289.388977 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:19:03 2023: Train Epoch: 29 [25600/57094 (45%)]	Loss: 293.833252 | Not computing TPR and F1 | Elapsed: 15.28s
+WARNING:root: [*] Sun Jan  1 11:19:18 2023: Train Epoch: 29 [38400/57094 (67%)]	Loss: 271.354889 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:19:34 2023: Train Epoch: 29 [51200/57094 (89%)]	Loss: 259.787567 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:19:40 2023:   29    | Tr.loss: 271.251129 | Not computing TPR and F1 | Elapsed:   68.05  s
+WARNING:root: [*] Started epoch: 30
+WARNING:root: [*] Sun Jan  1 11:19:41 2023: Train Epoch: 30 [  0  /57094 (0 %)]	Loss: 262.612885 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:19:56 2023: Train Epoch: 30 [12800/57094 (22%)]	Loss: 295.724121 | Not computing TPR and F1 | Elapsed: 15.34s
+WARNING:root: [*] Sun Jan  1 11:20:11 2023: Train Epoch: 30 [25600/57094 (45%)]	Loss: 278.631012 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:20:27 2023: Train Epoch: 30 [38400/57094 (67%)]	Loss: 246.584503 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:20:42 2023: Train Epoch: 30 [51200/57094 (89%)]	Loss: 279.140320 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:20:48 2023:   30    | Tr.loss: 271.522443 | Not computing TPR and F1 | Elapsed:   68.10  s
+WARNING:root:[!] Sun Jan  1 11:20:49 2023: Dumped results:
+                model     : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\preTraining\trainingFiles_1672568448-model.torch
+                losses    : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\preTraining\trainingFiles_1672568448-train_losses.npy
+                duration  : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\preTraining\trainingFiles_1672568448-trainTime.npy
+WARNING:root: [!] Training pretrained model on downstream task...
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Sun Jan  1 11:20:49 2023: Train Epoch: 1 [  0  /19032 (0 %)]	Loss: 0.884089 | FPR 0.01 -- TPR 0.0123 | F1 0.0242 | Elapsed: 0.30s
+WARNING:root: [*] Sun Jan  1 11:21:04 2023: Train Epoch: 1 [12800/19032 (67%)]	Loss: 0.248472 | FPR 0.01 -- TPR 0.5754 | F1 0.7305 | Elapsed: 14.95s
+WARNING:root: [*] Sun Jan  1 11:21:11 2023:    1    | Tr.loss: 0.372220 | FPR 0.01 -- TPR: 0.35 |  F1: 0.49 | Elapsed:   22.29  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Sun Jan  1 11:21:11 2023: Train Epoch: 2 [  0  /19032 (0 %)]	Loss: 0.258534 | FPR 0.01 -- TPR 0.4099 | F1 0.5815 | Elapsed: 0.29s
+WARNING:root: [*] Sun Jan  1 11:21:26 2023: Train Epoch: 2 [12800/19032 (67%)]	Loss: 0.117706 | FPR 0.01 -- TPR 0.6964 | F1 0.8211 | Elapsed: 14.91s
+WARNING:root: [*] Sun Jan  1 11:21:33 2023:    2    | Tr.loss: 0.159468 | FPR 0.01 -- TPR: 0.71 |  F1: 0.82 | Elapsed:   22.16  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Sun Jan  1 11:21:34 2023: Train Epoch: 3 [  0  /19032 (0 %)]	Loss: 0.099786 | FPR 0.01 -- TPR 0.9148 | F1 0.9555 | Elapsed: 0.29s
+WARNING:root: [*] Sun Jan  1 11:21:49 2023: Train Epoch: 3 [12800/19032 (67%)]	Loss: 0.085694 | FPR 0.01 -- TPR 0.9333 | F1 0.9655 | Elapsed: 14.95s
+WARNING:root: [*] Sun Jan  1 11:21:56 2023:    3    | Tr.loss: 0.097831 | FPR 0.01 -- TPR: 0.85 |  F1: 0.90 | Elapsed:   22.24  s
+WARNING:root:[!] Sun Jan  1 11:21:56 2023: Dumped results:
+                model     : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_pretrained\trainingFiles_1672568516-model.torch
+                losses    : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_pretrained\trainingFiles_1672568516-train_losses.npy
+                duration  : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_pretrained\trainingFiles_1672568516-trainTime.npy
+		train F1s : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_pretrained\trainingFiles_1672568516-trainF1s.npy
+		train TPRs: evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_pretrained\trainingFiles_1672568516-trainTPRs.npy
+WARNING:root: [!] Training non_pretrained model on downstream task...
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Sun Jan  1 11:21:56 2023: Train Epoch: 1 [  0  /19032 (0 %)]	Loss: 0.709229 | FPR 0.01 -- TPR 0.0000 | F1 0.0000 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 11:22:10 2023: Train Epoch: 1 [12800/19032 (67%)]	Loss: 0.236901 | FPR 0.01 -- TPR 0.7111 | F1 0.8312 | Elapsed: 14.23s
+WARNING:root: [*] Sun Jan  1 11:22:17 2023:    1    | Tr.loss: 0.350167 | FPR 0.01 -- TPR: 0.43 |  F1: 0.53 | Elapsed:   21.19  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Sun Jan  1 11:22:17 2023: Train Epoch: 2 [  0  /19032 (0 %)]	Loss: 0.154850 | FPR 0.01 -- TPR 0.7268 | F1 0.8418 | Elapsed: 0.28s
+WARNING:root: [*] Sun Jan  1 11:22:31 2023: Train Epoch: 2 [12800/19032 (67%)]	Loss: 0.050215 | FPR 0.01 -- TPR 0.8931 | F1 0.9435 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 11:22:38 2023:    2    | Tr.loss: 0.106143 | FPR 0.01 -- TPR: 0.88 |  F1: 0.93 | Elapsed:   21.11  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Sun Jan  1 11:22:38 2023: Train Epoch: 3 [  0  /19032 (0 %)]	Loss: 0.108932 | FPR 0.01 -- TPR 0.9102 | F1 0.9530 | Elapsed: 0.28s
+WARNING:root: [*] Sun Jan  1 11:22:53 2023: Train Epoch: 3 [12800/19032 (67%)]	Loss: 0.056829 | FPR 0.01 -- TPR 0.9831 | F1 0.9915 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 11:22:59 2023:    3    | Tr.loss: 0.073535 | FPR 0.01 -- TPR: 0.93 |  F1: 0.96 | Elapsed:   21.11  s
+WARNING:root:[!] Sun Jan  1 11:22:59 2023: Dumped results:
+                model     : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_non_pretrained\trainingFiles_1672568579-model.torch
+                losses    : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_non_pretrained\trainingFiles_1672568579-train_losses.npy
+                duration  : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_non_pretrained\trainingFiles_1672568579-trainTime.npy
+		train F1s : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_non_pretrained\trainingFiles_1672568579-trainF1s.npy
+		train TPRs: evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_non_pretrained\trainingFiles_1672568579-trainTPRs.npy
+WARNING:root: [!] Training full_data model on downstream task...
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Sun Jan  1 11:23:00 2023: Train Epoch: 1 [  0  /76126 (0 %)]	Loss: 0.681405 | FPR 0.01 -- TPR 0.0057 | F1 0.0114 | Elapsed: 0.33s
+WARNING:root: [*] Sun Jan  1 11:23:14 2023: Train Epoch: 1 [12800/76126 (17%)]	Loss: 0.296903 | FPR 0.01 -- TPR 0.8246 | F1 0.9038 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 11:23:28 2023: Train Epoch: 1 [25600/76126 (34%)]	Loss: 0.130811 | FPR 0.01 -- TPR 0.8415 | F1 0.9139 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 11:23:42 2023: Train Epoch: 1 [38400/76126 (50%)]	Loss: 0.074874 | FPR 0.01 -- TPR 0.9345 | F1 0.9662 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 11:23:57 2023: Train Epoch: 1 [51200/76126 (67%)]	Loss: 0.088477 | FPR 0.01 -- TPR 0.9217 | F1 0.9592 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 11:24:11 2023: Train Epoch: 1 [64000/76126 (84%)]	Loss: 0.128144 | FPR 0.01 -- TPR 0.9146 | F1 0.9554 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 11:24:24 2023:    1    | Tr.loss: 0.146703 | FPR 0.01 -- TPR: 0.80 |  F1: 0.85 | Elapsed:   84.49  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Sun Jan  1 11:24:24 2023: Train Epoch: 2 [  0  /76126 (0 %)]	Loss: 0.025294 | FPR 0.01 -- TPR 0.9943 | F1 0.9971 | Elapsed: 0.29s
+WARNING:root: [*] Sun Jan  1 11:24:39 2023: Train Epoch: 2 [12800/76126 (17%)]	Loss: 0.025268 | FPR 0.01 -- TPR 0.9820 | F1 0.9909 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 11:24:53 2023: Train Epoch: 2 [25600/76126 (34%)]	Loss: 0.034803 | FPR 0.01 -- TPR 0.9891 | F1 0.9945 | Elapsed: 14.32s
+WARNING:root: [*] Sun Jan  1 11:25:07 2023: Train Epoch: 2 [38400/76126 (50%)]	Loss: 0.102404 | FPR 0.01 -- TPR 0.9756 | F1 0.9877 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 11:25:21 2023: Train Epoch: 2 [51200/76126 (67%)]	Loss: 0.023393 | FPR 0.01 -- TPR 1.0000 | F1 1.0000 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 11:25:35 2023: Train Epoch: 2 [64000/76126 (84%)]	Loss: 0.045626 | FPR 0.01 -- TPR 0.9763 | F1 0.9880 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 11:25:49 2023:    2    | Tr.loss: 0.060016 | FPR 0.01 -- TPR: 0.94 |  F1: 0.96 | Elapsed:   84.58  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Sun Jan  1 11:25:49 2023: Train Epoch: 3 [  0  /76126 (0 %)]	Loss: 0.038013 | FPR 0.01 -- TPR 0.9645 | F1 0.9819 | Elapsed: 0.29s
+WARNING:root: [*] Sun Jan  1 11:26:03 2023: Train Epoch: 3 [12800/76126 (17%)]	Loss: 0.108996 | FPR 0.01 -- TPR 0.9529 | F1 0.9759 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 11:26:17 2023: Train Epoch: 3 [25600/76126 (34%)]	Loss: 0.078312 | FPR 0.01 -- TPR 0.9480 | F1 0.9733 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 11:26:31 2023: Train Epoch: 3 [38400/76126 (50%)]	Loss: 0.034175 | FPR 0.01 -- TPR 0.9882 | F1 0.9941 | Elapsed: 14.18s
+WARNING:root: [*] Sun Jan  1 11:26:46 2023: Train Epoch: 3 [51200/76126 (67%)]	Loss: 0.041121 | FPR 0.01 -- TPR 0.9657 | F1 0.9826 | Elapsed: 14.21s
+WARNING:root: [*] Sun Jan  1 11:27:00 2023: Train Epoch: 3 [64000/76126 (84%)]	Loss: 0.041053 | FPR 0.01 -- TPR 0.9825 | F1 0.9912 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 11:27:13 2023:    3    | Tr.loss: 0.050743 | FPR 0.01 -- TPR: 0.95 |  F1: 0.97 | Elapsed:   84.45  s
+WARNING:root:[!] Sun Jan  1 11:27:13 2023: Dumped results:
+                model     : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_full_data\trainingFiles_1672568833-model.torch
+                losses    : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_full_data\trainingFiles_1672568833-train_losses.npy
+                duration  : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_full_data\trainingFiles_1672568833-trainTime.npy
+		train F1s : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_full_data\trainingFiles_1672568833-trainF1s.npy
+		train TPRs: evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867\downstreamTask_full_data\trainingFiles_1672568833-trainTPRs.npy
+WARNING:root: [*] Evaluating pretrained model on test set...
+WARNING:root: [!] Test F1 score for pretrained model at 0.01 FPR : 0.8173
+WARNING:root: [!] Test TPR score for pretrained model at 0.01 FPR: 0.6995
+WARNING:root: [*] Evaluating non_pretrained model on test set...
+WARNING:root: [!] Test F1 score for non_pretrained model at 0.01 FPR : 0.7972
+WARNING:root: [!] Test TPR score for non_pretrained model at 0.01 FPR: 0.6712
+WARNING:root: [*] Evaluating full_data model on test set...
+WARNING:root: [!] Test F1 score for full_data model at 0.01 FPR : 0.8667
+WARNING:root: [!] Test TPR score for full_data model at 0.01 FPR: 0.7718
+WARNING:root: [!] Finished pre-training evaluation over 2 splits! Saved metrics to:
+	evaluation\MaskedLanguageModeling\unlabeledDataSize_0.75_preTrain_30_downStream_3_nSplits_2_1672563867/metrics_MaskedLanguageModel_nSplits_2_limit_None.json
+WARNING:root: [!] Starting Masked Language Model evaluation over 2 splits!
+WARNING:root: [!] Loaded data and vocab. X train size: (76126, 2048), X test size: (17407, 2048), vocab size: 10000
+WARNING:root: [!] Initiating Self-Supervised Learning Pretraining
+     Language Modeling MaskedLanguageModel
+     Model Cnn1DLinearLM with config:
+	{'vocabSize': 10000, 'hiddenNeurons': [512, 256, 128]}
+
+WARNING:root: [!] Running pre-training split 1/2
+WARNING:root: [!] Pre-training model...
+WARNING:root: [*] Masking sequences...
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Sun Jan  1 11:28:20 2023: Train Epoch: 1 [  0  /60900 (0 %)]	Loss: 515.579590 | Not computing TPR and F1 | Elapsed: 1.04s
+WARNING:root: [*] Sun Jan  1 11:28:35 2023: Train Epoch: 1 [12800/60900 (21%)]	Loss: 354.670227 | Not computing TPR and F1 | Elapsed: 15.52s
+WARNING:root: [*] Sun Jan  1 11:28:51 2023: Train Epoch: 1 [25600/60900 (42%)]	Loss: 397.563568 | Not computing TPR and F1 | Elapsed: 15.62s
+WARNING:root: [*] Sun Jan  1 11:29:06 2023: Train Epoch: 1 [38400/60900 (63%)]	Loss: 319.944397 | Not computing TPR and F1 | Elapsed: 15.39s
+WARNING:root: [*] Sun Jan  1 11:29:22 2023: Train Epoch: 1 [51200/60900 (84%)]	Loss: 346.410706 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 11:29:33 2023:    1    | Tr.loss: 352.106506 | Not computing TPR and F1 | Elapsed:   74.14  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Sun Jan  1 11:29:33 2023: Train Epoch: 2 [  0  /60900 (0 %)]	Loss: 312.790466 | Not computing TPR and F1 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 11:29:49 2023: Train Epoch: 2 [12800/60900 (21%)]	Loss: 321.540649 | Not computing TPR and F1 | Elapsed: 15.29s
+WARNING:root: [*] Sun Jan  1 11:30:04 2023: Train Epoch: 2 [25600/60900 (42%)]	Loss: 289.025024 | Not computing TPR and F1 | Elapsed: 15.30s
+WARNING:root: [*] Sun Jan  1 11:30:19 2023: Train Epoch: 2 [38400/60900 (63%)]	Loss: 287.075165 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 11:30:34 2023: Train Epoch: 2 [51200/60900 (84%)]	Loss: 297.660583 | Not computing TPR and F1 | Elapsed: 15.33s
+WARNING:root: [*] Sun Jan  1 11:30:46 2023:    2    | Tr.loss: 305.405393 | Not computing TPR and F1 | Elapsed:   72.78  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Sun Jan  1 11:30:46 2023: Train Epoch: 3 [  0  /60900 (0 %)]	Loss: 294.467621 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 11:31:01 2023: Train Epoch: 3 [12800/60900 (21%)]	Loss: 279.337402 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 11:31:17 2023: Train Epoch: 3 [25600/60900 (42%)]	Loss: 289.738159 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 11:31:32 2023: Train Epoch: 3 [38400/60900 (63%)]	Loss: 291.614014 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:31:47 2023: Train Epoch: 3 [51200/60900 (84%)]	Loss: 301.454285 | Not computing TPR and F1 | Elapsed: 15.40s
+WARNING:root: [*] Sun Jan  1 11:31:58 2023:    3    | Tr.loss: 296.271824 | Not computing TPR and F1 | Elapsed:   72.72  s
+WARNING:root: [*] Started epoch: 4
+WARNING:root: [*] Sun Jan  1 11:31:59 2023: Train Epoch: 4 [  0  /60900 (0 %)]	Loss: 295.911987 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:32:14 2023: Train Epoch: 4 [12800/60900 (21%)]	Loss: 302.738953 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:32:29 2023: Train Epoch: 4 [25600/60900 (42%)]	Loss: 306.224792 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:32:45 2023: Train Epoch: 4 [38400/60900 (63%)]	Loss: 289.112000 | Not computing TPR and F1 | Elapsed: 15.52s
+WARNING:root: [*] Sun Jan  1 11:33:00 2023: Train Epoch: 4 [51200/60900 (84%)]	Loss: 286.197144 | Not computing TPR and F1 | Elapsed: 15.30s
+WARNING:root: [*] Sun Jan  1 11:33:11 2023:    4    | Tr.loss: 292.276567 | Not computing TPR and F1 | Elapsed:   73.01  s
+WARNING:root: [*] Started epoch: 5
+WARNING:root: [*] Sun Jan  1 11:33:12 2023: Train Epoch: 5 [  0  /60900 (0 %)]	Loss: 283.991974 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 11:33:27 2023: Train Epoch: 5 [12800/60900 (21%)]	Loss: 280.376526 | Not computing TPR and F1 | Elapsed: 15.37s
+WARNING:root: [*] Sun Jan  1 11:33:43 2023: Train Epoch: 5 [25600/60900 (42%)]	Loss: 298.817322 | Not computing TPR and F1 | Elapsed: 15.46s
+WARNING:root: [*] Sun Jan  1 11:33:58 2023: Train Epoch: 5 [38400/60900 (63%)]	Loss: 306.875183 | Not computing TPR and F1 | Elapsed: 15.40s
+WARNING:root: [*] Sun Jan  1 11:34:13 2023: Train Epoch: 5 [51200/60900 (84%)]	Loss: 279.538269 | Not computing TPR and F1 | Elapsed: 15.34s
+WARNING:root: [*] Sun Jan  1 11:34:25 2023:    5    | Tr.loss: 289.316135 | Not computing TPR and F1 | Elapsed:   73.38  s
+WARNING:root: [*] Started epoch: 6
+WARNING:root: [*] Sun Jan  1 11:34:25 2023: Train Epoch: 6 [  0  /60900 (0 %)]	Loss: 274.205780 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:34:41 2023: Train Epoch: 6 [12800/60900 (21%)]	Loss: 296.852722 | Not computing TPR and F1 | Elapsed: 15.61s
+WARNING:root: [*] Sun Jan  1 11:34:56 2023: Train Epoch: 6 [25600/60900 (42%)]	Loss: 258.684357 | Not computing TPR and F1 | Elapsed: 15.52s
+WARNING:root: [*] Sun Jan  1 11:35:12 2023: Train Epoch: 6 [38400/60900 (63%)]	Loss: 287.669403 | Not computing TPR and F1 | Elapsed: 15.74s
+WARNING:root: [*] Sun Jan  1 11:35:28 2023: Train Epoch: 6 [51200/60900 (84%)]	Loss: 272.827820 | Not computing TPR and F1 | Elapsed: 15.96s
+WARNING:root: [*] Sun Jan  1 11:35:40 2023:    6    | Tr.loss: 286.393489 | Not computing TPR and F1 | Elapsed:   74.77  s
+WARNING:root: [*] Started epoch: 7
+WARNING:root: [*] Sun Jan  1 11:35:40 2023: Train Epoch: 7 [  0  /60900 (0 %)]	Loss: 279.060364 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:35:55 2023: Train Epoch: 7 [12800/60900 (21%)]	Loss: 296.633484 | Not computing TPR and F1 | Elapsed: 15.52s
+WARNING:root: [*] Sun Jan  1 11:36:11 2023: Train Epoch: 7 [25600/60900 (42%)]	Loss: 294.388153 | Not computing TPR and F1 | Elapsed: 15.30s
+WARNING:root: [*] Sun Jan  1 11:36:26 2023: Train Epoch: 7 [38400/60900 (63%)]	Loss: 288.298523 | Not computing TPR and F1 | Elapsed: 15.40s
+WARNING:root: [*] Sun Jan  1 11:36:42 2023: Train Epoch: 7 [51200/60900 (84%)]	Loss: 282.419128 | Not computing TPR and F1 | Elapsed: 15.62s
+WARNING:root: [*] Sun Jan  1 11:36:53 2023:    7    | Tr.loss: 284.963857 | Not computing TPR and F1 | Elapsed:   73.68  s
+WARNING:root: [*] Started epoch: 8
+WARNING:root: [*] Sun Jan  1 11:36:54 2023: Train Epoch: 8 [  0  /60900 (0 %)]	Loss: 295.171173 | Not computing TPR and F1 | Elapsed: 0.35s
+WARNING:root: [*] Sun Jan  1 11:37:09 2023: Train Epoch: 8 [12800/60900 (21%)]	Loss: 286.991577 | Not computing TPR and F1 | Elapsed: 15.44s
+WARNING:root: [*] Sun Jan  1 11:37:24 2023: Train Epoch: 8 [25600/60900 (42%)]	Loss: 284.151031 | Not computing TPR and F1 | Elapsed: 15.36s
+WARNING:root: [*] Sun Jan  1 11:37:40 2023: Train Epoch: 8 [38400/60900 (63%)]	Loss: 270.242065 | Not computing TPR and F1 | Elapsed: 15.38s
+WARNING:root: [*] Sun Jan  1 11:37:55 2023: Train Epoch: 8 [51200/60900 (84%)]	Loss: 262.796875 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:38:06 2023:    8    | Tr.loss: 281.816495 | Not computing TPR and F1 | Elapsed:   73.15  s
+WARNING:root: [*] Started epoch: 9
+WARNING:root: [*] Sun Jan  1 11:38:07 2023: Train Epoch: 9 [  0  /60900 (0 %)]	Loss: 270.890961 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 11:38:22 2023: Train Epoch: 9 [12800/60900 (21%)]	Loss: 296.548981 | Not computing TPR and F1 | Elapsed: 15.28s
+WARNING:root: [*] Sun Jan  1 11:38:37 2023: Train Epoch: 9 [25600/60900 (42%)]	Loss: 278.921112 | Not computing TPR and F1 | Elapsed: 15.29s
+WARNING:root: [*] Sun Jan  1 11:38:53 2023: Train Epoch: 9 [38400/60900 (63%)]	Loss: 277.442627 | Not computing TPR and F1 | Elapsed: 15.30s
+WARNING:root: [*] Sun Jan  1 11:39:08 2023: Train Epoch: 9 [51200/60900 (84%)]	Loss: 270.845917 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:39:19 2023:    9    | Tr.loss: 280.252804 | Not computing TPR and F1 | Elapsed:   72.67  s
+WARNING:root: [*] Started epoch: 10
+WARNING:root: [*] Sun Jan  1 11:39:19 2023: Train Epoch: 10 [  0  /60900 (0 %)]	Loss: 280.105164 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 11:39:35 2023: Train Epoch: 10 [12800/60900 (21%)]	Loss: 270.018921 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 11:39:50 2023: Train Epoch: 10 [25600/60900 (42%)]	Loss: 269.114166 | Not computing TPR and F1 | Elapsed: 15.28s
+WARNING:root: [*] Sun Jan  1 11:40:05 2023: Train Epoch: 10 [38400/60900 (63%)]	Loss: 294.632080 | Not computing TPR and F1 | Elapsed: 15.29s
+WARNING:root: [*] Sun Jan  1 11:40:21 2023: Train Epoch: 10 [51200/60900 (84%)]	Loss: 262.630280 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:40:32 2023:   10    | Tr.loss: 279.748870 | Not computing TPR and F1 | Elapsed:   72.71  s
+WARNING:root: [*] Started epoch: 11
+WARNING:root: [*] Sun Jan  1 11:40:32 2023: Train Epoch: 11 [  0  /60900 (0 %)]	Loss: 254.777756 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 11:40:47 2023: Train Epoch: 11 [12800/60900 (21%)]	Loss: 264.578674 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:41:03 2023: Train Epoch: 11 [25600/60900 (42%)]	Loss: 258.826385 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:41:18 2023: Train Epoch: 11 [38400/60900 (63%)]	Loss: 325.044922 | Not computing TPR and F1 | Elapsed: 15.31s
+WARNING:root: [*] Sun Jan  1 11:41:33 2023: Train Epoch: 11 [51200/60900 (84%)]	Loss: 277.247192 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:41:44 2023:   11    | Tr.loss: 278.976464 | Not computing TPR and F1 | Elapsed:   72.60  s
+WARNING:root: [*] Started epoch: 12
+WARNING:root: [*] Sun Jan  1 11:41:45 2023: Train Epoch: 12 [  0  /60900 (0 %)]	Loss: 283.410706 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 11:42:00 2023: Train Epoch: 12 [12800/60900 (21%)]	Loss: 279.005646 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 11:42:15 2023: Train Epoch: 12 [25600/60900 (42%)]	Loss: 282.061218 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:42:30 2023: Train Epoch: 12 [38400/60900 (63%)]	Loss: 289.396545 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:42:46 2023: Train Epoch: 12 [51200/60900 (84%)]	Loss: 264.464233 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:42:57 2023:   12    | Tr.loss: 277.488102 | Not computing TPR and F1 | Elapsed:   72.50  s
+WARNING:root: [*] Started epoch: 13
+WARNING:root: [*] Sun Jan  1 11:42:57 2023: Train Epoch: 13 [  0  /60900 (0 %)]	Loss: 272.986237 | Not computing TPR and F1 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 11:43:13 2023: Train Epoch: 13 [12800/60900 (21%)]	Loss: 280.803040 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 11:43:28 2023: Train Epoch: 13 [25600/60900 (42%)]	Loss: 262.246979 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:43:43 2023: Train Epoch: 13 [38400/60900 (63%)]	Loss: 275.341309 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 11:43:58 2023: Train Epoch: 13 [51200/60900 (84%)]	Loss: 281.302917 | Not computing TPR and F1 | Elapsed: 15.32s
+WARNING:root: [*] Sun Jan  1 11:44:10 2023:   13    | Tr.loss: 276.454992 | Not computing TPR and F1 | Elapsed:   72.63  s
+WARNING:root: [*] Started epoch: 14
+WARNING:root: [*] Sun Jan  1 11:44:10 2023: Train Epoch: 14 [  0  /60900 (0 %)]	Loss: 257.369568 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 11:44:25 2023: Train Epoch: 14 [12800/60900 (21%)]	Loss: 264.456238 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 11:44:40 2023: Train Epoch: 14 [25600/60900 (42%)]	Loss: 281.090759 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:44:56 2023: Train Epoch: 14 [38400/60900 (63%)]	Loss: 278.013275 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:45:11 2023: Train Epoch: 14 [51200/60900 (84%)]	Loss: 279.087769 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:45:22 2023:   14    | Tr.loss: 276.044799 | Not computing TPR and F1 | Elapsed:   72.54  s
+WARNING:root: [*] Started epoch: 15
+WARNING:root: [*] Sun Jan  1 11:45:22 2023: Train Epoch: 15 [  0  /60900 (0 %)]	Loss: 239.558380 | Not computing TPR and F1 | Elapsed: 0.33s
+WARNING:root: [*] Sun Jan  1 11:45:38 2023: Train Epoch: 15 [12800/60900 (21%)]	Loss: 288.896790 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:45:53 2023: Train Epoch: 15 [25600/60900 (42%)]	Loss: 271.718597 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:46:08 2023: Train Epoch: 15 [38400/60900 (63%)]	Loss: 280.217651 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:46:23 2023: Train Epoch: 15 [51200/60900 (84%)]	Loss: 283.690704 | Not computing TPR and F1 | Elapsed: 15.30s
+WARNING:root: [*] Sun Jan  1 11:46:35 2023:   15    | Tr.loss: 275.550512 | Not computing TPR and F1 | Elapsed:   72.57  s
+WARNING:root: [*] Started epoch: 16
+WARNING:root: [*] Sun Jan  1 11:46:35 2023: Train Epoch: 16 [  0  /60900 (0 %)]	Loss: 263.919220 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 11:46:50 2023: Train Epoch: 16 [12800/60900 (21%)]	Loss: 263.495941 | Not computing TPR and F1 | Elapsed: 15.34s
+WARNING:root: [*] Sun Jan  1 11:47:06 2023: Train Epoch: 16 [25600/60900 (42%)]	Loss: 265.679352 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 11:47:21 2023: Train Epoch: 16 [38400/60900 (63%)]	Loss: 271.598328 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:47:36 2023: Train Epoch: 16 [51200/60900 (84%)]	Loss: 254.706100 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:47:47 2023:   16    | Tr.loss: 274.428826 | Not computing TPR and F1 | Elapsed:   72.66  s
+WARNING:root: [*] Started epoch: 17
+WARNING:root: [*] Sun Jan  1 11:47:48 2023: Train Epoch: 17 [  0  /60900 (0 %)]	Loss: 277.369812 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 11:48:03 2023: Train Epoch: 17 [12800/60900 (21%)]	Loss: 285.430878 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 11:48:18 2023: Train Epoch: 17 [25600/60900 (42%)]	Loss: 291.373322 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:48:33 2023: Train Epoch: 17 [38400/60900 (63%)]	Loss: 258.459778 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 11:48:49 2023: Train Epoch: 17 [51200/60900 (84%)]	Loss: 263.064209 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 11:49:00 2023:   17    | Tr.loss: 274.719855 | Not computing TPR and F1 | Elapsed:   72.60  s
+WARNING:root: [*] Started epoch: 18
+WARNING:root: [*] Sun Jan  1 11:49:00 2023: Train Epoch: 18 [  0  /60900 (0 %)]	Loss: 280.692810 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 11:49:15 2023: Train Epoch: 18 [12800/60900 (21%)]	Loss: 267.258789 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:49:31 2023: Train Epoch: 18 [25600/60900 (42%)]	Loss: 288.976562 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:49:46 2023: Train Epoch: 18 [38400/60900 (63%)]	Loss: 274.652527 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:50:01 2023: Train Epoch: 18 [51200/60900 (84%)]	Loss: 280.623810 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:50:12 2023:   18    | Tr.loss: 273.672876 | Not computing TPR and F1 | Elapsed:   72.49  s
+WARNING:root: [*] Started epoch: 19
+WARNING:root: [*] Sun Jan  1 11:50:13 2023: Train Epoch: 19 [  0  /60900 (0 %)]	Loss: 263.889771 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 11:50:28 2023: Train Epoch: 19 [12800/60900 (21%)]	Loss: 249.246674 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:50:43 2023: Train Epoch: 19 [25600/60900 (42%)]	Loss: 282.516083 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:50:58 2023: Train Epoch: 19 [38400/60900 (63%)]	Loss: 275.643860 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:51:14 2023: Train Epoch: 19 [51200/60900 (84%)]	Loss: 271.547058 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:51:25 2023:   19    | Tr.loss: 273.581163 | Not computing TPR and F1 | Elapsed:   72.49  s
+WARNING:root: [*] Started epoch: 20
+WARNING:root: [*] Sun Jan  1 11:51:25 2023: Train Epoch: 20 [  0  /60900 (0 %)]	Loss: 275.346863 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 11:51:40 2023: Train Epoch: 20 [12800/60900 (21%)]	Loss: 283.131470 | Not computing TPR and F1 | Elapsed: 15.25s
+WARNING:root: [*] Sun Jan  1 11:51:56 2023: Train Epoch: 20 [25600/60900 (42%)]	Loss: 273.916870 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:52:11 2023: Train Epoch: 20 [38400/60900 (63%)]	Loss: 253.523483 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:52:26 2023: Train Epoch: 20 [51200/60900 (84%)]	Loss: 277.434509 | Not computing TPR and F1 | Elapsed: 15.31s
+WARNING:root: [*] Sun Jan  1 11:52:37 2023:   20    | Tr.loss: 273.144524 | Not computing TPR and F1 | Elapsed:   72.59  s
+WARNING:root: [*] Started epoch: 21
+WARNING:root: [*] Sun Jan  1 11:52:38 2023: Train Epoch: 21 [  0  /60900 (0 %)]	Loss: 273.163269 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 11:52:53 2023: Train Epoch: 21 [12800/60900 (21%)]	Loss: 285.859314 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:53:08 2023: Train Epoch: 21 [25600/60900 (42%)]	Loss: 260.202148 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:53:23 2023: Train Epoch: 21 [38400/60900 (63%)]	Loss: 273.624207 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:53:39 2023: Train Epoch: 21 [51200/60900 (84%)]	Loss: 298.214905 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:53:50 2023:   21    | Tr.loss: 272.429211 | Not computing TPR and F1 | Elapsed:   72.49  s
+WARNING:root: [*] Started epoch: 22
+WARNING:root: [*] Sun Jan  1 11:53:50 2023: Train Epoch: 22 [  0  /60900 (0 %)]	Loss: 258.197083 | Not computing TPR and F1 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 11:54:06 2023: Train Epoch: 22 [12800/60900 (21%)]	Loss: 285.757996 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 11:54:21 2023: Train Epoch: 22 [25600/60900 (42%)]	Loss: 243.867432 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:54:36 2023: Train Epoch: 22 [38400/60900 (63%)]	Loss: 280.305054 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:54:51 2023: Train Epoch: 22 [51200/60900 (84%)]	Loss: 278.392822 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:55:03 2023:   22    | Tr.loss: 271.829063 | Not computing TPR and F1 | Elapsed:   72.53  s
+WARNING:root: [*] Started epoch: 23
+WARNING:root: [*] Sun Jan  1 11:55:03 2023: Train Epoch: 23 [  0  /60900 (0 %)]	Loss: 269.168274 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 11:55:18 2023: Train Epoch: 23 [12800/60900 (21%)]	Loss: 288.637268 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:55:33 2023: Train Epoch: 23 [25600/60900 (42%)]	Loss: 271.196594 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:55:49 2023: Train Epoch: 23 [38400/60900 (63%)]	Loss: 285.509338 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:56:04 2023: Train Epoch: 23 [51200/60900 (84%)]	Loss: 269.002472 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:56:15 2023:   23    | Tr.loss: 272.540428 | Not computing TPR and F1 | Elapsed:   72.48  s
+WARNING:root: [*] Started epoch: 24
+WARNING:root: [*] Sun Jan  1 11:56:15 2023: Train Epoch: 24 [  0  /60900 (0 %)]	Loss: 254.277924 | Not computing TPR and F1 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 11:56:31 2023: Train Epoch: 24 [12800/60900 (21%)]	Loss: 273.329102 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 11:56:46 2023: Train Epoch: 24 [25600/60900 (42%)]	Loss: 275.010254 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:57:01 2023: Train Epoch: 24 [38400/60900 (63%)]	Loss: 265.621826 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:57:16 2023: Train Epoch: 24 [51200/60900 (84%)]	Loss: 278.631866 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 11:57:28 2023:   24    | Tr.loss: 271.469682 | Not computing TPR and F1 | Elapsed:   72.53  s
+WARNING:root: [*] Started epoch: 25
+WARNING:root: [*] Sun Jan  1 11:57:28 2023: Train Epoch: 25 [  0  /60900 (0 %)]	Loss: 256.215759 | Not computing TPR and F1 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 11:57:43 2023: Train Epoch: 25 [12800/60900 (21%)]	Loss: 268.190186 | Not computing TPR and F1 | Elapsed: 15.32s
+WARNING:root: [*] Sun Jan  1 11:57:58 2023: Train Epoch: 25 [25600/60900 (42%)]	Loss: 292.559845 | Not computing TPR and F1 | Elapsed: 15.30s
+WARNING:root: [*] Sun Jan  1 11:58:14 2023: Train Epoch: 25 [38400/60900 (63%)]	Loss: 265.287262 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:58:29 2023: Train Epoch: 25 [51200/60900 (84%)]	Loss: 266.501038 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:58:40 2023:   25    | Tr.loss: 270.690812 | Not computing TPR and F1 | Elapsed:   72.68  s
+WARNING:root: [*] Started epoch: 26
+WARNING:root: [*] Sun Jan  1 11:58:41 2023: Train Epoch: 26 [  0  /60900 (0 %)]	Loss: 270.054077 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 11:58:56 2023: Train Epoch: 26 [12800/60900 (21%)]	Loss: 270.466003 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:59:11 2023: Train Epoch: 26 [25600/60900 (42%)]	Loss: 277.727722 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:59:26 2023: Train Epoch: 26 [38400/60900 (63%)]	Loss: 267.639069 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 11:59:41 2023: Train Epoch: 26 [51200/60900 (84%)]	Loss: 262.774750 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 11:59:53 2023:   26    | Tr.loss: 271.218912 | Not computing TPR and F1 | Elapsed:   72.55  s
+WARNING:root: [*] Started epoch: 27
+WARNING:root: [*] Sun Jan  1 11:59:53 2023: Train Epoch: 27 [  0  /60900 (0 %)]	Loss: 254.518524 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 12:00:08 2023: Train Epoch: 27 [12800/60900 (21%)]	Loss: 241.817245 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:00:24 2023: Train Epoch: 27 [25600/60900 (42%)]	Loss: 266.042236 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:00:39 2023: Train Epoch: 27 [38400/60900 (63%)]	Loss: 255.389343 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:00:54 2023: Train Epoch: 27 [51200/60900 (84%)]	Loss: 270.223389 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:01:05 2023:   27    | Tr.loss: 271.026159 | Not computing TPR and F1 | Elapsed:   72.52  s
+WARNING:root: [*] Started epoch: 28
+WARNING:root: [*] Sun Jan  1 12:01:06 2023: Train Epoch: 28 [  0  /60900 (0 %)]	Loss: 262.778992 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 12:01:21 2023: Train Epoch: 28 [12800/60900 (21%)]	Loss: 251.787903 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:01:36 2023: Train Epoch: 28 [25600/60900 (42%)]	Loss: 244.834259 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:01:51 2023: Train Epoch: 28 [38400/60900 (63%)]	Loss: 258.518677 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 12:02:07 2023: Train Epoch: 28 [51200/60900 (84%)]	Loss: 266.557983 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:02:18 2023:   28    | Tr.loss: 271.663740 | Not computing TPR and F1 | Elapsed:   72.49  s
+WARNING:root: [*] Started epoch: 29
+WARNING:root: [*] Sun Jan  1 12:02:18 2023: Train Epoch: 29 [  0  /60900 (0 %)]	Loss: 270.322906 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 12:02:33 2023: Train Epoch: 29 [12800/60900 (21%)]	Loss: 265.702209 | Not computing TPR and F1 | Elapsed: 15.34s
+WARNING:root: [*] Sun Jan  1 12:02:49 2023: Train Epoch: 29 [25600/60900 (42%)]	Loss: 288.954346 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 12:03:04 2023: Train Epoch: 29 [38400/60900 (63%)]	Loss: 266.021332 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:03:19 2023: Train Epoch: 29 [51200/60900 (84%)]	Loss: 308.621521 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 12:03:30 2023:   29    | Tr.loss: 270.448279 | Not computing TPR and F1 | Elapsed:   72.68  s
+WARNING:root: [*] Started epoch: 30
+WARNING:root: [*] Sun Jan  1 12:03:31 2023: Train Epoch: 30 [  0  /60900 (0 %)]	Loss: 276.130066 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 12:03:46 2023: Train Epoch: 30 [12800/60900 (21%)]	Loss: 265.585388 | Not computing TPR and F1 | Elapsed: 15.29s
+WARNING:root: [*] Sun Jan  1 12:04:01 2023: Train Epoch: 30 [25600/60900 (42%)]	Loss: 248.990494 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 12:04:17 2023: Train Epoch: 30 [38400/60900 (63%)]	Loss: 281.041840 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:04:32 2023: Train Epoch: 30 [51200/60900 (84%)]	Loss: 252.975281 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:04:43 2023:   30    | Tr.loss: 269.733370 | Not computing TPR and F1 | Elapsed:   72.58  s
+WARNING:root:[!] Sun Jan  1 12:04:43 2023: Dumped results:
+                model     : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\preTraining\trainingFiles_1672571083-model.torch
+                losses    : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\preTraining\trainingFiles_1672571083-train_losses.npy
+                duration  : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\preTraining\trainingFiles_1672571083-trainTime.npy
+WARNING:root: [!] Training pretrained model on downstream task...
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Sun Jan  1 12:04:44 2023: Train Epoch: 1 [  0  /15226 (0 %)]	Loss: 0.712061 | FPR 0.01 -- TPR 0.1277 | F1 0.2264 | Elapsed: 0.33s
+WARNING:root: [*] Sun Jan  1 12:04:59 2023: Train Epoch: 1 [12800/15226 (83%)]	Loss: 0.248893 | FPR 0.01 -- TPR 0.4804 | F1 0.6491 | Elapsed: 14.94s
+WARNING:root: [*] Sun Jan  1 12:05:01 2023:    1    | Tr.loss: 0.369162 | FPR 0.01 -- TPR: 0.34 |  F1: 0.49 | Elapsed:   17.85  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Sun Jan  1 12:05:02 2023: Train Epoch: 2 [  0  /15226 (0 %)]	Loss: 0.223992 | FPR 0.01 -- TPR 0.6807 | F1 0.8100 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 12:05:17 2023: Train Epoch: 2 [12800/15226 (83%)]	Loss: 0.137400 | FPR 0.01 -- TPR 0.7104 | F1 0.8307 | Elapsed: 14.97s
+WARNING:root: [*] Sun Jan  1 12:05:19 2023:    2    | Tr.loss: 0.188418 | FPR 0.01 -- TPR: 0.63 |  F1: 0.76 | Elapsed:   17.82  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Sun Jan  1 12:05:19 2023: Train Epoch: 3 [  0  /15226 (0 %)]	Loss: 0.164063 | FPR 0.01 -- TPR 0.7760 | F1 0.8738 | Elapsed: 0.29s
+WARNING:root: [*] Sun Jan  1 12:05:34 2023: Train Epoch: 3 [12800/15226 (83%)]	Loss: 0.120099 | FPR 0.01 -- TPR 0.8973 | F1 0.9459 | Elapsed: 15.02s
+WARNING:root: [*] Sun Jan  1 12:05:37 2023:    3    | Tr.loss: 0.118040 | FPR 0.01 -- TPR: 0.83 |  F1: 0.90 | Elapsed:   17.83  s
+WARNING:root:[!] Sun Jan  1 12:05:37 2023: Dumped results:
+                model     : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_pretrained\trainingFiles_1672571137-model.torch
+                losses    : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_pretrained\trainingFiles_1672571137-train_losses.npy
+                duration  : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_pretrained\trainingFiles_1672571137-trainTime.npy
+		train F1s : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_pretrained\trainingFiles_1672571137-trainF1s.npy
+		train TPRs: evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_pretrained\trainingFiles_1672571137-trainTPRs.npy
+WARNING:root: [!] Training non_pretrained model on downstream task...
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Sun Jan  1 12:05:37 2023: Train Epoch: 1 [  0  /15226 (0 %)]	Loss: 0.704802 | FPR 0.01 -- TPR 0.0000 | F1 0.0000 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 12:05:52 2023: Train Epoch: 1 [12800/15226 (83%)]	Loss: 0.226164 | FPR 0.01 -- TPR 0.7294 | F1 0.8435 | Elapsed: 14.18s
+WARNING:root: [*] Sun Jan  1 12:05:54 2023:    1    | Tr.loss: 0.388808 | FPR 0.01 -- TPR: 0.39 |  F1: 0.48 | Elapsed:   16.91  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Sun Jan  1 12:05:54 2023: Train Epoch: 2 [  0  /15226 (0 %)]	Loss: 0.138997 | FPR 0.01 -- TPR 0.8588 | F1 0.9240 | Elapsed: 0.28s
+WARNING:root: [*] Sun Jan  1 12:06:09 2023: Train Epoch: 2 [12800/15226 (83%)]	Loss: 0.121962 | FPR 0.01 -- TPR 0.8462 | F1 0.9167 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 12:06:11 2023:    2    | Tr.loss: 0.122040 | FPR 0.01 -- TPR: 0.88 |  F1: 0.93 | Elapsed:   16.90  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Sun Jan  1 12:06:11 2023: Train Epoch: 3 [  0  /15226 (0 %)]	Loss: 0.107426 | FPR 0.01 -- TPR 0.9556 | F1 0.9773 | Elapsed: 0.28s
+WARNING:root: [*] Sun Jan  1 12:06:25 2023: Train Epoch: 3 [12800/15226 (83%)]	Loss: 0.133201 | FPR 0.01 -- TPR 0.8125 | F1 0.8966 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 12:06:28 2023:    3    | Tr.loss: 0.091652 | FPR 0.01 -- TPR: 0.90 |  F1: 0.95 | Elapsed:   16.89  s
+WARNING:root:[!] Sun Jan  1 12:06:28 2023: Dumped results:
+                model     : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_non_pretrained\trainingFiles_1672571188-model.torch
+                losses    : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_non_pretrained\trainingFiles_1672571188-train_losses.npy
+                duration  : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_non_pretrained\trainingFiles_1672571188-trainTime.npy
+		train F1s : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_non_pretrained\trainingFiles_1672571188-trainF1s.npy
+		train TPRs: evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_non_pretrained\trainingFiles_1672571188-trainTPRs.npy
+WARNING:root: [!] Training full_data model on downstream task...
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Sun Jan  1 12:06:28 2023: Train Epoch: 1 [  0  /76126 (0 %)]	Loss: 0.699248 | FPR 0.01 -- TPR 0.0120 | F1 0.0238 | Elapsed: 0.29s
+WARNING:root: [*] Sun Jan  1 12:06:43 2023: Train Epoch: 1 [12800/76126 (17%)]	Loss: 0.154697 | FPR 0.01 -- TPR 0.7561 | F1 0.8611 | Elapsed: 14.22s
+WARNING:root: [*] Sun Jan  1 12:06:57 2023: Train Epoch: 1 [25600/76126 (34%)]	Loss: 0.120105 | FPR 0.01 -- TPR 0.9157 | F1 0.9560 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 12:07:11 2023: Train Epoch: 1 [38400/76126 (50%)]	Loss: 0.048949 | FPR 0.01 -- TPR 0.9827 | F1 0.9913 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 12:07:25 2023: Train Epoch: 1 [51200/76126 (67%)]	Loss: 0.055684 | FPR 0.01 -- TPR 0.9529 | F1 0.9759 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 12:07:39 2023: Train Epoch: 1 [64000/76126 (84%)]	Loss: 0.045960 | FPR 0.01 -- TPR 0.9121 | F1 0.9540 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 12:07:53 2023:    1    | Tr.loss: 0.147298 | FPR 0.01 -- TPR: 0.80 |  F1: 0.85 | Elapsed:   84.47  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Sun Jan  1 12:07:53 2023: Train Epoch: 2 [  0  /76126 (0 %)]	Loss: 0.039350 | FPR 0.01 -- TPR 0.9814 | F1 0.9906 | Elapsed: 0.29s
+WARNING:root: [*] Sun Jan  1 12:08:07 2023: Train Epoch: 2 [12800/76126 (17%)]	Loss: 0.062241 | FPR 0.01 -- TPR 0.7716 | F1 0.8711 | Elapsed: 14.18s
+WARNING:root: [*] Sun Jan  1 12:08:21 2023: Train Epoch: 2 [25600/76126 (34%)]	Loss: 0.064406 | FPR 0.01 -- TPR 0.9598 | F1 0.9795 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 12:08:36 2023: Train Epoch: 2 [38400/76126 (50%)]	Loss: 0.043884 | FPR 0.01 -- TPR 0.9266 | F1 0.9619 | Elapsed: 14.24s
+WARNING:root: [*] Sun Jan  1 12:08:50 2023: Train Epoch: 2 [51200/76126 (67%)]	Loss: 0.039728 | FPR 0.01 -- TPR 0.9889 | F1 0.9944 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 12:09:04 2023: Train Epoch: 2 [64000/76126 (84%)]	Loss: 0.039849 | FPR 0.01 -- TPR 0.9716 | F1 0.9856 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 12:09:17 2023:    2    | Tr.loss: 0.060104 | FPR 0.01 -- TPR: 0.93 |  F1: 0.96 | Elapsed:   84.46  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Sun Jan  1 12:09:17 2023: Train Epoch: 3 [  0  /76126 (0 %)]	Loss: 0.049371 | FPR 0.01 -- TPR 0.9422 | F1 0.9702 | Elapsed: 0.29s
+WARNING:root: [*] Sun Jan  1 12:09:32 2023: Train Epoch: 3 [12800/76126 (17%)]	Loss: 0.089727 | FPR 0.01 -- TPR 0.9081 | F1 0.9518 | Elapsed: 14.24s
+WARNING:root: [*] Sun Jan  1 12:09:46 2023: Train Epoch: 3 [25600/76126 (34%)]	Loss: 0.059724 | FPR 0.01 -- TPR 0.9408 | F1 0.9695 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 12:10:00 2023: Train Epoch: 3 [38400/76126 (50%)]	Loss: 0.039255 | FPR 0.01 -- TPR 0.9840 | F1 0.9919 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 12:10:14 2023: Train Epoch: 3 [51200/76126 (67%)]	Loss: 0.054559 | FPR 0.01 -- TPR 0.9672 | F1 0.9833 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 12:10:28 2023: Train Epoch: 3 [64000/76126 (84%)]	Loss: 0.048010 | FPR 0.01 -- TPR 0.9769 | F1 0.9883 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 12:10:42 2023:    3    | Tr.loss: 0.052643 | FPR 0.01 -- TPR: 0.95 |  F1: 0.97 | Elapsed:   84.48  s
+WARNING:root:[!] Sun Jan  1 12:10:42 2023: Dumped results:
+                model     : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_full_data\trainingFiles_1672571442-model.torch
+                losses    : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_full_data\trainingFiles_1672571442-train_losses.npy
+                duration  : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_full_data\trainingFiles_1672571442-trainTime.npy
+		train F1s : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_full_data\trainingFiles_1672571442-trainF1s.npy
+		train TPRs: evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_full_data\trainingFiles_1672571442-trainTPRs.npy
+WARNING:root: [*] Evaluating pretrained model on test set...
+WARNING:root: [!] Test F1 score for pretrained model at 0.01 FPR : 0.7610
+WARNING:root: [!] Test TPR score for pretrained model at 0.01 FPR: 0.6257
+WARNING:root: [*] Evaluating non_pretrained model on test set...
+WARNING:root: [!] Test F1 score for non_pretrained model at 0.01 FPR : 0.8214
+WARNING:root: [!] Test TPR score for non_pretrained model at 0.01 FPR: 0.7075
+WARNING:root: [*] Evaluating full_data model on test set...
+WARNING:root: [!] Test F1 score for full_data model at 0.01 FPR : 0.8717
+WARNING:root: [!] Test TPR score for full_data model at 0.01 FPR: 0.7792
+WARNING:root: [!] Running pre-training split 2/2
+WARNING:root: [!] Pre-training model...
+WARNING:root: [*] Masking sequences...
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Sun Jan  1 12:11:48 2023: Train Epoch: 1 [  0  /60900 (0 %)]	Loss: 480.036346 | Not computing TPR and F1 | Elapsed: 1.04s
+WARNING:root: [*] Sun Jan  1 12:12:03 2023: Train Epoch: 1 [12800/60900 (21%)]	Loss: 404.908295 | Not computing TPR and F1 | Elapsed: 15.72s
+WARNING:root: [*] Sun Jan  1 12:12:19 2023: Train Epoch: 1 [25600/60900 (42%)]	Loss: 368.584839 | Not computing TPR and F1 | Elapsed: 15.78s
+WARNING:root: [*] Sun Jan  1 12:12:35 2023: Train Epoch: 1 [38400/60900 (63%)]	Loss: 326.082947 | Not computing TPR and F1 | Elapsed: 15.48s
+WARNING:root: [*] Sun Jan  1 12:12:50 2023: Train Epoch: 1 [51200/60900 (84%)]	Loss: 317.241577 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 12:13:01 2023:    1    | Tr.loss: 353.297247 | Not computing TPR and F1 | Elapsed:   74.55  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Sun Jan  1 12:13:02 2023: Train Epoch: 2 [  0  /60900 (0 %)]	Loss: 302.755890 | Not computing TPR and F1 | Elapsed: 0.33s
+WARNING:root: [*] Sun Jan  1 12:13:17 2023: Train Epoch: 2 [12800/60900 (21%)]	Loss: 311.724731 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:13:32 2023: Train Epoch: 2 [25600/60900 (42%)]	Loss: 293.266571 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:13:47 2023: Train Epoch: 2 [38400/60900 (63%)]	Loss: 312.645752 | Not computing TPR and F1 | Elapsed: 15.28s
+WARNING:root: [*] Sun Jan  1 12:14:03 2023: Train Epoch: 2 [51200/60900 (84%)]	Loss: 304.260254 | Not computing TPR and F1 | Elapsed: 15.31s
+WARNING:root: [*] Sun Jan  1 12:14:14 2023:    2    | Tr.loss: 305.911099 | Not computing TPR and F1 | Elapsed:   72.67  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Sun Jan  1 12:14:14 2023: Train Epoch: 3 [  0  /60900 (0 %)]	Loss: 294.405090 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 12:14:30 2023: Train Epoch: 3 [12800/60900 (21%)]	Loss: 293.707581 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 12:14:45 2023: Train Epoch: 3 [25600/60900 (42%)]	Loss: 305.641724 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:15:00 2023: Train Epoch: 3 [38400/60900 (63%)]	Loss: 299.737000 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:15:15 2023: Train Epoch: 3 [51200/60900 (84%)]	Loss: 291.859558 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:15:26 2023:    3    | Tr.loss: 296.413436 | Not computing TPR and F1 | Elapsed:   72.52  s
+WARNING:root: [*] Started epoch: 4
+WARNING:root: [*] Sun Jan  1 12:15:27 2023: Train Epoch: 4 [  0  /60900 (0 %)]	Loss: 292.920288 | Not computing TPR and F1 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 12:15:42 2023: Train Epoch: 4 [12800/60900 (21%)]	Loss: 300.856171 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 12:15:57 2023: Train Epoch: 4 [25600/60900 (42%)]	Loss: 289.985687 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:16:12 2023: Train Epoch: 4 [38400/60900 (63%)]	Loss: 318.355591 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:16:28 2023: Train Epoch: 4 [51200/60900 (84%)]	Loss: 289.363800 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:16:39 2023:    4    | Tr.loss: 291.921306 | Not computing TPR and F1 | Elapsed:   72.54  s
+WARNING:root: [*] Started epoch: 5
+WARNING:root: [*] Sun Jan  1 12:16:39 2023: Train Epoch: 5 [  0  /60900 (0 %)]	Loss: 297.856537 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 12:16:55 2023: Train Epoch: 5 [12800/60900 (21%)]	Loss: 282.136169 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:17:10 2023: Train Epoch: 5 [25600/60900 (42%)]	Loss: 300.375153 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:17:25 2023: Train Epoch: 5 [38400/60900 (63%)]	Loss: 271.885803 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:17:40 2023: Train Epoch: 5 [51200/60900 (84%)]	Loss: 295.152985 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:17:51 2023:    5    | Tr.loss: 288.059262 | Not computing TPR and F1 | Elapsed:   72.50  s
+WARNING:root: [*] Started epoch: 6
+WARNING:root: [*] Sun Jan  1 12:17:52 2023: Train Epoch: 6 [  0  /60900 (0 %)]	Loss: 278.740936 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 12:18:07 2023: Train Epoch: 6 [12800/60900 (21%)]	Loss: 280.234619 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:18:22 2023: Train Epoch: 6 [25600/60900 (42%)]	Loss: 296.712341 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:18:38 2023: Train Epoch: 6 [38400/60900 (63%)]	Loss: 286.301941 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:18:53 2023: Train Epoch: 6 [51200/60900 (84%)]	Loss: 289.970703 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:19:04 2023:    6    | Tr.loss: 285.842501 | Not computing TPR and F1 | Elapsed:   72.52  s
+WARNING:root: [*] Started epoch: 7
+WARNING:root: [*] Sun Jan  1 12:19:04 2023: Train Epoch: 7 [  0  /60900 (0 %)]	Loss: 285.808197 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 12:19:20 2023: Train Epoch: 7 [12800/60900 (21%)]	Loss: 267.669739 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:19:35 2023: Train Epoch: 7 [25600/60900 (42%)]	Loss: 308.496368 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 12:19:50 2023: Train Epoch: 7 [38400/60900 (63%)]	Loss: 281.070953 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:20:05 2023: Train Epoch: 7 [51200/60900 (84%)]	Loss: 291.938416 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:20:17 2023:    7    | Tr.loss: 284.035278 | Not computing TPR and F1 | Elapsed:   72.52  s
+WARNING:root: [*] Started epoch: 8
+WARNING:root: [*] Sun Jan  1 12:20:17 2023: Train Epoch: 8 [  0  /60900 (0 %)]	Loss: 265.104218 | Not computing TPR and F1 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 12:20:32 2023: Train Epoch: 8 [12800/60900 (21%)]	Loss: 284.737396 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:20:47 2023: Train Epoch: 8 [25600/60900 (42%)]	Loss: 283.445831 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:21:03 2023: Train Epoch: 8 [38400/60900 (63%)]	Loss: 272.221741 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:21:18 2023: Train Epoch: 8 [51200/60900 (84%)]	Loss: 260.098328 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:21:29 2023:    8    | Tr.loss: 282.949299 | Not computing TPR and F1 | Elapsed:   72.49  s
+WARNING:root: [*] Started epoch: 9
+WARNING:root: [*] Sun Jan  1 12:21:29 2023: Train Epoch: 9 [  0  /60900 (0 %)]	Loss: 294.341705 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 12:21:45 2023: Train Epoch: 9 [12800/60900 (21%)]	Loss: 274.988129 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:22:00 2023: Train Epoch: 9 [25600/60900 (42%)]	Loss: 308.760925 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:22:15 2023: Train Epoch: 9 [38400/60900 (63%)]	Loss: 288.773560 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:22:30 2023: Train Epoch: 9 [51200/60900 (84%)]	Loss: 272.172241 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:22:41 2023:    9    | Tr.loss: 282.280924 | Not computing TPR and F1 | Elapsed:   72.48  s
+WARNING:root: [*] Started epoch: 10
+WARNING:root: [*] Sun Jan  1 12:22:42 2023: Train Epoch: 10 [  0  /60900 (0 %)]	Loss: 302.431091 | Not computing TPR and F1 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 12:22:57 2023: Train Epoch: 10 [12800/60900 (21%)]	Loss: 280.564758 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 12:23:12 2023: Train Epoch: 10 [25600/60900 (42%)]	Loss: 258.052795 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:23:28 2023: Train Epoch: 10 [38400/60900 (63%)]	Loss: 269.297241 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:23:43 2023: Train Epoch: 10 [51200/60900 (84%)]	Loss: 284.416626 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 12:23:54 2023:   10    | Tr.loss: 279.518609 | Not computing TPR and F1 | Elapsed:   72.53  s
+WARNING:root: [*] Started epoch: 11
+WARNING:root: [*] Sun Jan  1 12:23:54 2023: Train Epoch: 11 [  0  /60900 (0 %)]	Loss: 295.908203 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 12:24:10 2023: Train Epoch: 11 [12800/60900 (21%)]	Loss: 260.685638 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:24:25 2023: Train Epoch: 11 [25600/60900 (42%)]	Loss: 283.913910 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:24:40 2023: Train Epoch: 11 [38400/60900 (63%)]	Loss: 268.553711 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:24:55 2023: Train Epoch: 11 [51200/60900 (84%)]	Loss: 282.032684 | Not computing TPR and F1 | Elapsed: 15.38s
+WARNING:root: [*] Sun Jan  1 12:25:07 2023:   11    | Tr.loss: 278.707599 | Not computing TPR and F1 | Elapsed:   72.65  s
+WARNING:root: [*] Started epoch: 12
+WARNING:root: [*] Sun Jan  1 12:25:07 2023: Train Epoch: 12 [  0  /60900 (0 %)]	Loss: 279.189453 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 12:25:22 2023: Train Epoch: 12 [12800/60900 (21%)]	Loss: 275.966400 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:25:37 2023: Train Epoch: 12 [25600/60900 (42%)]	Loss: 270.356934 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:25:53 2023: Train Epoch: 12 [38400/60900 (63%)]	Loss: 287.440155 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:26:08 2023: Train Epoch: 12 [51200/60900 (84%)]	Loss: 276.491974 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 12:26:19 2023:   12    | Tr.loss: 277.687305 | Not computing TPR and F1 | Elapsed:   72.49  s
+WARNING:root: [*] Started epoch: 13
+WARNING:root: [*] Sun Jan  1 12:26:19 2023: Train Epoch: 13 [  0  /60900 (0 %)]	Loss: 263.329712 | Not computing TPR and F1 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 12:26:35 2023: Train Epoch: 13 [12800/60900 (21%)]	Loss: 273.780304 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 12:26:50 2023: Train Epoch: 13 [25600/60900 (42%)]	Loss: 296.448669 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:27:05 2023: Train Epoch: 13 [38400/60900 (63%)]	Loss: 273.241119 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:27:20 2023: Train Epoch: 13 [51200/60900 (84%)]	Loss: 271.406891 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:27:32 2023:   13    | Tr.loss: 277.202890 | Not computing TPR and F1 | Elapsed:   72.54  s
+WARNING:root: [*] Started epoch: 14
+WARNING:root: [*] Sun Jan  1 12:27:32 2023: Train Epoch: 14 [  0  /60900 (0 %)]	Loss: 262.224213 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 12:27:47 2023: Train Epoch: 14 [12800/60900 (21%)]	Loss: 288.757874 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:28:03 2023: Train Epoch: 14 [25600/60900 (42%)]	Loss: 263.409912 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:28:18 2023: Train Epoch: 14 [38400/60900 (63%)]	Loss: 274.137207 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:28:33 2023: Train Epoch: 14 [51200/60900 (84%)]	Loss: 291.717285 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:28:44 2023:   14    | Tr.loss: 275.845765 | Not computing TPR and F1 | Elapsed:   72.54  s
+WARNING:root: [*] Started epoch: 15
+WARNING:root: [*] Sun Jan  1 12:28:45 2023: Train Epoch: 15 [  0  /60900 (0 %)]	Loss: 267.337311 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 12:29:00 2023: Train Epoch: 15 [12800/60900 (21%)]	Loss: 267.872559 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:29:15 2023: Train Epoch: 15 [25600/60900 (42%)]	Loss: 294.108978 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:29:30 2023: Train Epoch: 15 [38400/60900 (63%)]	Loss: 267.337463 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:29:45 2023: Train Epoch: 15 [51200/60900 (84%)]	Loss: 287.787994 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:29:57 2023:   15    | Tr.loss: 276.506408 | Not computing TPR and F1 | Elapsed:   72.51  s
+WARNING:root: [*] Started epoch: 16
+WARNING:root: [*] Sun Jan  1 12:29:57 2023: Train Epoch: 16 [  0  /60900 (0 %)]	Loss: 280.507416 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 12:30:12 2023: Train Epoch: 16 [12800/60900 (21%)]	Loss: 276.444458 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:30:28 2023: Train Epoch: 16 [25600/60900 (42%)]	Loss: 276.198334 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 12:30:43 2023: Train Epoch: 16 [38400/60900 (63%)]	Loss: 279.172668 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:30:58 2023: Train Epoch: 16 [51200/60900 (84%)]	Loss: 263.839142 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 12:31:09 2023:   16    | Tr.loss: 275.846844 | Not computing TPR and F1 | Elapsed:   72.57  s
+WARNING:root: [*] Started epoch: 17
+WARNING:root: [*] Sun Jan  1 12:31:10 2023: Train Epoch: 17 [  0  /60900 (0 %)]	Loss: 290.896912 | Not computing TPR and F1 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 12:31:25 2023: Train Epoch: 17 [12800/60900 (21%)]	Loss: 271.152435 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:31:40 2023: Train Epoch: 17 [25600/60900 (42%)]	Loss: 273.329468 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 12:31:55 2023: Train Epoch: 17 [38400/60900 (63%)]	Loss: 275.256226 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:32:11 2023: Train Epoch: 17 [51200/60900 (84%)]	Loss: 272.225769 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:32:22 2023:   17    | Tr.loss: 275.095441 | Not computing TPR and F1 | Elapsed:   72.50  s
+WARNING:root: [*] Started epoch: 18
+WARNING:root: [*] Sun Jan  1 12:32:22 2023: Train Epoch: 18 [  0  /60900 (0 %)]	Loss: 293.954651 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 12:32:37 2023: Train Epoch: 18 [12800/60900 (21%)]	Loss: 272.363373 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 12:32:53 2023: Train Epoch: 18 [25600/60900 (42%)]	Loss: 277.675507 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:33:08 2023: Train Epoch: 18 [38400/60900 (63%)]	Loss: 255.901276 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:33:23 2023: Train Epoch: 18 [51200/60900 (84%)]	Loss: 282.111206 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:33:34 2023:   18    | Tr.loss: 273.722677 | Not computing TPR and F1 | Elapsed:   72.55  s
+WARNING:root: [*] Started epoch: 19
+WARNING:root: [*] Sun Jan  1 12:33:35 2023: Train Epoch: 19 [  0  /60900 (0 %)]	Loss: 287.780334 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 12:33:50 2023: Train Epoch: 19 [12800/60900 (21%)]	Loss: 278.557678 | Not computing TPR and F1 | Elapsed: 15.29s
+WARNING:root: [*] Sun Jan  1 12:34:05 2023: Train Epoch: 19 [25600/60900 (42%)]	Loss: 296.947144 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 12:34:20 2023: Train Epoch: 19 [38400/60900 (63%)]	Loss: 257.799316 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:34:36 2023: Train Epoch: 19 [51200/60900 (84%)]	Loss: 255.644958 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:34:47 2023:   19    | Tr.loss: 273.565870 | Not computing TPR and F1 | Elapsed:   72.58  s
+WARNING:root: [*] Started epoch: 20
+WARNING:root: [*] Sun Jan  1 12:34:47 2023: Train Epoch: 20 [  0  /60900 (0 %)]	Loss: 273.857117 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 12:35:03 2023: Train Epoch: 20 [12800/60900 (21%)]	Loss: 297.699280 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 12:35:18 2023: Train Epoch: 20 [25600/60900 (42%)]	Loss: 276.189972 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:35:33 2023: Train Epoch: 20 [38400/60900 (63%)]	Loss: 267.498749 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:35:48 2023: Train Epoch: 20 [51200/60900 (84%)]	Loss: 264.578583 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:35:59 2023:   20    | Tr.loss: 273.090635 | Not computing TPR and F1 | Elapsed:   72.53  s
+WARNING:root: [*] Started epoch: 21
+WARNING:root: [*] Sun Jan  1 12:36:00 2023: Train Epoch: 21 [  0  /60900 (0 %)]	Loss: 287.771118 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 12:36:15 2023: Train Epoch: 21 [12800/60900 (21%)]	Loss: 282.226837 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 12:36:30 2023: Train Epoch: 21 [25600/60900 (42%)]	Loss: 267.626709 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:36:46 2023: Train Epoch: 21 [38400/60900 (63%)]	Loss: 254.405914 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:37:01 2023: Train Epoch: 21 [51200/60900 (84%)]	Loss: 264.840698 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:37:12 2023:   21    | Tr.loss: 271.803088 | Not computing TPR and F1 | Elapsed:   72.55  s
+WARNING:root: [*] Started epoch: 22
+WARNING:root: [*] Sun Jan  1 12:37:12 2023: Train Epoch: 22 [  0  /60900 (0 %)]	Loss: 259.115936 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 12:37:28 2023: Train Epoch: 22 [12800/60900 (21%)]	Loss: 282.128143 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:37:43 2023: Train Epoch: 22 [25600/60900 (42%)]	Loss: 262.460114 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:37:58 2023: Train Epoch: 22 [38400/60900 (63%)]	Loss: 254.523544 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:38:13 2023: Train Epoch: 22 [51200/60900 (84%)]	Loss: 250.230957 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:38:25 2023:   22    | Tr.loss: 271.424511 | Not computing TPR and F1 | Elapsed:   72.51  s
+WARNING:root: [*] Started epoch: 23
+WARNING:root: [*] Sun Jan  1 12:38:25 2023: Train Epoch: 23 [  0  /60900 (0 %)]	Loss: 276.774170 | Not computing TPR and F1 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 12:38:40 2023: Train Epoch: 23 [12800/60900 (21%)]	Loss: 247.295609 | Not computing TPR and F1 | Elapsed: 15.30s
+WARNING:root: [*] Sun Jan  1 12:38:55 2023: Train Epoch: 23 [25600/60900 (42%)]	Loss: 261.469055 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:39:11 2023: Train Epoch: 23 [38400/60900 (63%)]	Loss: 275.539307 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:39:26 2023: Train Epoch: 23 [51200/60900 (84%)]	Loss: 258.683716 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:39:37 2023:   23    | Tr.loss: 272.312978 | Not computing TPR and F1 | Elapsed:   72.57  s
+WARNING:root: [*] Started epoch: 24
+WARNING:root: [*] Sun Jan  1 12:39:37 2023: Train Epoch: 24 [  0  /60900 (0 %)]	Loss: 268.411926 | Not computing TPR and F1 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 12:39:53 2023: Train Epoch: 24 [12800/60900 (21%)]	Loss: 271.182068 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 12:40:08 2023: Train Epoch: 24 [25600/60900 (42%)]	Loss: 262.759705 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:40:23 2023: Train Epoch: 24 [38400/60900 (63%)]	Loss: 279.193787 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:40:38 2023: Train Epoch: 24 [51200/60900 (84%)]	Loss: 240.232239 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:40:50 2023:   24    | Tr.loss: 270.632338 | Not computing TPR and F1 | Elapsed:   72.53  s
+WARNING:root: [*] Started epoch: 25
+WARNING:root: [*] Sun Jan  1 12:40:50 2023: Train Epoch: 25 [  0  /60900 (0 %)]	Loss: 288.917664 | Not computing TPR and F1 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 12:41:05 2023: Train Epoch: 25 [12800/60900 (21%)]	Loss: 261.076294 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 12:41:21 2023: Train Epoch: 25 [25600/60900 (42%)]	Loss: 266.708130 | Not computing TPR and F1 | Elapsed: 15.30s
+WARNING:root: [*] Sun Jan  1 12:41:36 2023: Train Epoch: 25 [38400/60900 (63%)]	Loss: 262.543457 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:41:51 2023: Train Epoch: 25 [51200/60900 (84%)]	Loss: 251.136383 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 12:42:02 2023:   25    | Tr.loss: 270.874238 | Not computing TPR and F1 | Elapsed:   72.60  s
+WARNING:root: [*] Started epoch: 26
+WARNING:root: [*] Sun Jan  1 12:42:03 2023: Train Epoch: 26 [  0  /60900 (0 %)]	Loss: 264.435547 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 12:42:18 2023: Train Epoch: 26 [12800/60900 (21%)]	Loss: 269.735168 | Not computing TPR and F1 | Elapsed: 15.28s
+WARNING:root: [*] Sun Jan  1 12:42:33 2023: Train Epoch: 26 [25600/60900 (42%)]	Loss: 285.202148 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:42:48 2023: Train Epoch: 26 [38400/60900 (63%)]	Loss: 289.334961 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:43:04 2023: Train Epoch: 26 [51200/60900 (84%)]	Loss: 270.445801 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:43:15 2023:   26    | Tr.loss: 271.633944 | Not computing TPR and F1 | Elapsed:   72.57  s
+WARNING:root: [*] Started epoch: 27
+WARNING:root: [*] Sun Jan  1 12:43:15 2023: Train Epoch: 27 [  0  /60900 (0 %)]	Loss: 278.952393 | Not computing TPR and F1 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 12:43:30 2023: Train Epoch: 27 [12800/60900 (21%)]	Loss: 289.489685 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:43:46 2023: Train Epoch: 27 [25600/60900 (42%)]	Loss: 273.661316 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:44:01 2023: Train Epoch: 27 [38400/60900 (63%)]	Loss: 249.049866 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:44:16 2023: Train Epoch: 27 [51200/60900 (84%)]	Loss: 267.786499 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:44:27 2023:   27    | Tr.loss: 270.415293 | Not computing TPR and F1 | Elapsed:   72.49  s
+WARNING:root: [*] Started epoch: 28
+WARNING:root: [*] Sun Jan  1 12:44:28 2023: Train Epoch: 28 [  0  /60900 (0 %)]	Loss: 281.827576 | Not computing TPR and F1 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 12:44:43 2023: Train Epoch: 28 [12800/60900 (21%)]	Loss: 256.959503 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 12:44:58 2023: Train Epoch: 28 [25600/60900 (42%)]	Loss: 281.026672 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:45:13 2023: Train Epoch: 28 [38400/60900 (63%)]	Loss: 252.331909 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 12:45:29 2023: Train Epoch: 28 [51200/60900 (84%)]	Loss: 274.358337 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:45:40 2023:   28    | Tr.loss: 269.968587 | Not computing TPR and F1 | Elapsed:   72.52  s
+WARNING:root: [*] Started epoch: 29
+WARNING:root: [*] Sun Jan  1 12:45:40 2023: Train Epoch: 29 [  0  /60900 (0 %)]	Loss: 280.351746 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 12:45:55 2023: Train Epoch: 29 [12800/60900 (21%)]	Loss: 257.832336 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:46:11 2023: Train Epoch: 29 [25600/60900 (42%)]	Loss: 261.386139 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:46:26 2023: Train Epoch: 29 [38400/60900 (63%)]	Loss: 268.290344 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 12:46:41 2023: Train Epoch: 29 [51200/60900 (84%)]	Loss: 269.932892 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:46:52 2023:   29    | Tr.loss: 269.188031 | Not computing TPR and F1 | Elapsed:   72.57  s
+WARNING:root: [*] Started epoch: 30
+WARNING:root: [*] Sun Jan  1 12:46:53 2023: Train Epoch: 30 [  0  /60900 (0 %)]	Loss: 282.734436 | Not computing TPR and F1 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 12:47:08 2023: Train Epoch: 30 [12800/60900 (21%)]	Loss: 271.809601 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 12:47:23 2023: Train Epoch: 30 [25600/60900 (42%)]	Loss: 261.836456 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:47:38 2023: Train Epoch: 30 [38400/60900 (63%)]	Loss: 268.303833 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:47:54 2023: Train Epoch: 30 [51200/60900 (84%)]	Loss: 273.924072 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:48:05 2023:   30    | Tr.loss: 268.770038 | Not computing TPR and F1 | Elapsed:   72.51  s
+WARNING:root:[!] Sun Jan  1 12:48:05 2023: Dumped results:
+                model     : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\preTraining\trainingFiles_1672573685-model.torch
+                losses    : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\preTraining\trainingFiles_1672573685-train_losses.npy
+                duration  : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\preTraining\trainingFiles_1672573685-trainTime.npy
+WARNING:root: [!] Training pretrained model on downstream task...
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Sun Jan  1 12:48:06 2023: Train Epoch: 1 [  0  /15226 (0 %)]	Loss: 1.077763 | FPR 0.01 -- TPR 0.0169 | F1 0.0333 | Elapsed: 0.33s
+WARNING:root: [*] Sun Jan  1 12:48:21 2023: Train Epoch: 1 [12800/15226 (83%)]	Loss: 0.366028 | FPR 0.01 -- TPR 0.2609 | F1 0.4138 | Elapsed: 14.95s
+WARNING:root: [*] Sun Jan  1 12:48:23 2023:    1    | Tr.loss: 0.455787 | FPR 0.01 -- TPR: 0.25 |  F1: 0.39 | Elapsed:   17.85  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Sun Jan  1 12:48:23 2023: Train Epoch: 2 [  0  /15226 (0 %)]	Loss: 0.307955 | FPR 0.01 -- TPR 0.2833 | F1 0.4416 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 12:48:38 2023: Train Epoch: 2 [12800/15226 (83%)]	Loss: 0.137258 | FPR 0.01 -- TPR 0.8588 | F1 0.9241 | Elapsed: 14.96s
+WARNING:root: [*] Sun Jan  1 12:48:41 2023:    2    | Tr.loss: 0.237137 | FPR 0.01 -- TPR: 0.52 |  F1: 0.67 | Elapsed:   17.82  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Sun Jan  1 12:48:41 2023: Train Epoch: 3 [  0  /15226 (0 %)]	Loss: 0.140363 | FPR 0.01 -- TPR 0.7159 | F1 0.8344 | Elapsed: 0.30s
+WARNING:root: [*] Sun Jan  1 12:48:56 2023: Train Epoch: 3 [12800/15226 (83%)]	Loss: 0.073093 | FPR 0.01 -- TPR 0.9141 | F1 0.9551 | Elapsed: 14.83s
+WARNING:root: [*] Sun Jan  1 12:48:59 2023:    3    | Tr.loss: 0.119069 | FPR 0.01 -- TPR: 0.82 |  F1: 0.90 | Elapsed:   17.63  s
+WARNING:root:[!] Sun Jan  1 12:48:59 2023: Dumped results:
+                model     : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_pretrained\trainingFiles_1672573739-model.torch
+                losses    : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_pretrained\trainingFiles_1672573739-train_losses.npy
+                duration  : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_pretrained\trainingFiles_1672573739-trainTime.npy
+		train F1s : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_pretrained\trainingFiles_1672573739-trainF1s.npy
+		train TPRs: evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_pretrained\trainingFiles_1672573739-trainTPRs.npy
+WARNING:root: [!] Training non_pretrained model on downstream task...
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Sun Jan  1 12:48:59 2023: Train Epoch: 1 [  0  /15226 (0 %)]	Loss: 0.730313 | FPR 0.01 -- TPR 0.0058 | F1 0.0116 | Elapsed: 0.28s
+WARNING:root: [*] Sun Jan  1 12:49:13 2023: Train Epoch: 1 [12800/15226 (83%)]	Loss: 0.307043 | FPR 0.01 -- TPR 0.4611 | F1 0.6311 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 12:49:16 2023:    1    | Tr.loss: 0.448008 | FPR 0.01 -- TPR: 0.32 |  F1: 0.42 | Elapsed:   16.89  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Sun Jan  1 12:49:16 2023: Train Epoch: 2 [  0  /15226 (0 %)]	Loss: 0.161838 | FPR 0.01 -- TPR 0.8548 | F1 0.9217 | Elapsed: 0.28s
+WARNING:root: [*] Sun Jan  1 12:49:30 2023: Train Epoch: 2 [12800/15226 (83%)]	Loss: 0.109154 | FPR 0.01 -- TPR 0.9102 | F1 0.9530 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 12:49:33 2023:    2    | Tr.loss: 0.137043 | FPR 0.01 -- TPR: 0.85 |  F1: 0.92 | Elapsed:   16.89  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Sun Jan  1 12:49:33 2023: Train Epoch: 3 [  0  /15226 (0 %)]	Loss: 0.112438 | FPR 0.01 -- TPR 0.7151 | F1 0.8339 | Elapsed: 0.28s
+WARNING:root: [*] Sun Jan  1 12:49:47 2023: Train Epoch: 3 [12800/15226 (83%)]	Loss: 0.058083 | FPR 0.01 -- TPR 0.9880 | F1 0.9939 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 12:49:49 2023:    3    | Tr.loss: 0.090151 | FPR 0.01 -- TPR: 0.90 |  F1: 0.95 | Elapsed:   16.90  s
+WARNING:root:[!] Sun Jan  1 12:49:50 2023: Dumped results:
+                model     : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_non_pretrained\trainingFiles_1672573789-model.torch
+                losses    : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_non_pretrained\trainingFiles_1672573789-train_losses.npy
+                duration  : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_non_pretrained\trainingFiles_1672573789-trainTime.npy
+		train F1s : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_non_pretrained\trainingFiles_1672573789-trainF1s.npy
+		train TPRs: evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_non_pretrained\trainingFiles_1672573789-trainTPRs.npy
+WARNING:root: [!] Training full_data model on downstream task...
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Sun Jan  1 12:49:50 2023: Train Epoch: 1 [  0  /76126 (0 %)]	Loss: 0.689384 | FPR 0.01 -- TPR 0.0000 | F1 0.0000 | Elapsed: 0.29s
+WARNING:root: [*] Sun Jan  1 12:50:04 2023: Train Epoch: 1 [12800/76126 (17%)]	Loss: 0.164054 | FPR 0.01 -- TPR 0.8678 | F1 0.9292 | Elapsed: 14.23s
+WARNING:root: [*] Sun Jan  1 12:50:18 2023: Train Epoch: 1 [25600/76126 (34%)]	Loss: 0.135287 | FPR 0.01 -- TPR 0.9045 | F1 0.9499 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 12:50:33 2023: Train Epoch: 1 [38400/76126 (50%)]	Loss: 0.154414 | FPR 0.01 -- TPR 0.8111 | F1 0.8957 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 12:50:47 2023: Train Epoch: 1 [51200/76126 (67%)]	Loss: 0.040866 | FPR 0.01 -- TPR 0.9738 | F1 0.9867 | Elapsed: 14.21s
+WARNING:root: [*] Sun Jan  1 12:51:01 2023: Train Epoch: 1 [64000/76126 (84%)]	Loss: 0.124837 | FPR 0.01 -- TPR 0.9357 | F1 0.9668 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 12:51:14 2023:    1    | Tr.loss: 0.155037 | FPR 0.01 -- TPR: 0.79 |  F1: 0.85 | Elapsed:   84.48  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Sun Jan  1 12:51:15 2023: Train Epoch: 2 [  0  /76126 (0 %)]	Loss: 0.100738 | FPR 0.01 -- TPR 0.7895 | F1 0.8824 | Elapsed: 0.29s
+WARNING:root: [*] Sun Jan  1 12:51:29 2023: Train Epoch: 2 [12800/76126 (17%)]	Loss: 0.087276 | FPR 0.01 -- TPR 0.9318 | F1 0.9647 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 12:51:43 2023: Train Epoch: 2 [25600/76126 (34%)]	Loss: 0.040098 | FPR 0.01 -- TPR 0.9540 | F1 0.9765 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 12:51:57 2023: Train Epoch: 2 [38400/76126 (50%)]	Loss: 0.084921 | FPR 0.01 -- TPR 0.8944 | F1 0.9443 | Elapsed: 14.21s
+WARNING:root: [*] Sun Jan  1 12:52:11 2023: Train Epoch: 2 [51200/76126 (67%)]	Loss: 0.045162 | FPR 0.01 -- TPR 0.9835 | F1 0.9917 | Elapsed: 14.23s
+WARNING:root: [*] Sun Jan  1 12:52:26 2023: Train Epoch: 2 [64000/76126 (84%)]	Loss: 0.042864 | FPR 0.01 -- TPR 0.9827 | F1 0.9913 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 12:52:39 2023:    2    | Tr.loss: 0.058274 | FPR 0.01 -- TPR: 0.94 |  F1: 0.97 | Elapsed:   84.48  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Sun Jan  1 12:52:39 2023: Train Epoch: 3 [  0  /76126 (0 %)]	Loss: 0.077206 | FPR 0.01 -- TPR 0.9412 | F1 0.9697 | Elapsed: 0.29s
+WARNING:root: [*] Sun Jan  1 12:52:53 2023: Train Epoch: 3 [12800/76126 (17%)]	Loss: 0.031784 | FPR 0.01 -- TPR 0.9942 | F1 0.9971 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 12:53:07 2023: Train Epoch: 3 [25600/76126 (34%)]	Loss: 0.036227 | FPR 0.01 -- TPR 0.9940 | F1 0.9970 | Elapsed: 14.20s
+WARNING:root: [*] Sun Jan  1 12:53:22 2023: Train Epoch: 3 [38400/76126 (50%)]	Loss: 0.035330 | FPR 0.01 -- TPR 0.9831 | F1 0.9915 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 12:53:36 2023: Train Epoch: 3 [51200/76126 (67%)]	Loss: 0.056651 | FPR 0.01 -- TPR 0.9752 | F1 0.9874 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 12:53:50 2023: Train Epoch: 3 [64000/76126 (84%)]	Loss: 0.084893 | FPR 0.01 -- TPR 0.8314 | F1 0.9079 | Elapsed: 14.19s
+WARNING:root: [*] Sun Jan  1 12:54:03 2023:    3    | Tr.loss: 0.050690 | FPR 0.01 -- TPR: 0.95 |  F1: 0.97 | Elapsed:   84.44  s
+WARNING:root:[!] Sun Jan  1 12:54:03 2023: Dumped results:
+                model     : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_full_data\trainingFiles_1672574043-model.torch
+                losses    : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_full_data\trainingFiles_1672574043-train_losses.npy
+                duration  : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_full_data\trainingFiles_1672574043-trainTime.npy
+		train F1s : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_full_data\trainingFiles_1672574043-trainF1s.npy
+		train TPRs: evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882\downstreamTask_full_data\trainingFiles_1672574043-trainTPRs.npy
+WARNING:root: [*] Evaluating pretrained model on test set...
+WARNING:root: [!] Test F1 score for pretrained model at 0.01 FPR : 0.7711
+WARNING:root: [!] Test TPR score for pretrained model at 0.01 FPR: 0.6384
+WARNING:root: [*] Evaluating non_pretrained model on test set...
+WARNING:root: [!] Test F1 score for non_pretrained model at 0.01 FPR : 0.8519
+WARNING:root: [!] Test TPR score for non_pretrained model at 0.01 FPR: 0.7588
+WARNING:root: [*] Evaluating full_data model on test set...
+WARNING:root: [!] Test F1 score for full_data model at 0.01 FPR : 0.8820
+WARNING:root: [!] Test TPR score for full_data model at 0.01 FPR: 0.7955
+WARNING:root: [!] Finished pre-training evaluation over 2 splits! Saved metrics to:
+	evaluation\MaskedLanguageModeling\unlabeledDataSize_0.8_preTrain_30_downStream_3_nSplits_2_1672568882/metrics_MaskedLanguageModel_nSplits_2_limit_None.json
+WARNING:root: [!] Starting Masked Language Model evaluation over 2 splits!
+WARNING:root: [!] Loaded data and vocab. X train size: (76126, 2048), X test size: (17407, 2048), vocab size: 10000
+WARNING:root: [!] Initiating Self-Supervised Learning Pretraining
+     Language Modeling MaskedLanguageModel
+     Model Cnn1DLinearLM with config:
+	{'vocabSize': 10000, 'hiddenNeurons': [512, 256, 128]}
+
+WARNING:root: [!] Running pre-training split 1/2
+WARNING:root: [!] Pre-training model...
+WARNING:root: [*] Masking sequences...
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Sun Jan  1 12:55:11 2023: Train Epoch: 1 [  0  /64707 (0 %)]	Loss: 508.102661 | Not computing TPR and F1 | Elapsed: 1.04s
+WARNING:root: [*] Sun Jan  1 12:55:26 2023: Train Epoch: 1 [12800/64707 (20%)]	Loss: 371.781616 | Not computing TPR and F1 | Elapsed: 15.55s
+WARNING:root: [*] Sun Jan  1 12:55:42 2023: Train Epoch: 1 [25600/64707 (40%)]	Loss: 365.927490 | Not computing TPR and F1 | Elapsed: 15.59s
+WARNING:root: [*] Sun Jan  1 12:55:57 2023: Train Epoch: 1 [38400/64707 (59%)]	Loss: 340.738434 | Not computing TPR and F1 | Elapsed: 15.58s
+WARNING:root: [*] Sun Jan  1 12:56:13 2023: Train Epoch: 1 [51200/64707 (79%)]	Loss: 302.210907 | Not computing TPR and F1 | Elapsed: 15.43s
+WARNING:root: [*] Sun Jan  1 12:56:28 2023: Train Epoch: 1 [64000/64707 (99%)]	Loss: 329.316315 | Not computing TPR and F1 | Elapsed: 15.35s
+WARNING:root: [*] Sun Jan  1 12:56:29 2023:    1    | Tr.loss: 350.669628 | Not computing TPR and F1 | Elapsed:   79.13  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Sun Jan  1 12:56:29 2023: Train Epoch: 2 [  0  /64707 (0 %)]	Loss: 304.887634 | Not computing TPR and F1 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 12:56:44 2023: Train Epoch: 2 [12800/64707 (20%)]	Loss: 313.877686 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:57:00 2023: Train Epoch: 2 [25600/64707 (40%)]	Loss: 305.708008 | Not computing TPR and F1 | Elapsed: 15.32s
+WARNING:root: [*] Sun Jan  1 12:57:15 2023: Train Epoch: 2 [38400/64707 (59%)]	Loss: 310.588745 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:57:30 2023: Train Epoch: 2 [51200/64707 (79%)]	Loss: 311.966187 | Not computing TPR and F1 | Elapsed: 15.35s
+WARNING:root: [*] Sun Jan  1 12:57:45 2023: Train Epoch: 2 [64000/64707 (99%)]	Loss: 291.904083 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:57:46 2023:    2    | Tr.loss: 307.870402 | Not computing TPR and F1 | Elapsed:   77.23  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Sun Jan  1 12:57:46 2023: Train Epoch: 3 [  0  /64707 (0 %)]	Loss: 278.979919 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 12:58:02 2023: Train Epoch: 3 [12800/64707 (20%)]	Loss: 301.682495 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 12:58:17 2023: Train Epoch: 3 [25600/64707 (40%)]	Loss: 298.665405 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:58:32 2023: Train Epoch: 3 [38400/64707 (59%)]	Loss: 295.453857 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:58:47 2023: Train Epoch: 3 [51200/64707 (79%)]	Loss: 308.365753 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:59:03 2023: Train Epoch: 3 [64000/64707 (99%)]	Loss: 297.079407 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 12:59:03 2023:    3    | Tr.loss: 297.390506 | Not computing TPR and F1 | Elapsed:   77.02  s
+WARNING:root: [*] Started epoch: 4
+WARNING:root: [*] Sun Jan  1 12:59:03 2023: Train Epoch: 4 [  0  /64707 (0 %)]	Loss: 291.968475 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 12:59:19 2023: Train Epoch: 4 [12800/64707 (20%)]	Loss: 290.770874 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 12:59:34 2023: Train Epoch: 4 [25600/64707 (40%)]	Loss: 293.161621 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 12:59:49 2023: Train Epoch: 4 [38400/64707 (59%)]	Loss: 272.347290 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 13:00:04 2023: Train Epoch: 4 [51200/64707 (79%)]	Loss: 270.749542 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 13:00:20 2023: Train Epoch: 4 [64000/64707 (99%)]	Loss: 292.237976 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:00:20 2023:    4    | Tr.loss: 292.544622 | Not computing TPR and F1 | Elapsed:   77.02  s
+WARNING:root: [*] Started epoch: 5
+WARNING:root: [*] Sun Jan  1 13:00:20 2023: Train Epoch: 5 [  0  /64707 (0 %)]	Loss: 280.308167 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 13:00:36 2023: Train Epoch: 5 [12800/64707 (20%)]	Loss: 284.402740 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:00:51 2023: Train Epoch: 5 [25600/64707 (40%)]	Loss: 277.137085 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:01:06 2023: Train Epoch: 5 [38400/64707 (59%)]	Loss: 298.790802 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:01:21 2023: Train Epoch: 5 [51200/64707 (79%)]	Loss: 298.317139 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:01:37 2023: Train Epoch: 5 [64000/64707 (99%)]	Loss: 287.651459 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 13:01:37 2023:    5    | Tr.loss: 290.482615 | Not computing TPR and F1 | Elapsed:   77.06  s
+WARNING:root: [*] Started epoch: 6
+WARNING:root: [*] Sun Jan  1 13:01:37 2023: Train Epoch: 6 [  0  /64707 (0 %)]	Loss: 311.289490 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 13:01:53 2023: Train Epoch: 6 [12800/64707 (20%)]	Loss: 284.163544 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:02:08 2023: Train Epoch: 6 [25600/64707 (40%)]	Loss: 272.377380 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:02:23 2023: Train Epoch: 6 [38400/64707 (59%)]	Loss: 305.184570 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:02:38 2023: Train Epoch: 6 [51200/64707 (79%)]	Loss: 276.560852 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:02:54 2023: Train Epoch: 6 [64000/64707 (99%)]	Loss: 278.214355 | Not computing TPR and F1 | Elapsed: 15.31s
+WARNING:root: [*] Sun Jan  1 13:02:54 2023:    6    | Tr.loss: 288.084639 | Not computing TPR and F1 | Elapsed:   77.11  s
+WARNING:root: [*] Started epoch: 7
+WARNING:root: [*] Sun Jan  1 13:02:55 2023: Train Epoch: 7 [  0  /64707 (0 %)]	Loss: 302.283142 | Not computing TPR and F1 | Elapsed: 0.32s
+WARNING:root: [*] Sun Jan  1 13:03:10 2023: Train Epoch: 7 [12800/64707 (20%)]	Loss: 302.631775 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 13:03:25 2023: Train Epoch: 7 [25600/64707 (40%)]	Loss: 300.934540 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:03:40 2023: Train Epoch: 7 [38400/64707 (59%)]	Loss: 296.818939 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:03:56 2023: Train Epoch: 7 [51200/64707 (79%)]	Loss: 280.670227 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:04:11 2023: Train Epoch: 7 [64000/64707 (99%)]	Loss: 277.552216 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:04:11 2023:    7    | Tr.loss: 286.258405 | Not computing TPR and F1 | Elapsed:   77.08  s
+WARNING:root: [*] Started epoch: 8
+WARNING:root: [*] Sun Jan  1 13:04:12 2023: Train Epoch: 8 [  0  /64707 (0 %)]	Loss: 293.403748 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 13:04:27 2023: Train Epoch: 8 [12800/64707 (20%)]	Loss: 297.772400 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 13:04:42 2023: Train Epoch: 8 [25600/64707 (40%)]	Loss: 299.382202 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:04:57 2023: Train Epoch: 8 [38400/64707 (59%)]	Loss: 276.958740 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:05:13 2023: Train Epoch: 8 [51200/64707 (79%)]	Loss: 275.617371 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:05:28 2023: Train Epoch: 8 [64000/64707 (99%)]	Loss: 284.293976 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:05:28 2023:    8    | Tr.loss: 285.478353 | Not computing TPR and F1 | Elapsed:   77.02  s
+WARNING:root: [*] Started epoch: 9
+WARNING:root: [*] Sun Jan  1 13:05:29 2023: Train Epoch: 9 [  0  /64707 (0 %)]	Loss: 288.875549 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 13:05:44 2023: Train Epoch: 9 [12800/64707 (20%)]	Loss: 284.987885 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:05:59 2023: Train Epoch: 9 [25600/64707 (40%)]	Loss: 301.931610 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 13:06:14 2023: Train Epoch: 9 [38400/64707 (59%)]	Loss: 300.969055 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:06:30 2023: Train Epoch: 9 [51200/64707 (79%)]	Loss: 272.727356 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:06:45 2023: Train Epoch: 9 [64000/64707 (99%)]	Loss: 285.712036 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 13:06:45 2023:    9    | Tr.loss: 284.866614 | Not computing TPR and F1 | Elapsed:   77.03  s
+WARNING:root: [*] Started epoch: 10
+WARNING:root: [*] Sun Jan  1 13:06:46 2023: Train Epoch: 10 [  0  /64707 (0 %)]	Loss: 280.941223 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 13:07:01 2023: Train Epoch: 10 [12800/64707 (20%)]	Loss: 267.789246 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 13:07:16 2023: Train Epoch: 10 [25600/64707 (40%)]	Loss: 297.163513 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:07:31 2023: Train Epoch: 10 [38400/64707 (59%)]	Loss: 290.229034 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:07:47 2023: Train Epoch: 10 [51200/64707 (79%)]	Loss: 279.191956 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:08:02 2023: Train Epoch: 10 [64000/64707 (99%)]	Loss: 289.447876 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:08:02 2023:   10    | Tr.loss: 282.870030 | Not computing TPR and F1 | Elapsed:   77.02  s
+WARNING:root: [*] Started epoch: 11
+WARNING:root: [*] Sun Jan  1 13:08:03 2023: Train Epoch: 11 [  0  /64707 (0 %)]	Loss: 268.300873 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 13:08:18 2023: Train Epoch: 11 [12800/64707 (20%)]	Loss: 286.314606 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 13:08:33 2023: Train Epoch: 11 [25600/64707 (40%)]	Loss: 267.461700 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 13:08:48 2023: Train Epoch: 11 [38400/64707 (59%)]	Loss: 266.982819 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:09:04 2023: Train Epoch: 11 [51200/64707 (79%)]	Loss: 293.310394 | Not computing TPR and F1 | Elapsed: 15.27s
+WARNING:root: [*] Sun Jan  1 13:09:19 2023: Train Epoch: 11 [64000/64707 (99%)]	Loss: 307.972351 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:09:20 2023:   11    | Tr.loss: 281.959656 | Not computing TPR and F1 | Elapsed:   77.14  s
+WARNING:root: [*] Started epoch: 12
+WARNING:root: [*] Sun Jan  1 13:09:20 2023: Train Epoch: 12 [  0  /64707 (0 %)]	Loss: 250.837494 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 13:09:35 2023: Train Epoch: 12 [12800/64707 (20%)]	Loss: 295.950287 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:09:50 2023: Train Epoch: 12 [25600/64707 (40%)]	Loss: 281.300903 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 13:10:06 2023: Train Epoch: 12 [38400/64707 (59%)]	Loss: 275.470398 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:10:21 2023: Train Epoch: 12 [51200/64707 (79%)]	Loss: 275.295654 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:10:36 2023: Train Epoch: 12 [64000/64707 (99%)]	Loss: 273.605835 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:10:37 2023:   12    | Tr.loss: 280.422027 | Not computing TPR and F1 | Elapsed:   77.08  s
+WARNING:root: [*] Started epoch: 13
+WARNING:root: [*] Sun Jan  1 13:10:37 2023: Train Epoch: 13 [  0  /64707 (0 %)]	Loss: 282.291351 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 13:10:52 2023: Train Epoch: 13 [12800/64707 (20%)]	Loss: 275.910156 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:11:07 2023: Train Epoch: 13 [25600/64707 (40%)]	Loss: 272.305664 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:11:23 2023: Train Epoch: 13 [38400/64707 (59%)]	Loss: 257.054047 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:11:38 2023: Train Epoch: 13 [51200/64707 (79%)]	Loss: 286.769836 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:11:53 2023: Train Epoch: 13 [64000/64707 (99%)]	Loss: 269.483887 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:11:54 2023:   13    | Tr.loss: 279.033824 | Not computing TPR and F1 | Elapsed:   77.05  s
+WARNING:root: [*] Started epoch: 14
+WARNING:root: [*] Sun Jan  1 13:11:54 2023: Train Epoch: 14 [  0  /64707 (0 %)]	Loss: 276.573914 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 13:12:09 2023: Train Epoch: 14 [12800/64707 (20%)]	Loss: 264.121216 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 13:12:24 2023: Train Epoch: 14 [25600/64707 (40%)]	Loss: 274.932159 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:12:40 2023: Train Epoch: 14 [38400/64707 (59%)]	Loss: 261.149292 | Not computing TPR and F1 | Elapsed: 15.31s
+WARNING:root: [*] Sun Jan  1 13:12:55 2023: Train Epoch: 14 [51200/64707 (79%)]	Loss: 266.947754 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 13:13:10 2023: Train Epoch: 14 [64000/64707 (99%)]	Loss: 277.356262 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 13:13:11 2023:   14    | Tr.loss: 279.368152 | Not computing TPR and F1 | Elapsed:   77.11  s
+WARNING:root: [*] Started epoch: 15
+WARNING:root: [*] Sun Jan  1 13:13:11 2023: Train Epoch: 15 [  0  /64707 (0 %)]	Loss: 286.589752 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 13:13:26 2023: Train Epoch: 15 [12800/64707 (20%)]	Loss: 282.485474 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 13:13:42 2023: Train Epoch: 15 [25600/64707 (40%)]	Loss: 278.693665 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 13:13:57 2023: Train Epoch: 15 [38400/64707 (59%)]	Loss: 279.363831 | Not computing TPR and F1 | Elapsed: 15.28s
+WARNING:root: [*] Sun Jan  1 13:14:12 2023: Train Epoch: 15 [51200/64707 (79%)]	Loss: 276.768066 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 13:14:27 2023: Train Epoch: 15 [64000/64707 (99%)]	Loss: 282.440582 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 13:14:28 2023:   15    | Tr.loss: 278.143632 | Not computing TPR and F1 | Elapsed:   77.04  s
+WARNING:root: [*] Started epoch: 16
+WARNING:root: [*] Sun Jan  1 13:14:28 2023: Train Epoch: 16 [  0  /64707 (0 %)]	Loss: 276.811523 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 13:14:43 2023: Train Epoch: 16 [12800/64707 (20%)]	Loss: 275.423279 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:14:59 2023: Train Epoch: 16 [25600/64707 (40%)]	Loss: 301.586884 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:15:14 2023: Train Epoch: 16 [38400/64707 (59%)]	Loss: 265.844360 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:15:29 2023: Train Epoch: 16 [51200/64707 (79%)]	Loss: 272.671570 | Not computing TPR and F1 | Elapsed: 15.23s
+WARNING:root: [*] Sun Jan  1 13:15:44 2023: Train Epoch: 16 [64000/64707 (99%)]	Loss: 269.889404 | Not computing TPR and F1 | Elapsed: 15.22s
+WARNING:root: [*] Sun Jan  1 13:15:45 2023:   16    | Tr.loss: 276.892430 | Not computing TPR and F1 | Elapsed:   77.02  s
+WARNING:root: [*] Started epoch: 17
+WARNING:root: [*] Sun Jan  1 13:15:45 2023: Train Epoch: 17 [  0  /64707 (0 %)]	Loss: 278.744629 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 13:16:00 2023: Train Epoch: 17 [12800/64707 (20%)]	Loss: 258.267700 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 13:16:16 2023: Train Epoch: 17 [25600/64707 (40%)]	Loss: 277.116394 | Not computing TPR and F1 | Elapsed: 15.24s
+WARNING:root: [*] Sun Jan  1 13:16:31 2023: Train Epoch: 17 [38400/64707 (59%)]	Loss: 287.206268 | Not computing TPR and F1 | Elapsed: 15.60s
+WARNING:root: [*] Sun Jan  1 13:16:47 2023: Train Epoch: 17 [51200/64707 (79%)]	Loss: 272.122284 | Not computing TPR and F1 | Elapsed: 15.72s
+WARNING:root: [*] Sun Jan  1 13:17:02 2023: Train Epoch: 17 [64000/64707 (99%)]	Loss: 300.100830 | Not computing TPR and F1 | Elapsed: 15.43s
+WARNING:root: [*] Sun Jan  1 13:17:03 2023:   17    | Tr.loss: 275.899367 | Not computing TPR and F1 | Elapsed:   78.17  s
+WARNING:root: [*] Started epoch: 18
+WARNING:root: [*] Sun Jan  1 13:17:03 2023: Train Epoch: 18 [  0  /64707 (0 %)]	Loss: 258.250183 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 13:17:19 2023: Train Epoch: 18 [12800/64707 (20%)]	Loss: 266.693726 | Not computing TPR and F1 | Elapsed: 15.39s
+WARNING:root: [*] Sun Jan  1 13:17:34 2023: Train Epoch: 18 [25600/64707 (40%)]	Loss: 299.399567 | Not computing TPR and F1 | Elapsed: 15.58s
+WARNING:root: [*] Sun Jan  1 13:17:50 2023: Train Epoch: 18 [38400/64707 (59%)]	Loss: 281.475098 | Not computing TPR and F1 | Elapsed: 15.62s
+WARNING:root: [*] Sun Jan  1 13:18:05 2023: Train Epoch: 18 [51200/64707 (79%)]	Loss: 306.129333 | Not computing TPR and F1 | Elapsed: 15.38s
+WARNING:root: [*] Sun Jan  1 13:18:21 2023: Train Epoch: 18 [64000/64707 (99%)]	Loss: 261.295166 | Not computing TPR and F1 | Elapsed: 15.76s
+WARNING:root: [*] Sun Jan  1 13:18:22 2023:   18    | Tr.loss: 275.165079 | Not computing TPR and F1 | Elapsed:   78.68  s
+WARNING:root: [*] Started epoch: 19
+WARNING:root: [*] Sun Jan  1 13:18:22 2023: Train Epoch: 19 [  0  /64707 (0 %)]	Loss: 276.046326 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 13:18:37 2023: Train Epoch: 19 [12800/64707 (20%)]	Loss: 242.093781 | Not computing TPR and F1 | Elapsed: 15.38s
+WARNING:root: [*] Sun Jan  1 13:18:53 2023: Train Epoch: 19 [25600/64707 (40%)]	Loss: 275.637024 | Not computing TPR and F1 | Elapsed: 15.47s
+WARNING:root: [*] Sun Jan  1 13:19:08 2023: Train Epoch: 19 [38400/64707 (59%)]	Loss: 273.189270 | Not computing TPR and F1 | Elapsed: 15.32s
+WARNING:root: [*] Sun Jan  1 13:19:24 2023: Train Epoch: 19 [51200/64707 (79%)]	Loss: 267.147430 | Not computing TPR and F1 | Elapsed: 15.51s
+WARNING:root: [*] Sun Jan  1 13:19:40 2023: Train Epoch: 19 [64000/64707 (99%)]	Loss: 277.794098 | Not computing TPR and F1 | Elapsed: 15.81s
+WARNING:root: [*] Sun Jan  1 13:19:40 2023:   19    | Tr.loss: 275.235418 | Not computing TPR and F1 | Elapsed:   78.43  s
+WARNING:root: [*] Started epoch: 20
+WARNING:root: [*] Sun Jan  1 13:19:40 2023: Train Epoch: 20 [  0  /64707 (0 %)]	Loss: 276.981079 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 13:19:56 2023: Train Epoch: 20 [12800/64707 (20%)]	Loss: 263.897949 | Not computing TPR and F1 | Elapsed: 15.48s
+WARNING:root: [*] Sun Jan  1 13:20:11 2023: Train Epoch: 20 [25600/64707 (40%)]	Loss: 290.067963 | Not computing TPR and F1 | Elapsed: 15.40s
+WARNING:root: [*] Sun Jan  1 13:20:27 2023: Train Epoch: 20 [38400/64707 (59%)]	Loss: 270.765686 | Not computing TPR and F1 | Elapsed: 15.53s
+WARNING:root: [*] Sun Jan  1 13:20:42 2023: Train Epoch: 20 [51200/64707 (79%)]	Loss: 280.714111 | Not computing TPR and F1 | Elapsed: 15.31s
+WARNING:root: [*] Sun Jan  1 13:20:57 2023: Train Epoch: 20 [64000/64707 (99%)]	Loss: 282.728760 | Not computing TPR and F1 | Elapsed: 15.30s
+WARNING:root: [*] Sun Jan  1 13:20:58 2023:   20    | Tr.loss: 275.868881 | Not computing TPR and F1 | Elapsed:   77.97  s
+WARNING:root: [*] Started epoch: 21
+WARNING:root: [*] Sun Jan  1 13:20:58 2023: Train Epoch: 21 [  0  /64707 (0 %)]	Loss: 265.987610 | Not computing TPR and F1 | Elapsed: 0.31s
+WARNING:root: [*] Sun Jan  1 13:21:14 2023: Train Epoch: 21 [12800/64707 (20%)]	Loss: 276.218628 | Not computing TPR and F1 | Elapsed: 15.51s
+WARNING:root: [*] Sun Jan  1 13:21:29 2023: Train Epoch: 21 [25600/64707 (40%)]	Loss: 281.824951 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 13:21:45 2023: Train Epoch: 21 [38400/64707 (59%)]	Loss: 277.411835 | Not computing TPR and F1 | Elapsed: 15.35s
+WARNING:root: [*] Sun Jan  1 13:22:00 2023: Train Epoch: 21 [51200/64707 (79%)]	Loss: 269.656403 | Not computing TPR and F1 | Elapsed: 15.64s
+WARNING:root: [*] Sun Jan  1 13:22:15 2023: Train Epoch: 21 [64000/64707 (99%)]	Loss: 266.594391 | Not computing TPR and F1 | Elapsed: 15.26s
+WARNING:root: [*] Sun Jan  1 13:22:16 2023:   21    | Tr.loss: 275.571587 | Not computing TPR and F1 | Elapsed:   77.94  s
+WARNING:root: [*] Started epoch: 22
+WARNING:root: [*] Sun Jan  1 13:22:16 2023: Train Epoch: 22 [  0  /64707 (0 %)]	Loss: 285.226013 | Not computing TPR and F1 | Elapsed: 0.34s
+WARNING:root: [*] Sun Jan  1 13:22:32 2023: Train Epoch: 22 [12800/64707 (20%)]	Loss: 262.401428 | Not computing TPR and F1 | Elapsed: 15.49s
+WARNING:root: [*] Sun Jan  1 13:22:48 2023: Train Epoch: 22 [25600/64707 (40%)]	Loss: 267.724823 | Not computing TPR and F1 | Elapsed: 15.78s
+WARNING:root: [*] Sun Jan  1 13:23:04 2023: Train Epoch: 22 [38400/64707 (59%)]	Loss: 300.170563 | Not computing TPR and F1 | Elapsed: 15.89s
+WARNING:root:[!] Sun Jan  1 13:23:18 2023: Dumped results:
+                model     : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.85_preTrain_30_downStream_3_nSplits_2_1672574092\preTraining\trainingFiles_1672575798-model.torch
+                losses    : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.85_preTrain_30_downStream_3_nSplits_2_1672574092\preTraining\trainingFiles_1672575798-train_losses.npy
+                duration  : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.85_preTrain_30_downStream_3_nSplits_2_1672574092\preTraining\trainingFiles_1672575798-trainTime.npy
+		train F1s : evaluation\MaskedLanguageModeling\unlabeledDataSize_0.85_preTrain_30_downStream_3_nSplits_2_1672574092\preTraining\trainingFiles_1672575798-trainF1s.npy
+		train TPRs: evaluation\MaskedLanguageModeling\unlabeledDataSize_0.85_preTrain_30_downStream_3_nSplits_2_1672574092\preTraining\trainingFiles_1672575798-trainTPRs.npy

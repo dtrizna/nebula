@@ -15,14 +15,17 @@ from nebula.pretraining import SelfSupervisedPretraining, MaskedLanguageModel
 
 train_limit = None # 13000
 random_state = 42
+rest = 30 # seconds to cool down between splits
 logFile = f"PreTrainingEvaluation_randomState_{random_state}_limit_{train_limit}.log"
 
-nSplits = 3
-downStreamEpochs = 3
-preTrainEpochs = 7
-unlabeledDataSize = 0.8
+#for unlabeledDataSize in [0.75, 0.8, 0.85, 0.9, 0.95]:
+unlabeledDataSize = 0.95
+nSplits = 5
+downStreamEpochs = 2
+preTrainEpochs = 5
+#unlabeledDataSize = 0.8
 falsePositiveRates = [0.003, 0.01, 0.03, 0.1]
-outputFolder = rf"evaluation\MaskedLanguageModeling\deeperCnn_unlabeledDataSize_{unlabeledDataSize}_preTrain_{preTrainEpochs}_downStream_{downStreamEpochs}_nSplits_{nSplits}_{int(time.time())}"
+outputFolder = rf"evaluation\MaskedLanguageModeling\unlabeledDataSize_{unlabeledDataSize}_preTrain_{preTrainEpochs}_downStream_{downStreamEpochs}_nSplits_{nSplits}_{int(time.time())}"
 
 # ===== LOGGING SETUP =====
 
@@ -59,9 +62,7 @@ logging.warning(f" [!] Loaded data and vocab. X train size: {xTrain.shape}, X te
 
 modelConfig = {
     "vocabSize": len(vocab),
-    "filterSizes": [2, 3, 4, 5],
-    "numFilters": [192, 192, 192, 192],
-    "hiddenNeurons": [768, 512, 256, 128]
+    "hiddenNeurons": [512, 256, 128]
 }
 modelClass = Cnn1DLinearLM # only difference is that .pretrain() is implemented
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -90,8 +91,13 @@ pretrainingConfig = {
 
 # =========== PRETRAINING RUN ===========
 
+msg = f" [!] Initiating Self-Supervised Learning Pretraining\n"
+msg += f"     Language Modeling {languageModelClass.__name__}\n"
+msg += f"     Model {modelClass.__name__} with config:\n\t{modelConfig}\n"
+logging.warning(msg)
+
 pretrain = SelfSupervisedPretraining(**pretrainingConfig)
-metrics = pretrain.runSplits(xTrain, yTrain, xTest, yTest, outputFolder=outputFolder, nSplits=nSplits)
+metrics = pretrain.runSplits(xTrain, yTrain, xTest, yTest, outputFolder=outputFolder, nSplits=nSplits, rest=rest)
 metricsOutFile = f"{outputFolder}/metrics_{languageModelClass.__name__}_nSplits_{nSplits}_limit_{train_limit}.json"
 with open(metricsOutFile, 'w') as f:
     json.dump(metrics, f, indent=4)
