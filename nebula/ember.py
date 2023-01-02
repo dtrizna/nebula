@@ -167,15 +167,18 @@ class SectionInfo(FeatureType):
                     if lief.PE.SECTION_CHARACTERISTICS.MEM_EXECUTE in s.characteristics_lists:
                         entry_section = s.name
                         break
-
         raw_obj = {"entry": entry_section}
-        raw_obj["sections"] = [{
-            'name': s.name,
-            'size': s.size,
-            'entropy': s.entropy,
-            'vsize': s.virtual_size,
-            'props': self._properties(s)
-        } for s in lief_binary.sections]
+        raw_obj["sections"] = []
+        for i in range(len(lief_binary.sections)):
+            section = lief_binary.sections[i]
+            sectionDict = {
+                'name': section.name,
+                'size': section.size,
+                'entropy': section.entropy,
+                'vsize': section.virtual_size,
+                'props': self._properties(section)
+            }
+            raw_obj["sections"].append(sectionDict)
         return raw_obj
 
     def process_raw_features(self, raw_obj):
@@ -225,18 +228,20 @@ class ImportsInfo(FeatureType):
         if lief_binary is None:
             return imports
 
-        for lib in lief_binary.imports:
+        for i in range((len(lief_binary.imports))):
+            lib = lief_binary.imports[i]
             if lib.name not in imports:
                 imports[lib.name] = []  # libraries can be duplicated in listing, extend instead of overwrite
 
             # Clipping assumes there are diminishing returns on the discriminatory power of imported functions
             #  beyond the first 10000 characters, and this will help limit the dataset size
-            for entry in lib.entries:
+            for i in range(len(lib.entries)):
+                entry = lib.entries[i]
                 if entry.is_ordinal:
                     imports[lib.name].append("ordinal" + str(entry.ordinal))
                 else:
                     imports[lib.name].append(entry.name[:10000])
-
+            
         return imports
 
     def process_raw_features(self, raw_obj):
@@ -485,7 +490,8 @@ class DataDirectories(FeatureType):
         if lief_binary is None:
             return output
 
-        for data_directory in lief_binary.data_directories:
+        for i in range(len(lief_binary.data_directories)):
+            data_directory = lief_binary.data_directories[i]
             output.append({
                 "name": str(data_directory.type).replace("DATA_DIRECTORY.", ""),
                 "size": data_directory.size,
@@ -554,7 +560,9 @@ class PEFeatureExtractor(object):
             raise
 
         features = {"sha256": hashlib.sha256(bytez).hexdigest()}
-        features.update({fe.name: fe.raw_features(bytez, lief_binary) for fe in self.features})
+        for fe in self.features:
+            fDict = {fe.name: fe.raw_features(bytez, lief_binary)}
+            features.update(fDict)
         return features
 
     def process_raw_features(self, raw_obj):
