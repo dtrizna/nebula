@@ -1,0 +1,4 @@
+global-exclude *.pyc
+
+include nebula/configs/*.json
+include nebula/objects/*.json
