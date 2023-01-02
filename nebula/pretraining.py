@@ -6,6 +6,7 @@ from nebula import ModelInterface
 import os
 import logging
 import numpy as np
+from time import sleep
 from tqdm import tqdm
 from torch.optim import Adam
 from torch.nn import BCEWithLogitsLoss, CrossEntropyLoss
@@ -18,6 +19,7 @@ class MaskedLanguageModel(object):
                     random_state=None,
                     token_id_type="onehot"):
         super(MaskedLanguageModel, self).__init__()
+        self.__name__ = "MaskedLanguageModel"
         
         self.mask_probability = mask_probability
         self.vocab = vocab
@@ -27,7 +29,6 @@ class MaskedLanguageModel(object):
             raise ValueError("token_id_type must be either 'onehot' or 'count'")
         self.token_id_type = token_id_type
 
-        self.__name__ = "MaskedLanguageModel"
     
     def maskSequence(self, sequence):
         """
@@ -188,7 +189,7 @@ class SelfSupervisedPretraining:
         del models, modelInterfaces # cleanup to not accidentaly reuse 
         return metrics
 
-    def runSplits(self, x, y, x_test, y_test, outputFolder=None, nSplits=5):
+    def runSplits(self, x, y, x_test, y_test, outputFolder=None, nSplits=5, rest=None):
         metrics = {k: {"fpr_"+str(fpr): {"f1": [], "tpr": []} for fpr in self.falsePositiveRates} for k in self.trainingTypes}
         # collect metrics for number of iterations
         for i in range(nSplits):
@@ -199,6 +200,8 @@ class SelfSupervisedPretraining:
                 for fpr in self.falsePositiveRates:
                     metrics[trainingType]["fpr_"+str(fpr)]["f1"].append(splitMetrics[trainingType]["fpr_"+str(fpr)]["f1"])
                     metrics[trainingType]["fpr_"+str(fpr)]["tpr"].append(splitMetrics[trainingType]["fpr_"+str(fpr)]["tpr"])
+            if rest:
+                sleep(rest)
 
         # compute mean and std for each metric
         for trainingType in self.trainingTypes:

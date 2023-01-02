@@ -14,13 +14,13 @@ from nebula.evaluation import CrossValidation
 # ============== SCRIPT CONFIG
 train_limit = None
 runName = f"Cnn1DLinear_VocabSize_maxLen"
-runType = "WithDns"
+runType = "WithError"
 
 # ============== Cross-Valiation CONFIG
 nFolds = 3
 epochs = 3
 fprValues = [0.0001, 0.001, 0.01, 0.1]
-rest = 0 #30 # seconds to rest between folds (to cool down)
+rest = 30 # seconds to rest between folds (to cool down)
 metricFilePrefix = "" # is set later, within the loop
 random_state = 42
 
@@ -94,20 +94,21 @@ y_train_orig = np.load(os.path.join(trainSetPath, "speakeasy_y.npy"))
 existingRuns = [x for x in os.listdir(outputFolder) if x.endswith(".json")]
 
 for i, file in enumerate(trainSetsFiles):
-    logging.warning(f" [!] Starting valiation of file {i}/{len(trainSetsFiles)}")
     x_train = np.load(os.path.join(trainSetPath, file))
 
     vocabSize = int(file.split("_")[2])
     modelArch["vocabSize"] = vocabSize
     maxLen = int(file.split("_")[4])
     metricFilePrefix = f"maxLen_{maxLen}_"
+    existingRunPrefix = f"maxLen_{maxLen}_vocabSize_{vocabSize}_"
+    logging.warning(f" [!] Starting valiation of file {i}/{len(trainSetsFiles)}: {file}")
     
-    # TEMP: skip all if not maxLen 1024 and vocabSize 2000
-    if maxLen != 1024 or vocabSize != 2000:
+    # what to skip
+    if maxLen not in [2048] or vocabSize not in [10000, 15000]:
+        logging.warning(f" [!] Skipping {existingRunPrefix} as it is not in the list of parameters to test")
         continue
 
     # skip if already exists
-    existingRunPrefix = f"maxLen_{maxLen}_vocabSize_{vocabSize}_"
     if any([x for x in existingRuns if existingRunPrefix in x]):
         logging.warning(f" [!] Skipping {existingRunPrefix} as it already exists")
         continue
