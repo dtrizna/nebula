@@ -19,10 +19,7 @@ Quasi-functional implementation:
 ```python
 from nebula import PEHybridClassifier
 
-model = PEHybridClassifier(
-    vocabFile=vocabFile,
-    speakeasyConfig=speakeasyConfigFile
-)
+model = PEHybridClassifier()
 pe = r"C:\windows\syswow64\xcopy.exe"
 staticFeatures, dynamicFeatures = model.preprocess(pe)
 logits = model(staticFeatures, dynamicFeatures)
@@ -30,13 +27,13 @@ logits = model(staticFeatures, dynamicFeatures)
 
 ## PE classifier configuration evaluations
 
-<center><img src="evaluation\_crossValidationPlots\_modelArchitectureComparison.png" width=800>
+<center><img src="evaluation\_crossValidationPlots\_modelArchitectureComparison.png" width=700>
 
-<img src="evaluation\_crossValidationPlots\_vocabularySizeComparison.png" width=800>
+<img src="evaluation\_crossValidationPlots\_vocabularySizeComparison.png" width=700>
 
-<img src="evaluation\_crossValidationPlots\_fullVocabSizeMaxLenHeatmap_fpr_0_001.png" width=800>
+<img src="evaluation\_crossValidationPlots\_fullVocabSizeMaxLenHeatmap_fpr_0_001.png" width=700>
 
-<img src="evaluation\_crossValidationPlots\_PreProcessingComparison.png" width=800></center>
+<img src="evaluation\_crossValidationPlots\_PreProcessingComparison.png" width=700></center>
 
 ## Pre-training with self-supervised techniques
 
@@ -50,11 +47,11 @@ Evaluation done using `nebula.pretraining.SelfSupervisedPretraining` class that 
 
 Results with even brief pre-training (5 epochs on single GPU laptop) are unclear. On trainig set (i.e. $\mathbb{L}$) metrics are improved:
 
-<center><img src="evaluation\_maskedLanguageModelPlots\unlabeledDataSize_0.9_preTrain_5_downStream_2_nSplits_5_1672239000_trainSetStats.png" width=800></center>
+<center><img src="evaluation\_maskedLanguageModelPlots\unlabeledDataSize_0.9_preTrain_5_downStream_2_nSplits_5_1672239000_trainSetStats.png" width=700></center>
 
 Yet no significant benefit on test set (i.e. $\mathbb{F}$) are observed:
 
-<center><img src="evaluation\_maskedLanguageModelPlots\unlabeledDataSize_0.8_preTrain_10_downStream_3_nSplits_5_1672232495_testSetStats.png" width=800></center>
+<center><img src="evaluation\_maskedLanguageModelPlots\unlabeledDataSize_0.8_preTrain_10_downStream_3_nSplits_5_1672232495_testSetStats.png" width=700></center>
 
 Pre-training was brief, done on a single laptop, with futher tests required.
 
