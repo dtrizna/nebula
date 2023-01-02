@@ -3,6 +3,7 @@ from nebula.models import Cnn1DLinearLM, MLP
 
 import os
 import time
+import json
 import logging
 import numpy as np
 from pandas import DataFrame
@@ -229,7 +230,7 @@ class ModelInterface(object):
 
 class PEHybridClassifier(nn.Module):
     def __init__(self,
-                    speakeasyConfig,
+                    speakeasyConfig=None,
                     vocabFile=None,
                     outputFolder=None,
                     malwareHeadLayers = [128, 64],
@@ -238,9 +239,13 @@ class PEHybridClassifier(nn.Module):
         ):
         super(PEHybridClassifier, self).__init__()
         
-        # TODO: add configuration for each of those classes through init of this class?
-        # or perform feature extraction through a separate class?
+        if speakeasyConfig is None:
+            speakeasyConfig = json.load("configs/speakeasyConfig.json")
+        if vocabFile is None:
+            vocabFile = json.load("objects/speakeasyReportVocab.json")
+
         self.staticExtractor = PEStaticFeatureExtractor()
+        # TODO: add configuration for dynamic extractor during init
         self.dynamicExtractor = PEDynamicFeatureExtractor(
             speakeasyConfig=speakeasyConfig,
             emulationOutputFolder=outputFolder,
@@ -253,7 +258,7 @@ class PEHybridClassifier(nn.Module):
             msg += " Please use the 'build_vocabulary()' method of this class to train the tokenizer."
             logging.warning(msg)
         
-        # models
+        # TODO: add ability to provide config for models
         self.staticModel = MLP(
             layer_sizes=[1024, 512, representationSize],
             dropout=dropout,
@@ -278,7 +283,7 @@ class PEHybridClassifier(nn.Module):
         layers.append(nn.Linear(malwareHeadLayers[-1], 1))
         self.malware_head = nn.Sequential(*layers)
 
-        if not os.path.exists(outputFolder):
+        if outputFolder and not os.path.exists(outputFolder):
             os.makedirs(outputFolder, exist_ok=True)
         self.outputFolder = outputFolder
 
@@ -303,6 +308,7 @@ class PEHybridClassifier(nn.Module):
         return self.malware_head(features)
 
     def build_vocabulary(self, folderBenign, folderMalicious, vocabSize=10000):
+        # TODO: training the tokenizer from a set of raw PE files
         raise NotImplementedError("build_vocabulary(): Not implemented yet")
 
     def train(
@@ -312,4 +318,5 @@ class PEHybridClassifier(nn.Module):
         epochs=10
     ):
         # TODO: train classifier using raw PE files in benign an malicious folders
+        # Consider how to train static and dynamic models separately to get individual scores
         raise NotImplementedError("train(): Not implemented yet")

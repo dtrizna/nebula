@@ -13,10 +13,12 @@ Quasi-functional implementation:
     - sequence of API calls, their arguments and return values;
     - File system modifications;
     - Registry modifications;
-    - Networ connections.
+    - Network connections.
   - (2) Fully connected neural network (FFNN) for analysis of static features as discussed in EMBER paper (Anderson and Roth, <https://arxiv.org/abs/1804.04637>).
 
 ```python
+from nebula import PEHybridClassifier
+
 model = PEHybridClassifier(
     vocabFile=vocabFile,
     speakeasyConfig=speakeasyConfigFile
@@ -62,7 +64,9 @@ Pre-training was brief, done on a single laptop, with futher tests required.
 
 1. Build malware classifier class with convenient API
    - ~~Add ember feature extraction to sequential emulation model.~~
-   - Provide it as `pip` package.
+   - ~~Provide it as `pip` package.~~ Can be done as: `python -m pip install git+https://github.com/dtrizna/nebula`
+     - Add vocab and speakeasy config files to package.
+     - Add pre-trained models to package.
    - Download raw PE data, build dataset, and train classifier.
 2. Try efficient long-sequence attention models:
    - Reformer
@@ -147,14 +151,6 @@ Pre-training was brief, done on a single laptop, with futher tests required.
 
   - consider in-memory data processing
     > NOTE: Need to rerun SpeakEasy on raw PEs to get this data!
-- Pre-training routines on unlabeled data according to CEF-SSL framework:
-  - naive methods like expectation minimization
-  - pretraining embeddings:
-    - fastText
-    - language modelling with `nn.Embedding()`
-  - language modeling:
-    - MLM
-    - GPT like $p(x_{t+1}|x_{t}\ ...\ x_{0})$
 
 ### `auditd` dataset and dowstream tasks
 
