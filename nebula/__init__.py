@@ -1,3 +1,4 @@
+import nebula
 from nebula.preprocessing import JSONTokenizer, PEDynamicFeatureExtractor, PEStaticFeatureExtractor
 from nebula.models import Cnn1DLinearLM, MLP
 
@@ -231,7 +232,7 @@ class ModelInterface(object):
 class PEHybridClassifier(nn.Module):
     def __init__(self,
                     speakeasyConfig=None,
-                    vocabFile=None,
+                    vocab=None,
                     outputFolder=None,
                     malwareHeadLayers = [128, 64],
                     representationSize = 256,
@@ -240,9 +241,13 @@ class PEHybridClassifier(nn.Module):
         super(PEHybridClassifier, self).__init__()
         
         if speakeasyConfig is None:
-            speakeasyConfig = json.load("configs/speakeasyConfig.json")
-        if vocabFile is None:
-            vocabFile = json.load("objects/speakeasyReportVocab.json")
+            speakeasyConfigFile = os.path.join(os.path.dirname(nebula.__file__), "configs", "speakeasyConfig.json")
+            with open(speakeasyConfigFile, "r") as f:
+                speakeasyConfig = json.load(f)
+        if vocab is None:
+            vocabFile = os.path.join(os.path.dirname(nebula.__file__), "objects", "speakeasyReportVocab.json")
+            with open(vocabFile, "r") as f:
+                vocab = json.load(f)
 
         self.staticExtractor = PEStaticFeatureExtractor()
         # TODO: add configuration for dynamic extractor during init
@@ -252,7 +257,7 @@ class PEHybridClassifier(nn.Module):
         )
         self.tokenizer = JSONTokenizer()
         if vocabFile:
-            self.tokenizer.load_from_pretrained(vocabFile)
+            self.tokenizer.load_from_pretrained(vocab)
         else:
             msg = "[!] No 'vocabFile' was provided, the tokenizer has to be pre-trained on your data."
             msg += " Please use the 'build_vocabulary()' method of this class to train the tokenizer."
