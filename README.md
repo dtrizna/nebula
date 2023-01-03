@@ -33,13 +33,13 @@ pip install git+https://github.com/dtrizna/nebula
 
 ## PE classifier configuration evaluations
 
-<center><img src="evaluation\_crossValidationPlots\_modelArchitectureComparison.png" width=700>
+<center><img src="evaluation\_crossValidationPlots\_modelArchitectureComparison.png" width=1000>
 
-<img src="evaluation\_crossValidationPlots\_vocabularySizeComparison.png" width=700>
+<img src="evaluation\_crossValidationPlots\_vocabularySizeComparison.png" width=1000>
 
-<img src="evaluation\_crossValidationPlots\_fullVocabSizeMaxLenHeatmap_fpr_0_001.png" width=700>
+<img src="evaluation\_crossValidationPlots\_fullVocabSizeMaxLenHeatmap_fpr_0_001.png" width=1000>
 
-<img src="evaluation\_crossValidationPlots\_PreProcessingComparison.png" width=700></center>
+<img src="evaluation\_crossValidationPlots\_PreProcessingComparison.png" width=1000></center>
 
 ## Pre-training with self-supervised techniques
 
@@ -49,15 +49,15 @@ Implementation is under `nebula.pretraining.MaskedLanguageModel` class.
 
 Evaluation done using `nebula.pretraining.SelfSupervisedPretraining` class that implements Cybersecurity Evaluation Framework for semisupervised learning (CEF-SSL) framework, introduced by Apruzzese et al. in <https://arxiv.org/pdf/2205.08944.pdf>. It suggests to perform data splits $N$ times as follows, where $\mathbb{U}$ is used for pre-training, $\mathbb{L}$ for downstream task, and $\mathbb{F}$ for final evaluation:
 
-<center><img src="evaluation\_maskedLanguageModelPlots\datasetSplit.png" width=300></center>
+<center><img src="evaluation\_maskedLanguageModelPlots\datasetSplit.png" width=500></center>
 
 Results with even brief pre-training (5 epochs on single GPU laptop) are unclear. On trainig set (i.e. $\mathbb{L}$) metrics are improved:
 
-<center><img src="evaluation\_maskedLanguageModelPlots\unlabeledDataSize_0.9_preTrain_5_downStream_2_nSplits_5_1672239000_trainSetStats.png" width=700></center>
+<center><img src="evaluation\_maskedLanguageModelPlots\unlabeledDataSize_0.9_preTrain_5_downStream_2_nSplits_5_1672239000_trainSetStats.png" width=1000></center>
 
 Yet no significant benefit on test set (i.e. $\mathbb{F}$) are observed:
 
-<center><img src="evaluation\_maskedLanguageModelPlots\unlabeledDataSize_0.8_preTrain_10_downStream_3_nSplits_5_1672232495_testSetStats.png" width=700></center>
+<center><img src="evaluation\_maskedLanguageModelPlots\unlabeledDataSize_0.8_preTrain_10_downStream_3_nSplits_5_1672232495_testSetStats.png" width=1000></center>
 
 Pre-training was brief, done on a single laptop, with futher tests required.
 
