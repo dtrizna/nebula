@@ -6,7 +6,7 @@
 
 Behavioral intrusion detection system that is capable of self-supervised learning from unlabeled data. **Work in progress.**
 
-Quasi-functional implementation:
+Quasi-functional implementation
 
 - Portable Executable (PE) classifier under `nebula.PEHybridClassifier` class. It uses:
   - (1) 1D Convolutional Neural Network (CNN) for dynamic PE analysis. Behavior is obtained using *speakeasy* emulator (see `nebula.preprocessing.PEDynamicFeatureExtractor`), with analysis of:
@@ -23,6 +23,12 @@ model = PEHybridClassifier()
 pe = r"C:\windows\syswow64\xcopy.exe"
 staticFeatures, dynamicFeatures = model.preprocess(pe)
 logits = model(staticFeatures, dynamicFeatures)
+```
+
+### Installation
+
+```bash
+pip install git+https://github.com/dtrizna/nebula
 ```
 
 ## PE classifier configuration evaluations
