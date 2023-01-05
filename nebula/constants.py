@@ -1,7 +1,8 @@
-from nebula.misc import flattenList
 from pefile import PEFormatError
 from unicorn import UcError
 from speakeasy import errors
+
+from nebula.misc import flattenList
 
 AUDITD_FIELDS = [
     'TimeStamp',
@@ -48,6 +49,18 @@ SPEAKEASY_RECORD_SUBFILTER = {'apis': ['api_name', 'args', 'ret_val'],
 SPEAKEASY_RECORD_SUBFILTER_OPTIMAL = {'apis': ['api_name', 'args', 'ret_val'],
                                     'file_access': ['event', 'path'],
                                     'network_events.traffic': ['server', 'port']}
+
+SPEAKEASY_RECORD_SUBFILTER_OPTIMAL_FIELDS = [
+    'apis.api_name',
+    'apis.args',
+    'apis.ret_val',
+    'file_access.event',
+    'file_access.path',
+    'network_events.traffic.server',
+    'network_events.traffic.port',
+    'registry_access.event',
+    'registry_access.path',
+]
 
 SPEAKEASY_RECORD_SUBFILTER_MINIMALISTIC = {'apis': ['api_name', 'ret_val'],
                                     'file_access': ['event', 'path'],
