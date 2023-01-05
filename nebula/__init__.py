@@ -15,7 +15,7 @@ from sklearn.metrics import f1_score
 from nebula.evaluation import get_tpr_at_fpr
 
 
-class ModelInterface(object):
+class ModelTrainer(object):
     def __init__(self, 
                     model,
                     device, 
@@ -81,7 +81,7 @@ class ModelInterface(object):
             metrics.append([tpr, f1_at_fpr])        
         return np.array(metrics)
 
-    def trainEpoch(self, trainLoader, epochId):
+    def trainOneEpoch(self, trainLoader, epochId):
         epochMetrics = []
         epochLosses = []
         now = time.time()
@@ -141,7 +141,7 @@ class ModelInterface(object):
                 epochStartTime = time.time()
                 logging.warning(f" [*] Started epoch: {epochIdx}")
 
-                epochTrainLoss, epochTPRs, epochF1s = self.trainEpoch(trainLoader, epochIdx)
+                epochTrainLoss, epochTPRs, epochF1s = self.trainOneEpoch(trainLoader, epochIdx)
                 self.trainTruePositiveRates[epochIdx-1] = epochTPRs
                 self.trainF1s[epochIdx-1] = epochF1s
                 self.trainLosses.extend(epochTrainLoss)

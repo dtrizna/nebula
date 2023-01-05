@@ -6,7 +6,7 @@ import pickle
 import sys
 sys.path.extend(['..', '.'])
 from nebula.attention import TransformerEncoderModel
-from nebula import ModelInterface
+from nebula import ModelTrainer
 from sklearn.utils import shuffle
 
 outputFolder = r"C:\Users\dtrizna\Code\nebula\tests\speakeasy_2_Modeling\output"
@@ -62,7 +62,7 @@ modelConfig = {
     "verbosityBatches": 10
 }
 
-ModelInterface(**modelConfig).fit(x_train, y_train, epochs=3)
+ModelTrainer(**modelConfig).fit(x_train, y_train, epochs=3)
 
 trainLoader = torch.utils.data.DataLoader(
             torch.utils.data.TensorDataset(

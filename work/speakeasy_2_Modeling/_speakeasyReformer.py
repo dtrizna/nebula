@@ -6,7 +6,7 @@ import pickle
 import sys
 sys.path.extend(['..', '.', '../..'])
 from transformers import ReformerConfig, ReformerModel, ReformerForSequenceClassification
-from nebula import ModelInterface
+from nebula import ModelTrainer
 from sklearn.utils import shuffle
 
 outputFolder = r"C:\Users\dtrizna\Code\nebula\tests\speakeasy_2_Modeling\output"

@@ -1,16 +1,8 @@
+from nebula import ModelTrainer
 
-import sys
-sys.path.append('../..')
-from nebula import ModelInterface
-
-import os
 import logging
 import numpy as np
-from time import sleep
 from tqdm import tqdm
-from torch.optim import Adam
-from torch.nn import BCEWithLogitsLoss, CrossEntropyLoss
-from sklearn.model_selection import train_test_split
 
 class MaskedLanguageModel(object):
     def __init__(self,
@@ -100,114 +92,5 @@ class MaskedLanguageModel(object):
         logging.warning(' [*] Masking sequences...')
         self.maskSequenceArr(unlabeledData)
         # stored in self.seq_masked, self.target
-        modelTrainer = ModelInterface(**modelTrainerConfig)
+        modelTrainer = ModelTrainer(**modelTrainerConfig)
         modelTrainer.fit(self.seq_masked, self.target, epochs=pretrainEpochs)
-
-
-class SelfSupervisedPretraining:
-    def __init__(self, 
-                    vocab,
-                    modelClass,
-                    modelConfig,
-                    pretrainingTaskClass,
-                    pretrainingTaskConfig,
-                    device,
-                    falsePositiveRates=[0.001, 0.003, 0.01, 0.03, 0.1],
-                    unlabeledDataSize=0.8,
-                    randomState=None,
-                    pretraingEpochs=5,
-                    downstreamEpochs=5,
-                    batchSize=256,
-                    verbosityBatches=100):
-        self.vocab = vocab
-        self.modelClass = modelClass
-        self.modelConfig = modelConfig
-        self.falsePositiveRates = falsePositiveRates
-        self.unlabeledDataSize = unlabeledDataSize
-        self.randomState = randomState
-        self.batchSize = batchSize
-        self.pretrainingEpochs = pretraingEpochs
-        self.downstreamEpochs = downstreamEpochs
-        self.device = device
-        self.verbosityBatches = verbosityBatches
-        self.pretrainingTask = pretrainingTaskClass(**pretrainingTaskConfig)
-
-        self.trainingTypes = ['pretrained', 'non_pretrained', 'full_data']
-
-    def run(self, x, y, x_test, y_test, outputFolder=None):
-        models = {k: None for k in self.trainingTypes}
-        modelInterfaces = {k: None for k in self.trainingTypes}
-        metrics = {k: None for k in self.trainingTypes}
-        
-        # split x and y into train and validation sets
-        U, L_x, _, L_y = train_test_split(x, y, train_size=self.unlabeledDataSize, random_state=self.randomState)
-
-        # create a pretraining model and task
-        logging.warning(' [!] Pre-training model...')
-        models['pretrained'] = self.modelClass(**self.modelConfig).to(self.device)
-        modelInterfaceConfig = {
-            "device": self.device,
-            "model": models['pretrained'],
-            "modelForwardPass": models['pretrained'].pretrain,
-            "lossFunction": CrossEntropyLoss(),
-            "optimizerClass": Adam,
-            "optimizerConfig": {"lr": 0.001},
-            "verbosityBatches": self.verbosityBatches,
-            "batchSize": self.batchSize,
-            "falsePositiveRates": self.falsePositiveRates,
-        }
-        if outputFolder:
-            modelInterfaceConfig["outputFolder"] = os.path.join(outputFolder, "preTraining")
-        self.pretrainingTask.pretrain(U, modelInterfaceConfig, pretrainEpochs=self.pretrainingEpochs)
-        
-        # downstream task for pretrained model
-        modelInterfaceConfig['lossFunction'] = BCEWithLogitsLoss()
-        modelInterfaceConfig['modelForwardPass'] = None
-        # print torch models parameters
-
-        for model in self.trainingTypes:
-            logging.warning(f' [!] Training {model} model on downstream task...')
-            if model != 'pretrained':
-                models[model] = self.modelClass(**self.modelConfig).to(self.device)
-                modelInterfaceConfig['model'] = models[model]
-            
-            if outputFolder:
-                modelInterfaceConfig["outputFolder"] = os.path.join(outputFolder, "downstreamTask_{}".format(model))
-            
-            modelInterfaces[model] = ModelInterface(**modelInterfaceConfig)
-            if model == 'full_data':
-                modelInterfaces[model].fit(x, y, self.downstreamEpochs)
-            else:
-                modelInterfaces[model].fit(L_x, L_y, self.downstreamEpochs)
-        
-        for model in models:
-            logging.warning(f' [*] Evaluating {model} model on test set...')
-            metrics[model] = modelInterfaces[model].evaluate(x_test, y_test, metrics="json")
-            reportingFPR = self.falsePositiveRates[modelInterfaces[model].fprReportingIdx]
-            logging.warning(f' [!] Test F1 score for {model} model at {reportingFPR} FPR : {metrics[model]["fpr_"+str(reportingFPR)]["f1"]:.4f}')
-            logging.warning(f' [!] Test TPR score for {model} model at {reportingFPR} FPR: {metrics[model]["fpr_"+str(reportingFPR)]["tpr"]:.4f}')
-        del models, modelInterfaces # cleanup to not accidentaly reuse 
-        return metrics
-
-    def runSplits(self, x, y, x_test, y_test, outputFolder=None, nSplits=5, rest=None):
-        metrics = {k: {"fpr_"+str(fpr): {"f1": [], "tpr": []} for fpr in self.falsePositiveRates} for k in self.trainingTypes}
-        # collect metrics for number of iterations
-        for i in range(nSplits):
-            self.randomState += i # to get different splits
-            logging.warning(f' [!] Running pre-training split {i+1}/{nSplits}')
-            splitMetrics = self.run(x, y, x_test, y_test, outputFolder=outputFolder)
-            for trainingType in self.trainingTypes:
-                for fpr in self.falsePositiveRates:
-                    metrics[trainingType]["fpr_"+str(fpr)]["f1"].append(splitMetrics[trainingType]["fpr_"+str(fpr)]["f1"])
-                    metrics[trainingType]["fpr_"+str(fpr)]["tpr"].append(splitMetrics[trainingType]["fpr_"+str(fpr)]["tpr"])
-            if rest:
-                sleep(rest)
-
-        # compute mean and std for each metric
-        for trainingType in self.trainingTypes:
-            for fpr in self.falsePositiveRates:
-                metrics[trainingType]["fpr_"+str(fpr)]["f1_mean"] = np.mean(metrics[trainingType]["fpr_"+str(fpr)]["f1"])
-                metrics[trainingType]["fpr_"+str(fpr)]["f1_std"] = np.std(metrics[trainingType]["fpr_"+str(fpr)]["f1"])
-                metrics[trainingType]["fpr_"+str(fpr)]["tpr_mean"] = np.mean(metrics[trainingType]["fpr_"+str(fpr)]["tpr"])
-                metrics[trainingType]["fpr_"+str(fpr)]["tpr_std"] = np.std(metrics[trainingType]["fpr_"+str(fpr)]["tpr"])
-        return metrics
