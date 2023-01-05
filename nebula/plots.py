@@ -44,22 +44,21 @@ def plotCounterCountsLineplot(
     else:
         plt.show()
 
-def plotListElementLengths(list_of_strings, xlim=None, outfile=None):
+def plotListElementLengths(list_of_strings, xlim=None, outfile=None, bins=100, ax=None):
     lengths = [len(x) for x in list_of_strings]
-    _, ax = plt.subplots(1, 1, figsize=(10, 8))
-    ax.hist(lengths, bins=100)
-    plt.title("Histogram of list element lengths")
+    if ax is None:
+        fig, ax = plt.subplots(1, 1, figsize=(10, 8))
+    ax.hist(lengths, bins=bins)
+    ax.set_title("Histogram of list element lengths")
     if xlim:
-        plt.xlim(xlim)
-    plt.yscale("log")
-    plt.ylabel("Count (log)")
-    plt.grid(which="both")
+        ax.set_xlim(xlim)
+    ax.set_yscale("log")
+    ax.set_ylabel("Count (log)")
+    ax.grid(which="both")
     if outfile:
         plt.tight_layout()
         plt.savefig(outfile)
-    else:
-        plt.show()
-    return lengths
+    return lengths, ax
 
 def plotCrossValidationDict(dfDict, key, ax=None, legendTitle=None, savePath=None):
     if ax is None:
