@@ -8,10 +8,12 @@ from tqdm import tqdm
 from time import time
 from pathlib import Path
 from copy import deepcopy
-from collections import Counter
+from collections import Counter, defaultdict
+from functools import reduce
+import operator
 from typing import Iterable
 from nltk import WhitespaceTokenizer
-from pandas import json_normalize, concat, DataFrame
+from pandas import json_normalize, concat, DataFrame, merge
 
 from nebula.constants import *
 from nebula.misc import getAlphaNumChars
@@ -20,6 +22,83 @@ from nebula.normalization import normalizeTableIP, normalizeTablePath
 from nebula.ember import PEFeatureExtractor
 
 import speakeasy
+
+class JSONParser:
+    def __init__(self,
+                fields,
+                normalized=False):
+        super().__init__()
+        self.fields = fields
+        assert isinstance(normalized, bool), "normalized must be boolean!"
+        self.normalized = normalized
+
+    @staticmethod
+    def filterNonNormalizedField(jsonEvent, field):
+        keysLeft = field.split(".")
+        keysIterated = []
+
+        currentVal = jsonEvent
+        for i in range(len(keysLeft)):
+            keysIterated.append(keysLeft.pop(0))
+            
+            # get value from dictionary based on keysIterated
+            if keysIterated[-1] not in currentVal:
+                return None, keysIterated
+            
+            currentVal = reduce(operator.getitem, keysIterated, jsonEvent)
+            if currentVal == []:
+                return None, keysIterated
+            
+            elif isinstance(currentVal, dict):
+                continue # iterate deeper
+            elif isinstance(currentVal, list):
+                table = json_normalize(jsonEvent, record_path=keysIterated)[keysLeft]
+                return table, keysIterated
+            else: # currentVal is not a collection, just value
+                return currentVal, keysIterated
+
+    def filterNonNormalizedEvent(self, jsonEvent):
+        values = defaultdict(list)
+        for field in self.fields:
+            filteredValue, key = self.filterNonNormalizedField(jsonEvent, field)
+            if filteredValue is not None:
+                values['.'.join(key)].append(filteredValue)
+        
+        # merge tables into a single dataframe
+        for key, valueList in values.items():
+            if all([isinstance(x, DataFrame) for x in valueList]):
+                values[key] = reduce(
+                    lambda x,y: merge(x,y, left_index=True, right_index=True), 
+                    valueList
+                )
+        return values
+
+    def filterNormalizedEvent(self, jsonEvent):        
+        table = json_normalize(jsonEvent)
+        # preserve fields that are only table columns 
+        cols = table.columns[table.columns.isin(self.fields)]
+        table = table[cols]
+        return table
+
+    def filter(self, jsonEvents):
+        if isinstance(jsonEvents, str):
+            jsonEvents = json.loads(jsonEvents)
+        assert isinstance(jsonEvents, (list, dict)), "jsonEvent must be list or dict!"
+        if isinstance(jsonEvents, dict):
+            jsonEvents = [jsonEvents]
+        assert [isinstance(x, dict) for x in jsonEvents], "jsonEvent must be list of dicts!"
+
+        if self.normalized:
+            filteredEvents = [self.filterNormalizedEvent(x) for x in jsonEvents]
+            return filteredEvents # list of Dataframes
+        else:
+            filteredEvents = [self.filterNonNormalizedEvent(x) for x in jsonEvents]
+            recordDict = defaultdict(DataFrame)
+            for tableDict in filteredEvents:
+                for key in tableDict:
+                    recordDict[key] = concat([recordDict[key], tableDict[key]], axis=0, ignore_index=True)
+            return recordDict # dict with Dataframes
+
 
 class JSONTokenizer(object):
     def __init__(self, 
@@ -191,16 +270,15 @@ class PEDynamicFeatureExtractor(object):
                     recordLimits=SPEAKEASY_RECORD_LIMITS,
                     emulationOutputFolder=None
                 ):
-        
-        if isinstance(speakeasyConfig, str):
-            if not os.path.exists(speakeasyConfig):
-                raise Exception(f"Speakeasy config file not found: {speakeasyConfig}")
-            with open(speakeasyConfig, "r") as f:
-                self.speakeasyConfig = json.load(f)
-        elif isinstance(speakeasyConfig, dict):
+        if not speakeasyConfig:
+            self.speakeasyConfig = "./configs/speakeasyConfig.json"
+        assert isinstance(speakeasyConfig, (str, dict)), "speakeasyConfig must be a string or a dict"
+        if isinstance(speakeasyConfig, dict):
             self.speakeasyConfig = speakeasyConfig
         else:
-            self.speakeasyConfig = None
+            assert os.path.exists(speakeasyConfig), f"Speakeasy config file not found: {speakeasyConfig}"
+            with open(speakeasyConfig, "r") as f:
+                self.speakeasyConfig = json.load(f)
         
         self.speakeasyRecords = speakeasyRecords
         self.recordSubFilter = recordSubFilter
@@ -232,13 +310,10 @@ class PEDynamicFeatureExtractor(object):
             return None
     
     def emulate(self, path=None, data=None):
-                
-        if path is None and data is None:
-            raise ValueError("Either 'file' or 'data' must be specified.")
+        assert path or data, "Either 'file' or 'data' must be specified."
         if path:
-            if not os.path.exists(path):
-                raise ValueError(f"File {path} does not exist.")
-            self.sampleName = os.path.basename(path).replace(".exe", "")
+            assert os.path.exists(path), f"File {path} does not exist."
+            self.sampleName = os.path.basename(path).replace(".exe", "").replace(".dll", "")
         else:
             self.sampleName = f"{int(time())}"
         report = self._emulation(self.speakeasyConfig, path, data)
@@ -251,10 +326,7 @@ class PEDynamicFeatureExtractor(object):
                 self._createErrorFile(os.path.join(self.outputFolder, f"{self.sampleName}.err"))
 
         api_seq_len = sum([len(x["apis"]) for x in report["entry_points"]]) if report else 0
-        if api_seq_len == 0:
-            return None
-        else:
-            return self.parseReportEntryPoints(report["entry_points"])
+        return None if api_seq_len == 0 else self.parseReportEntryPoints(report["entry_points"])
     
     def parseReportEntryPoints(self, entryPoints):
         # clean up report
