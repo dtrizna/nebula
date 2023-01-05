@@ -15,6 +15,7 @@ from typing import Iterable
 from nltk import WhitespaceTokenizer
 from pandas import json_normalize, concat, DataFrame, merge
 
+import nebula
 from nebula.constants import *
 from nebula.misc import getAlphaNumChars
 from nebula.plots import plotCounterCountsLineplot, plotListElementLengths
@@ -93,11 +94,15 @@ class JSONParser:
             return filteredEvents # list of Dataframes
         else:
             filteredEvents = [self.filterNonNormalizedEvent(x) for x in jsonEvents]
-            recordDict = defaultdict(DataFrame)
-            for tableDict in filteredEvents:
-                for key in tableDict:
-                    recordDict[key] = concat([recordDict[key], tableDict[key]], axis=0, ignore_index=True)
-            return recordDict # dict with Dataframes
+            return filteredEvents # list of dicts
+
+    def filter_and_concat(self, jsonEvents):
+        filteredEvents = self.filter(jsonEvents)
+        recordDict = defaultdict(DataFrame)
+        for tableDict in filteredEvents:
+            for key in tableDict:
+                recordDict[key] = concat([recordDict[key], tableDict[key]], axis=0, ignore_index=True)
+        return recordDict
 
 
 class JSONTokenizer(object):
@@ -265,14 +270,14 @@ class PEStaticFeatureExtractor(object):
 class PEDynamicFeatureExtractor(object):
     def __init__(self, 
                     speakeasyConfig=None, 
-                    speakeasyRecords=SPEAKEASY_RECORDS,
-                    recordSubFilter=SPEAKEASY_RECORD_SUBFILTER_OPTIMAL,
+                    speakeasyRecordFields=SPEAKEASY_RECORD_FIELDS,
                     recordLimits=SPEAKEASY_RECORD_LIMITS,
                     emulationOutputFolder=None
                 ):
-        if not speakeasyConfig:
-            self.speakeasyConfig = "./configs/speakeasyConfig.json"
-        assert isinstance(speakeasyConfig, (str, dict)), "speakeasyConfig must be a string or a dict"
+        
+        # setup speakseasy config
+        if speakeasyConfig is None:
+            speakeasyConfig = os.path.join(os.path.dirname(nebula.__file__), "configs", "speakeasyConfig.json")
         if isinstance(speakeasyConfig, dict):
             self.speakeasyConfig = speakeasyConfig
         else:
@@ -280,9 +285,8 @@ class PEDynamicFeatureExtractor(object):
             with open(speakeasyConfig, "r") as f:
                 self.speakeasyConfig = json.load(f)
         
-        self.speakeasyRecords = speakeasyRecords
-        self.recordSubFilter = recordSubFilter
         self.recordLimits = recordLimits
+        self.parser = JSONParser(fields=speakeasyRecordFields)
 
         self.outputFolder = emulationOutputFolder
         if self.outputFolder:
@@ -326,26 +330,26 @@ class PEDynamicFeatureExtractor(object):
                 self._createErrorFile(os.path.join(self.outputFolder, f"{self.sampleName}.err"))
 
         api_seq_len = sum([len(x["apis"]) for x in report["entry_points"]]) if report else 0
-        return None if api_seq_len == 0 else self.parseReportEntryPoints(report["entry_points"])
+        return None if api_seq_len == 0 else self.filter_and_normalize_report(report["entry_points"])
     
-    def parseReportEntryPoints(self, entryPoints):
+    def filter_and_normalize_report(self, entryPoints):
         # clean up report
-        recordDict = self.getRecordsFromReport(entryPoints)
+        recordDict = self.parser.filter_and_concat(entryPoints)
         
         # filter out events with uninformative API sequences
         # i.e. emulation failed extract valuable info
-        if 'apis' in self.speakeasyRecords and \
+        if 'apis' in recordDict and \
             recordDict['apis'].shape[0] == 1 and \
             recordDict['apis'].iloc[0].api_name == 'MSVBVM60.ordinal_100':
                 return None
 
         # normalize
-        if 'file_access' in self.speakeasyRecords:
+        if 'file_access' in recordDict:
             recordDict['file_access'] = normalizeTablePath(recordDict['file_access'], col='path')
-        if 'network_events.traffic' in self.speakeasyRecords \
+        if 'network_events.traffic' in recordDict \
             and 'server' in recordDict['network_events.traffic'].columns:
                 recordDict['network_events.traffic'] = normalizeTableIP(recordDict['network_events.traffic'], col='server')
-        if 'network_events.dns' in self.speakeasyRecords \
+        if 'network_events.dns' in recordDict \
             and 'query' in recordDict['network_events.dns'].columns:
             recordDict['network_events.dns']['query'] = recordDict['network_events.dns']['query'].apply(lambda x: ' '.join(x.split('.')))
         # normalize args to exclude any non-alphanumeric characters
@@ -362,37 +366,13 @@ class PEDynamicFeatureExtractor(object):
         recordJson = self.joinRecordsToJSON(recordDict)
         return recordJson
     
-    def getRecordsFromReport(self, entryPoints):
-        records = dict()
-        for recordField in self.speakeasyRecords:
-            fieldRoot = recordField.split('.')[0]
-            matchEntryPoints = [x for x in entryPoints if fieldRoot in x]
-            if not matchEntryPoints:
-                records[recordField] = DataFrame()
-                continue
-            # 'record_path=' is used in cases when recordField is a list of dictionaries, e.g. 'apis' or 'network_events.traffic'
-            if isinstance(matchEntryPoints[0][fieldRoot], list) or recordField != fieldRoot:
-                recordList = [json_normalize(x, record_path=[recordField.split('.')]) for x in matchEntryPoints]
-            # this is used in all other cases when recordField has its own dictionary, e.g. 'error'
-            elif isinstance(matchEntryPoints[0][fieldRoot], dict):
-                recordList = [json_normalize(x[fieldRoot]) for x in matchEntryPoints]
-            else:
-                raise ValueError(f" [-] Unexpected 'recordField' {recordField} type: {type(matchEntryPoints[0][recordField])}")
-            records[recordField] = concat(recordList)
-        return records
-
-    def joinRecordsToJSON(self, recordDict):
+    @staticmethod
+    def joinRecordsToJSON(recordDict):
         jsonEvent = "{"
-        for i, key in enumerate(recordDict.keys()):
-            if recordDict[key].empty:
-                continue
-            if key in self.recordSubFilter.keys():
-                # filter only columns from self.recordSubFilter[key] present in recordDict[key] dataframe
-                cols = recordDict[key].columns[recordDict[key].columns.isin(self.recordSubFilter[key])]
-                jsonVal = recordDict[key][cols].to_json(orient='records', indent=4)
-            else:
-                jsonVal = recordDict[key].to_json(orient='records', indent=4)
-            jsonEvent += f"\n\"{key}\":\n{jsonVal}"
+        # sort in order to ensure consistent order of fields, put 'apis' at the end
+        for i, key in enumerate(sorted(recordDict.keys(), reverse=True)):
+            jsonVal = recordDict[key].to_json(orient='records')
+            jsonEvent += f"\"{key}\":{jsonVal}"
 
             if i != len(recordDict.keys())-1:
                 jsonEvent += ","
@@ -400,4 +380,4 @@ class PEDynamicFeatureExtractor(object):
         if jsonEvent.endswith(","):
             jsonEvent = jsonEvent[:-1]
         jsonEvent += "}"
-        return jsonEvent
+        return json.loads(jsonEvent)

@@ -10,7 +10,7 @@ with open(report, "r") as f:
 extractor = PEDynamicFeatureExtractor(
     speakeasyConfig="./_speakeasyConfig.json"
 )
-parsedJson = extractor.parseReportEntryPoints(report)
+parsedJson = extractor.filter_and_normalize_report(report)
 
 with open("./parsedJson.json", "w") as f:
     f.write(parsedJson)

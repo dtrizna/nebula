@@ -37,36 +37,21 @@ AUDITD_TYPES = [
 
 JSON_CLEANUP_SYMBOLS = ['"', "'", ":", ",", "[", "]", "{", "}", "\\", "/"]
 
-# this defines an order in which events occur in final sequence
-SPEAKEASY_RECORDS = ["registry_access", "file_access", "network_events.traffic", "apis"]
-
 SPEAKEASY_RECORD_LIMITS = {"network_events.traffic": 256}
 
-SPEAKEASY_RECORD_SUBFILTER = {'apis': ['api_name', 'args', 'ret_val'],
-                       'file_access': ['event', 'path', 'open_flags', 'access_flags', 'size'],
-                       'network_events.traffic': ['server', 'proto', 'port', 'method']}
-
-SPEAKEASY_RECORD_SUBFILTER_OPTIMAL = {'apis': ['api_name', 'args', 'ret_val'],
-                                    'file_access': ['event', 'path'],
-                                    'network_events.traffic': ['server', 'port']}
-
-SPEAKEASY_RECORD_SUBFILTER_OPTIMAL_FIELDS = [
-    'apis.api_name',
-    'apis.args',
-    'apis.ret_val',
+SPEAKEASY_RECORD_FIELDS = [
     'file_access.event',
     'file_access.path',
     'network_events.traffic.server',
     'network_events.traffic.port',
     'registry_access.event',
     'registry_access.path',
+    'apis.api_name',
+    'apis.args',
+    'apis.ret_val',
 ]
 
-SPEAKEASY_RECORD_SUBFILTER_MINIMALISTIC = {'apis': ['api_name', 'ret_val'],
-                                    'file_access': ['event', 'path'],
-                                    'network_events.traffic': ['server', 'port']}
-
-SPEAKEASY_TOKEN_STOPWORDS = flattenList([SPEAKEASY_RECORD_SUBFILTER[x] for x in SPEAKEASY_RECORD_SUBFILTER])
+SPEAKEASY_TOKEN_STOPWORDS = ['api_name', 'args', 'ret_val', 'event', 'path', 'open_flags', 'access_flags', 'size', 'server', 'proto', 'port', 'method']
 
 SPEAKEASY_CONFIG = r"C:\Users\dtrizna\Code\nebula\emulation\_speakeasyConfig.json"
 
