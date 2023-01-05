@@ -8,7 +8,6 @@ from torch.nn import TransformerEncoder, TransformerEncoderLayer
 from reformer_pytorch import LSHAttention
 
 class TransformerEncoderModel(nn.Module):
-
     def __init__(self, 
                     vocabSize: int, # size of vocabulary
                     dModel: int = 32, # embedding & transformer dimension

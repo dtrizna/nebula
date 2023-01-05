@@ -6,7 +6,7 @@ import sys
 import time
 from sklearn.utils import shuffle
 sys.path.extend(['..', '.'])
-from nebula import ModelInterface
+from nebula import ModelTrainer
 from nebula.models import Cnn1DLinear, Cnn1DLSTM, LSTM
 from nebula.attention import TransformerEncoderModel
 from nebula.evaluation import CrossValidation
@@ -73,7 +73,7 @@ modelArch = {
 # }
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-modelInterfaceClass = ModelInterface
+modelInterfaceClass = ModelTrainer
 modelInterfaceConfig = {
     "device": device,
     "model": None, # will be set later
