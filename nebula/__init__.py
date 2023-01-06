@@ -12,7 +12,7 @@ from pandas import DataFrame
 import torch
 from torch import nn
 from sklearn.metrics import f1_score
-from nebula.evaluation import get_tpr_at_fpr
+from nebula.misc import get_tpr_at_fpr
 
 
 class ModelTrainer(object):

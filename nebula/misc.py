@@ -2,7 +2,28 @@ import os
 import sys
 from pandas import to_datetime
 from collections.abc import Iterable
+from sklearn.metrics import roc_curve
 import string
+import torch
+import random
+import numpy as np
+
+def get_tpr_at_fpr(true_labels, predicted_probs, fprNeeded):
+        fpr, tpr, thresholds = roc_curve(true_labels, predicted_probs)
+        tpr_at_fpr = tpr[fpr <= fprNeeded][-1]
+        threshold_at_fpr = thresholds[fpr <= fprNeeded][-1]
+        return tpr_at_fpr, threshold_at_fpr
+
+def set_random_seed(seed_value):
+    random.seed(seed_value) # Python
+    np.random.seed(seed_value) # cpu vars
+    torch.manual_seed(seed_value) # cpu  vars
+    
+    if torch.cuda.is_available(): 
+        torch.cuda.manual_seed(seed_value)
+        torch.cuda.manual_seed_all(seed_value) # gpu vars
+        torch.backends.cudnn.deterministic = True  #needed
+        torch.backends.cudnn.benchmark = False
 
 def getRealPath(type="script"):
     idx = 1 if type == "notebook" else 0
