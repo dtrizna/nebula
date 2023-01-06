@@ -2,8 +2,6 @@ from pefile import PEFormatError
 from unicorn import UcError
 from speakeasy import errors
 
-from nebula.misc import flattenList
-
 AUDITD_FIELDS = [
     'TimeStamp',
     'rule.sidid',

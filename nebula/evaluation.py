@@ -9,10 +9,10 @@ from time import sleep
 from torch.optim import Adam
 from torch.nn import BCEWithLogitsLoss, CrossEntropyLoss
 from sklearn.model_selection import train_test_split, KFold
-from sklearn.metrics import roc_curve, f1_score
+from sklearn.metrics import f1_score
 
 from nebula import ModelTrainer
-from nebula.misc import dictToString
+from nebula.misc import dictToString, get_tpr_at_fpr
 
 
 class SelfSupervisedPretraining:
@@ -208,57 +208,3 @@ class CrossValidation(object):
         for fpr in self.fprValues:
             msg += f"\tFPR: {fpr:>6} -- TPR: {self.metrics[fpr]['tpr_avg']:.4f} -- F1: {self.metrics[fpr]['f1_avg']:.4f}\n"
         logging.warning(msg)
-
-
-def readCrossValidationMetricFile(file):
-    with open(file, "r") as f:
-            metrics = json.load(f)
-    cols = ["tpr_avg", "tpr_std", "f1_avg", "f1_std"]
-    dfMetrics = DataFrame(columns=cols)
-    for fpr in metrics:
-        if fpr in ("avg_epoch_time", "epoch_time_avg"):
-            timeValue = metrics[fpr]
-        else:
-            if isinstance(metrics[fpr], dict):
-                tpr_avg = metrics[fpr]["tpr_avg"]
-                tpr_std = np.std(metrics[fpr]["tpr"])
-                f1_avg = metrics[fpr]["f1_avg"]
-                f1_std = np.std(metrics[fpr]["f1"])
-            else:
-                arr = np.array(metrics[fpr]).squeeze()
-                if arr.ndim == 1:
-                    tpr_avg = arr[0]
-                    tpr_std = 0
-                    f1_avg = arr[1]
-                    f1_std = 0
-                elif arr.ndim == 2:
-                    tpr_avg = arr[:, 0].mean()
-                    tpr_std = arr[:, 0].std()
-                    f1_avg = arr[:, 1].mean()
-                    f1_std = arr[:, 1].std()
-            dfMetrics.loc[fpr] = [tpr_avg, tpr_std, f1_avg, f1_std]
-    return dfMetrics, timeValue
-
-def readCrossValidationFolder(folder, diffExtractor, extraFileFilter=None):
-    if extraFileFilter:
-        metricFiles = [x for x in os.listdir(folder) if x.endswith(".json") and extraFileFilter(x)]
-    else:
-        metricFiles = [x for x in os.listdir(folder) if x.endswith(".json")]
-    fileToField = dict(zip(metricFiles, [diffExtractor(x) for x in metricFiles]))
-    # sort fileToFiel based on values
-    fileToField = {k: v for k, v in sorted(fileToField.items(), key=lambda item: int(item[1]))}
-
-    dfDict = dict()
-    timeDict = dict()
-    for file in fileToField:
-        dfMetrics, avgEpochTime = readCrossValidationMetricFile(os.path.join(folder, file))
-        dfDict[fileToField[file]] = dfMetrics
-        timeDict[fileToField[file]] = avgEpochTime
-        
-    return dfDict, timeDict
-
-def get_tpr_at_fpr(true_labels, predicted_probs, fprNeeded):
-        fpr, tpr, thresholds = roc_curve(true_labels, predicted_probs)
-        tpr_at_fpr = tpr[fpr <= fprNeeded][-1]
-        threshold_at_fpr = thresholds[fpr <= fprNeeded][-1]
-        return tpr_at_fpr, threshold_at_fpr
