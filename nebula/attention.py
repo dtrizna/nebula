@@ -5,15 +5,15 @@ import torch
 from torch import nn, Tensor
 from torch.nn import TransformerEncoder, TransformerEncoderLayer, Identity
 from nebula.reformer import (
-    default, Reformer, Always, AbsolutePositionalEmbedding, 
+    default, Reformer, Always, AbsolutePositionalEmbedding,
     AxialPositionalEmbedding, FixedPositionalEmbedding, MatrixMultiply
 )
 
 
 class TransformerEncoderModel(nn.Module):
-    def __init__(self, 
+    def __init__(self,
                     vocabSize: int, # size of vocabulary
-                    maxLen: int = 2048, # maximum length of input sequence
+                    maxLen: int, # maximum length of input sequence
                     dModel: int = 32, # embedding & transformer dimension
                     nHeads: int = 8, # number of heads in nn.MultiheadAttention
                     dHidden: int = 200, # dimension of the feedforward network model in nn.TransformerEncoder
@@ -87,43 +87,43 @@ class TransformerEncoderModel(nn.Module):
 
 class MyReformerLM(nn.Module):
     def __init__(
-        self, 
-        vocabSize, 
+        self,
+        vocabSize,
         maxLen,
-        dim = 256, 
-        depth = 6, 
-        heads = 8, 
-        dim_head = 64, 
-        bucket_size = 64, 
-        n_hashes = 4, 
-        ff_chunks = 100, 
-        attn_chunks = 1, 
-        causal = False, 
-        weight_tie = False, 
-        lsh_dropout = 0., 
-        ff_dropout = 0., 
-        ff_mult = 4, 
-        ff_activation = None, 
-        ff_glu = False, 
-        post_attn_dropout = 0., 
-        layer_dropout = 0., 
-        random_rotations_per_head = False, 
-        use_scale_norm = False, 
-        use_rezero = False, 
-        use_full_attn = False, 
-        full_attn_thres = 0, 
-        reverse_thres = 0, 
-        num_mem_kv = 0, 
-        one_value_head = False, 
-        emb_dim = None, 
-        return_embeddings = False, 
-        weight_tie_embedding = False, 
-        fixed_position_emb = False, 
-        absolute_position_emb = False, 
-        axial_position_emb = False, 
-        axial_position_shape = None, 
-        n_local_attn_heads = 0, 
-        pkm_layers = tuple(), 
+        dim = 64,
+        depth = 4,
+        heads = 4,
+        dim_head = 64,
+        bucket_size = 64,
+        n_hashes = 4,
+        ff_chunks = 100,
+        attn_chunks = 1,
+        causal = False,
+        weight_tie = False,
+        lsh_dropout = 0.,
+        ff_dropout = 0.,
+        ff_mult = 4,
+        ff_activation = None,
+        ff_glu = False,
+        post_attn_dropout = 0.,
+        layer_dropout = 0.,
+        random_rotations_per_head = False,
+        use_scale_norm = False,
+        use_rezero = False,
+        use_full_attn = False,
+        full_attn_thres = 0,
+        reverse_thres = 0,
+        num_mem_kv = 0,
+        one_value_head = False,
+        emb_dim = None,
+        return_embeddings = False,
+        weight_tie_embedding = False,
+        fixed_position_emb = False,
+        absolute_position_emb = False,
+        axial_position_emb = False,
+        axial_position_shape = None,
+        n_local_attn_heads = 0,
+        pkm_layers = tuple(),
         pkm_num_keys = 128,
         hiddenNeurons: list = [64], # decoder's classifier FFNN complexity
         classifierDropout: int = 0.5,
@@ -157,10 +157,10 @@ class MyReformerLM(nn.Module):
             self.out = Identity()
             return
 
-        self.preTrainLayers = nn.Sequential(
-            nn.Linear(dim, emb_dim) if emb_dim != dim else Identity(),
-            nn.Linear(emb_dim, vocabSize) if not weight_tie_embedding else MatrixMultiply(self.token_emb.weight, transpose=True, normalize=True)
-        )
+        # self.preTrainLayers = nn.Sequential(
+        #     nn.Linear(dim, emb_dim) if emb_dim != dim else Identity(),
+        #     nn.Linear(emb_dim, vocabSize) if not weight_tie_embedding else MatrixMultiply(self.token_emb.weight, transpose=True, normalize=True)
+        # )
 
         self.ffnn = []
         for i,h in enumerate(hiddenNeurons):
@@ -189,9 +189,9 @@ class MyReformerLM(nn.Module):
         x = self.norm(x)
         return x
     
-    def pretrain(self, x):
-        x_core = self.core(x)
-        return self.preTrainLayers(x_core)
+    # def pretrain(self, x):
+    #     x_core = self.core(x)
+    #     return self.preTrainLayers(x_core)
     
     def forward(self, x):
         x = self.core(x)

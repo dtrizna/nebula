@@ -8,11 +8,18 @@ import torch
 import random
 import numpy as np
 
+# supress UndefinedMetricWarning, which appears when a batch has only one class
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning)
+
 def get_tpr_at_fpr(true_labels, predicted_probs, fprNeeded):
         fpr, tpr, thresholds = roc_curve(true_labels, predicted_probs)
-        tpr_at_fpr = tpr[fpr <= fprNeeded][-1]
-        threshold_at_fpr = thresholds[fpr <= fprNeeded][-1]
-        return tpr_at_fpr, threshold_at_fpr
+        if all(np.isnan(fpr)):
+            return np.nan, np.nan
+        else:
+            tpr_at_fpr = tpr[fpr <= fprNeeded][-1]
+            threshold_at_fpr = thresholds[fpr <= fprNeeded][-1]
+            return tpr_at_fpr, threshold_at_fpr
 
 def set_random_seed(seed_value):
     random.seed(seed_value) # Python
