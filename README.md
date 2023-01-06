@@ -6,7 +6,7 @@
 
 Behavioral intrusion detection system that is capable of self-supervised learning from unlabeled data. **Work in progress.**
 
-Quasi-functional implementation:
+Quasi-functional implementation
 
 - Portable Executable (PE) classifier under `nebula.PEHybridClassifier` class. It uses:
   - (1) 1D Convolutional Neural Network (CNN) for dynamic PE analysis. Behavior is obtained using *speakeasy* emulator (see `nebula.preprocessing.PEDynamicFeatureExtractor`), with analysis of:
@@ -23,6 +23,12 @@ model = PEHybridClassifier()
 pe = r"C:\windows\syswow64\xcopy.exe"
 staticFeatures, dynamicFeatures = model.preprocess(pe)
 logits = model(staticFeatures, dynamicFeatures)
+```
+
+### Installation
+
+```bash
+pip install git+https://github.com/dtrizna/nebula
 ```
 
 ## PE classifier configuration evaluations
@@ -61,18 +67,24 @@ Pre-training was brief, done on a single laptop, with futher tests required.
 
 1. Build malware classifier class with convenient API
    - ~~Add ember feature extraction to sequential emulation model.~~
-   - ~~Provide it as `pip` package.~~ Can be done as: `python -m pip install git+https://github.com/dtrizna/nebula`
-     - Add vocab and speakeasy config files to package.
-     - Add pre-trained models to package.
-   - Download raw PE data, build dataset, and train classifier.
-2. Try efficient long-sequence attention models:
-   - Reformer
-   - Start transformer
+   - ~~Provide it as `pip` package.~~ Can be installed as: `python -m pip install git+https://github.com/dtrizna/nebula`
+     - ~~Add vocab and speakeasy config files to package.~~
+     - ~~Optimize JSON parsing.~~ Done in `JSONParser` class.
+   - Add pre-trained models to package.
+     - Organize a dedicated server suitable for: (a) storing malware dataset; (b) GPU training
+     - Download raw PE data, build dataset, and train classifier.
+2. Try attention models:
+   - Transformer: re-run tests after fix of positional embeddings
+   - ~~Reformer~~ Implemented `nebula.attention.MyReformerLM` class.  
+       Initial tests show good metrics, but takes ~80min per epoch with 50k samples on GPU if sample length 2048.  
+       Cross-validation with 3 epochs over 3 folds will take ~12 hours.  
+       > NOTE: Might reduce complexity by taking mean/max pooling over seq. length after attention, similar to Conv model?  
+   - Star transformer
 3. Pre-training routines on unlabeled data according to CEF-SSL framework:
    - naive methods:
      - expectation minimization (?)
    - language modeling:
-     - ~~MLM~~ (see `nebula/pretraining/MaskedLanguageModel` class)
+     - ~~MLM~~ (see `nebula.pretraining.MaskedLanguageModel` class)
      - GPT like $p(x_{t+1}|x_{t}\ ...\ x_{0})$
    - embedding pretraining:
      - CBOW embedding langauge modeling
@@ -96,9 +108,11 @@ Pre-training was brief, done on a single laptop, with futher tests required.
 - ~~preprocess train and test sets~~
 - try different models with labeled dataset:
   - ~~1D-CNN + Linear~~
+    - try different padding configuration
   - ~~Transformer~~
   - ~~LSTM~~
   - ~~1D-CNN + LSTM~~
+    - try 3D structure, with 1D-CNN embeddings
   - Reformer (!)
   - star transformer (?)
   - 1D-CNN-Transformer (?)
@@ -134,8 +148,8 @@ Pre-training was brief, done on a single laptop, with futher tests required.
       - ~~include dns: (1) preprocess dataset (2) run cross validation~~
     Results reported under `_speakeasyPreProcessingResults.ipynb` notebook.
   - rewrite preprocessing:
-    - extract separate `JSONParser` class from `PEDynamicExtractor` class that will be suitable for `auditd` dataset
-    - input for `JSONParser` should be list of normalized fields, e.g.: `[api.name, api.args, ...]`. It should be able to find where JSON has list of values, pass it `json_normalize` and then filter all consequent fields
+    - ~~extract separate `JSONParser` class from `PEDynamicExtractor` class that will be suitable for `auditd` dataset~~
+    - ~~input for `JSONParser` should be list of normalized fields, e.g.: `[api.name, api.args, ...]`. It should be able to find where JSON has list of values, pass it `json_normalize` and then filter all consequent fields~~
   - 3D dataset: `(batch_size, seq_len, features)` where each sequence represent:
     - API call tokens: name, ret_val, args
     - network request tokens
