@@ -2,8 +2,9 @@ import os
 import json
 import logging
 import numpy as np
-from pandas import DataFrame
 from collections import defaultdict
+from torch import cuda
+import gc
 
 from time import sleep
 from torch.optim import Adam
@@ -148,9 +149,16 @@ class CrossValidation(object):
         Returns: {fpr1: [mean_tpr, mean_f1], fpr2: [mean_tpr, mean_f1], ...], "avg_epoch_time": N seconds}
         """
         self.fprValues = fprValues
-        self.nFolds = folds
         self.epochs = epochs
         self.trainSize = X.shape[0]
+        if folds == 1:
+            # kfold requires at least 2 folds -- this is rude shortcut 
+            # will split 2/3 trainig set; 1/3 test set and run only one fold
+            self.nFolds = 3
+            singleFold = True
+        else:
+            self.nFolds = folds
+            singleFold = False
         # Create the folds
         logging.warning(f" [!] Epochs per fold: {epochs} | Model config: {self.modelConfig}")
 
@@ -166,26 +174,38 @@ class CrossValidation(object):
             logging.warning(f" [!] Fold {i+1}/{self.nFolds} | Train set size: {len(X_train)}, Validation set size: {len(X_test)}")
             # Create the model
             model = self.modelClass(**self.modelConfig)
-            
+
             modelInterfaceConfig = self.modelInterfaceConfig
             modelInterfaceConfig["model"] = model
             modelInterfaceConfig["outputFolder"] = self.outputFolderTrainingFiles
             modelTrainer = self.modelInterfaceClass(**modelInterfaceConfig)
 
             # Train the model
-            modelTrainer.fit(X_train, y_train, epochs=self.epochs)
-            trainingTime[i,:] = np.pad(modelTrainer.trainingTime, (0, epochs-len(modelTrainer.trainingTime)), 'constant', constant_values=(0,0))
+            try:
+                modelTrainer.fit(X_train, y_train, epochs=self.epochs)
+                trainingTime[i,:] = np.pad(modelTrainer.trainingTime, (0, epochs-len(modelTrainer.trainingTime)), 'constant', constant_values=(0,0))
+            except RuntimeError as e: # usually cuda outofmemory
+                logging.warning(f" [!] Exception: {e}")
+                break
 
             # Evaluate the model
+            logging.warning(f" [!] Evaluating model on validation set...")
             predicted_probs = modelTrainer.predict_proba(X_test)
+            logging.warning(f" [!] This fold metrics on validation set:")
             for fpr in self.fprValues:
                 tpr, threshold = get_tpr_at_fpr(y_test, predicted_probs, fpr)
                 f1 = f1_score(y[test_index], predicted_probs >= threshold)
                 self.metrics[fpr]["tpr"].append(tpr)
-                self.metrics[fpr]["f1"].append(f1)
+                self.metrics[fpr]["f1"].append(f1)       
+                logging.warning(f" [!] FPR: {fpr} | TPR: {tpr} | F1: {f1}")
             
-            # cleanup to avoid reusing the same model for the next fold
+            # cleanup
             del model, modelTrainer, modelInterfaceConfig
+            cuda.empty_cache()
+            gc.collect()
+
+            if singleFold:
+                break
 
         # take means over all folds        
         for fpr in self.fprValues:
