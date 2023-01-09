@@ -58,7 +58,6 @@ class TransformerEncoderModel(nn.Module):
     def init_weights(self) -> None:
         initrange = 0.1
         self.encoder.weight.data.uniform_(-initrange, initrange)
-        # also set the bias to zero for the linear layers in self.ffnn
         for block in self.ffnn:
             for layer in block:
                 if isinstance(layer, nn.Linear):
@@ -66,19 +65,11 @@ class TransformerEncoderModel(nn.Module):
                     layer.weight.data.uniform_(-initrange, initrange)
 
     def forward(self, src: Tensor, src_mask: Optional[Tensor] = None) -> Tensor:
-        """
-        Args:
-            src: Tensor, shape [seq_len, batch_size]
-            src_mask: Tensor, shape [seq_len, seq_len]
-
-        Returns:
-            output Tensor of shape [seq_len, batch_size, ntoken]
-        """
         src = self.encoder(src) * math.sqrt(self.d_model)
         src = self.pos_encoder(src)
         x = self.transformer_encoder(src, src_mask)
         x = x.view(x.size(0), -1)
-        # alternatives: 
+        # alternative -- take mean over sequence length:
         # x = x.mean(dim=1)
         x = self.ffnn(x)
         out = self.fcOutput(x)
@@ -105,7 +96,6 @@ class MyReformerLM(nn.Module):
         ff_mult = 4,
         ff_activation = None,
         ff_glu = False,
-        post_attn_dropout = 0.,
         layer_dropout = 0.,
         random_rotations_per_head = False,
         use_scale_norm = False,
@@ -117,7 +107,6 @@ class MyReformerLM(nn.Module):
         one_value_head = False,
         emb_dim = None,
         return_embeddings = False,
-        weight_tie_embedding = False,
         fixed_position_emb = False,
         absolute_position_emb = False,
         axial_position_emb = False,
@@ -127,11 +116,13 @@ class MyReformerLM(nn.Module):
         pkm_num_keys = 128,
         hiddenNeurons: list = [64], # decoder's classifier FFNN complexity
         classifierDropout: int = 0.5,
+        meanOverSequence: bool = False,
         numClasses = 1, # binary classification
     ):
         super().__init__()
         emb_dim = default(emb_dim, dim)
         self.max_seq_len = maxLen
+        self.meanOverSeq = meanOverSequence
 
         self.token_emb = nn.Embedding(vocabSize, emb_dim)
 
@@ -166,7 +157,10 @@ class MyReformerLM(nn.Module):
         for i,h in enumerate(hiddenNeurons):
             self.ffnnBlock = []
             if i == 0:
-                self.ffnnBlock.append(nn.Linear(dim * maxLen, h))
+                if self.meanOverSeq:
+                    self.ffnnBlock.append(nn.Linear(dim, h))
+                else:
+                    self.ffnnBlock.append(nn.Linear(dim * maxLen, h))
             else:
                 self.ffnnBlock.append(nn.Linear(hiddenNeurons[i-1], h))
 
@@ -195,7 +189,10 @@ class MyReformerLM(nn.Module):
     
     def forward(self, x):
         x = self.core(x)
-        x = x.view(x.size(0), -1)
+        if self.meanOverSeq:
+            x = torch.mean(x, dim=1)
+        else:
+            x = x.view(x.size(0), -1)
         x = self.ffnn(x)
         return self.fcOutput(x)
 

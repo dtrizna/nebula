@@ -1,5 +1,6 @@
 import nebula
 from nebula.preprocessing import JSONTokenizer, PEDynamicFeatureExtractor, PEStaticFeatureExtractor
+from nebula.optimization import OptimSchedulerGPT, OptimSchedulerStep
 from nebula.models import Cnn1DLinearLM, MLP
 
 import os
@@ -22,6 +23,7 @@ class ModelTrainer(object):
                     lossFunction,
                     optimizerClass,
                     optimizerConfig,
+                    optimSchedulerClass=None,
                     batchSize=64,
                     verbosityBatches = 100,
                     outputFolder=None,
@@ -33,6 +35,16 @@ class ModelTrainer(object):
         self.lossFunction = lossFunction
         self.verbosityBatches = verbosityBatches
         self.batchSize = batchSize
+
+        # lr scheduling setup
+        if optimSchedulerClass is None:
+            self.optimScheduler = None
+        elif optimSchedulerClass == "gpt":
+            self.optimScheduler = OptimSchedulerGPT(self.optimizer)
+        elif optimSchedulerClass == "step":
+            self.optimScheduler = OptimSchedulerStep(self.optimizer)
+        else:
+            self.optimScheduler = optimSchedulerClass(self.optimizer)
 
         self.falsePositiveRates = falsePositiveRates
         self.fprReportingIdx = 1 # what FPR stats to report every epoch
@@ -88,7 +100,11 @@ class ModelTrainer(object):
 
         for batchIdx, (data, target) in enumerate(trainLoader):
             data, target = data.to(self.device), target.to(self.device)
-            self.optimizer.zero_grad()
+
+            self.globalBatchCounter += 1
+            if self.optimScheduler is not None:
+                self.optimScheduler.step(self.globalBatchCounter)
+
             logits = self.model.forwardPass(data)
             # if dimension of target is 1, reshape to (-1,1)
             if target.dim() == 1:
@@ -97,6 +113,7 @@ class ModelTrainer(object):
 
             epochLosses.append(loss.item())
 
+            self.optimizer.zero_grad()
             loss.backward() # derivatives
             self.optimizer.step() # parameter update  
 
@@ -107,8 +124,11 @@ class ModelTrainer(object):
             
             if batchIdx % self.verbosityBatches == 0:
                 if target.shape[1] == 1:
+                    currentMetrics = np.nanmean(np.array(epochMetrics), axis=0).reshape(-1,2)
+                    currentTPR = currentMetrics[self.fprReportingIdx, 0]
+                    currentF1 = currentMetrics[self.fprReportingIdx, 1]
                     metricsReport = f"FPR {self.falsePositiveRates[self.fprReportingIdx]} -- "
-                    metricsReport += f"TPR {batchMetrics[self.fprReportingIdx, 0]:.4f} | F1 {batchMetrics[self.fprReportingIdx, 1]:.4f}"
+                    metricsReport += f"TPR {currentTPR:.4f} | F1 {currentF1:.4f}"
                 else:
                     metricsReport = "Not computing TPR and F1"
                 logging.warning(" [*] {}: Train Epoch: {} [{:^5}/{:^5} ({:^2.0f}%)]\tLoss: {:.6f} | {} | Elapsed: {:.2f}s".format(
@@ -118,7 +138,7 @@ class ModelTrainer(object):
         
         if epochMetrics: # we do not collect metrics if target is not binary
             # taking mean across all batches
-            epochMetrics = np.array(epochMetrics).mean(axis=0).reshape(-1,2)
+            epochMetrics = np.nanmean(np.array(epochMetrics), axis=0).reshape(-1,2)
             epochTPRs, epochF1s = epochMetrics[:,0], epochMetrics[:,1]
             # shape of each metrics array: (len(falsePositiveRates), )
             return epochLosses, epochTPRs, epochF1s
@@ -136,6 +156,7 @@ class ModelTrainer(object):
         self.trainF1s = np.empty(shape=(epochs, len(self.falsePositiveRates)))
         self.trainLosses = []
         self.trainingTime = []
+        self.globalBatchCounter = 0
         try:
             for epochIdx in range(1, epochs + 1):
                 epochStartTime = time.time()
@@ -208,11 +229,13 @@ class ModelTrainer(object):
         )
 
         self.model.eval()
-        for data in loader:
+        for batch_idx, data in enumerate(loader):
             with torch.no_grad():
                 logits = self.model(torch.Tensor(data[0]).long().to(self.device))
                 out = torch.vstack([out, logits])
-        
+            if batch_idx % self.verbosityBatches == 0:
+                logging.warning(f" [*] Predicting batch: {batch_idx}/{len(loader)}")
+
         return torch.sigmoid(out).clone().detach().cpu().numpy()
     
     def predict(self, arr, threshold=0.5):
