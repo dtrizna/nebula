@@ -73,14 +73,13 @@ Pre-training was brief, done on a single laptop, with futher tests required.
    - Add pre-trained models to package.
      - Organize a dedicated server suitable for: (a) storing malware dataset; (b) GPU training
      - Download raw PE data, build dataset, and train classifier.
-2. Try attention models:
-   - Transformer: re-run tests after fix of positional embeddings
-   - ~~Reformer~~ Implemented `nebula.attention.MyReformerLM` class.  
-       Initial tests show good metrics, but takes ~80min per epoch with 50k samples on GPU if sample length 2048.  
-       Cross-validation with 3 epochs over 3 folds will take ~12 hours.  
-       > NOTE: Might reduce complexity by taking mean/max pooling over seq. length after attention, similar to Conv model?  
-   - Star transformer
-3. Pre-training routines on unlabeled data according to CEF-SSL framework:
+1. Try attention models:
+   - ~~Transformer: re-run tests after fix of positional embeddings~~
+   - ~~Reformer~~ Implemented `nebula.attention.MyReformerLM` class. Takes ~80min per epoch with 50k samples on GPU if sample length 2048.  
+     - Try lower learning rate -- training seems to hit plateau and fluctuate strongly after ~500 batches.
+   - Star transformer (?)
+   - Longformer (?)
+1. Pre-training routines on unlabeled data according to CEF-SSL framework:
    - naive methods:
      - expectation minimization (?)
    - language modeling:
@@ -94,7 +93,8 @@ Pre-training was brief, done on a single laptop, with futher tests required.
        - different pretraining methods for these
      - pre-training epochs
      - unlabeled/labeled data ratio
-4. 3D dataset `(batch_size, seq_len, features)` -- first learn representation for event (`features`), then for sequence of events (`seq_len`)
+1. 3D dataset `(batch_size, seq_len, features)` -- first learn representation for event (`features`), then for sequence of events (`seq_len`)
+1. Evaluate preprocessing with BPE tokenizer instead of JSON cleanup + whitespace
 
 ### Detailed ToDo list
 
