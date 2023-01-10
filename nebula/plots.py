@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
+import json
 
 from pandas import DataFrame
 
@@ -157,17 +158,21 @@ def plotVocabSizeMaxLenTests(inFolder, plotOutFolder, maxLen=1024, vocabSize=200
     pngPath = plotOutFolder + title.replace(" ", "_").replace("=", "_").replace(";", "")+".png"
     plotCrossValidationFolder(inFolder, field, diffExtractor, extraFileFilter, title=title, savePath=pngPath)
 
-def plotVocabSizeMaxLenArchComparison(vmFolders, maxLen=512, vocabSize=2000, savePath=None, legendTitle=None, title="Architecture", figSize=(18, 6), legendValues=None):
+def plotVocabSizeMaxLenArchComparison(vmFolders, maxLen=512, vocabSize=2000, savePath=None, legendTitle=None, title="Architecture", figSize=(18, 6), legendValues=None, fprs=['0.0001', '0.001', '0.01', '0.1']):
     metricDict = dict()
     timeDict = dict()
     for folder in vmFolders:
-        key = folder.rstrip("_VocabSize_maxLen")
-        metricFile = [x for x in os.listdir(folder) if f"maxLen_{maxLen}_vocabSize_{vocabSize}" in x][0]
+        key = folder.split("\\")[-1].rstrip("_VocabSize_maxLen").rstrip("_PositEmbFix")
+        try:
+            metricFile = [x for x in os.listdir(folder) if f"maxLen_{maxLen}_vocabSize_{vocabSize}" in x][0]
+        except IndexError:
+            metricFile = [x for x in os.listdir(folder) if f"vocabSize_10000_maxLen_2048" in x][0]
         metricFile = os.path.join(folder, metricFile)
         dfDict, timeValue = readCrossValidationMetricFile(metricFile)
+        dfDict = dfDict[dfDict.index.isin(fprs)]
         metricDict[key] = dfDict
         timeDict[key] = timeValue
-    plotTitle = f"{title} Comparison; maxLen={maxLen}, vocabSize={vocabSize}"
+    plotTitle = f"{title} Comparison"
     fig, ax = plotCrossValidation_TPR_F1_Time(metricDict, timeDict, legentTitle=legendTitle, savePath=savePath, title=plotTitle, figSize=figSize)
     if legendValues:
                 # modify legend for first plot

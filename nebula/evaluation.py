@@ -63,7 +63,7 @@ class SelfSupervisedPretraining:
             "modelForwardPass": models['pretrained'].pretrain,
             "lossFunction": CrossEntropyLoss(),
             "optimizerClass": Adam,
-            "optimizerConfig": {"lr": 0.001},
+            "optimizerConfig": {"lr": 0.0005},
             "verbosityBatches": self.verbosityBatches,
             "batchSize": self.batchSize,
             "falsePositiveRates": self.falsePositiveRates,
