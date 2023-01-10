@@ -1,6 +1,5 @@
 import json
 import torch
-import pickle
 import logging
 import numpy as np
 import time
@@ -9,42 +8,47 @@ import sys
 from sklearn.utils import shuffle
 sys.path.extend(['../..', '.'])
 from nebula.models import Cnn1DLinearLM
-from nebula.pretraining import SelfSupervisedPretraining, MaskedLanguageModel
+from nebula.attention import ReformerLM
+from nebula.pretraining import MaskedLanguageModel
+from nebula.evaluation import SelfSupervisedPretraining
+
+# supress UndefinedMetricWarning, which appears when a batch has only one class
+import warnings
+warnings.filterwarnings("ignore")
 
 # =========== SCRIPT CONFIG ===========
 
-train_limit = None # 13000
+train_limit = None # 3000
 random_state = 42
 rest = 30 # seconds to cool down between splits
 logFile = f"PreTrainingEvaluation_randomState_{random_state}_limit_{train_limit}.log"
 
 #for unlabeledDataSize in [0.75, 0.8, 0.85, 0.9, 0.95]:
-unlabeledDataSize = 0.95
-nSplits = 5
+unlabeledDataSize = 0.9
+nSplits = 2
 downStreamEpochs = 2
-preTrainEpochs = 5
-#unlabeledDataSize = 0.8
+preTrainEpochs = 3
 falsePositiveRates = [0.003, 0.01, 0.03, 0.1]
-outputFolder = rf"evaluation\MaskedLanguageModeling\unlabeledDataSize_{unlabeledDataSize}_preTrain_{preTrainEpochs}_downStream_{downStreamEpochs}_nSplits_{nSplits}_{int(time.time())}"
+outputFolder = rf"evaluation\MaskedLanguageModeling\Reformer_unlabeledDataSize_{unlabeledDataSize}_preTrain_{preTrainEpochs}_downStream_{downStreamEpochs}_nSplits_{nSplits}_{int(time.time())}"
 
 # ===== LOGGING SETUP =====
 
 os.makedirs(outputFolder, exist_ok=True)
 # loging setup
-logging.basicConfig(filename=os.path.join(outputFolder, logFile), level=logging.WARNING)
+logging.basicConfig(format='%(asctime)s %(message)s', filename=os.path.join(outputFolder, logFile), level=logging.WARNING)
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 logging.warning(" [!] Starting Masked Language Model evaluation over {} splits!".format(nSplits))
 
 # =========== LOADING DATA ===========
 
-xTrainFile = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset_WithAPIargs\speakeasy_VocabSize_10000_maxLen_2048_x.npy"
+xTrainFile = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset\speakeasy_VocabSize_10000_maxLen_2048_x.npy"
 xTrain = np.load(xTrainFile)
-yTrainFile = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset_WithAPIargs\speakeasy_y.npy"
+yTrainFile = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset\speakeasy_y.npy"
 yTrain = np.load(yTrainFile)
-xTestFile = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_testset_WithAPIargs\speakeasy_VocabSize_10000_maxLen_2048_x.npy"
+xTestFile = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_testset\speakeasy_VocabSize_10000_maxLen_2048_x.npy"
 xTest = np.load(xTestFile)
-yTestFile = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_testset_WithAPIargs\speakeasy_y.npy"
+yTestFile = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_testset\speakeasy_y.npy"
 yTest = np.load(yTestFile)
 
 if train_limit:
@@ -52,19 +56,24 @@ if train_limit:
     xTrain = xTrain[:train_limit]
     yTrain = yTrain[:train_limit]
 
-vocabFile = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset_WithAPIargs\speakeasy_VocabSize_10000.pkl"
-with open(vocabFile, 'rb') as f:
-    vocab = pickle.load(f)
+vocabFile = r"nebula\objects\speakeasyReportVocab.json"
+with open(vocabFile, 'r') as f:
+    vocab = json.load(f)
 
 logging.warning(f" [!] Loaded data and vocab. X train size: {xTrain.shape}, X test size: {xTest.shape}, vocab size: {len(vocab)}")
 
 # =========== PRETRAINING CONFIG ===========
 
+# modelConfig = {
+#     "vocabSize": len(vocab),
+#     "hiddenNeurons": [512, 256, 128]
+# }
+# modelClass = Cnn1DLinearLM # only difference is that .pretrain() is implemented
 modelConfig = {
     "vocabSize": len(vocab),
-    "hiddenNeurons": [512, 256, 128]
+    "hiddenNeurons": [64]
 }
-modelClass = Cnn1DLinearLM # only difference is that .pretrain() is implemented
+modelClass = ReformerLM
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 languageModelClass = MaskedLanguageModel
@@ -84,7 +93,7 @@ pretrainingConfig = {
     "pretraingEpochs": preTrainEpochs,
     "downstreamEpochs": downStreamEpochs,
     "verbosityBatches": 50,
-    "batchSize": 256,
+    "batchSize": 8,
     "randomState": random_state,
     "falsePositiveRates": falsePositiveRates,
 }

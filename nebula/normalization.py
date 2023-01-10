@@ -1,7 +1,8 @@
 import re
 from numpy import where
 from pandas import to_datetime
-from .constants import VARIABLE_MAP
+
+from nebula.constants import VARIABLE_MAP
 
 def normalizeTablePath(df, col="path"):
     if df.empty:

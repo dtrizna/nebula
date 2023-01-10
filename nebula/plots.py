@@ -2,9 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
+import json
 
 from pandas import DataFrame
-from nebula.evaluation import readCrossValidationFolder, readCrossValidationMetricFile
 
 def plot3D(arr, labels, title):
     #from mpl_toolkits.mplot3d import Axes3D
@@ -44,22 +44,21 @@ def plotCounterCountsLineplot(
     else:
         plt.show()
 
-def plotListElementLengths(list_of_strings, xlim=None, outfile=None):
+def plotListElementLengths(list_of_strings, xlim=None, outfile=None, bins=100, ax=None):
     lengths = [len(x) for x in list_of_strings]
-    _, ax = plt.subplots(1, 1, figsize=(10, 8))
-    ax.hist(lengths, bins=100)
-    plt.title("Histogram of list element lengths")
+    if ax is None:
+        fig, ax = plt.subplots(1, 1, figsize=(10, 8))
+    ax.hist(lengths, bins=bins)
+    ax.set_title("Histogram of list element lengths")
     if xlim:
-        plt.xlim(xlim)
-    plt.yscale("log")
-    plt.ylabel("Count (log)")
-    plt.grid(which="both")
+        ax.set_xlim(xlim)
+    ax.set_yscale("log")
+    ax.set_ylabel("Count (log)")
+    ax.grid(which="both")
     if outfile:
         plt.tight_layout()
         plt.savefig(outfile)
-    else:
-        plt.show()
-    return lengths
+    return lengths, ax
 
 def plotCrossValidationDict(dfDict, key, ax=None, legendTitle=None, savePath=None):
     if ax is None:
@@ -159,17 +158,21 @@ def plotVocabSizeMaxLenTests(inFolder, plotOutFolder, maxLen=1024, vocabSize=200
     pngPath = plotOutFolder + title.replace(" ", "_").replace("=", "_").replace(";", "")+".png"
     plotCrossValidationFolder(inFolder, field, diffExtractor, extraFileFilter, title=title, savePath=pngPath)
 
-def plotVocabSizeMaxLenArchComparison(vmFolders, maxLen=512, vocabSize=2000, savePath=None, legendTitle=None, title="Architecture", figSize=(18, 6), legendValues=None):
+def plotVocabSizeMaxLenArchComparison(vmFolders, maxLen=512, vocabSize=2000, savePath=None, legendTitle=None, title="Architecture", figSize=(18, 6), legendValues=None, fprs=['0.0001', '0.001', '0.01', '0.1']):
     metricDict = dict()
     timeDict = dict()
     for folder in vmFolders:
-        key = folder.rstrip("_VocabSize_maxLen")
-        metricFile = [x for x in os.listdir(folder) if f"maxLen_{maxLen}_vocabSize_{vocabSize}" in x][0]
+        key = folder.split("\\")[-1].rstrip("_VocabSize_maxLen").rstrip("_PositEmbFix")
+        try:
+            metricFile = [x for x in os.listdir(folder) if f"maxLen_{maxLen}_vocabSize_{vocabSize}" in x][0]
+        except IndexError:
+            metricFile = [x for x in os.listdir(folder) if f"vocabSize_10000_maxLen_2048" in x][0]
         metricFile = os.path.join(folder, metricFile)
         dfDict, timeValue = readCrossValidationMetricFile(metricFile)
+        dfDict = dfDict[dfDict.index.isin(fprs)]
         metricDict[key] = dfDict
         timeDict[key] = timeValue
-    plotTitle = f"{title} Comparison; maxLen={maxLen}, vocabSize={vocabSize}"
+    plotTitle = f"{title} Comparison"
     fig, ax = plotCrossValidation_TPR_F1_Time(metricDict, timeDict, legentTitle=legendTitle, savePath=savePath, title=plotTitle, figSize=figSize)
     if legendValues:
                 # modify legend for first plot
@@ -239,3 +242,51 @@ def plotVocabSizeMaxLenHeatmap(inFolder, fpr, savePath=None, rangeL=None, figSiz
         plt.savefig(savePath)
 
     return axs
+
+
+def readCrossValidationMetricFile(file):
+    with open(file, "r") as f:
+            metrics = json.load(f)
+    cols = ["tpr_avg", "tpr_std", "f1_avg", "f1_std"]
+    dfMetrics = DataFrame(columns=cols)
+    for fpr in metrics:
+        if fpr in ("avg_epoch_time", "epoch_time_avg"):
+            timeValue = metrics[fpr]
+        else:
+            if isinstance(metrics[fpr], dict):
+                tpr_avg = metrics[fpr]["tpr_avg"]
+                tpr_std = np.std(metrics[fpr]["tpr"])
+                f1_avg = metrics[fpr]["f1_avg"]
+                f1_std = np.std(metrics[fpr]["f1"])
+            else:
+                arr = np.array(metrics[fpr]).squeeze()
+                if arr.ndim == 1:
+                    tpr_avg = arr[0]
+                    tpr_std = 0
+                    f1_avg = arr[1]
+                    f1_std = 0
+                elif arr.ndim == 2:
+                    tpr_avg = arr[:, 0].mean()
+                    tpr_std = arr[:, 0].std()
+                    f1_avg = arr[:, 1].mean()
+                    f1_std = arr[:, 1].std()
+            dfMetrics.loc[fpr] = [tpr_avg, tpr_std, f1_avg, f1_std]
+    return dfMetrics, timeValue
+
+def readCrossValidationFolder(folder, diffExtractor, extraFileFilter=None):
+    if extraFileFilter:
+        metricFiles = [x for x in os.listdir(folder) if x.endswith(".json") and extraFileFilter(x)]
+    else:
+        metricFiles = [x for x in os.listdir(folder) if x.endswith(".json")]
+    fileToField = dict(zip(metricFiles, [diffExtractor(x) for x in metricFiles]))
+    # sort fileToFiel based on values
+    fileToField = {k: v for k, v in sorted(fileToField.items(), key=lambda item: int(item[1]))}
+
+    dfDict = dict()
+    timeDict = dict()
+    for file in fileToField:
+        dfMetrics, avgEpochTime = readCrossValidationMetricFile(os.path.join(folder, file))
+        dfDict[fileToField[file]] = dfMetrics
+        timeDict[fileToField[file]] = avgEpochTime
+        
+    return dfDict, timeDict
