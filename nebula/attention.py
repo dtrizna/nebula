@@ -76,11 +76,11 @@ class TransformerEncoderModel(nn.Module):
         return out
 
 
-class MyReformerLM(nn.Module):
+class ReformerLM(nn.Module):
     def __init__(
         self,
         vocabSize,
-        maxLen,
+        maxLen = None,
         dim = 64,
         depth = 4,
         heads = 4,
@@ -98,6 +98,7 @@ class MyReformerLM(nn.Module):
         ff_glu = False,
         layer_dropout = 0.,
         random_rotations_per_head = False,
+        weight_tie_embedding = False,
         use_scale_norm = False,
         use_rezero = False,
         use_full_attn = False,
@@ -116,7 +117,7 @@ class MyReformerLM(nn.Module):
         pkm_num_keys = 128,
         hiddenNeurons: list = [64], # decoder's classifier FFNN complexity
         classifierDropout: int = 0.5,
-        meanOverSequence: bool = False,
+        meanOverSequence: bool = True,
         numClasses = 1, # binary classification
     ):
         super().__init__()
@@ -148,10 +149,10 @@ class MyReformerLM(nn.Module):
             self.out = Identity()
             return
 
-        # self.preTrainLayers = nn.Sequential(
-        #     nn.Linear(dim, emb_dim) if emb_dim != dim else Identity(),
-        #     nn.Linear(emb_dim, vocabSize) if not weight_tie_embedding else MatrixMultiply(self.token_emb.weight, transpose=True, normalize=True)
-        # )
+        self.preTrainLayers = nn.Sequential(
+            nn.Linear(dim, emb_dim) if emb_dim != dim else Identity(),
+            nn.Linear(emb_dim, vocabSize) if not weight_tie_embedding else MatrixMultiply(self.token_emb.weight, transpose=True, normalize=True)
+        )
 
         self.ffnn = []
         for i,h in enumerate(hiddenNeurons):
@@ -183,9 +184,9 @@ class MyReformerLM(nn.Module):
         x = self.norm(x)
         return x
     
-    # def pretrain(self, x):
-    #     x_core = self.core(x)
-    #     return self.preTrainLayers(x_core)
+    def pretrain(self, x):
+        x_core = self.core(x)
+        return self.preTrainLayers(x_core).mean(dim=1)
     
     def forward(self, x):
         x = self.core(x)

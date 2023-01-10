@@ -2,7 +2,7 @@ import torch
 
 import sys
 sys.path.extend(['.', '..\\..'])
-from nebula.attention import TransformerEncoderModel, MyReformerLM
+from nebula.attention import TransformerEncoderModel, ReformerLM
 
 model = TransformerEncoderModel(
     vocabSize=10000,
@@ -14,7 +14,7 @@ x = torch.randint(0, 10000, (1, 2048)).cuda()
 y = model(x).detach().cpu()
 print(y.shape)
 
-model2 = MyReformerLM(
+model2 = ReformerLM(
     vocabSize=10000,
     maxLen=2048,
     dim=512,

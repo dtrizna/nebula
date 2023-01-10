@@ -8,20 +8,24 @@ from sklearn.utils import shuffle
 sys.path.extend(['..', '.'])
 from nebula import ModelTrainer
 from nebula.models import Cnn1DLinear, Cnn1DLSTM, LSTM
-from nebula.attention import TransformerEncoderModel, MyReformerLM
+from nebula.attention import TransformerEncoderModel, ReformerLM
 from nebula.evaluation import CrossValidation
+
+# supress UndefinedMetricWarning, which appears when a batch has only one class
+import warnings
+warnings.filterwarnings("ignore")
 
 # ============== SCRIPT CONFIG
 train_limit = None
 runType = "_modelSelection"
-runName = f"Reformer_VocabSize_maxLen"
+runName = f"Reformer_LR_tests"
 
 # ============== Cross-Valiation CONFIG
-nFolds = 3
-epochs = 3
-fprValues = [0.0001, 0.001, 0.01, 0.1]
+nFolds = 2
+epochs = 2
+fprValues = [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1]
 rest = 30 # seconds to rest between folds (to cool down)
-metricFilePrefix = "" # is set later, within the loop
+metricFilePrefix = "stepLR500_" # if vocabSize loop - it is set later, within the loop
 random_state = 42
 
 # ============== REPORTING CONFIG
@@ -32,7 +36,7 @@ outputFolder = os.path.join(outputFolder, runName)
 os.makedirs(outputFolder, exist_ok=True)
 
 # loging setup
-logFile = f"CrossValidationRun_{int(time.time())}.log"
+logFile = f"CrossValidationRun_{metricFilePrefix}{int(time.time())}.log"
 logging.basicConfig(filename=os.path.join(outputFolder, logFile), level=logging.WARNING)
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
@@ -52,22 +56,24 @@ maxLen = 2048
 # modelClass = TransformerEncoderModel
 # modelArch = {
 #     "vocabSize": vocabSize,  # size of vocabulary
+#     "maxLen": maxLen,  # maximum length of the input sequence
 #     "dModel": 32,  # embedding & transformer dimension
 #     "nHeads": 8,  # number of heads in nn.MultiheadAttention
 #     "dHidden": 128,  # dimension of the feedforward network model in nn.TransformerEncoder
-#     "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+#     "nLayers": 4,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
 #     "numClasses": 1, # binary classification
 #     "hiddenNeurons": [64],
 #     "layerNorm": False,
 #     "dropout": 0.5
 # }
-modelClass = MyReformerLM
+modelClass = ReformerLM
 modelArch = {
     "vocabSize": vocabSize,
     "maxLen": maxLen,
     "dim": 64,
     "heads": 4,
     "depth": 4,
+    "meanOverSequence": True,
 }
 # modelClass = Cnn1DLSTM
 # modelArch = {
@@ -89,7 +95,7 @@ modelInterfaceConfig = {
     "model": None, # will be set later
     "lossFunction": torch.nn.BCEWithLogitsLoss(),
     "optimizerClass": torch.optim.Adam,
-    "optimizerConfig": {"lr": 0.001},
+    "optimizerConfig": {"lr": 2.5e-4},
     "outputFolder": None, # will be set later
     "batchSize": 16,
     "verbosityBatches": 100
