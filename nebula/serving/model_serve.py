@@ -1,24 +1,27 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from base64 import b64decode
 import logging
 import argparse
-import time
 import pickle
-from base64 import b64decode
+import time
 
-# machine learning utilities
 from xgboost import XGBClassifier
 
 import sys
-sys.path.append(".")
-sys.path.append("..")
-
-# this is needed during pickel.load() since it uses normalization
-#from utils.preprocessing import normalizeCmd
-from utils.misc import getScriptPath
-SCRIPT_PATH = getScriptPath()
+sys.path.extend(["..", "."])
+from nebula.misc import getRealPath
+SCRIPT_PATH = getRealPath(type="script")
 
 
 class MyHTTPHandler(BaseHTTPRequestHandler):
+    def __init__(self,
+        model = None,
+        encoder = None,
+    ):
+        super().__init__()
+        self.model = model
+        self.encoder = encoder
+
     def _set_response_headers(self, code=200):
         self.send_response(code)
         self.send_header('Content-type', 'text/html')
@@ -39,21 +42,16 @@ Body:\n{post_data}\n""")
         xgb_model = XGBClassifier(n_estimators=100, 
                                   use_label_encoder=False, 
                                   eval_metric="logloss")
-        
-        model_type = str(self.path)
-        
-        if model_type == "/":
-            model_type = "TfidfVectorizer_max500_ngram12"
-            encoder_path = f"{SCRIPT_PATH}/../models/{model_type}.pkl"
-            model_path = f"{SCRIPT_PATH}/../models/{model_type}.model"
+                
+        if self.path == "/":
+            encoder_path = self.encoder
+            model_path = self.model
         else:
             encoder_path = None
             model_path = None
             self._set_response_headers(code=404)
 
         if encoder_path and model_path:
-
-            #wpt = WordPunctTokenizer()
             encoder = pickle.load(open(encoder_path, "rb"))            
             xgb_model.load_model(model_path)
             
@@ -62,7 +60,7 @@ Body:\n{post_data}\n""")
             except:
                 cmd = str(post_data)
 
-            #logging.info(f"Command: {cmd}")
+            #logging.info(f"Received command to verify: {cmd}")
             x = encoder.transform([cmd])
             prediction = xgb_model.predict_proba(x)
             msg = f"Input:{cmd}\nProb(malicious): {prediction[0][1]*100:.6f}%\n"

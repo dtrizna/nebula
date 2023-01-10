@@ -8,7 +8,7 @@ import threading
 import sys
 sys.path.append(".")
 sys.path.append("..\\..\\")
-from src.emulation import emulate
+from nebula.preprocessing import PEDynamicFeatureExtractor
 
 CONFIG = r"C:\Users\dtrizna\Code\nebula\preprocessing\_speakeasyConfig.json"
 
@@ -88,6 +88,9 @@ if __name__ == "__main__":
 
     l = len(filelist)
     
+    extractor = PEDynamicFeatureExtractor(
+        speakeasyConfig="./_speakeasyConfig.json"
+    )
     for i,file in enumerate(filelist):
         print(f" [!] Emulating {i}\{l}", end="\r")
         if i < args.start_idx:
@@ -95,6 +98,6 @@ if __name__ == "__main__":
         while len(threading.enumerate()) > args.threads:
             time.sleep(0.1)
 
-        t = threading.Thread(target=emulate, args=(file, report_folder, i, l, CONFIG))
+        t = threading.Thread(target=extractor.emulate, args=(file, report_folder, i, l, CONFIG))
         t.start()
         logging.debug(f" [D] Started theread: {i}\{l}")
