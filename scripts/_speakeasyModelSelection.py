@@ -10,6 +10,7 @@ from nebula import ModelTrainer
 from nebula.models import Cnn1DLinear, Cnn1DLSTM, LSTM
 from nebula.attention import TransformerEncoderModel, ReformerLM
 from nebula.evaluation import CrossValidation
+from nebula.misc import get_path
 
 # supress UndefinedMetricWarning, which appears when a batch has only one class
 import warnings
@@ -28,22 +29,30 @@ rest = 30 # seconds to rest between folds (to cool down)
 metricFilePrefix = "" # if vocabSize loop - it is set later, within the loop
 random_state = 42
 
+vocabSize = 50000
+maxLen = 2048
+
 # ============== REPORTING CONFIG
 
-outputFolder = rf"C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\{runType}"
+SCRIPT_PATH = get_path(type="script")
+REPO_ROOT = os.path.join(SCRIPT_PATH, "..")
+outputFolder = os.path.join(REPO_ROOT, "evaluation", "crossValidation", runType)
 os.makedirs(outputFolder, exist_ok=True)
 outputFolder = os.path.join(outputFolder, runName)
 os.makedirs(outputFolder, exist_ok=True)
 
 # loging setup
 logFile = f"CrossValidationRun_{metricFilePrefix}{int(time.time())}.log"
-logging.basicConfig(filename=os.path.join(outputFolder, logFile), level=logging.WARNING)
+logging.basicConfig(
+    filename=os.path.join(outputFolder, logFile),
+    level=logging.WARNING,
+    format='%(asctime)s %(message)s',
+    datefmt='%m/%d/%Y %I:%M:%S %p'
+)
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 # =============== MODEL CONFIG
 
-vocabSize = 50000
-maxLen = 2048
 # modelClass = Cnn1DLinear
 # modelArch = {
 #     "vocabSize": vocabSize,
@@ -107,7 +116,7 @@ modelInterfaceConfig = {
 # =============== CROSS-VALIDATION LOOP
 
 # 1. CROSS VALIDATING OVER DIFFERENT VOCABULARY AND PADDING SIZES
-# trainSetPath = rf"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset_{runType}"
+# trainSetPath = os.path.join(REPO_ROOT, "data", "data_filtered", f"speakeasy_trainset_{runType}")
 # trainSetsFiles = sorted([x for x in os.listdir(trainSetPath) if x.endswith("_x.npy")])
 # y_train_orig = np.load(os.path.join(trainSetPath, "speakeasy_y.npy"))
 
@@ -136,8 +145,8 @@ modelInterfaceConfig = {
 #     logging.warning(f" [!] Running Cross Validation with vocabSize: {vocabSize} | maxLen: {maxLen}")
 
 # 2. CROSS VALIDATION OVER DIFFERENT MODEL CONFIGRATIONS
-x_train = np.load(rf"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset_50k\speakeasy_VocabSize_{vocabSize}_maxLen_{maxLen}_x.npy")
-y_train = np.load(r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset_50k\speakeasy_y.npy")
+x_train = np.load(os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_50k", f"speakeasy_VocabSize_{vocabSize}_maxLen_{maxLen}_x.npy"))
+y_train = np.load(os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_50k", "speakeasy_y.npy"))
 
 # for heads in [2, 4, 8, 16]:
 #     modelArch["nHeads"] = heads

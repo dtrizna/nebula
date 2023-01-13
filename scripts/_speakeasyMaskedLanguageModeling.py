@@ -11,6 +11,9 @@ from nebula.models import Cnn1DLinearLM
 from nebula.attention import ReformerLM
 from nebula.pretraining import MaskedLanguageModel
 from nebula.evaluation import SelfSupervisedPretraining
+from nebula.misc import get_path
+SCRIPT_PATH = get_path(type="script")
+REPO_ROOT = os.path.join(SCRIPT_PATH, "..")
 
 # supress UndefinedMetricWarning, which appears when a batch has only one class
 import warnings
@@ -29,26 +32,34 @@ nSplits = 2
 downStreamEpochs = 2
 preTrainEpochs = 3
 falsePositiveRates = [0.003, 0.01, 0.03, 0.1]
-outputFolder = rf"evaluation\MaskedLanguageModeling\Reformer_unlabeledDataSize_{unlabeledDataSize}_preTrain_{preTrainEpochs}_downStream_{downStreamEpochs}_nSplits_{nSplits}_{int(time.time())}"
+modelType = "ReformerLM"
+outputFolder = os.path.join(SCRIPT_PATH, "evaluation", "MaskedLanguageModeling", 
+    f"{modelType}_unlabeledDataSize_{unlabeledDataSize}_preTrain_{preTrainEpochs}_downStream_{downStreamEpochs}_nSplits_{nSplits}_{int(time.time())}")
 
 # ===== LOGGING SETUP =====
 
 os.makedirs(outputFolder, exist_ok=True)
-# loging setup
-logging.basicConfig(format='%(asctime)s %(message)s', filename=os.path.join(outputFolder, logFile), level=logging.WARNING)
+logging.basicConfig(
+    filename=os.path.join(outputFolder, logFile),
+    level=logging.WARNING,
+    format='%(asctime)s %(message)s',
+    datefmt='%m/%d/%Y %I:%M:%S %p'
+)
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 logging.warning(" [!] Starting Masked Language Model evaluation over {} splits!".format(nSplits))
 
 # =========== LOADING DATA ===========
 
-xTrainFile = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset\speakeasy_VocabSize_10000_maxLen_2048_x.npy"
+vocabSize = 10000
+maxLen = 2048
+xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset", f"speakeasy_VocabSize_{vocabSize}_maxLen_{maxLen}_x.npy")
 xTrain = np.load(xTrainFile)
-yTrainFile = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset\speakeasy_y.npy"
+yTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset", "speakeasy_y.npy")
 yTrain = np.load(yTrainFile)
-xTestFile = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_testset\speakeasy_VocabSize_10000_maxLen_2048_x.npy"
+xTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset", f"speakeasy_VocabSize_{vocabSize}_maxLen_{maxLen}_x.npy")
 xTest = np.load(xTestFile)
-yTestFile = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_testset\speakeasy_y.npy"
+yTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset", "speakeasy_y.npy")
 yTest = np.load(yTestFile)
 
 if train_limit:
@@ -56,7 +67,7 @@ if train_limit:
     xTrain = xTrain[:train_limit]
     yTrain = yTrain[:train_limit]
 
-vocabFile = r"nebula\objects\speakeasyReportVocab.json"
+vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", "speakeasyReportVocab.json")
 with open(vocabFile, 'r') as f:
     vocab = json.load(f)
 
