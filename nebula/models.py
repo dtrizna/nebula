@@ -310,25 +310,51 @@ class Cnn1DLSTM(nn.Module):
 
 class LSTM(nn.Module):
     def __init__(self, 
-                    vocabSize = None, 
-                    embeddingDim = 64, 
-                    hiddenDim = 128, 
+                    vocabSize = None,
+                    embeddingDim = 64,
+                    lstmHidden = 256,
                     lstmLayers = 1,
-                    bidirectionalLSTM = True,
-                    outputDim = 1):
+                    lstmDropout=0.1,
+                    lstmBidirectional = True,
+                    hiddenNeurons = [256, 64],
+                    batchNormFFNN = False,
+                    dropout=0.5,
+                    numClasses = 1):
         super(LSTM, self).__init__()
 
         self.embedding = nn.Embedding(vocabSize, embeddingDim)
-        self.lstm = nn.LSTM(embeddingDim, hiddenDim, lstmLayers, bidirectional=bidirectionalLSTM)
-        self.linear = nn.Linear(hiddenDim * 2 if bidirectionalLSTM else hiddenDim, outputDim)
+        self.lstm = nn.LSTM(embeddingDim, lstmHidden, lstmLayers, bidirectional=lstmBidirectional, dropout=lstmDropout)
+        #self.linear = nn.Linear(hiddenDim * 2 if bidirectionalLSTM else hiddenDim, outputDim)
+        self.ffnn = []
+        for i,h in enumerate(hiddenNeurons):
+            self.ffnnBlock = nn.Sequential()
+            if i == 0:
+                self.ffnnBlock.append(nn.Linear(lstmHidden * 2 if lstmBidirectional else lstmHidden, h))
+            else:
+                self.ffnnBlock.append(nn.Linear(hiddenNeurons[i-1], h))
+
+            # add BatchNorm to every layer except last
+            if batchNormFFNN and i < len(hiddenNeurons)-1:
+                self.ffnnBlock.append(nn.BatchNorm1d(h))
+            # add dropout to every layer except last
+
+            self.ffnnBlock.append(nn.ReLU())
+
+            if dropout > 0 and i < len(hiddenNeurons)-1:
+                self.ffnnBlock.append(nn.Dropout(dropout))
+            
+            self.ffnn.append(self.ffnnBlock)
+        self.ffnn = nn.Sequential(*self.ffnn)
+        self.output = nn.Linear(hiddenNeurons[-1], numClasses)
         
     def forward(self, input, hidden=None):
         # input is of shape (batch_size, sequence_length)
         embedded = self.embedding(input)
         # embedded is of shape (batch_size, sequence_length, embedding_size)
-        output, hidden = self.lstm(embedded, hidden)
-        # output is of shape (batch_size, sequence_length, hidden_size * 2 if bidirectional else hidden_size)
-        logits = self.linear(output).mean(dim=1)
+        x, hidden = self.lstm(embedded, hidden)
+        # x is of shape (batch_size, sequence_length, hidden_size * 2 if bidirectional else hidden_size)
+        x = self.ffnn(x.mean(axis=1))
+        logits = self.output(x)
         return logits
 
 

@@ -18,7 +18,7 @@ from nebula.misc import dictToString, get_tpr_at_fpr
 
 class SelfSupervisedPretraining:
     def __init__(self, 
-                    vocab,
+                    vocab, # TODO: remove? don't need it
                     modelClass,
                     modelConfig,
                     pretrainingTaskClass,
@@ -31,7 +31,7 @@ class SelfSupervisedPretraining:
                     downstreamEpochs=5,
                     batchSize=256,
                     verbosityBatches=100):
-        self.vocab = vocab
+        self.vocab = vocab # TODO: remove? don't need it
         self.modelClass = modelClass
         self.modelConfig = modelConfig
         self.falsePositiveRates = falsePositiveRates
@@ -118,10 +118,10 @@ class SelfSupervisedPretraining:
         # compute mean and std for each metric
         for trainingType in self.trainingTypes:
             for fpr in self.falsePositiveRates:
-                metrics[trainingType]["fpr_"+str(fpr)]["f1_mean"] = np.mean(metrics[trainingType]["fpr_"+str(fpr)]["f1"])
-                metrics[trainingType]["fpr_"+str(fpr)]["f1_std"] = np.std(metrics[trainingType]["fpr_"+str(fpr)]["f1"])
-                metrics[trainingType]["fpr_"+str(fpr)]["tpr_mean"] = np.mean(metrics[trainingType]["fpr_"+str(fpr)]["tpr"])
-                metrics[trainingType]["fpr_"+str(fpr)]["tpr_std"] = np.std(metrics[trainingType]["fpr_"+str(fpr)]["tpr"])
+                metrics[trainingType]["fpr_"+str(fpr)]["f1_mean"] = np.nanmean(metrics[trainingType]["fpr_"+str(fpr)]["f1"])
+                metrics[trainingType]["fpr_"+str(fpr)]["f1_std"] = np.nanstd(metrics[trainingType]["fpr_"+str(fpr)]["f1"])
+                metrics[trainingType]["fpr_"+str(fpr)]["tpr_mean"] = np.nanmean(metrics[trainingType]["fpr_"+str(fpr)]["tpr"])
+                metrics[trainingType]["fpr_"+str(fpr)]["tpr_std"] = np.nanstd(metrics[trainingType]["fpr_"+str(fpr)]["tpr"])
         return metrics
 
 
@@ -209,15 +209,17 @@ class CrossValidation(object):
 
         # take means over all folds        
         for fpr in self.fprValues:
-            self.metrics[fpr]["tpr_avg"] = np.mean(self.metrics[fpr]["tpr"])
-            self.metrics[fpr]["f1_avg"] = np.mean(self.metrics[fpr]["f1"])
+            self.metrics[fpr]["tpr_avg"] = np.nanmean(self.metrics[fpr]["tpr"])
+            self.metrics[fpr]["f1_avg"] = np.nanmean(self.metrics[fpr]["f1"])
 
         # Add the average epoch time
-        self.metrics["epoch_time_avg"] = np.mean(trainingTime)
+        self.metrics["epoch_time_avg"] = np.nanmean(trainingTime)
 
     def dump_metrics(self, prefix="", suffix=""):
         configStr = dictToString(self.modelConfig)
-        metricFilename = f"metrics_trainSize_{self.trainSize}_ep_{self.epochs}_cv_{self.nFolds}_{prefix}{configStr}{suffix}.json"
+        prefix = prefix.rstrip('_').lstrip('_') + '_' if prefix else ''
+        suffix = f"_{suffix.rstrip('_').lstrip('_')}" if suffix else ''
+        metricFilename = f"metrics_{prefix}trainSize_{self.trainSize}_ep_{self.epochs}_cv_{self.nFolds}_{configStr}{suffix}.json"
         metricFileFullpath = os.path.join(self.outputRootFolder, metricFilename)
         with open(metricFileFullpath, "w") as f:
             json.dump(self.metrics, f, indent=4)
