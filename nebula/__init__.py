@@ -29,7 +29,8 @@ class ModelTrainer(object):
                     outputFolder=None,
                     falsePositiveRates=[0.0001, 0.001, 0.01, 0.1],
                     modelForwardPass=None,
-                    stateDict = None):
+                    stateDict = None,
+                    step_size=1000):
         self.model = model    
         self.optimizer = optimizerClass(self.model.parameters(), **optimizerConfig)
         self.lossFunction = lossFunction
@@ -42,7 +43,7 @@ class ModelTrainer(object):
         elif optimSchedulerClass == "gpt":
             self.optimScheduler = OptimSchedulerGPT(self.optimizer)
         elif optimSchedulerClass == "step":
-            self.optimScheduler = OptimSchedulerStep(self.optimizer)
+            self.optimScheduler = OptimSchedulerStep(self.optimizer, step_size=step_size)
         else:
             self.optimScheduler = optimSchedulerClass(self.optimizer)
 
@@ -174,7 +175,7 @@ class ModelTrainer(object):
                     metricsReport += f"TPR: {epochTPRs[self.fprReportingIdx]:.2f} |  F1: {epochF1s[self.fprReportingIdx]:.2f}"
                 else:
                     metricsReport = "Not computing TPR and F1"
-                logging.warning(f" [*] {time.ctime()}: {epochIdx:^7} | Tr.loss: {np.mean(epochTrainLoss):.6f} | {metricsReport} | Elapsed: {timeElapsed:^9.2f}s")
+                logging.warning(f" [*] {time.ctime()}: {epochIdx:^7} | Tr.loss: {np.nanmean(epochTrainLoss):.6f} | {metricsReport} | Elapsed: {timeElapsed:^9.2f}s")
             if self.outputFolder:
                 self.dumpResults()
         except KeyboardInterrupt:
@@ -211,8 +212,8 @@ class ModelTrainer(object):
             
         # take mean across all batches for each metric
         # resulting shape of each metric: (len(falsePositiveRates), )
-        self.testTruePositiveRates = np.array(self.testTruePositiveRates).mean(axis=0)
-        self.testF1s = np.array(self.testF1s).mean(axis=0)
+        self.testTruePositiveRates = np.array(self.testTruePositiveRates).nanmean(axis=0)
+        self.testF1s = np.array(self.testF1s).nanmean(axis=0)
         if metrics == "array":
             return self.testLoss, self.testTruePositiveRates, self.testF1s
         elif metrics == "json":

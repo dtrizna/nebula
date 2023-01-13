@@ -266,10 +266,10 @@ def readCrossValidationMetricFile(file):
                     f1_avg = arr[1]
                     f1_std = 0
                 elif arr.ndim == 2:
-                    tpr_avg = arr[:, 0].mean()
-                    tpr_std = arr[:, 0].std()
-                    f1_avg = arr[:, 1].mean()
-                    f1_std = arr[:, 1].std()
+                    tpr_avg = arr[:, 0].nanmean()
+                    tpr_std = arr[:, 0].nanstd()
+                    f1_avg = arr[:, 1].nanmean()
+                    f1_std = arr[:, 1].nanstd()
             dfMetrics.loc[fpr] = [tpr_avg, tpr_std, f1_avg, f1_std]
     return dfMetrics, timeValue
 
