@@ -12,8 +12,8 @@
      - Download raw PE data, build dataset, and train classifier.
 1. Try attention models:
    - ~~Transformer: re-run tests after fix of positional embeddings~~
-   - ~~Reformer~~ Implemented `nebula.attention.MyReformerLM` class. Takes ~80min per epoch with 50k samples on GPU if sample length 2048.  
-     - Try lower learning rate -- training seems to hit plateau and fluctuate strongly after ~500 batches.
+   - ~~Reformer~~ Implemented `nebula.attention.ReformerLM` class. Takes ~80min per epoch with 50k samples on GPU if sample length 2048.  
+     - ~~Try lower learning rate -- training seems to hit plateau and fluctuate strongly after ~500 batches.~~ Loss still doesn't fall below ~0.13-0.2, even with scheduling of LR to $n\times10^{-7}$ scale.
    - Star transformer (?)
    - Longformer (?)
 1. Pre-training routines on unlabeled data according to CEF-SSL framework:
@@ -21,7 +21,7 @@
      - expectation minimization (?)
    - language modeling:
      - ~~MLM~~ (see `nebula.pretraining.MaskedLanguageModel` class)
-     - GPT like $p(x_{t+1}|x_{t}\ ...\ x_{0})$
+     - **GPT like $p(x_{t+1}|x_{t}\ ...\ x_{0})$**
    - embedding pretraining:
      - CBOW embedding langauge modeling
      - fastText
@@ -30,7 +30,9 @@
        - different pretraining methods for these
      - pre-training epochs
      - unlabeled/labeled data ratio
-1. 3D dataset `(batch_size, seq_len, features)` -- first learn representation for event (`features`), then for sequence of events (`seq_len`)
+1. Data prep:
+   - **try 50k vocab size for all promising models**
+   - 3D data : `(batch_size, seq_len, features)` -- first learn representation for event (`features`), then for sequence of events (`seq_len`)
 1. Evaluate preprocessing with BPE tokenizer instead of JSON cleanup + whitespace
 
 ## Detailed ToDo list
