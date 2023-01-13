@@ -9,8 +9,8 @@ from xgboost import XGBClassifier
 
 import sys
 sys.path.extend(["..", "."])
-from nebula.misc import getRealPath
-SCRIPT_PATH = getRealPath(type="script")
+from nebula.misc import get_path
+SCRIPT_PATH = get_path(type="script")
 
 
 class MyHTTPHandler(BaseHTTPRequestHandler):
