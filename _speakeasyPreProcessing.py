@@ -8,16 +8,15 @@ from tqdm import tqdm
 
 import sys
 sys.path.extend([".", ".."])
-from nebula.misc import getRealPath, flattenList
+from nebula.misc import getRealPath
 from nebula import PEDynamicFeatureExtractor, JSONTokenizer
 
 # SCRIPT CONFIG
 
-#OUTFOLDER_SUFFIX = "_WithError"
-OUTFOLDER_SUFFIX = "_WithDns"
+OUTFOLDER_SUFFIX = "_50k"
 LOGFILE = f"PreProcessing{OUTFOLDER_SUFFIX}_{int(time.time())}.log"
-VOCAB_SIZES = [500, 1000, 1500, 2000, 10000, 15000]
-MAX_SEQ_LENGTHS = [512, 1024, 2048, 4096]
+VOCAB_SIZES = [50000]
+MAX_SEQ_LENGTHS = [2048]
 
 # from nebula.constants import *
 # PREPROCESSING CONFIG AS DEFINED IN nebula.constants
@@ -27,7 +26,6 @@ SPEAKEASY_RECORD_FIELDS = [
     'file_access.path',
     'network_events.traffic.server',
     'network_events.traffic.port',
-    'network_events.dns.query',
     'registry_access.event',
     'registry_access.path',
     'apis.api_name',
@@ -43,7 +41,6 @@ JSON_CLEANUP_SYMBOLS = ['"', "'", ":", ",", "[", "]", "{", "}", "\\", "/"]
 SPEAKEASY_TOKEN_STOPWORDS = ['api_name', 'args', 'ret_val', 'event', 'path', 'open_flags', 'access_flags', 'size', 'server', 'proto', 'port', 'method']
 
 # DATA CONFIG
-
 SCRIPT_PATH = getRealPath(type="script")
 EMULATION_TRAINSET_PATH = SCRIPT_PATH + r"\data\data_raw\windows_emulation_trainset"
 EMULATION_TESTSET_PATH = SCRIPT_PATH + r"\data\data_raw\windows_emulation_testset"
@@ -230,4 +227,4 @@ if __name__ == "__main__":
     # ===============
 
     #main(limit=None, mode="load")
-    main(limit=1000)
+    main()
