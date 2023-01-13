@@ -6,7 +6,7 @@
 
 Behavioral intrusion detection system that is capable of self-supervised learning from unlabeled data. **Work in progress.**
 
-Quasi-functional implementation
+Quasi-functional implementation:
 
 - Portable Executable (PE) classifier under `nebula.PEHybridClassifier` class. It uses:
   - (1) 1D Convolutional Neural Network (CNN) for dynamic PE analysis. Behavior is obtained using *speakeasy* emulator (see `nebula.preprocessing.PEDynamicFeatureExtractor`), with analysis of:
@@ -33,13 +33,15 @@ pip install git+https://github.com/dtrizna/nebula
 
 ## PE classifier configuration evaluations
 
-<center><img src="img\_crossValidationPlots\_modelArchitectureComparison.png" width=700>
+Evaluation code is available in `dev` branch, under `evaluation`.
 
-<img src="img\_crossValidationPlots\_vocabularySizeComparison.png" width=700>
+<center><img src="img\_crossValidationPlots\_modelArchitectureComparison.png" width=900>
 
-<img src="img\_crossValidationPlots\_fullVocabSizeMaxLenHeatmap_fpr_0_001.png" width=700>
+<img src="img\_crossValidationPlots\_vocabularySizeComparison.png" width=800>
 
-<img src="img\_crossValidationPlots\_PreProcessingComparison.png" width=700></center>
+<img src="img\_crossValidationPlots\_fullVocabSizeMaxLenHeatmap_fpr_0_001.png" width=800>
+
+<img src="img\_crossValidationPlots\_PreProcessingComparison.png" width=800></center>
 
 ## Pre-training with self-supervised techniques
 
@@ -53,10 +55,10 @@ Evaluation done using `nebula.pretraining.SelfSupervisedPretraining` class that 
 
 Results with even brief pre-training (5 epochs on single GPU laptop) are unclear. On trainig set (i.e. $\mathbb{L}$) metrics are improved:
 
-<center><img src="img\_maskedLanguageModelPlots\unlabeledDataSize_0.9_preTrain_5_downStream_2_nSplits_5_1672239000_trainSetStats.png" width=700></center>
+<center><img src="img\_maskedLanguageModelPlots\unlabeledDataSize_0.9_preTrain_5_downStream_2_nSplits_5_1672239000_trainSetStats.png" width=800></center>
 
 Yet no significant benefit on test set (i.e. $\mathbb{F}$) are observed:
 
-<center><img src="img\_maskedLanguageModelPlots\unlabeledDataSize_0.8_preTrain_10_downStream_3_nSplits_5_1672232495_testSetStats.png" width=700></center>
+<center><img src="img\_maskedLanguageModelPlots\unlabeledDataSize_0.8_preTrain_10_downStream_3_nSplits_5_1672232495_testSetStats.png" width=800></center>
 
 Pre-training was brief, done on a single laptop, with futher tests required.
