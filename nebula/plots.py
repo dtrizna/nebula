@@ -145,7 +145,7 @@ def plotVocabSizeMaxLenTests(inFolder, plotOutFolder, maxLen=1024, vocabSize=200
     extraFileFilter = lambda x: myFilter in x
 
     title = f"{inFolder.split('_')[0]} {field}; {'='.join(myFilter.split('_')[:-1])}"
-    pngPath = plotOutFolder + title.replace(" ", "_").replace("=", "_").replace(";", "")+".png"
+    pngPath = os.path.join(plotOutFolder, title.replace(" ", "_").replace("=", "_").replace(";", "").replace("crossValidation", "")+".png")
     plotCrossValidationFolder(inFolder, field, diffExtractor, extraFileFilter, title=title, savePath=pngPath)
 
     field = "maxLen"
@@ -155,7 +155,7 @@ def plotVocabSizeMaxLenTests(inFolder, plotOutFolder, maxLen=1024, vocabSize=200
     extraFileFilter = lambda x: myFilter in x
 
     title = f"{inFolder.split('_')[0]} {field}; {'='.join(myFilter.split('_')[:-1])}"
-    pngPath = plotOutFolder + title.replace(" ", "_").replace("=", "_").replace(";", "")+".png"
+    pngPath = os.path.join(plotOutFolder, title.replace(" ", "_").replace("=", "_").replace(";", "").replace("crossValidation", "")+".png")
     plotCrossValidationFolder(inFolder, field, diffExtractor, extraFileFilter, title=title, savePath=pngPath)
 
 def plotVocabSizeMaxLenArchComparison(vmFolders, maxLen=512, vocabSize=2000, savePath=None, legendTitle=None, title="Architecture", figSize=(18, 6), legendValues=None, fprs=['0.0001', '0.001', '0.01', '0.1']):
@@ -266,10 +266,10 @@ def readCrossValidationMetricFile(file):
                     f1_avg = arr[1]
                     f1_std = 0
                 elif arr.ndim == 2:
-                    tpr_avg = arr[:, 0].nanmean()
-                    tpr_std = arr[:, 0].nanstd()
-                    f1_avg = arr[:, 1].nanmean()
-                    f1_std = arr[:, 1].nanstd()
+                    tpr_avg = np.nanmean(arr[:, 0])
+                    tpr_std = np.nanstd(arr[:, 0])
+                    f1_avg = np.nanmean(arr[:, 1])
+                    f1_std = np.nanstd(arr[:, 1])
             dfMetrics.loc[fpr] = [tpr_avg, tpr_std, f1_avg, f1_std]
     return dfMetrics, timeValue
 
