@@ -32,7 +32,7 @@ def set_random_seed(seed_value):
         torch.backends.cudnn.deterministic = True  #needed
         torch.backends.cudnn.benchmark = False
 
-def getRealPath(type="script"):
+def get_path(type="script"):
     idx = 1 if type == "notebook" else 0
     return os.path.dirname(os.path.realpath(sys.argv[idx]))
 

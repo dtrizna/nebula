@@ -8,11 +8,11 @@ from datetime import datetime
 
 import sys
 sys.path.extend([".", "../.."])
-from nebula.misc import getRealPath
+from nebula.misc import get_path
 from nebula.ember import PEFeatureExtractor
 from nebula.constants import STATIC_FEATURE_VECTOR_LENGTH
 
-SCRIPT_PATH = getRealPath(type="script")
+SCRIPT_PATH = get_path(type="script")
 #SCRIPT_PATH = getRealPath(type="notebook")
 
 def getHashDirectory(h, dataset):
