@@ -8,16 +8,15 @@ from tqdm import tqdm
 
 import sys
 sys.path.extend([".", ".."])
-from nebula.misc import getRealPath, flattenList
+from nebula.misc import get_path
 from nebula import PEDynamicFeatureExtractor, JSONTokenizer
 
 # SCRIPT CONFIG
 
-#OUTFOLDER_SUFFIX = "_WithError"
-OUTFOLDER_SUFFIX = "_WithDns"
+OUTFOLDER_SUFFIX = "_50k"
 LOGFILE = f"PreProcessing{OUTFOLDER_SUFFIX}_{int(time.time())}.log"
-VOCAB_SIZES = [500, 1000, 1500, 2000, 10000, 15000]
-MAX_SEQ_LENGTHS = [512, 1024, 2048, 4096]
+VOCAB_SIZES = [50000]
+MAX_SEQ_LENGTHS = [2048]
 
 # from nebula.constants import *
 # PREPROCESSING CONFIG AS DEFINED IN nebula.constants
@@ -27,7 +26,6 @@ SPEAKEASY_RECORD_FIELDS = [
     'file_access.path',
     'network_events.traffic.server',
     'network_events.traffic.port',
-    'network_events.dns.query',
     'registry_access.event',
     'registry_access.path',
     'apis.api_name',
@@ -43,10 +41,10 @@ JSON_CLEANUP_SYMBOLS = ['"', "'", ":", ",", "[", "]", "{", "}", "\\", "/"]
 SPEAKEASY_TOKEN_STOPWORDS = ['api_name', 'args', 'ret_val', 'event', 'path', 'open_flags', 'access_flags', 'size', 'server', 'proto', 'port', 'method']
 
 # DATA CONFIG
-
-SCRIPT_PATH = getRealPath(type="script")
-EMULATION_TRAINSET_PATH = SCRIPT_PATH + r"\data\data_raw\windows_emulation_trainset"
-EMULATION_TESTSET_PATH = SCRIPT_PATH + r"\data\data_raw\windows_emulation_testset"
+SCRIPT_PATH = get_path(type="script")
+REPO_ROOT = os.path.join(SCRIPT_PATH, "..")
+EMULATION_TRAINSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_trainset")
+EMULATION_TESTSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_testset")
 
 BENIGN_FOLDERS = ["report_clean", "report_windows_syswow64"]
 
@@ -84,9 +82,9 @@ def main(limit=None, mode="readAndFilter"):
 
     logging.warning("Initialized ...")
 
-    trainOutFolder = SCRIPT_PATH + rf"\data\data_filtered\speakeasy_trainset{OUTFOLDER_SUFFIX}"
+    trainOutFolder = os.path.join(REPO_ROOT, "data", "data_filtered", f"speakeasy_trainset{OUTFOLDER_SUFFIX}")
     os.makedirs(trainOutFolder, exist_ok=True)
-    testOutFolder = SCRIPT_PATH + rf"\data\data_filtered\speakeasy_testset{OUTFOLDER_SUFFIX}"
+    testOutFolder = os.path.join(REPO_ROOT, "data", "data_filtered", f"speakeasy_testset{OUTFOLDER_SUFFIX}")
     os.makedirs(testOutFolder, exist_ok=True)
     
     if mode == "readAndFilter":
@@ -105,41 +103,39 @@ def main(limit=None, mode="readAndFilter"):
         # ==== TOKENIZING REPORTS =====
         # FORMAT: [[EVENT1_TOKEN1, EVENT1_TOKEN2, ...], [EVENT2_TOKEN1, EVENT2_TOKEN2, ...], ...]
 
-        timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-        logging.warning(f"{timenow}: Tokenizing...")
+        logging.warning(f"Tokenizing...")
         eventsTokenizedTrain = tokenizerFunction(eventsTrain)
         eventsTokenizedTest = tokenizerFunction(eventsTest)
 
         # dump tokenized datasets
-        with open(f"{trainOutFolder}\\speakeasy_tokenized.json", "w") as f:
+        with open(os.path.join(trainOutFolder, "speakeasy_tokenized.json"), "w") as f:
             json.dump(eventsTokenizedTrain, f, indent=4)
-        with open(f"{testOutFolder}\\speakeasy_tokenized.json", "w") as f:
+        with open(os.path.join(testOutFolder, "speakeasy_tokenized.json"), "w") as f:
             json.dump(eventsTokenizedTest, f, indent=4)
     
         # dump yHashes
-        with open(f"{trainOutFolder}\\speakeasy_yHashes.json", "w") as f:
+        with open(os.path.join(trainOutFolder, "speakeasy_yHashes.json"), "w") as f:
             json.dump(yHashesTrain, f, indent=4)
-        with open(f"{testOutFolder}\\speakeasy_yHashes.json", "w") as f:
+        with open(os.path.join(testOutFolder, "speakeasy_yHashes.json"), "w") as f:
             json.dump(yHashesTest, f, indent=4)
 
         # dump y
-        np.save(f"{trainOutFolder}\\speakeasy_y.npy", np.array(yTrain, dtype=np.int8))
-        np.save(f"{testOutFolder}\\speakeasy_y.npy", np.array(yTest, dtype=np.int8))
+        np.save(os.path.join(trainOutFolder, "speakeasy_y.npy"), np.array(yTrain, dtype=np.int8))
+        np.save(os.path.join(testOutFolder, "speakeasy_y.npy"), np.array(yTest, dtype=np.int8))
 
-        timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-        logging.warning(f"{timenow}: Dumped tokenized files to {trainOutFolder} and {testOutFolder}")
+        logging.warning(f"Dumped tokenized files to {trainOutFolder} and {testOutFolder}")
 
     elif mode == "load":
-        with open(f"{trainOutFolder}\\speakeasy_tokenized.json", "r") as f:
+        with open(os.path.join(trainOutFolder, "speakeasy_tokenized.json"), "r") as f:
             eventsTokenizedTrain = json.load(f)
-        with open(f"{testOutFolder}\\speakeasy_tokenized.json", "r") as f:
+        with open(os.path.join(testOutFolder, "speakeasy_tokenized.json"), "r") as f:
             eventsTokenizedTest = json.load(f)
-        with open(f"{trainOutFolder}\\speakeasy_yHashes.json", "r") as f:
+        with open(os.path.join(trainOutFolder, "speakeasy_yHashes.json"), "r") as f:
             yHashesTrain = json.load(f)
-        with open(f"{testOutFolder}\\speakeasy_yHashes.json", "r") as f:
+        with open(os.path.join(testOutFolder, "speakeasy_yHashes.json"), "r") as f:
             yHashesTest = json.load(f)
-        yTrain = np.load(f"{trainOutFolder}\\speakeasy_y.npy", allow_pickle=True).tolist()
-        yTest = np.load(f"{testOutFolder}\\speakeasy_y.npy", allow_pickle=True).tolist()
+        yTrain = np.load(os.path.join(trainOutFolder, "speakeasy_y.npy"), allow_pickle=True).tolist()
+        yTest = np.load(os.path.join(testOutFolder, "speakeasy_y.npy"), allow_pickle=True).tolist()
 
     else:
         raise ValueError("Invalid mode")
@@ -151,38 +147,33 @@ def main(limit=None, mode="readAndFilter"):
         for maxSeqLen in MAX_SEQ_LENGTHS: 
 
             filePrefix = f"speakeasy_VocabSize_{vocabSize}_maxLen_{maxSeqLen}"
-            if os.path.exists(f"{trainOutFolder}\\{filePrefix}_x.npy") and \
-                os.path.exists(f"{testOutFolder}\\{filePrefix}_x.npy"):
+            if os.path.exists(os.path.join(trainOutFolder, f"{filePrefix}_x.npy")) and \
+                os.path.exists(os.path.join(testOutFolder, f"{filePrefix}_x.npy")):
                 logging.warning(f" [!] Skipping {filePrefix} because files already exist")
                 continue
 
-            timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-            logging.warning(f"{timenow}: Starting Preprocessing: VocabSize: {vocabSize}, MaxSeqLen: {maxSeqLen}")
+            logging.warning(f"Starting Preprocessing: VocabSize: {vocabSize}, MaxSeqLen: {maxSeqLen}")
 
             # training tokenizer -- building vocabulary on train set
-            timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-            logging.warning(f"{timenow}: Building vocab with vocab size: {vocabSize}...")
+            logging.warning(f"Building vocab with vocab size: {vocabSize}...")
             tokenizer.train(eventsTokenizedTrain, vocabSize=vocabSize)
             tokenizer.dumpTokenizerFiles(trainOutFolder, tokenListSequence=eventsTokenizedTrain)
 
             # encoding
-            timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-            logging.warning(f"{timenow}: Encoding...")
+            logging.warning(f"Encoding...")
             eventsEncodedTrain = encodingFunction(eventsTokenizedTrain)
             eventsEncodedTest = encodingFunction(eventsTokenizedTest)
             
             # padding
-            timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-            logging.warning(f"{timenow}: Padding...")
+            logging.warning(f"Padding...")
             tokenizer.sequenceLength = maxSeqLen
             eventsEncodedPaddedTrain = tokenizer.padSequenceList(eventsEncodedTrain)
             eventsEncodedPaddedTest = tokenizer.padSequenceList(eventsEncodedTest)
             
             # saving processed arrays
-            timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-            logging.warning(f"{timenow}: Saving files with prefix: {filePrefix}")
-            np.save(f"{trainOutFolder}\\{filePrefix}_x.npy", eventsEncodedPaddedTrain)
-            np.save(f"{testOutFolder}\\{filePrefix}_x.npy", eventsEncodedPaddedTest)
+            logging.warning(f"Saving files with prefix: {filePrefix}")
+            np.save(os.path.join(trainOutFolder, f"{filePrefix}_x.npy"), eventsEncodedPaddedTrain)
+            np.save(os.path.join(testOutFolder, f"{filePrefix}_x.npy"), eventsEncodedPaddedTest)
 
 
 def readAndFilterFolders(subFolders, parserFunction, limit=None):
@@ -194,8 +185,7 @@ def readAndFilterFolders(subFolders, parserFunction, limit=None):
     yHashes = []
     for subFolder in subFolders:
         timenowStart = time.time()
-        timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-        logging.warning(f"{timenow}: Filtering and normalizing {subFolder.strip()}...")
+        logging.warning(f"Filtering and normalizing {subFolder.strip()}...")
 
         files = [os.path.join(subFolder,x) for x in os.listdir(subFolder)[:limit] if x.endswith(".json")]
         for file in tqdm(files):
@@ -212,22 +202,26 @@ def readAndFilterFolders(subFolders, parserFunction, limit=None):
                     y.append(0)
                 else:
                     y.append(1)
-        timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
         timenowEnd = time.time()
-        logging.warning(f"{timenow}: Finished... Took: {timenowEnd - timenowStart:.2f}s")
+        logging.warning(f"Finished... Took: {timenowEnd - timenowStart:.2f}s")
     return events, y, yHashes
 
 if __name__ == "__main__":
 
-    outputRootFolder = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_parsing_logs"
+    outputRootFolder = rf"{SCRIPT_PATH}\..\data\data_filtered\speakeasy_parsing_logs"
     outputFolder = os.path.join(outputRootFolder)
     os.makedirs(outputFolder, exist_ok=True)
 
-    if LOGFILE:
-        logging.basicConfig(filename=os.path.join(outputFolder, LOGFILE), level=logging.WARNING)
-        logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+    logging.basicConfig(
+        filename=os.path.join(outputFolder, LOGFILE),
+        level=logging.WARNING,
+        format='%(asctime)s %(message)s',
+        datefmt='%m/%d/%Y %I:%M:%S %p'
+    )        
+    logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
     # ===============
 
     #main(limit=None, mode="load")
-    main(limit=1000)
+    #main(limit=100)
+    main()
