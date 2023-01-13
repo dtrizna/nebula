@@ -1,0 +1,158 @@
+WARNING:root: [!] Using device: cuda:0 | Dataset size: 76126
+WARNING:root: [!] Epochs per fold: 3 | Model config: {'vocabSize': 50000, 'embeddingDim': 64, 'hiddenNeurons': [512, 256, 128], 'batchNormConv': False, 'batchNormFFNN': False, 'filterSizes': [2, 3, 4, 5], 'dropout': 0.3}
+WARNING:root: [!] Fold 1/2 | Train set size: 38063, Validation set size: 38063
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Thu Jan 12 14:01:28 2023: Train Epoch: 1 [  0  /38063 (0 %)]	Loss: 0.690924 | FPR 0.001 -- TPR 0.0000 | F1 0.0000 | Elapsed: 10.22s
+WARNING:root: [*] Thu Jan 12 14:01:32 2023: Train Epoch: 1 [3200 /38063 (8 %)]	Loss: 0.314434 | FPR 0.001 -- TPR 0.3716 | F1 0.4903 | Elapsed: 4.28s
+WARNING:root: [*] Thu Jan 12 14:01:36 2023: Train Epoch: 1 [6400 /38063 (17%)]	Loss: 0.135929 | FPR 0.001 -- TPR 0.5741 | F1 0.6729 | Elapsed: 4.17s
+WARNING:root: [*] Thu Jan 12 14:01:41 2023: Train Epoch: 1 [9600 /38063 (25%)]	Loss: 0.068388 | FPR 0.001 -- TPR 0.6766 | F1 0.7587 | Elapsed: 4.24s
+WARNING:root: [*] Thu Jan 12 14:01:45 2023: Train Epoch: 1 [12800/38063 (34%)]	Loss: 0.036540 | FPR 0.001 -- TPR 0.7423 | F1 0.8107 | Elapsed: 4.28s
+WARNING:root: [*] Thu Jan 12 14:01:49 2023: Train Epoch: 1 [16000/38063 (42%)]	Loss: 0.146829 | FPR 0.001 -- TPR 0.7850 | F1 0.8437 | Elapsed: 4.61s
+WARNING:root: [*] Thu Jan 12 14:01:54 2023: Train Epoch: 1 [19200/38063 (50%)]	Loss: 0.051127 | FPR 0.001 -- TPR 0.8159 | F1 0.8672 | Elapsed: 4.61s
+WARNING:root: [*] Thu Jan 12 14:01:59 2023: Train Epoch: 1 [22400/38063 (59%)]	Loss: 0.155207 | FPR 0.001 -- TPR 0.8394 | F1 0.8847 | Elapsed: 4.61s
+WARNING:root: [*] Thu Jan 12 14:02:03 2023: Train Epoch: 1 [25600/38063 (67%)]	Loss: 0.177282 | FPR 0.001 -- TPR 0.8552 | F1 0.8968 | Elapsed: 4.43s
+WARNING:root: [*] Thu Jan 12 14:02:08 2023: Train Epoch: 1 [28800/38063 (76%)]	Loss: 0.066284 | FPR 0.001 -- TPR 0.8683 | F1 0.9066 | Elapsed: 4.39s
+WARNING:root:[!] Learning rate: 2.5e-05
+WARNING:root: [*] Thu Jan 12 14:02:12 2023: Train Epoch: 1 [32000/38063 (84%)]	Loss: 0.009344 | FPR 0.001 -- TPR 0.8794 | F1 0.9149 | Elapsed: 4.50s
+WARNING:root: [*] Thu Jan 12 14:02:17 2023: Train Epoch: 1 [35200/38063 (92%)]	Loss: 0.087549 | FPR 0.001 -- TPR 0.8892 | F1 0.9220 | Elapsed: 4.49s
+WARNING:root: [*] Thu Jan 12 14:02:20 2023:    1    | Tr.loss: 0.156060 | FPR 0.001 -- TPR: 0.90 |  F1: 0.93 | Elapsed:   62.78  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Thu Jan 12 14:02:21 2023: Train Epoch: 2 [  0  /38063 (0 %)]	Loss: 0.012727 | FPR 0.001 -- TPR 1.0000 | F1 1.0000 | Elapsed: 0.04s
+WARNING:root: [*] Thu Jan 12 14:02:25 2023: Train Epoch: 2 [3200 /38063 (8 %)]	Loss: 0.020426 | FPR 0.001 -- TPR 0.9842 | F1 0.9909 | Elapsed: 4.56s
+WARNING:root: [*] Thu Jan 12 14:02:30 2023: Train Epoch: 2 [6400 /38063 (17%)]	Loss: 0.055335 | FPR 0.001 -- TPR 0.9835 | F1 0.9909 | Elapsed: 4.66s
+WARNING:root: [*] Thu Jan 12 14:02:34 2023: Train Epoch: 2 [9600 /38063 (25%)]	Loss: 0.004399 | FPR 0.001 -- TPR 0.9844 | F1 0.9915 | Elapsed: 4.64s
+WARNING:root: [*] Thu Jan 12 14:02:39 2023: Train Epoch: 2 [12800/38063 (34%)]	Loss: 0.006704 | FPR 0.001 -- TPR 0.9852 | F1 0.9920 | Elapsed: 4.73s
+WARNING:root: [*] Thu Jan 12 14:02:44 2023: Train Epoch: 2 [16000/38063 (42%)]	Loss: 0.053210 | FPR 0.001 -- TPR 0.9859 | F1 0.9924 | Elapsed: 4.91s
+WARNING:root: [*] Thu Jan 12 14:02:49 2023: Train Epoch: 2 [19200/38063 (50%)]	Loss: 0.029070 | FPR 0.001 -- TPR 0.9866 | F1 0.9928 | Elapsed: 4.86s
+WARNING:root: [*] Thu Jan 12 14:02:54 2023: Train Epoch: 2 [22400/38063 (59%)]	Loss: 0.066844 | FPR 0.001 -- TPR 0.9869 | F1 0.9930 | Elapsed: 4.91s
+WARNING:root: [*] Thu Jan 12 14:02:59 2023: Train Epoch: 2 [25600/38063 (67%)]	Loss: 0.017746 | FPR 0.001 -- TPR 0.9871 | F1 0.9931 | Elapsed: 4.82s
+WARNING:root:[!] Learning rate: 2.5e-06
+WARNING:root: [*] Thu Jan 12 14:03:03 2023: Train Epoch: 2 [28800/38063 (76%)]	Loss: 0.047481 | FPR 0.001 -- TPR 0.9875 | F1 0.9933 | Elapsed: 4.76s
+WARNING:root: [*] Thu Jan 12 14:03:08 2023: Train Epoch: 2 [32000/38063 (84%)]	Loss: 0.009084 | FPR 0.001 -- TPR 0.9878 | F1 0.9936 | Elapsed: 4.71s
+WARNING:root: [*] Thu Jan 12 14:03:13 2023: Train Epoch: 2 [35200/38063 (92%)]	Loss: 0.017459 | FPR 0.001 -- TPR 0.9877 | F1 0.9934 | Elapsed: 4.73s
+WARNING:root: [*] Thu Jan 12 14:03:17 2023:    2    | Tr.loss: 0.048749 | FPR 0.001 -- TPR: 0.99 |  F1: 0.99 | Elapsed:   56.45  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Thu Jan 12 14:03:17 2023: Train Epoch: 3 [  0  /38063 (0 %)]	Loss: 0.009741 | FPR 0.001 -- TPR 1.0000 | F1 1.0000 | Elapsed: 0.06s
+WARNING:root: [*] Thu Jan 12 14:03:22 2023: Train Epoch: 3 [3200 /38063 (8 %)]	Loss: 0.005948 | FPR 0.001 -- TPR 0.9942 | F1 0.9970 | Elapsed: 4.72s
+WARNING:root: [*] Thu Jan 12 14:03:26 2023: Train Epoch: 3 [6400 /38063 (17%)]	Loss: 0.022581 | FPR 0.001 -- TPR 0.9935 | F1 0.9966 | Elapsed: 4.71s
+WARNING:root: [*] Thu Jan 12 14:03:31 2023: Train Epoch: 3 [9600 /38063 (25%)]	Loss: 0.024880 | FPR 0.001 -- TPR 0.9931 | F1 0.9964 | Elapsed: 4.63s
+WARNING:root: [*] Thu Jan 12 14:03:36 2023: Train Epoch: 3 [12800/38063 (34%)]	Loss: 0.099190 | FPR 0.001 -- TPR 0.9910 | F1 0.9951 | Elapsed: 4.70s
+WARNING:root: [*] Thu Jan 12 14:03:40 2023: Train Epoch: 3 [16000/38063 (42%)]	Loss: 0.198192 | FPR 0.001 -- TPR 0.9909 | F1 0.9951 | Elapsed: 4.63s
+WARNING:root: [*] Thu Jan 12 14:03:45 2023: Train Epoch: 3 [19200/38063 (50%)]	Loss: 0.072135 | FPR 0.001 -- TPR 0.9909 | F1 0.9951 | Elapsed: 4.81s
+WARNING:root:[!] Learning rate: 2.5000000000000004e-07
+WARNING:root: [*] Thu Jan 12 14:03:50 2023: Train Epoch: 3 [22400/38063 (59%)]	Loss: 0.014685 | FPR 0.001 -- TPR 0.9914 | F1 0.9954 | Elapsed: 4.98s
+WARNING:root: [*] Thu Jan 12 14:03:55 2023: Train Epoch: 3 [25600/38063 (67%)]	Loss: 0.067025 | FPR 0.001 -- TPR 0.9910 | F1 0.9951 | Elapsed: 4.76s
+WARNING:root: [*] Thu Jan 12 14:04:00 2023: Train Epoch: 3 [28800/38063 (76%)]	Loss: 0.148183 | FPR 0.001 -- TPR 0.9905 | F1 0.9949 | Elapsed: 4.71s
+WARNING:root: [*] Thu Jan 12 14:04:04 2023: Train Epoch: 3 [32000/38063 (84%)]	Loss: 0.009284 | FPR 0.001 -- TPR 0.9904 | F1 0.9948 | Elapsed: 4.69s
+WARNING:root: [*] Thu Jan 12 14:04:09 2023: Train Epoch: 3 [35200/38063 (92%)]	Loss: 0.014746 | FPR 0.001 -- TPR 0.9902 | F1 0.9948 | Elapsed: 4.72s
+WARNING:root: [*] Thu Jan 12 14:04:13 2023:    3    | Tr.loss: 0.042958 | FPR 0.001 -- TPR: 0.99 |  F1: 0.99 | Elapsed:   56.43  s
+WARNING:root:[!] Thu Jan 12 14:04:13 2023: Dumped results:
+                model     : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\_modelSelection_50k\CNNLinear\trainingFiles\trainingFiles_1673528653-model.torch
+                losses    : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\_modelSelection_50k\CNNLinear\trainingFiles\trainingFiles_1673528653-train_losses.npy
+                duration  : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\_modelSelection_50k\CNNLinear\trainingFiles\trainingFiles_1673528653-trainTime.npy
+		train F1s : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\_modelSelection_50k\CNNLinear\trainingFiles\trainingFiles_1673528653-trainF1s.npy
+		train TPRs: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\_modelSelection_50k\CNNLinear\trainingFiles\trainingFiles_1673528653-trainTPRs.npy
+WARNING:root: [!] Evaluating model on validation set...
+WARNING:root: [*] Predicting batch: 0/1190
+WARNING:root: [*] Predicting batch: 100/1190
+WARNING:root: [*] Predicting batch: 200/1190
+WARNING:root: [*] Predicting batch: 300/1190
+WARNING:root: [*] Predicting batch: 400/1190
+WARNING:root: [*] Predicting batch: 500/1190
+WARNING:root: [*] Predicting batch: 600/1190
+WARNING:root: [*] Predicting batch: 700/1190
+WARNING:root: [*] Predicting batch: 800/1190
+WARNING:root: [*] Predicting batch: 900/1190
+WARNING:root: [*] Predicting batch: 1000/1190
+WARNING:root: [*] Predicting batch: 1100/1190
+WARNING:root: [!] This fold metrics on validation set:
+WARNING:root: [!] FPR: 0.0001 | TPR: 0.266545045219889 | F1: 0.42090101133925834
+WARNING:root: [!] FPR: 0.0003 | TPR: 0.746807437022086 | F1: 0.8549971114962449
+WARNING:root: [!] FPR: 0.001 | TPR: 0.9411559212824594 | F1: 0.9694534404861861
+WARNING:root: [!] FPR: 0.003 | TPR: 0.9633194891899235 | F1: 0.9806385332701122
+WARNING:root: [!] FPR: 0.01 | TPR: 0.9772930171175717 | F1: 0.9861350462165125
+WARNING:root: [!] FPR: 0.03 | TPR: 0.9875790862865349 | F1: 0.9866408143480367
+WARNING:root: [!] FPR: 0.1 | TPR: 0.9951480805806777 | F1: 0.974476899979095
+WARNING:root: [!] Fold 2/2 | Train set size: 38063, Validation set size: 38063
+WARNING:root: [*] Started epoch: 1
+WARNING:root: [*] Thu Jan 12 14:04:28 2023: Train Epoch: 1 [  0  /38063 (0 %)]	Loss: 0.730686 | FPR 0.001 -- TPR 0.0000 | F1 0.0000 | Elapsed: 0.05s
+WARNING:root: [*] Thu Jan 12 14:04:33 2023: Train Epoch: 1 [3200 /38063 (8 %)]	Loss: 0.370230 | FPR 0.001 -- TPR 0.3692 | F1 0.4851 | Elapsed: 4.68s
+WARNING:root: [*] Thu Jan 12 14:04:38 2023: Train Epoch: 1 [6400 /38063 (17%)]	Loss: 0.228939 | FPR 0.001 -- TPR 0.5699 | F1 0.6679 | Elapsed: 4.76s
+WARNING:root: [*] Thu Jan 12 14:04:43 2023: Train Epoch: 1 [9600 /38063 (25%)]	Loss: 0.039458 | FPR 0.001 -- TPR 0.6749 | F1 0.7565 | Elapsed: 4.76s
+WARNING:root: [*] Thu Jan 12 14:04:47 2023: Train Epoch: 1 [12800/38063 (34%)]	Loss: 0.155653 | FPR 0.001 -- TPR 0.7426 | F1 0.8100 | Elapsed: 4.68s
+WARNING:root: [*] Thu Jan 12 14:04:52 2023: Train Epoch: 1 [16000/38063 (42%)]	Loss: 0.031764 | FPR 0.001 -- TPR 0.7854 | F1 0.8434 | Elapsed: 4.70s
+WARNING:root: [*] Thu Jan 12 14:04:57 2023: Train Epoch: 1 [19200/38063 (50%)]	Loss: 0.117566 | FPR 0.001 -- TPR 0.8149 | F1 0.8658 | Elapsed: 4.71s
+WARNING:root: [*] Thu Jan 12 14:05:01 2023: Train Epoch: 1 [22400/38063 (59%)]	Loss: 0.112815 | FPR 0.001 -- TPR 0.8371 | F1 0.8826 | Elapsed: 4.77s
+WARNING:root: [*] Thu Jan 12 14:05:06 2023: Train Epoch: 1 [25600/38063 (67%)]	Loss: 0.018979 | FPR 0.001 -- TPR 0.8539 | F1 0.8952 | Elapsed: 4.88s
+WARNING:root: [*] Thu Jan 12 14:05:11 2023: Train Epoch: 1 [28800/38063 (76%)]	Loss: 0.057449 | FPR 0.001 -- TPR 0.8672 | F1 0.9053 | Elapsed: 5.10s
+WARNING:root:[!] Learning rate: 2.5e-05
+WARNING:root: [*] Thu Jan 12 14:05:16 2023: Train Epoch: 1 [32000/38063 (84%)]	Loss: 0.063909 | FPR 0.001 -- TPR 0.8782 | F1 0.9135 | Elapsed: 5.04s
+WARNING:root: [*] Thu Jan 12 14:05:21 2023: Train Epoch: 1 [35200/38063 (92%)]	Loss: 0.016821 | FPR 0.001 -- TPR 0.8880 | F1 0.9208 | Elapsed: 4.97s
+WARNING:root: [*] Thu Jan 12 14:05:26 2023:    1    | Tr.loss: 0.153391 | FPR 0.001 -- TPR: 0.89 |  F1: 0.93 | Elapsed:   57.38  s
+WARNING:root: [*] Started epoch: 2
+WARNING:root: [*] Thu Jan 12 14:05:26 2023: Train Epoch: 2 [  0  /38063 (0 %)]	Loss: 0.022748 | FPR 0.001 -- TPR 1.0000 | F1 1.0000 | Elapsed: 0.05s
+WARNING:root: [*] Thu Jan 12 14:05:31 2023: Train Epoch: 2 [3200 /38063 (8 %)]	Loss: 0.045129 | FPR 0.001 -- TPR 0.9873 | F1 0.9935 | Elapsed: 5.03s
+WARNING:root: [*] Thu Jan 12 14:05:36 2023: Train Epoch: 2 [6400 /38063 (17%)]	Loss: 0.071851 | FPR 0.001 -- TPR 0.9867 | F1 0.9931 | Elapsed: 5.44s
+WARNING:root: [*] Thu Jan 12 14:05:41 2023: Train Epoch: 2 [9600 /38063 (25%)]	Loss: 0.062367 | FPR 0.001 -- TPR 0.9883 | F1 0.9939 | Elapsed: 5.19s
+WARNING:root: [*] Thu Jan 12 14:05:46 2023: Train Epoch: 2 [12800/38063 (34%)]	Loss: 0.006658 | FPR 0.001 -- TPR 0.9880 | F1 0.9938 | Elapsed: 4.85s
+WARNING:root: [*] Thu Jan 12 14:05:51 2023: Train Epoch: 2 [16000/38063 (42%)]	Loss: 0.005946 | FPR 0.001 -- TPR 0.9886 | F1 0.9941 | Elapsed: 4.74s
+WARNING:root: [*] Thu Jan 12 14:05:56 2023: Train Epoch: 2 [19200/38063 (50%)]	Loss: 0.029395 | FPR 0.001 -- TPR 0.9893 | F1 0.9945 | Elapsed: 4.75s
+WARNING:root: [*] Thu Jan 12 14:06:00 2023: Train Epoch: 2 [22400/38063 (59%)]	Loss: 0.065761 | FPR 0.001 -- TPR 0.9890 | F1 0.9943 | Elapsed: 4.76s
+WARNING:root: [*] Thu Jan 12 14:06:05 2023: Train Epoch: 2 [25600/38063 (67%)]	Loss: 0.009553 | FPR 0.001 -- TPR 0.9876 | F1 0.9934 | Elapsed: 4.70s
+WARNING:root:[!] Learning rate: 2.5e-06
+WARNING:root: [*] Thu Jan 12 14:06:10 2023: Train Epoch: 2 [28800/38063 (76%)]	Loss: 0.007677 | FPR 0.001 -- TPR 0.9873 | F1 0.9929 | Elapsed: 4.74s
+WARNING:root: [*] Thu Jan 12 14:06:15 2023: Train Epoch: 2 [32000/38063 (84%)]	Loss: 0.005792 | FPR 0.001 -- TPR 0.9878 | F1 0.9932 | Elapsed: 4.76s
+WARNING:root: [*] Thu Jan 12 14:06:19 2023: Train Epoch: 2 [35200/38063 (92%)]	Loss: 0.018751 | FPR 0.001 -- TPR 0.9878 | F1 0.9933 | Elapsed: 4.80s
+WARNING:root: [*] Thu Jan 12 14:06:24 2023:    2    | Tr.loss: 0.046505 | FPR 0.001 -- TPR: 0.99 |  F1: 0.99 | Elapsed:   58.11  s
+WARNING:root: [*] Started epoch: 3
+WARNING:root: [*] Thu Jan 12 14:06:24 2023: Train Epoch: 3 [  0  /38063 (0 %)]	Loss: 0.010296 | FPR 0.001 -- TPR 1.0000 | F1 1.0000 | Elapsed: 0.05s
+WARNING:root: [*] Thu Jan 12 14:06:29 2023: Train Epoch: 3 [3200 /38063 (8 %)]	Loss: 0.083752 | FPR 0.001 -- TPR 0.9842 | F1 0.9890 | Elapsed: 4.76s
+WARNING:root: [*] Thu Jan 12 14:06:33 2023: Train Epoch: 3 [6400 /38063 (17%)]	Loss: 0.050658 | FPR 0.001 -- TPR 0.9883 | F1 0.9925 | Elapsed: 4.73s
+WARNING:root: [*] Thu Jan 12 14:06:38 2023: Train Epoch: 3 [9600 /38063 (25%)]	Loss: 0.018597 | FPR 0.001 -- TPR 0.9874 | F1 0.9923 | Elapsed: 4.76s
+WARNING:root: [*] Thu Jan 12 14:06:43 2023: Train Epoch: 3 [12800/38063 (34%)]	Loss: 0.019022 | FPR 0.001 -- TPR 0.9876 | F1 0.9927 | Elapsed: 4.70s
+WARNING:root: [*] Thu Jan 12 14:06:48 2023: Train Epoch: 3 [16000/38063 (42%)]	Loss: 0.039553 | FPR 0.001 -- TPR 0.9869 | F1 0.9917 | Elapsed: 4.82s
+WARNING:root: [*] Thu Jan 12 14:06:52 2023: Train Epoch: 3 [19200/38063 (50%)]	Loss: 0.010474 | FPR 0.001 -- TPR 0.9878 | F1 0.9924 | Elapsed: 4.80s
+WARNING:root:[!] Learning rate: 2.5000000000000004e-07
+WARNING:root: [*] Thu Jan 12 14:06:57 2023: Train Epoch: 3 [22400/38063 (59%)]	Loss: 0.003852 | FPR 0.001 -- TPR 0.9887 | F1 0.9930 | Elapsed: 4.82s
+WARNING:root: [*] Thu Jan 12 14:07:02 2023: Train Epoch: 3 [25600/38063 (67%)]	Loss: 0.010674 | FPR 0.001 -- TPR 0.9896 | F1 0.9937 | Elapsed: 4.87s
+WARNING:root: [*] Thu Jan 12 14:07:07 2023: Train Epoch: 3 [28800/38063 (76%)]	Loss: 0.093626 | FPR 0.001 -- TPR 0.9903 | F1 0.9941 | Elapsed: 4.85s
+WARNING:root: [*] Thu Jan 12 14:07:12 2023: Train Epoch: 3 [32000/38063 (84%)]	Loss: 0.005355 | FPR 0.001 -- TPR 0.9902 | F1 0.9942 | Elapsed: 4.76s
+WARNING:root: [*] Thu Jan 12 14:07:17 2023: Train Epoch: 3 [35200/38063 (92%)]	Loss: 0.018478 | FPR 0.001 -- TPR 0.9906 | F1 0.9944 | Elapsed: 4.86s
+WARNING:root: [*] Thu Jan 12 14:07:21 2023:    3    | Tr.loss: 0.041184 | FPR 0.001 -- TPR: 0.99 |  F1: 0.99 | Elapsed:   56.94  s
+WARNING:root:[!] Thu Jan 12 14:07:21 2023: Dumped results:
+                model     : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\_modelSelection_50k\CNNLinear\trainingFiles\trainingFiles_1673528841-model.torch
+                losses    : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\_modelSelection_50k\CNNLinear\trainingFiles\trainingFiles_1673528841-train_losses.npy
+                duration  : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\_modelSelection_50k\CNNLinear\trainingFiles\trainingFiles_1673528841-trainTime.npy
+		train F1s : C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\_modelSelection_50k\CNNLinear\trainingFiles\trainingFiles_1673528841-trainF1s.npy
+		train TPRs: C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\_modelSelection_50k\CNNLinear\trainingFiles\trainingFiles_1673528841-trainTPRs.npy
+WARNING:root: [!] Evaluating model on validation set...
+WARNING:root: [*] Predicting batch: 0/1190
+WARNING:root: [*] Predicting batch: 100/1190
+WARNING:root: [*] Predicting batch: 200/1190
+WARNING:root: [*] Predicting batch: 300/1190
+WARNING:root: [*] Predicting batch: 400/1190
+WARNING:root: [*] Predicting batch: 500/1190
+WARNING:root: [*] Predicting batch: 600/1190
+WARNING:root: [*] Predicting batch: 700/1190
+WARNING:root: [*] Predicting batch: 800/1190
+WARNING:root: [*] Predicting batch: 900/1190
+WARNING:root: [*] Predicting batch: 1000/1190
+WARNING:root: [*] Predicting batch: 1100/1190
+WARNING:root: [!] This fold metrics on validation set:
+WARNING:root: [!] FPR: 0.0001 | TPR: 0.26758534781423954 | F1: 0.4221840068787618
+WARNING:root: [!] FPR: 0.0003 | TPR: 0.7196465413211881 | F1: 0.8369134656737364
+WARNING:root: [!] FPR: 0.001 | TPR: 0.9301646619175522 | F1: 0.9635857730462134
+WARNING:root: [!] FPR: 0.003 | TPR: 0.9627077737553038 | F1: 0.9802802386190222
+WARNING:root: [!] FPR: 0.01 | TPR: 0.9788625481723695 | F1: 0.9869497811880606
+WARNING:root: [!] FPR: 0.03 | TPR: 0.988672194324419 | F1: 0.987135139336935
+WARNING:root: [!] FPR: 0.1 | TPR: 0.9941609249094944 | F1: 0.9737674915163763
+WARNING:root: [!] Metrics saved to C:\Users\dtrizna\Code\nebula\evaluation\crossValidation\_modelSelection_50k\CNNLinear\metrics_trainSize_76126_ep_3_cv_2_vocabSize_50000_embeddingDim_64_hiddenNeurons_512_256_128_batchNormConv_False_batchNormFFNN_False_filterSizes_2_3_4_5_dropout_0.3.json
+WARNING:root: [!] Average epoch time: 58.02s | Mean values over 2 folds:
+	FPR: 0.0001 -- TPR: 0.2671 -- F1: 0.4215
+	FPR: 0.0003 -- TPR: 0.7332 -- F1: 0.8460
+	FPR:  0.001 -- TPR: 0.9357 -- F1: 0.9665
+	FPR:  0.003 -- TPR: 0.9630 -- F1: 0.9805
+	FPR:   0.01 -- TPR: 0.9781 -- F1: 0.9865
+	FPR:   0.03 -- TPR: 0.9881 -- F1: 0.9869
+	FPR:    0.1 -- TPR: 0.9947 -- F1: 0.9741
+
