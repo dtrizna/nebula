@@ -19,7 +19,7 @@ warnings.filterwarnings("ignore")
 # ============== SCRIPT CONFIG
 train_limit = None
 runType = "_modelSelection_50k"
-runName = f"LSTM"
+runName = f"Reformer"
 
 # ============== Cross-Valiation CONFIG
 nFolds = 2
@@ -76,27 +76,27 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 #     "layerNorm": False,
 #     "dropout": 0.3
 # }
-# modelClass = ReformerLM
-# modelArch = {
-#     "vocabSize": vocabSize,
-#     "maxLen": maxLen,
-#     "dim": 64,
-#     "heads": 4,
-#     "depth": 4,
-#     "meanOverSequence": True,
-#     "dropout": 0.3,
-# }
-modelClass = LSTM
+modelClass = ReformerLM
 modelArch = {
     "vocabSize": vocabSize,
-    "embeddingDim": 64,
-    "lstmHidden": 256,
-    "lstmLayers": 1,
-    "lstmDropout": 0.1, # if > 0, need lstmLayers > 1
-    "lstmBidirectional": True,
-    "hiddenNeurons": [256, 128],
-    "batchNormFFNN": False,
+    "maxLen": maxLen,
+    "dim": 64,
+    "heads": 4,
+    "depth": 4,
+    "meanOverSequence": True,
+    "classifierDropout": 0.3,
 }
+# modelClass = LSTM
+# modelArch = {
+#     "vocabSize": vocabSize,
+#     "embeddingDim": 64,
+#     "lstmHidden": 256,
+#     "lstmLayers": 1,
+#     "lstmDropout": 0.1, # if > 0, need lstmLayers > 1
+#     "lstmBidirectional": True,
+#     "hiddenNeurons": [256, 128],
+#     "batchNormFFNN": False,
+# }
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 modelInterfaceClass = ModelTrainer
@@ -109,7 +109,7 @@ modelInterfaceConfig = {
     "optimSchedulerClass": "step",
     "step_size": 1000,
     "outputFolder": None, # will be set later
-    "batchSize": 32,
+    "batchSize": 16,
     "verbosityBatches": 100
 }
 

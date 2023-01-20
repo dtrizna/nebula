@@ -98,9 +98,10 @@ def plotCrossValidationTrainingTime(timeDict, ax=None, savePath=None, xlabel="")
     ax.set_ylabel("Training Time (s)")
     ax.set_title(f"Average Epoch Time vs {xlabel}")
     # set y limit to be -10 + 10 of min max y values
-    ax.set_ylim(min(y) - 10, max(y) + 10)
+    #ax.set_ylim(min(y) - 10, max(y) + 10)
     # add grid
     ax.grid()
+    ax.set_yscale('log')
     if savePath:
         plt.tight_layout()
         plt.savefig(savePath)
@@ -166,7 +167,7 @@ def plotVocabSizeMaxLenArchComparison(vmFolders, maxLen=512, vocabSize=2000, sav
         try:
             metricFile = [x for x in os.listdir(folder) if f"maxLen_{maxLen}_vocabSize_{vocabSize}" in x][0]
         except IndexError:
-            metricFile = [x for x in os.listdir(folder) if f"vocabSize_10000_maxLen_2048" in x][0]
+            metricFile = [x for x in os.listdir(folder) if f"metrics" in x][0]
         metricFile = os.path.join(folder, metricFile)
         dfDict, timeValue = readCrossValidationMetricFile(metricFile)
         dfDict = dfDict[dfDict.index.isin(fprs)]
