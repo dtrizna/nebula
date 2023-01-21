@@ -36,7 +36,7 @@ def get_path(type="script"):
     idx = 1 if type == "notebook" else 0
     return os.path.dirname(os.path.realpath(sys.argv[idx]))
 
-def getAlphaNumChars(s):
+def get_alphanum_chars(s):
     return ''.join(filter(lambda x: x in string.ascii_letters + string.digits + string.punctuation, s))
 
 def filterDictByKeys(dict, key_list):
