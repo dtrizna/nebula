@@ -1,5 +1,5 @@
 import nebula
-from nebula.preprocessing import JSONTokenizer, PEDynamicFeatureExtractor, PEStaticFeatureExtractor
+from nebula.preprocessing import JSONTokenizer, JSONTokenizerBPE, PEDynamicFeatureExtractor, PEStaticFeatureExtractor
 from nebula.optimization import OptimSchedulerGPT, OptimSchedulerStep
 from nebula.models import Cnn1DLinearLM, MLP
 

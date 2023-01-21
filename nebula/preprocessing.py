@@ -13,11 +13,12 @@ from functools import reduce
 import operator
 from typing import Iterable
 from nltk import WhitespaceTokenizer
+import sentencepiece as spm
 from pandas import json_normalize, concat, DataFrame, merge
 
 import nebula
 from nebula.constants import *
-from nebula.misc import getAlphaNumChars
+from nebula.misc import get_alphanum_chars
 from nebula.plots import plotCounterCountsLineplot, plotListElementLengths
 from nebula.normalization import normalizeTableIP, normalizeTablePath
 from nebula.ember import PEFeatureExtractor
@@ -105,15 +106,16 @@ class JSONParser:
         return recordDict
 
 
-class JSONTokenizer(object):
+class JSONTokenizer:
     def __init__(self, 
                 sequenceLength = 2048,
                 patternCleanup = JSON_CLEANUP_SYMBOLS,
                 stopwords = SPEAKEASY_TOKEN_STOPWORDS,
-                specialTokens = ["<pad>", "<unk>", "<mask>"]):
-        self.tokenizer = WhitespaceTokenizer()
+                specialTokens = ["<unk>", "<pad>", "<mask>"]):
+        self.sequenceLength = sequenceLength
         self.patternCleanup = patternCleanup
         self.stopwords = stopwords
+        self.tokenizer = WhitespaceTokenizer()
         
         self.specialTokens = dict(zip(specialTokens, range(len(specialTokens))))
         self.pad_token = "<pad>"
@@ -127,8 +129,6 @@ class JSONTokenizer(object):
         self.vocab = None
         self.reverseVocab = None
         self.vocabError = "Vocabulary not initialized! Use buildVocab() first or load it using loadVocab()!"
-
-        self.sequenceLength = sequenceLength
 
     # methods related to tokenization
     def clearJsonEvent(self, jsonEvent):
@@ -259,6 +259,135 @@ class JSONTokenizer(object):
             _ = plotListElementLengths(tokenListSequence, outfile=f"{outFolder}\\speakeasy_tokenListLengths.png")
 
 
+class JSONTokenizerBPE:
+    def __init__(self,
+                model_path=None,
+                patternCleanup=JSON_CLEANUP_SYMBOLS,
+                stopwords=SPEAKEASY_TOKEN_STOPWORDS,
+                specialTokens = ["<unk>", "<pad>", "<mask>"]):
+        self.patternCleanup = patternCleanup
+        self.stopwords = stopwords
+
+        self.specialTokens = dict(zip(specialTokens, range(len(specialTokens))))
+        self.pad_token = "<pad>"
+        self.unk_token = "<unk>"
+        self.mask_token = "<mask>"
+        self.pad_token_id = self.specialTokens[self.pad_token]
+        self.unk_token_id = self.specialTokens[self.unk_token]
+        self.mask_token_id = self.specialTokens[self.mask_token]
+
+        if model_path:
+            self.tokenizer = spm.SentencePieceProcessor(model_file=model_path.rstrip(".model")+".model")
+        else:
+            self.tokenizer = spm.SentencePieceTrainer
+        self.vocab = None
+        self.reverse_vocab = None
+    
+    def split_string_to_chunks(self, s, chunkSize=4192):
+        """This function should split a long string into smaller chunks of size chunkSize, 
+        but it shouldn't split the string in the middle of a word.
+
+        Args:
+            s (str): Longstring
+            chunkSize (int, optional): _description_. Defaults to 512.
+
+        Returns:
+            list: List of smaller strings
+        """
+        chunks = []
+        words = s.split(" ")
+        currentChunk = ""
+        for word in words:
+            if len(currentChunk) + len(word) < chunkSize:
+                currentChunk += word + " "
+            else:
+                chunks.append(currentChunk)
+                currentChunk = word + " "
+        chunks.append(currentChunk)
+        return chunks
+
+    def clear_json_event(self, jsonData):
+        """
+        Removes all special characters from the json event.
+        """
+        assert isinstance(jsonData, (str, bytes, list, dict))
+        jsonData = str(jsonData).lower()
+        for pattern in self.patternCleanup:
+            jsonData = jsonData.replace(pattern, " ")
+        jsonData = [get_alphanum_chars(x) for x in jsonData.split(" ") if x not in self.stopwords]
+        return ' '.join(jsonData)
+
+    def load_vocab(self):
+        with open(self.model_path+".vocab", encoding="utf-8") as f:
+            vocab = f.read().splitlines()
+        vocab = [x.split("\t")[0] for x in vocab]
+        self.vocab = {k:i for i,k in enumerate(vocab)}
+        self.reverse_vocab = {v:k for k,v in self.vocab.items()}
+        
+
+    def train(self, jsonData, model_prefix="tokenizer", vocab_size=1024, model_type="bpe", split_by_number=False, spLength=4192, removeTrainFiles=True):
+        """
+        Trains the tokenizer on the given json data.
+        """
+        jsonDataClean = self.clear_json_event(jsonData)
+        # splitting a string into chunks of 4192 characters since this sentencepiece limitation
+        jsonDataChunks = self.split_string_to_chunks(jsonDataClean, chunkSize=spLength)
+        # dump jsonDataClean to file
+        trainFile = f"{model_prefix}_trainset_{int(time())}.txt"
+        with open(trainFile, "w", encoding="utf-8") as f:
+            f.write("\n".join(jsonDataChunks))
+
+        trainCmd = " ".join([
+            f"--input={trainFile}",
+            f"--model_prefix={model_prefix}",
+            f"--vocab_size={vocab_size}",
+            f"--model_type={model_type}",
+            f"--split_by_number={split_by_number}",
+            f"--max_sentence_length={spLength}",
+            f"--max_sentencepiece_length=64"
+        ])
+        print(f"Training tokenizer with command: {trainCmd}")
+        self.tokenizer.Train(trainCmd)
+        self.tokenizer = spm.SentencePieceProcessor(model_file=f"{model_prefix}.model")
+        
+        self.model_path = model_prefix
+        self.load_vocab()
+
+        if removeTrainFiles:
+            os.remove(trainFile)
+            os.remove(f"{model_prefix}.vocab")
+    
+    def tokenize(self, jsonData):
+        """
+        Tokenizes the given json data.
+        """
+        if isinstance(jsonData, (str, bytes, dict)):
+            jsonData = [jsonData]
+        jsonDataClean = [self.clear_json_event(x) for x in jsonData]
+        return [self.tokenizer.encode_as_pieces(x) for x in jsonDataClean]
+    
+    def encode(self, jsonData):
+        """
+        Encodes the given json data.
+        """
+        if isinstance(jsonData, (str, bytes, dict)):
+            jsonData = [jsonData]
+        jsonDataClean = [self.clear_json_event(x) for x in jsonData]
+        return [self.tokenizer.encode_as_ids(x) for x in jsonDataClean]
+
+    def pad_sequence(self, encodedSequence):
+        if len(encodedSequence) > self.sequenceLength:
+            return encodedSequence[:self.sequenceLength]
+        else:
+            return encodedSequence + [self.pad_token_id] * (self.sequenceLength - len(encodedSequence))
+    
+    def pad_sequence_list(self, encodedSequenceList, sequenceLength=512):
+        self.sequenceLength = sequenceLength
+        return np.array([self.pad_sequence(x) for x in encodedSequenceList], dtype=np.int32)
+
+    def pad_sequences(self, encodedSequences, sequenceLength=512):
+        return self.pad_sequence_list(encodedSequences, sequenceLength=sequenceLength)
+
 class PEStaticFeatureExtractor(object):
     def __init__(self):
         self.extractor = PEFeatureExtractor(print_feature_warning=False)
@@ -355,7 +484,7 @@ class PEDynamicFeatureExtractor(object):
         # normalize args to exclude any non-alphanumeric characters
         if 'args' in recordDict['apis'].columns:
             # filter unicode '\uXXXX' values from args which is list of strings using re.sub
-            recordDict['apis']['args'] = recordDict['apis']['args'].apply(lambda x: [getAlphaNumChars(y) for y in x])
+            recordDict['apis']['args'] = recordDict['apis']['args'].apply(lambda x: [get_alphanum_chars(y) for y in x])
     
         # limit verbose fields to a certain number of records
         if self.recordLimits:
