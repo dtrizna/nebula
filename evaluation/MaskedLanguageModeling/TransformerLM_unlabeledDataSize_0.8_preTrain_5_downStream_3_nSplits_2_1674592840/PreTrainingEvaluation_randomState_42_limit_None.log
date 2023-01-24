@@ -1,0 +1,10 @@
+01/24/2023 09:40:40 PM  [!] Starting Masked Language Model evaluation over 2 splits!
+01/24/2023 09:40:40 PM  [!] Loaded data and vocab. X train size: (76126, 512), X test size: (17407, 512), vocab size: 50002
+01/24/2023 09:40:40 PM  [!] Initiating Self-Supervised Learning Pretraining
+     Language Modeling MaskedLanguageModel
+     Model TransformerEncoderLM with config:
+	{'vocabSize': 50002, 'maxLen': 512, 'dModel': 64, 'nHeads': 8, 'dHidden': 256, 'nLayers': 2, 'numClasses': 1, 'hiddenNeurons': [64], 'dropout': 0.3}
+
+01/24/2023 09:40:40 PM  [!] Running pre-training split 1/2
+01/24/2023 09:40:40 PM  [!] Pre-training model...
+01/24/2023 09:40:40 PM  [*] Masking sequences...
