@@ -278,6 +278,7 @@ class JSONTokenizerBPE:
 
         if model_path:
             self.tokenizer = spm.SentencePieceProcessor(model_file=model_path.rstrip(".model")+".model")
+            self.model_path = model_path
         else:
             self.tokenizer = spm.SentencePieceTrainer
         self.vocab = None
@@ -318,12 +319,17 @@ class JSONTokenizerBPE:
         return ' '.join(jsonData)
 
     def load_vocab(self):
-        with open(self.model_path+".vocab", encoding="utf-8") as f:
+        with open(self.model_path.rstrip(".model")+".vocab", encoding="utf-8") as f:
             vocab = f.read().splitlines()
         vocab = [x.split("\t")[0] for x in vocab]
         self.vocab = {k:i for i,k in enumerate(vocab)}
+        self.vocab.update(self.specialTokens)
         self.reverse_vocab = {v:k for k,v in self.vocab.items()}
         
+    def dump_vocab(self):
+        vocabFileName = self.model_path.rstrip(".model") + "_vocab.json"
+        with open(vocabFileName, "w") as f:
+            json.dump(self.vocab, f, indent=4)
 
     def train(self, jsonData, model_prefix="tokenizer", vocab_size=1024, model_type="bpe", split_by_number=False, spLength=4192, removeTrainFiles=True):
         """
@@ -387,6 +393,7 @@ class JSONTokenizerBPE:
 
     def pad_sequences(self, encodedSequences, sequenceLength=512):
         return self.pad_sequence_list(encodedSequences, sequenceLength=sequenceLength)
+
 
 class PEStaticFeatureExtractor(object):
     def __init__(self):
