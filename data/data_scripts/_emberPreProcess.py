@@ -7,6 +7,9 @@ from collections import defaultdict
 from datetime import datetime
 import subprocess
 
+from _lzma import LZMAError
+BROKEN_FILES = []
+
 import sys
 sys.path.extend([".", "../.."])
 from nebula.misc import get_path
@@ -34,7 +37,12 @@ def extractSamplesWithPy7zr(archiveName, archive, samples):
 def extractBrokenFile(archivePath, archive, errorFile, peBytes):
     cmd = f"7z e -pinfected -y -o{archivePath} {os.path.join(archivePath, archive)} \"{errorFile}\""
     # execute command with suprocess, but hide output
-    subprocess.check_output(cmd, stdout=None, shell=True)
+    try:
+        subprocess.check_output(cmd, shell=True)
+    except subprocess.CalledProcessError as e:
+        print(f"[!] {errorFile} could not be extracted even with 7z, added to broken files, and skipped")
+        BROKEN_FILES.append(errorFile)
+        return peBytes
     extractedPath = os.path.join(archivePath, errorFile.split("/")[-1])
     if os.path.exists(extractedPath):
         print(f"[!] {errorFile} extracted successfully")
@@ -48,7 +56,7 @@ def extractBrokenFile(archivePath, archive, errorFile, peBytes):
     return peBytes
 
 def extractSamplesWith7z(archivePath, archive, samples):
-    print(f"\n{now}: [*] Extracting {len(samples[archive])} samples from {archive} using 7z...")
+    print(f"{now}: [*] Extracting {len(samples[archive])} samples from {archive} using 7z...")
     peBytes = {}
     for sample in samples[archive]:
         peBytes = extractBrokenFile(archivePath, archive, sample, peBytes)
@@ -79,7 +87,10 @@ if __name__ == "__main__":
     assert arr.shape == (len(yHashes), STATIC_FEATURE_VECTOR_LENGTH)
     print(f"[!] Existing array: {existingArrName} with processed samples index {existingIdx}")
     
-    batch = 50
+    # sanity check
+    print(arr[existingIdx-50:existingIdx+3,0:3])
+
+    batch = 10
     i = 0
     py7zr_failed = False
     print(f"[*] Collecting samples with batch size: {batch}")
@@ -89,8 +100,7 @@ if __name__ == "__main__":
             print(f"Reading hash location: {i}/{len(yHashes)}", end="\r")
             if i <= existingIdx:
                 continue # skip if done
-            # sanity check
-            # np.load(f"x_trainset_{id}.npy")[id-50:id+10,0:3]
+
             
             directory = getHashDirectory(sampleHash, dataset=dataset)
             archive = directory + ".7z"
@@ -110,13 +120,13 @@ if __name__ == "__main__":
                     peBytes = extractSamplesWithPy7zr(os.path.join(archivePath, archive), archive, samples)
                 else:
                     peBytes = extractSamplesWith7z(archivePath, archive, samples)
-            except py7zr.exceptions.CrcError as e:
-                print(f"[-] {e.args[2]} exctration failed, falling back to 7z")
+            except (py7zr.exceptions.CrcError, LZMAError) as e:
+                print(f"[-] '{e}': extration failed, falling back to 7z")
                 # one (or more) of the PEs is corrupted, in that case py7zr fails to extract it
                 # using cmdline 7z to extract them, which do not cares
                 peBytes = extractSamplesWith7z(archivePath, archive, samples)
                 py7zr_failed = archive # py7zr will fail for next X (?) files in this archive
-
+            
             # add timestamp to log
             now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
             print(f" {now}: [*] Extracting Ember features for {batch} samples from {archive}...")
@@ -124,6 +134,19 @@ if __name__ == "__main__":
                 vector = extractor.feature_vector(peBytes[pe])
                 peHash = pe.split("/")[-1]
                 arr[yHashes.index(peHash)] = vector
+            
+            # dump BROKEN_FILES
+            if BROKEN_FILES:
+                # read existing broken files and apped new ones
+                if os.path.exists(os.path.join(outPath, f"broken_files.json")):
+                    with open(os.path.join(outPath, f"broken_files.json"), "r") as f:
+                        old = json.load(f)
+                    BROKEN_FILES = sorted((set(old + BROKEN_FILES)))
+                with open(os.path.join(outPath, f"broken_files.json"), "w") as f:
+                    json.dump(BROKEN_FILES, f, indent=4)
+                print(f"[!] Updated broken files list, current list length: {len(BROKEN_FILES)}")
+                BROKEN_FILES = []
+                
         
         np.save(os.path.join(f"{outPath}", f"x_{dataset}_{i}.npy"), arr)
         del samples
