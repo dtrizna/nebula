@@ -1,0 +1,73 @@
+01/21/2023 06:54:01 PM  [!] Cross-Validation config: 50000 vocab size, 512 maxLen, None train_limit, speakeasy_trainset_BPE train_folder, 42 random_state, 192 batchSize, 1000 optim_step_size
+01/21/2023 06:54:01 PM  [!] Using device: cuda:0 | Dataset size: 76126
+01/21/2023 06:54:01 PM  [!] Epochs per fold: 3 | Model config: {'vocabSize': 50000, 'maxLen': 512, 'embeddingDim': 64, 'hiddenNeurons': [512, 256, 128], 'batchNormConv': False, 'batchNormFFNN': False, 'filterSizes': [2, 3, 4, 5], 'dropout': 0.3}
+01/21/2023 06:54:01 PM  [!] Fold 1/2 | Train set size: 38063, Validation set size: 38063
+01/21/2023 06:54:02 PM  [*] Started epoch: 1
+01/21/2023 06:54:05 PM  [*] Sat Jan 21 18:54:05 2023: Train Epoch: 1 [  0  /38063 (0 %)]	Loss: 0.705223 | FPR 0.001 -- TPR 0.0000 | F1 0.0000 | Elapsed: 3.31s
+01/21/2023 06:54:11 PM  [*] Sat Jan 21 18:54:11 2023: Train Epoch: 1 [19200/38063 (50%)]	Loss: 0.224143 | FPR 0.001 -- TPR 0.3077 | F1 0.4169 | Elapsed: 6.11s
+01/21/2023 06:54:17 PM  [*] Sat Jan 21 18:54:17 2023:    1    | Tr.loss: 0.299369 | FPR 0.001 -- TPR: 0.56 |  F1: 0.65 | Elapsed:   15.51  s
+01/21/2023 06:54:17 PM  [*] Started epoch: 2
+01/21/2023 06:54:17 PM  [*] Sat Jan 21 18:54:17 2023: Train Epoch: 2 [  0  /38063 (0 %)]	Loss: 0.126277 | FPR 0.001 -- TPR 0.9380 | F1 0.9680 | Elapsed: 0.09s
+01/21/2023 06:54:24 PM  [*] Sat Jan 21 18:54:24 2023: Train Epoch: 2 [19200/38063 (50%)]	Loss: 0.125700 | FPR 0.001 -- TPR 0.9076 | F1 0.9502 | Elapsed: 6.61s
+01/21/2023 06:54:30 PM  [*] Sat Jan 21 18:54:30 2023:    2    | Tr.loss: 0.110533 | FPR 0.001 -- TPR: 0.92 |  F1: 0.96 | Elapsed:   13.14  s
+01/21/2023 06:54:30 PM  [*] Started epoch: 3
+01/21/2023 06:54:30 PM  [*] Sat Jan 21 18:54:30 2023: Train Epoch: 3 [  0  /38063 (0 %)]	Loss: 0.089386 | FPR 0.001 -- TPR 0.8594 | F1 0.9244 | Elapsed: 0.07s
+01/21/2023 06:54:37 PM  [*] Sat Jan 21 18:54:37 2023: Train Epoch: 3 [19200/38063 (50%)]	Loss: 0.102072 | FPR 0.001 -- TPR 0.9641 | F1 0.9813 | Elapsed: 6.64s
+01/21/2023 06:54:44 PM  [*] Sat Jan 21 18:54:44 2023:    3    | Tr.loss: 0.069670 | FPR 0.001 -- TPR: 0.96 |  F1: 0.98 | Elapsed:   13.27  s
+01/21/2023 06:54:44 PM [!] Sat Jan 21 18:54:44 2023: Dumped results:
+                model     : C:\Users\dtrizna\Code\nebula\scripts\..\evaluation\crossValidation\_modelSelection_BPE\CNNLinear\trainingFiles\trainingFiles_1674323684-model.torch
+                losses    : C:\Users\dtrizna\Code\nebula\scripts\..\evaluation\crossValidation\_modelSelection_BPE\CNNLinear\trainingFiles\trainingFiles_1674323684-train_losses.npy
+                duration  : C:\Users\dtrizna\Code\nebula\scripts\..\evaluation\crossValidation\_modelSelection_BPE\CNNLinear\trainingFiles\trainingFiles_1674323684-trainTime.npy
+		train F1s : C:\Users\dtrizna\Code\nebula\scripts\..\evaluation\crossValidation\_modelSelection_BPE\CNNLinear\trainingFiles\trainingFiles_1674323684-trainF1s.npy
+		train TPRs: C:\Users\dtrizna\Code\nebula\scripts\..\evaluation\crossValidation\_modelSelection_BPE\CNNLinear\trainingFiles\trainingFiles_1674323684-trainTPRs.npy
+01/21/2023 06:54:44 PM  [!] Evaluating model on validation set...
+01/21/2023 06:54:44 PM  [*] Predicting batch: 0/199
+01/21/2023 06:54:45 PM  [*] Predicting batch: 100/199
+01/21/2023 06:54:47 PM  [!] This fold metrics on validation set:
+01/21/2023 06:54:47 PM  [!] FPR: 0.0001 | TPR: 0.6002018398478438 | F1: 0.7501394717054357
+01/21/2023 06:54:47 PM  [!] FPR: 0.0003 | TPR: 0.8281644218452819 | F1: 0.9059487919833552
+01/21/2023 06:54:47 PM  [!] FPR: 0.001 | TPR: 0.8997787524744789 | F1: 0.9470136449056296
+01/21/2023 06:54:47 PM  [!] FPR: 0.003 | TPR: 0.9380118774987385 | F1: 0.9673364822672325
+01/21/2023 06:54:47 PM  [!] FPR: 0.01 | TPR: 0.9673951015021542 | F1: 0.9810466649609321
+01/21/2023 06:54:47 PM  [!] FPR: 0.03 | TPR: 0.9829212436439856 | F1: 0.9842775240501409
+01/21/2023 06:54:47 PM  [!] FPR: 0.1 | TPR: 0.9933237588790126 | F1: 0.9733378974593033
+01/21/2023 06:54:47 PM  [!] Fold 2/2 | Train set size: 38063, Validation set size: 38063
+01/21/2023 06:54:48 PM  [*] Started epoch: 1
+01/21/2023 06:54:48 PM  [*] Sat Jan 21 18:54:48 2023: Train Epoch: 1 [  0  /38063 (0 %)]	Loss: 0.700537 | FPR 0.001 -- TPR 0.0077 | F1 0.0153 | Elapsed: 0.08s
+01/21/2023 06:54:55 PM  [*] Sat Jan 21 18:54:55 2023: Train Epoch: 1 [19200/38063 (50%)]	Loss: 0.203444 | FPR 0.001 -- TPR 0.3222 | F1 0.4348 | Elapsed: 6.94s
+01/21/2023 06:55:01 PM  [*] Sat Jan 21 18:55:01 2023:    1    | Tr.loss: 0.290870 | FPR 0.001 -- TPR: 0.55 |  F1: 0.65 | Elapsed:   13.59  s
+01/21/2023 06:55:01 PM  [*] Started epoch: 2
+01/21/2023 06:55:01 PM  [*] Sat Jan 21 18:55:01 2023: Train Epoch: 2 [  0  /38063 (0 %)]	Loss: 0.098892 | FPR 0.001 -- TPR 0.9291 | F1 0.9633 | Elapsed: 0.08s
+01/21/2023 06:55:08 PM  [*] Sat Jan 21 18:55:08 2023: Train Epoch: 2 [19200/38063 (50%)]	Loss: 0.166168 | FPR 0.001 -- TPR 0.8986 | F1 0.9441 | Elapsed: 6.64s
+01/21/2023 06:55:14 PM  [*] Sat Jan 21 18:55:14 2023:    2    | Tr.loss: 0.104150 | FPR 0.001 -- TPR: 0.92 |  F1: 0.95 | Elapsed:   13.17  s
+01/21/2023 06:55:14 PM  [*] Started epoch: 3
+01/21/2023 06:55:14 PM  [*] Sat Jan 21 18:55:14 2023: Train Epoch: 3 [  0  /38063 (0 %)]	Loss: 0.125089 | FPR 0.001 -- TPR 0.9504 | F1 0.9746 | Elapsed: 0.07s
+01/21/2023 06:55:21 PM  [*] Sat Jan 21 18:55:21 2023: Train Epoch: 3 [19200/38063 (50%)]	Loss: 0.089429 | FPR 0.001 -- TPR 0.9598 | F1 0.9789 | Elapsed: 6.68s
+01/21/2023 06:55:27 PM  [*] Sat Jan 21 18:55:27 2023:    3    | Tr.loss: 0.068221 | FPR 0.001 -- TPR: 0.95 |  F1: 0.97 | Elapsed:   13.19  s
+01/21/2023 06:55:28 PM [!] Sat Jan 21 18:55:28 2023: Dumped results:
+                model     : C:\Users\dtrizna\Code\nebula\scripts\..\evaluation\crossValidation\_modelSelection_BPE\CNNLinear\trainingFiles\trainingFiles_1674323727-model.torch
+                losses    : C:\Users\dtrizna\Code\nebula\scripts\..\evaluation\crossValidation\_modelSelection_BPE\CNNLinear\trainingFiles\trainingFiles_1674323727-train_losses.npy
+                duration  : C:\Users\dtrizna\Code\nebula\scripts\..\evaluation\crossValidation\_modelSelection_BPE\CNNLinear\trainingFiles\trainingFiles_1674323727-trainTime.npy
+		train F1s : C:\Users\dtrizna\Code\nebula\scripts\..\evaluation\crossValidation\_modelSelection_BPE\CNNLinear\trainingFiles\trainingFiles_1674323727-trainF1s.npy
+		train TPRs: C:\Users\dtrizna\Code\nebula\scripts\..\evaluation\crossValidation\_modelSelection_BPE\CNNLinear\trainingFiles\trainingFiles_1674323727-trainTPRs.npy
+01/21/2023 06:55:28 PM  [!] Evaluating model on validation set...
+01/21/2023 06:55:28 PM  [*] Predicting batch: 0/199
+01/21/2023 06:55:29 PM  [*] Predicting batch: 100/199
+01/21/2023 06:55:31 PM  [!] This fold metrics on validation set:
+01/21/2023 06:55:31 PM  [!] FPR: 0.0001 | TPR: 0.4771302892288528 | F1: 0.6460062719055525
+01/21/2023 06:55:31 PM  [!] FPR: 0.0003 | TPR: 0.8321460547315972 | F1: 0.9083260744863922
+01/21/2023 06:55:31 PM  [!] FPR: 0.001 | TPR: 0.9166958620421192 | F1: 0.9563045685279188
+01/21/2023 06:55:31 PM  [!] FPR: 0.003 | TPR: 0.9491221923780606 | F1: 0.9731779356589765
+01/21/2023 06:55:31 PM  [!] FPR: 0.01 | TPR: 0.9686636303476196 | F1: 0.9817141729953645
+01/21/2023 06:55:31 PM  [!] FPR: 0.03 | TPR: 0.9844680602592549 | F1: 0.9850048685491724
+01/21/2023 06:55:31 PM  [!] FPR: 0.1 | TPR: 0.991786367706022 | F1: 0.9725541092491505
+01/21/2023 06:55:31 PM  [!] Metrics saved to C:\Users\dtrizna\Code\nebula\scripts\..\evaluation\crossValidation\_modelSelection_BPE\CNNLinear\metrics_512_trainSize_76126_ep_3_cv_2_vocabSize_50000_maxLen_512_embeddingDim_64_hiddenNeurons_512_256_128_batchNormConv_False_batchNormFFNN_False_filterSizes_2_3_4_5_dropout_0.3.json
+01/21/2023 06:55:31 PM  [!] Average epoch time: 13.65s | Mean values over 2 folds:
+	FPR: 0.0001 -- TPR: 0.5387 -- F1: 0.6981
+	FPR: 0.0003 -- TPR: 0.8302 -- F1: 0.9071
+	FPR:  0.001 -- TPR: 0.9082 -- F1: 0.9517
+	FPR:  0.003 -- TPR: 0.9436 -- F1: 0.9703
+	FPR:   0.01 -- TPR: 0.9680 -- F1: 0.9814
+	FPR:   0.03 -- TPR: 0.9837 -- F1: 0.9846
+	FPR:    0.1 -- TPR: 0.9926 -- F1: 0.9729
+
