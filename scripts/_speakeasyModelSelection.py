@@ -18,19 +18,9 @@ warnings.filterwarnings("ignore")
 
 # ============== SCRIPT CONFIG
 train_limit = None
-runType = "_modelSelection_50k"
-runName = f"Reformer"
-
-# ============== Cross-Valiation CONFIG
-nFolds = 2
-epochs = 3
-fprValues = [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1]
-rest = 30 # seconds to rest between folds (to cool down)
-metricFilePrefix = "" # if vocabSize loop - it is set later, within the loop
-random_state = 42
-
-vocabSize = 50000
-maxLen = 2048
+train_folder = "speakeasy_trainset_BPE"
+runType = "Transformer_512_BPE"
+runName = f"longRun_30_epochs"
 
 # ============== REPORTING CONFIG
 
@@ -42,7 +32,7 @@ outputFolder = os.path.join(outputFolder, runName)
 os.makedirs(outputFolder, exist_ok=True)
 
 # loging setup
-logFile = f"CrossValidationRun_{metricFilePrefix}{int(time.time())}.log"
+logFile = f"CrossValidationRun_{int(time.time())}.log"
 logging.basicConfig(
     filename=os.path.join(outputFolder, logFile),
     level=logging.WARNING,
@@ -51,11 +41,29 @@ logging.basicConfig(
 )
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
+# ============== Cross-Valiation CONFIG
+nFolds = 3
+epochs = 30
+fprValues = [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1]
+rest = 30 # seconds to rest between folds (to cool down the GPU)
+
+vocabSize = 50000
+maxLen = 512
+
+batchSize = 16 # 16 for Transformer; 192 for CNNLinear
+optim_step_size = 10000 # 1000-2000 for Transformer; 500 for CNNLinear
+
+random_state = 42
+metricFilePrefix = f""
+
+logging.warning(f" [!] Cross-Validation config: {vocabSize} vocab size, {maxLen} maxLen, {train_limit} train_limit, {train_folder} train_folder, {random_state} random_state, {batchSize} batchSize, {optim_step_size} optim_step_size")
+
 # =============== MODEL CONFIG
 
 # modelClass = Cnn1DLinear
 # modelArch = {
 #     "vocabSize": vocabSize,
+#     "maxLen": maxLen,
 #     "embeddingDim": 64,
 #     "hiddenNeurons": [512, 256, 128],
 #     "batchNormConv": False,
@@ -63,29 +71,29 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 #     "filterSizes": [2, 3, 4, 5],
 #     "dropout": 0.3
 # }
-# modelClass = TransformerEncoderModel
-# modelArch = {
-#     "vocabSize": vocabSize,  # size of vocabulary
-#     "maxLen": maxLen,  # maximum length of the input sequence
-#     "dModel": 64,  # embedding & transformer dimension
-#     "nHeads": 8,  # number of heads in nn.MultiheadAttention
-#     "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
-#     "nLayers": 8,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
-#     "numClasses": 1, # binary classification
-#     "hiddenNeurons": [64],
-#     "layerNorm": False,
-#     "dropout": 0.3
-# }
-modelClass = ReformerLM
+modelClass = TransformerEncoderModel
 modelArch = {
-    "vocabSize": vocabSize,
-    "maxLen": maxLen,
-    "dim": 64,
-    "heads": 4,
-    "depth": 4,
-    "meanOverSequence": True,
-    "classifierDropout": 0.3,
+    "vocabSize": vocabSize,  # size of vocabulary
+    "maxLen": maxLen,  # maximum length of the input sequence
+    "dModel": 64,  # embedding & transformer dimension
+    "nHeads": 8,  # number of heads in nn.MultiheadAttention
+    "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
+    "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+    "numClasses": 1, # binary classification
+    "hiddenNeurons": [64],
+    "layerNorm": False,
+    "dropout": 0.3
 }
+# modelClass = ReformerLM
+# modelArch = {
+#     "vocabSize": vocabSize,
+#     "maxLen": maxLen,
+#     "dim": 64,
+#     "heads": 4,
+#     "depth": 4,
+#     "meanOverSequence": True,
+#     "classifierDropout": 0.3,
+# }
 # modelClass = LSTM
 # modelArch = {
 #     "vocabSize": vocabSize,
@@ -102,15 +110,15 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 modelInterfaceClass = ModelTrainer
 modelInterfaceConfig = {
     "device": device,
-    "model": None, # will be set later
+    "model": None, # will be set later within CrossValidation class
     "lossFunction": torch.nn.BCEWithLogitsLoss(),
     "optimizerClass": torch.optim.Adam,
     "optimizerConfig": {"lr": 2.5e-4},
     "optimSchedulerClass": "step",
-    "step_size": 1000,
+    "optim_step_size": optim_step_size,
     "outputFolder": None, # will be set later
-    "batchSize": 16,
-    "verbosityBatches": 100
+    "batchSize": batchSize,
+    "verbosityBatches": 100,
 }
 
 # =============== CROSS-VALIDATION LOOP
@@ -145,8 +153,8 @@ modelInterfaceConfig = {
 #     logging.warning(f" [!] Running Cross Validation with vocabSize: {vocabSize} | maxLen: {maxLen}")
 
 # 2. CROSS VALIDATION OVER DIFFERENT MODEL CONFIGRATIONS
-x_train = np.load(os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_50k", f"speakeasy_VocabSize_{vocabSize}_maxLen_{maxLen}_x.npy"))
-y_train = np.load(os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_50k", "speakeasy_y.npy"))
+x_train = np.load(os.path.join(REPO_ROOT, "data", "data_filtered", train_folder, f"speakeasy_VocabSize_{vocabSize}_maxLen_{maxLen}_x.npy"))
+y_train = np.load(os.path.join(REPO_ROOT, "data", "data_filtered", train_folder, "speakeasy_y.npy"))
 
 # for heads in [2, 4, 8, 16]:
 #     modelArch["nHeads"] = heads
@@ -154,12 +162,11 @@ y_train = np.load(os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_tr
 #     modelArch["dModel"] = dim
 # for dHidden in [64, 128, 192, 256]:
 #     modelArch["dHidden"] = dHidden
-# for nLayers in [1, 2, 4, 8]:
+# for nLayers in [1, 2, 4, 8, 12]:
 #     modelArch["nLayers"] = nLayers
-#for hiddenLayer in [[64]]:
-for hiddenLayer in [[256, 64]]:
-    modelArch["hiddenNeurons"] = hiddenLayer
-
+# for hiddenLayer in [[256, 64], [512, 256, 64]]:
+#     modelArch["hiddenNeurons"] = hiddenLayer
+for _ in [1]:
     if train_limit:
         x_train, y_train = shuffle(x_train, y_train, random_state=random_state)
         x_train = x_train[:train_limit]
@@ -169,7 +176,7 @@ for hiddenLayer in [[256, 64]]:
     
     # =============== DO Cross Validation
     cv = CrossValidation(modelInterfaceClass, modelInterfaceConfig, modelClass, modelArch, outputFolder)
-    cv.run_folds(x_train, y_train, epochs=epochs, folds=nFolds, fprValues=fprValues)
+    cv.run_folds(x_train, y_train, epochs=epochs, folds=nFolds, fprValues=fprValues, random_state=random_state)
     cv.dump_metrics(prefix=metricFilePrefix)
     cv.log_avg_metrics()
 
