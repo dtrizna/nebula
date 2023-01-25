@@ -14,7 +14,7 @@ import torch
 from torch import nn
 from sklearn.metrics import f1_score
 from nebula.misc import get_tpr_at_fpr
-
+from tqdm import tqdm
 
 class ModelTrainer(object):
     def __init__(self, 
@@ -27,10 +27,10 @@ class ModelTrainer(object):
                     batchSize=64,
                     verbosityBatches = 100,
                     outputFolder=None,
-                    falsePositiveRates=[0.0001, 0.001, 0.01, 0.1],
+                    falsePositiveRates=[0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
                     modelForwardPass=None,
                     stateDict = None,
-                    step_size=1000):
+                    optim_step_size=1000):
         self.model = model    
         self.optimizer = optimizerClass(self.model.parameters(), **optimizerConfig)
         self.lossFunction = lossFunction
@@ -43,7 +43,7 @@ class ModelTrainer(object):
         elif optimSchedulerClass == "gpt":
             self.optimScheduler = OptimSchedulerGPT(self.optimizer)
         elif optimSchedulerClass == "step":
-            self.optimScheduler = OptimSchedulerStep(self.optimizer, step_size=step_size)
+            self.optimScheduler = OptimSchedulerStep(self.optimizer, step_size=optim_step_size)
         else:
             self.optimScheduler = optimSchedulerClass(self.optimizer)
 
@@ -87,19 +87,22 @@ class ModelTrainer(object):
         logging.warning(dumpString)
     
     def getMetrics(self, target, predProbs):
+        assert isinstance(target, np.ndarray) and isinstance(predProbs, np.ndarray)
         metrics = []
         for fpr in self.falsePositiveRates:
             tpr, threshold = get_tpr_at_fpr(target, predProbs, fpr)
             f1_at_fpr = f1_score(target, predProbs >= threshold)
-            metrics.append([tpr, f1_at_fpr])        
+            metrics.append([tpr, f1_at_fpr])
         return np.array(metrics)
 
     def trainOneEpoch(self, trainLoader, epochId):
-        epochMetrics = []
         epochLosses = []
+        epochProbs = []
+        targets = []
         now = time.time()
 
         for batchIdx, (data, target) in enumerate(trainLoader):
+            targets.extend(target)
             data, target = data.to(self.device), target.to(self.device)
 
             self.globalBatchCounter += 1
@@ -119,29 +122,28 @@ class ModelTrainer(object):
             self.optimizer.step() # parameter update  
 
             predProbs = torch.sigmoid(logits).clone().detach().cpu().numpy()
-            if target.shape[1] == 1:
-                batchMetrics = self.getMetrics(target.cpu().numpy(), predProbs)
-                epochMetrics.append(batchMetrics)
+            epochProbs.extend(predProbs)
             
             if batchIdx % self.verbosityBatches == 0:
-                if target.shape[1] == 1:
-                    currentMetrics = np.nanmean(np.array(epochMetrics), axis=0).reshape(-1,2)
-                    currentTPR = currentMetrics[self.fprReportingIdx, 0]
-                    currentF1 = currentMetrics[self.fprReportingIdx, 1]
-                    metricsReport = f"FPR {self.falsePositiveRates[self.fprReportingIdx]} -- "
-                    metricsReport += f"TPR {currentTPR:.4f} | F1 {currentF1:.4f}"
-                else:
-                    metricsReport = "Not computing TPR and F1"
-                logging.warning(" [*] {}: Train Epoch: {} [{:^5}/{:^5} ({:^2.0f}%)]\tLoss: {:.6f} | {} | Elapsed: {:.2f}s".format(
+                metricsReportList = [f"Loss: {loss.item():.6f}", f"Elapsed: {time.time() - now:.2f}s"]
+                if target.shape[1] == 1: # report TPR & F1 only for binary classification
+                    batchSetMetrics = self.getMetrics(
+                        np.array(targets[-self.verbosityBatches:]), 
+                        np.array(epochProbs[-self.verbosityBatches:])
+                    )
+                    currentTPR = batchSetMetrics[self.fprReportingIdx, 0]
+                    currentF1 = batchSetMetrics[self.fprReportingIdx, 1]
+                    metricsReport = f"FPR {self.falsePositiveRates[self.fprReportingIdx]} -> "
+                    metricsReport += f"TPR {currentTPR:.4f} & F1 {currentF1:.4f}"
+                    metricsReportList.append(metricsReport)
+                logging.warning(" [*] {}: Train Epoch: {} [{:^5}/{:^5} ({:^2.0f}%)]\t".format(
                     time.ctime(), epochId, batchIdx * len(data), len(trainLoader.dataset),
-                100. * batchIdx / len(trainLoader), loss.item(), metricsReport, time.time() - now))
+                100. * batchIdx / len(trainLoader)) + " | ".join(metricsReportList))
                 now = time.time()
-        
-        if epochMetrics: # we do not collect metrics if target is not binary
-            # taking mean across all batches
-            epochMetrics = np.nanmean(np.array(epochMetrics), axis=0).reshape(-1,2)
+
+        if target.shape[1] == 1: # calculate TRP & F1 only for binary classification
+            epochMetrics = self.getMetrics(np.array(targets), np.array(epochProbs))
             epochTPRs, epochF1s = epochMetrics[:,0], epochMetrics[:,1]
-            # shape of each metrics array: (len(falsePositiveRates), )
             return epochLosses, epochTPRs, epochF1s
         else:
             return epochLosses, None, None
@@ -170,12 +172,12 @@ class ModelTrainer(object):
                 timeElapsed = time.time() - epochStartTime
                 self.trainingTime.append(timeElapsed)
                 
+                metricsReportList = [f"{epochIdx:^7}", f"Tr.loss: {np.nanmean(epochTrainLoss):.6f}", f"Elapsed: {timeElapsed:^9.2f}s"]
                 if epochTPRs is not None and epochF1s is not None:
-                    metricsReport = f"FPR {self.falsePositiveRates[self.fprReportingIdx]} -- "
-                    metricsReport += f"TPR: {epochTPRs[self.fprReportingIdx]:.2f} |  F1: {epochF1s[self.fprReportingIdx]:.2f}"
-                else:
-                    metricsReport = "Not computing TPR and F1"
-                logging.warning(f" [*] {time.ctime()}: {epochIdx:^7} | Tr.loss: {np.nanmean(epochTrainLoss):.6f} | {metricsReport} | Elapsed: {timeElapsed:^9.2f}s")
+                    metricsReport = f"FPR {self.falsePositiveRates[self.fprReportingIdx]} -> "
+                    metricsReport += f"TPR: {epochTPRs[self.fprReportingIdx]:.2f} & F1: {epochF1s[self.fprReportingIdx]:.2f}"
+                    metricsReportList.append(metricsReport)
+                logging.warning(f" [*] {time.ctime()}: " + " | ".join(metricsReportList))
             if self.outputFolder:
                 self.dumpResults()
         except KeyboardInterrupt:
@@ -194,9 +196,10 @@ class ModelTrainer(object):
         self.model.eval()
 
         self.testLoss = []
-        self.testTruePositiveRates = []
-        self.testF1s = []
-        for data, target in testLoader:
+        self.predProbs = []
+        self.trueLabels = []
+        for data, target in tqdm(testLoader):
+            self.trueLabels.extend(target.cpu().numpy())
             data, target = data.to(self.device), target.to(self.device)
 
             with torch.no_grad():
@@ -206,18 +209,14 @@ class ModelTrainer(object):
             self.testLoss.append(loss.item())
 
             predProbs = torch.sigmoid(logits).clone().detach().cpu().numpy()
-            batchMetrics = self.getMetrics(target.cpu().numpy(), predProbs)
-            self.testTruePositiveRates.append(batchMetrics[:,0])
-            self.testF1s.append(batchMetrics[:,1])
-            
-        # take mean across all batches for each metric
-        # resulting shape of each metric: (len(falsePositiveRates), )
-        self.testTruePositiveRates = np.array(self.testTruePositiveRates).nanmean(axis=0)
-        self.testF1s = np.array(self.testF1s).nanmean(axis=0)
+            self.predProbs.extend(predProbs)
+        
+        metricsValues = self.getMetrics(np.array(self.trueLabels), np.array(self.predProbs))
+        self.testTPRs, self.testF1s = metricsValues[:,0], metricsValues[:,1]
         if metrics == "array":
-            return self.testLoss, self.testTruePositiveRates, self.testF1s
+            return self.testLoss, self.testTPRs, self.testF1s
         elif metrics == "json":
-            return self.metricsToJSON([self.testLoss, self.testTruePositiveRates, self.testF1s])
+            return self.metricsToJSON([self.testLoss, self.testTPRs, self.testF1s])
         else:
             raise ValueError("evaluate(): Inappropriate metrics value, must be in: ['array', 'json']")
 
@@ -257,6 +256,7 @@ class PEHybridClassifier(nn.Module):
     def __init__(self,
                     speakeasyConfig=None,
                     vocab=None,
+                    tokenizerModelPath=None,
                     outputFolder=None,
                     malwareHeadLayers = [128, 64],
                     representationSize = 256,
@@ -269,9 +269,13 @@ class PEHybridClassifier(nn.Module):
             with open(speakeasyConfigFile, "r") as f:
                 speakeasyConfig = json.load(f)
         if vocab is None:
-            vocabFile = os.path.join(os.path.dirname(nebula.__file__), "objects", "speakeasyReportVocab.json")
+            vocabFile = os.path.join(os.path.dirname(nebula.__file__), "objects", "speakeasy_BPE_vocab_50000.json")
             with open(vocabFile, "r") as f:
                 vocab = json.load(f)
+        if tokenizerModelPath is None:
+            tokenizerModelPath = os.path.join(os.path.dirname(nebula.__file__), "objects", "speakeasy_BPE_50000.model")
+            self.tokenizer = JSONTokenizerBPE(model_path=tokenizerModelPath)
+            self.tokenizer.load_vocab()
 
         self.staticExtractor = PEStaticFeatureExtractor()
         # TODO: add configuration for dynamic extractor during init
@@ -279,14 +283,6 @@ class PEHybridClassifier(nn.Module):
             speakeasyConfig=speakeasyConfig,
             emulationOutputFolder=outputFolder,
         )
-        self.tokenizer = JSONTokenizer()
-        if vocabFile:
-            self.tokenizer.load_from_pretrained(vocab)
-        else:
-            msg = "[!] No 'vocabFile' was provided, the tokenizer has to be pre-trained on your data."
-            msg += " Please use the 'build_vocabulary()' method of this class to train the tokenizer."
-            logging.warning(msg)
-        
         # TODO: add ability to provide config for models
         self.staticModel = MLP(
             layer_sizes=[1024, 512, representationSize],
