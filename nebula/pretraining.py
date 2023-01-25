@@ -16,12 +16,11 @@ class MaskedLanguageModel(object):
         self.mask_probability = mask_probability
         self.vocab = vocab
         self.random_state = random_state
+        np.random.seed(self.random_state)
 
-        if token_id_type not in ("onehot", "count"):
-            raise ValueError("token_id_type must be either 'onehot' or 'count'")
+        assert token_id_type in ["onehot", "count"], "token_id_type must be either 'onehot' or 'count'"
         self.token_id_type = token_id_type
 
-    
     def maskSequence(self, sequence):
         """
         Mask a sequence with a given probability.
@@ -48,14 +47,12 @@ class MaskedLanguageModel(object):
         else:
             maskedSequence = sequence.copy()
 
-        # find out which tokens to mask and loop over
-        if self.random_state is not None:
-            np.random.seed(self.random_state)
+        # find out which tokens to mask and loop over    
         maskIdxs = np.random.uniform(size=maskedSequence.shape) < self.mask_probability
         for idx in np.where(maskIdxs)[0]:
             # prepare array of vocabSize that specifies which tokens were masked
             tokenId = maskedSequence[idx]
-            if self.token_id_type.lower().startswith("count"):
+            if self.token_id_type == "count":
                 maskedTokenIds[tokenId] += 1
             else:
                 maskedTokenIds[tokenId] = 1
