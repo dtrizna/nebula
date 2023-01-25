@@ -8,6 +8,7 @@ class Cnn1DLinear(nn.Module):
     def __init__(self, 
                 # embedding params
                 vocabSize = None,
+                maxLen = None,
                 embeddingDim = 64,
                 paddingIdx = 0,
                 # conv params
