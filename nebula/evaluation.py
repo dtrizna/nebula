@@ -18,20 +18,19 @@ from nebula.misc import dictToString, get_tpr_at_fpr
 
 class SelfSupervisedPretraining:
     def __init__(self, 
-                    vocab, # TODO: remove? don't need it
                     modelClass,
                     modelConfig,
                     pretrainingTaskClass,
                     pretrainingTaskConfig,
                     device = 'auto',
-                    falsePositiveRates=[0.001, 0.003, 0.01, 0.03, 0.1],
+                    falsePositiveRates=[0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
                     unlabeledDataSize=0.8,
                     randomState=None,
                     pretraingEpochs=5,
                     downstreamEpochs=5,
                     batchSize=256,
-                    verbosityBatches=100):
-        self.vocab = vocab # TODO: remove? don't need it
+                    verbosityBatches=100,
+                    optimizerStep=5000):
         self.modelClass = modelClass
         self.modelConfig = modelConfig
         self.falsePositiveRates = falsePositiveRates
@@ -43,6 +42,7 @@ class SelfSupervisedPretraining:
         self.device = device
         self.verbosityBatches = verbosityBatches
         self.pretrainingTask = pretrainingTaskClass(**pretrainingTaskConfig)
+        self.optimizerStep = optimizerStep
 
         self.trainingTypes = ['pretrained', 'non_pretrained', 'full_data']
 
@@ -57,51 +57,56 @@ class SelfSupervisedPretraining:
         # create a pretraining model and task
         logging.warning(' [!] Pre-training model...')
         models['pretrained'] = self.modelClass(**self.modelConfig).to(self.device)
-        modelInterfaceConfig = {
+        modelTrainerConfig = {
             "device": self.device,
             "model": models['pretrained'],
             "modelForwardPass": models['pretrained'].pretrain,
             "lossFunction": CrossEntropyLoss(),
             "optimizerClass": Adam,
-            "optimizerConfig": {"lr": 0.0005},
+            "optimizerConfig": {"lr": 2.5e-4},
+            "optimSchedulerClass": "step",
+            "optim_step_size": self.optimizerStep,
             "verbosityBatches": self.verbosityBatches,
             "batchSize": self.batchSize,
             "falsePositiveRates": self.falsePositiveRates,
         }
         if outputFolder:
-            modelInterfaceConfig["outputFolder"] = os.path.join(outputFolder, "preTraining")
+            modelTrainerConfig["outputFolder"] = os.path.join(outputFolder, "preTraining")
 
-        self.pretrainingTask.pretrain(U, modelInterfaceConfig, pretrainEpochs=self.pretrainingEpochs)
+        self.pretrainingTask.pretrain(U, modelTrainerConfig, pretrainEpochs=self.pretrainingEpochs)
         
         # downstream task for pretrained model
-        modelInterfaceConfig['lossFunction'] = BCEWithLogitsLoss()
-        modelInterfaceConfig['modelForwardPass'] = None
+        modelTrainerConfig['lossFunction'] = BCEWithLogitsLoss()
+        modelTrainerConfig['modelForwardPass'] = None
 
         for model in self.trainingTypes:
             logging.warning(f' [!] Training {model} model on downstream task...')
             if model != 'pretrained':
                 models[model] = self.modelClass(**self.modelConfig).to(self.device)
-                modelInterfaceConfig['model'] = models[model]
+                modelTrainerConfig['model'] = models[model]
             
             if outputFolder:
-                modelInterfaceConfig["outputFolder"] = os.path.join(outputFolder, "downstreamTask_{}".format(model))
+                modelTrainerConfig["outputFolder"] = os.path.join(outputFolder, "downstreamTask_{}".format(model))
             
-            modelInterfaces[model] = ModelTrainer(**modelInterfaceConfig)
+            modelInterfaces[model] = ModelTrainer(**modelTrainerConfig)
             if model == 'full_data':
+                modelTrainerConfig['optim_step_size'] = self.optimizerStep//2
                 modelInterfaces[model].fit(x, y, self.downstreamEpochs)
             else:
+                modelTrainerConfig['optim_step_size'] = self.optimizerStep//5
                 modelInterfaces[model].fit(L_x, L_y, self.downstreamEpochs)
         
         for model in models:
             logging.warning(f' [*] Evaluating {model} model on test set...')
             metrics[model] = modelInterfaces[model].evaluate(x_test, y_test, metrics="json")
-            reportingFPR = self.falsePositiveRates[modelInterfaces[model].fprReportingIdx]
-            logging.warning(f' [!] Test F1 score for {model} model at {reportingFPR} FPR : {metrics[model]["fpr_"+str(reportingFPR)]["f1"]:.4f}')
-            logging.warning(f' [!] Test TPR score for {model} model at {reportingFPR} FPR: {metrics[model]["fpr_"+str(reportingFPR)]["tpr"]:.4f}')
+            for reportingFPR in self.falsePositiveRates:
+                f1 = metrics[model]["fpr_"+str(reportingFPR)]["f1"]
+                tpr = metrics[model]["fpr_"+str(reportingFPR)]["tpr"]
+                logging.warning(f'\t[!] Test set scores at FPR: {reportingFPR:>6} --> TPR: {tpr:.4f} | F1: {f1:.4f}')
         del models, modelInterfaces # cleanup to not accidentaly reuse 
         return metrics
 
-    def runSplits(self, x, y, x_test, y_test, outputFolder=None, nSplits=5, rest=None):
+    def run_splits(self, x, y, x_test, y_test, outputFolder=None, nSplits=5, rest=None):
         metrics = {k: {"fpr_"+str(fpr): {"f1": [], "tpr": []} for fpr in self.falsePositiveRates} for k in self.trainingTypes}
         # collect metrics for number of iterations
         for i in range(nSplits):
@@ -153,13 +158,13 @@ class CrossValidation(object):
         self.trainSize = X.shape[0]
         if folds == 1:
             # kfold requires at least 2 folds -- this is rude shortcut 
-            # will split 2/3 trainig set; 1/3 test set and run only one fold
-            self.nFolds = 3
+            # to get a single run with training on 80%, and validating on 20% of the data
+            self.nFolds = 5
             singleFold = True
         else:
             self.nFolds = folds
             singleFold = False
-        # Create the folds
+
         logging.warning(f" [!] Epochs per fold: {epochs} | Model config: {self.modelConfig}")
 
         kf = KFold(n_splits=self.nFolds, shuffle=True, random_state=random_state)
@@ -184,7 +189,7 @@ class CrossValidation(object):
             try:
                 modelTrainer.fit(X_train, y_train, epochs=self.epochs)
                 trainingTime[i,:] = np.pad(modelTrainer.trainingTime, (0, epochs-len(modelTrainer.trainingTime)), 'constant', constant_values=(0,0))
-            except RuntimeError as e: # usually cuda outofmemory
+            except RuntimeError as e: # cuda outofmemory
                 logging.warning(f" [!] Exception: {e}")
                 break
 
@@ -196,12 +201,13 @@ class CrossValidation(object):
                 tpr, threshold = get_tpr_at_fpr(y_test, predicted_probs, fpr)
                 f1 = f1_score(y[test_index], predicted_probs >= threshold)
                 self.metrics[fpr]["tpr"].append(tpr)
-                self.metrics[fpr]["f1"].append(f1)       
+                self.metrics[fpr]["f1"].append(f1)
                 logging.warning(f" [!] FPR: {fpr} | TPR: {tpr} | F1: {f1}")
             
             # cleanup
-            del model, modelTrainer, modelInterfaceConfig
+            model.cpu()
             cuda.empty_cache()
+            del model, modelTrainer, modelInterfaceConfig
             gc.collect()
 
             if singleFold:
