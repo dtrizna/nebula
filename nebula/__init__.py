@@ -269,7 +269,7 @@ class PEHybridClassifier(nn.Module):
             with open(speakeasyConfigFile, "r") as f:
                 speakeasyConfig = json.load(f)
         if vocab is None:
-            vocabFile = os.path.join(os.path.dirname(nebula.__file__), "objects", "speakeasy_BPE_vocab_50000.json")
+            vocabFile = os.path.join(os.path.dirname(nebula.__file__), "objects", "speakeasy_BPE_50000_vocab.json")
             with open(vocabFile, "r") as f:
                 vocab = json.load(f)
         if tokenizerModelPath is None:
