@@ -6,11 +6,17 @@ from sklearn.metrics import roc_curve
 import string
 import torch
 import random
+import gc
 import numpy as np
 
 # supress UndefinedMetricWarning, which appears when a batch has only one class
 import warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning)
+
+def clear_cuda_cache():
+    torch.cuda.empty_cache()
+    gc.collect()
+
 
 def get_tpr_at_fpr(true_labels, predicted_probs, fprNeeded):
         fpr, tpr, thresholds = roc_curve(true_labels, predicted_probs)
