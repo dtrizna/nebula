@@ -6,14 +6,15 @@ from collections import defaultdict
 from torch import cuda
 import gc
 
-from time import sleep
+from time import sleep, time
 from torch.optim import Adam
 from torch.nn import BCEWithLogitsLoss, CrossEntropyLoss
 from sklearn.model_selection import train_test_split, KFold
 from sklearn.metrics import f1_score
 
 from nebula import ModelTrainer
-from nebula.misc import dictToString, get_tpr_at_fpr
+from nebula.optimization import OptimSchedulerStep
+from nebula.misc import dictToString, get_tpr_at_fpr, clear_cuda_cache
 
 
 class SelfSupervisedPretraining:
@@ -30,7 +31,11 @@ class SelfSupervisedPretraining:
                     downstreamEpochs=5,
                     batchSize=256,
                     verbosityBatches=100,
-                    optimizerStep=5000):
+                    optimizerStep=5000,
+                    outputFolder=None,
+                    dump_model_every_epoch=False,
+                    dump_data_splits=True,
+                    remask_every_epoch=False):
         self.modelClass = modelClass
         self.modelConfig = modelConfig
         self.falsePositiveRates = falsePositiveRates
@@ -43,19 +48,32 @@ class SelfSupervisedPretraining:
         self.verbosityBatches = verbosityBatches
         self.pretrainingTask = pretrainingTaskClass(**pretrainingTaskConfig)
         self.optimizerStep = optimizerStep
+        self.outputFolder = outputFolder
+        self.dump_model_every_epoch = dump_model_every_epoch
+        self.dump_data_splits = dump_data_splits
+        self.remask_every_epoch = remask_every_epoch
 
         self.trainingTypes = ['pretrained', 'non_pretrained', 'full_data']
 
-    def run(self, x, y, x_test, y_test, outputFolder=None):
+    def run(self, x, y, x_test, y_test):
         models = {k: None for k in self.trainingTypes}
         modelInterfaces = {k: None for k in self.trainingTypes}
         metrics = {k: None for k in self.trainingTypes}
         
         # split x and y into train and validation sets
-        U, L_x, _, L_y = train_test_split(x, y, train_size=self.unlabeledDataSize, random_state=self.randomState)
+        unlabeled_data, labeled_x, _, labeled_y = train_test_split(
+            x, y, train_size=self.unlabeledDataSize, random_state=self.randomState
+        )
+        if self.dump_data_splits:
+            np.savez_compressed(
+                os.path.join(self.outputFolder, f"dataset_splits_{int(time())}.npz"), 
+                unlabeled_data=unlabeled_data,
+                labeled_x=labeled_x,
+                labeled_y=labeled_y
+            )
 
-        # create a pretraining model and task
         logging.warning(' [!] Pre-training model...')
+        # create a pretraining model and task
         models['pretrained'] = self.modelClass(**self.modelConfig).to(self.device)
         modelTrainerConfig = {
             "device": self.device,
@@ -70,31 +88,37 @@ class SelfSupervisedPretraining:
             "batchSize": self.batchSize,
             "falsePositiveRates": self.falsePositiveRates,
         }
-        if outputFolder:
-            modelTrainerConfig["outputFolder"] = os.path.join(outputFolder, "preTraining")
+        if self.outputFolder:
+            modelTrainerConfig["outputFolder"] = os.path.join(self.outputFolder, "preTraining")
 
-        self.pretrainingTask.pretrain(U, modelTrainerConfig, pretrainEpochs=self.pretrainingEpochs)
-        
+        self.pretrainingTask.pretrain(
+            unlabeled_data, 
+            modelTrainerConfig, 
+            pretrainEpochs=self.pretrainingEpochs,
+            dump_model_every_epoch=self.dump_model_every_epoch,
+            remask_every_epoch=self.remask_every_epoch
+        )
+
         # downstream task for pretrained model
         modelTrainerConfig['lossFunction'] = BCEWithLogitsLoss()
         modelTrainerConfig['modelForwardPass'] = None
 
         for model in self.trainingTypes:
             logging.warning(f' [!] Training {model} model on downstream task...')
-            if model != 'pretrained':
+            if model != 'pretrained': # if not pretrained -- create a new model
                 models[model] = self.modelClass(**self.modelConfig).to(self.device)
-                modelTrainerConfig['model'] = models[model]
+            modelTrainerConfig['model'] = models[model]
             
-            if outputFolder:
-                modelTrainerConfig["outputFolder"] = os.path.join(outputFolder, "downstreamTask_{}".format(model))
+            if self.outputFolder:
+                modelTrainerConfig["outputFolder"] = os.path.join(self.outputFolder, f"downstreamTask_{model}")
             
             modelInterfaces[model] = ModelTrainer(**modelTrainerConfig)
             if model == 'full_data':
                 modelTrainerConfig['optim_step_size'] = self.optimizerStep//2
                 modelInterfaces[model].fit(x, y, self.downstreamEpochs)
             else:
-                modelTrainerConfig['optim_step_size'] = self.optimizerStep//5
-                modelInterfaces[model].fit(L_x, L_y, self.downstreamEpochs)
+                modelTrainerConfig['optim_step_size'] = self.optimizerStep//10
+                modelInterfaces[model].fit(labeled_x, labeled_y, self.downstreamEpochs)
         
         for model in models:
             logging.warning(f' [*] Evaluating {model} model on test set...')
@@ -103,17 +127,21 @@ class SelfSupervisedPretraining:
                 f1 = metrics[model]["fpr_"+str(reportingFPR)]["f1"]
                 tpr = metrics[model]["fpr_"+str(reportingFPR)]["tpr"]
                 logging.warning(f'\t[!] Test set scores at FPR: {reportingFPR:>6} --> TPR: {tpr:.4f} | F1: {f1:.4f}')
-        del models, modelInterfaces # cleanup to not accidentaly reuse 
+        del models, modelInterfaces, pre_trained_model # cleanup to not accidentaly reuse 
+        clear_cuda_cache()
         return metrics
 
-    def run_splits(self, x, y, x_test, y_test, outputFolder=None, nSplits=5, rest=None):
+    def run_splits(self, x, y, x_test, y_test, nSplits=5, rest=None):
         metrics = {k: {"fpr_"+str(fpr): {"f1": [], "tpr": []} for fpr in self.falsePositiveRates} for k in self.trainingTypes}
+        for trainingType in self.trainingTypes:
+            metrics[trainingType]['auc'] = []
         # collect metrics for number of iterations
         for i in range(nSplits):
             self.randomState += i # to get different splits
             logging.warning(f' [!] Running pre-training split {i+1}/{nSplits}')
-            splitMetrics = self.run(x, y, x_test, y_test, outputFolder=outputFolder)
+            splitMetrics = self.run(x, y, x_test, y_test)
             for trainingType in self.trainingTypes:
+                metrics[trainingType]['auc'].append(splitMetrics[trainingType]['auc'])
                 for fpr in self.falsePositiveRates:
                     metrics[trainingType]["fpr_"+str(fpr)]["f1"].append(splitMetrics[trainingType]["fpr_"+str(fpr)]["f1"])
                     metrics[trainingType]["fpr_"+str(fpr)]["tpr"].append(splitMetrics[trainingType]["fpr_"+str(fpr)]["tpr"])
@@ -144,8 +172,7 @@ class CrossValidation(object):
 
         self.outputRootFolder = outputRootFolder
         os.makedirs(self.outputRootFolder, exist_ok=True)
-        self.outputFolderTrainingFiles = os.path.join(self.outputRootFolder, "trainingFiles")
-
+        
         self.metrics = defaultdict(lambda: defaultdict(list))
 
     def run_folds(self, X, y, folds=3, epochs=5, fprValues=[0.0001, 0.001, 0.01, 0.1], random_state=42):
@@ -182,7 +209,7 @@ class CrossValidation(object):
 
             modelInterfaceConfig = self.modelInterfaceConfig
             modelInterfaceConfig["model"] = model
-            modelInterfaceConfig["outputFolder"] = self.outputFolderTrainingFiles
+            modelInterfaceConfig["outputFolder"] = self.outputRootFolder
             modelTrainer = self.modelInterfaceClass(**modelInterfaceConfig)
 
             # Train the model
@@ -205,11 +232,8 @@ class CrossValidation(object):
                 logging.warning(f" [!] FPR: {fpr} | TPR: {tpr} | F1: {f1}")
             
             # cleanup
-            model.cpu()
-            cuda.empty_cache()
             del model, modelTrainer, modelInterfaceConfig
-            gc.collect()
-
+            clear_cuda_cache()
             if singleFold:
                 break
 
