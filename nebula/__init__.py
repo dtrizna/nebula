@@ -1,5 +1,5 @@
 import nebula
-from nebula.preprocessing import JSONTokenizer, JSONTokenizerBPE, PEDynamicFeatureExtractor, PEStaticFeatureExtractor
+from nebula.preprocessing import JSONTokenizerBPE, PEDynamicFeatureExtractor, PEStaticFeatureExtractor
 from nebula.optimization import OptimSchedulerGPT, OptimSchedulerStep
 from nebula.models import Cnn1DLinearLM, MLP
 
@@ -12,7 +12,7 @@ from pandas import DataFrame
 
 import torch
 from torch import nn
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, roc_auc_score
 from nebula.misc import get_tpr_at_fpr
 from tqdm import tqdm
 
@@ -54,6 +54,11 @@ class ModelTrainer(object):
         self.model.to(self.device)
 
         self.outputFolder = outputFolder
+        if self.outputFolder is not None:
+            self.trainingFileFolder = os.path.join(self.outputFolder, "training_files")
+            os.makedirs(self.outputFolder, exist_ok=True)
+            os.makedirs(self.trainingFileFolder, exist_ok=True)
+            
         if stateDict:
             self.model.load_state_dict(torch.load(stateDict))
         if modelForwardPass:
@@ -64,26 +69,29 @@ class ModelTrainer(object):
     def loadState(self, stateDict):
         self.model.load_state_dict(torch.load(stateDict))
 
-    def dumpResults(self):
-        prefix = os.path.join(self.outputFolder, f"trainingFiles_{int(time.time())}")
-        os.makedirs(self.outputFolder, exist_ok=True)
-
+    def dumpResults(self, prefix="", model_only=False):
+        prefix = os.path.join(self.trainingFileFolder, f"{prefix}{int(time.time())}")
+        
         modelFile = f"{prefix}-model.torch"
         torch.save(self.model.state_dict(), modelFile)
-        np.save(f"{prefix}-trainTime.npy", np.array(self.trainingTime))
-        np.save(f"{prefix}-trainLosses.npy", np.array(self.trainLosses))
         dumpString = f"""[!] {time.ctime()}: Dumped results:
-                model     : {modelFile}
-                losses    : {prefix}-train_losses.npy
-                duration  : {prefix}-trainTime.npy"""
+                model     : {os.path.basename(modelFile)}"""
+        if not model_only:
+            np.save(f"{prefix}-trainTime.npy", np.array(self.training_time))
+            dumpString += f"\n\t\ttrain time: {os.path.basename(prefix)}-trainTime.npy"
 
-        if not np.isnan(self.trainF1s).all():
-            np.save(f"{prefix}-trainF1s.npy", self.trainF1s)
-            dumpString += f"\n\t\ttrain F1s : {prefix}-trainF1s.npy"
-        if not np.isnan(self.trainTruePositiveRates).all():
-            np.save(f"{prefix}-trainTPRs.npy", self.trainTruePositiveRates)
-            dumpString += f"\n\t\ttrain TPRs: {prefix}-trainTPRs.npy"
+            np.save(f"{prefix}-trainLosses.npy", np.array(self.train_losses))
+            dumpString += f"\n\t\ttrain losses: {os.path.basename(prefix)}-trainLosses.npy"
 
+            np.save(f"{prefix}-auc.npy", np.array(self.auc))
+            dumpString += f"\n\t\ttrain AUC: {os.path.basename(prefix)}-auc.npy"
+
+            if not np.isnan(self.train_f1s).all():
+                np.save(f"{prefix}-trainF1s.npy", self.train_f1s)
+                dumpString += f"\n\t\ttrain F1s : {os.path.basename(prefix)}-trainF1s.npy"
+            if not np.isnan(self.train_tprs).all():
+                np.save(f"{prefix}-trainTPRs.npy", self.train_tprs)
+                dumpString += f"\n\t\ttrain TPRs: {os.path.basename(prefix)}-trainTPRs.npy"
         logging.warning(dumpString)
     
     def getMetrics(self, target, predProbs):
@@ -96,7 +104,7 @@ class ModelTrainer(object):
         return np.array(metrics)
 
     def trainOneEpoch(self, trainLoader, epochId):
-        epochLosses = []
+        epoch_losses = []
         epochProbs = []
         targets = []
         now = time.time()
@@ -105,21 +113,22 @@ class ModelTrainer(object):
             targets.extend(target)
             data, target = data.to(self.device), target.to(self.device)
 
-            self.globalBatchCounter += 1
-            if self.optimScheduler is not None:
-                self.optimScheduler.step(self.globalBatchCounter)
-
             logits = self.model.forwardPass(data)
             # if dimension of target is 1, reshape to (-1,1)
             if target.dim() == 1:
                 target = target.reshape(-1, 1)
             loss = self.lossFunction(logits, target)
 
-            epochLosses.append(loss.item())
+            epoch_losses.append(loss.item())
 
             self.optimizer.zero_grad()
             loss.backward() # derivatives
-            self.optimizer.step() # parameter update  
+            self.optimizer.step() # parameter update 
+            
+            # learning rate update
+            self.globalBatchCounter += 1
+            if self.optimScheduler is not None:
+                self.optimScheduler.step(self.globalBatchCounter)
 
             predProbs = torch.sigmoid(logits).clone().detach().cpu().numpy()
             epochProbs.extend(predProbs)
@@ -136,6 +145,9 @@ class ModelTrainer(object):
                     metricsReport = f"FPR {self.falsePositiveRates[self.fprReportingIdx]} -> "
                     metricsReport += f"TPR {currentTPR:.4f} & F1 {currentF1:.4f}"
                     metricsReportList.append(metricsReport)
+                    # calculate auc 
+                    batch_auc = roc_auc_score(targets[-self.verbosityBatches:], epochProbs[-self.verbosityBatches:])
+                    metricsReportList.append(f"AUC {batch_auc:.4f}")
                 logging.warning(" [*] {}: Train Epoch: {} [{:^5}/{:^5} ({:^2.0f}%)]\t".format(
                     time.ctime(), epochId, batchIdx * len(data), len(trainLoader.dataset),
                 100. * batchIdx / len(trainLoader)) + " | ".join(metricsReportList))
@@ -143,41 +155,57 @@ class ModelTrainer(object):
 
         if target.shape[1] == 1: # calculate TRP & F1 only for binary classification
             epochMetrics = self.getMetrics(np.array(targets), np.array(epochProbs))
-            epochTPRs, epochF1s = epochMetrics[:,0], epochMetrics[:,1]
-            return epochLosses, epochTPRs, epochF1s
+            epoch_tprs, epoch_f1s = epochMetrics[:,0], epochMetrics[:,1]
+            # calculate auc 
+            epoch_auc = roc_auc_score(targets, epochProbs)
+            return epoch_losses, epoch_tprs, epoch_f1s, epoch_auc
         else:
-            return epochLosses, None, None
+            return epoch_losses, None, None, None
 
-    def fit(self, X, y, epochs=10):
+    def fit(self, X, y, epochs=10, dump_model_every_epoch=False, overwrite_epoch_idx=False):
         trainLoader = torch.utils.data.DataLoader(
             torch.utils.data.TensorDataset(torch.from_numpy(X).long(), torch.from_numpy(y).float()),
             batch_size=self.batchSize,
             shuffle=True
         )
         self.model.train()
-        self.trainTruePositiveRates = np.empty(shape=(epochs, len(self.falsePositiveRates)))
-        self.trainF1s = np.empty(shape=(epochs, len(self.falsePositiveRates)))
-        self.trainLosses = []
-        self.trainingTime = []
+        self.train_tprs = np.empty(shape=(epochs, len(self.falsePositiveRates)))
+        self.train_f1s = np.empty(shape=(epochs, len(self.falsePositiveRates)))
+        self.train_losses = []
+        self.training_time = []
+        self.auc = []
         self.globalBatchCounter = 0
         try:
             for epochIdx in range(1, epochs + 1):
+                if overwrite_epoch_idx:
+                    assert isinstance(overwrite_epoch_idx, int), "overwrite_epoch_idx must be an integer"
+                    epochIdx = overwrite_epoch_idx + epochIdx
+
                 epochStartTime = time.time()
                 logging.warning(f" [*] Started epoch: {epochIdx}")
+                epoch_train_loss, epoch_tprs, epoch_f1s, epoch_auc = self.trainOneEpoch(trainLoader, epochIdx)
 
-                epochTrainLoss, epochTPRs, epochF1s = self.trainOneEpoch(trainLoader, epochIdx)
-                self.trainTruePositiveRates[epochIdx-1] = epochTPRs
-                self.trainF1s[epochIdx-1] = epochF1s
-                self.trainLosses.extend(epochTrainLoss)
+                if overwrite_epoch_idx:
+                    self.train_tprs[epochIdx-1-overwrite_epoch_idx] = epoch_tprs
+                    self.train_f1s[epochIdx-1-overwrite_epoch_idx] = epoch_f1s
+                else:
+                    self.train_tprs[epochIdx-1] = epoch_tprs
+                    self.train_f1s[epochIdx-1] = epoch_f1s
+
+                self.train_losses.extend(epoch_train_loss)
+                self.auc.append(epoch_auc)
                 timeElapsed = time.time() - epochStartTime
-                self.trainingTime.append(timeElapsed)
+                self.training_time.append(timeElapsed)
                 
-                metricsReportList = [f"{epochIdx:^7}", f"Tr.loss: {np.nanmean(epochTrainLoss):.6f}", f"Elapsed: {timeElapsed:^9.2f}s"]
-                if epochTPRs is not None and epochF1s is not None:
+                metricsReportList = [f"{epochIdx:^7}", f"Tr.loss: {np.nanmean(epoch_train_loss):.6f}", f"Elapsed: {timeElapsed:^9.2f}s"]
+                if epoch_tprs is not None and epoch_f1s is not None and epoch_auc is not None:
                     metricsReport = f"FPR {self.falsePositiveRates[self.fprReportingIdx]} -> "
-                    metricsReport += f"TPR: {epochTPRs[self.fprReportingIdx]:.2f} & F1: {epochF1s[self.fprReportingIdx]:.2f}"
+                    metricsReport += f"TPR: {epoch_tprs[self.fprReportingIdx]:.2f} & F1: {epoch_f1s[self.fprReportingIdx]:.2f}"
                     metricsReportList.append(metricsReport)
+                    metricsReportList.append(f"AUC: {epoch_auc:.4f}")
                 logging.warning(f" [*] {time.ctime()}: " + " | ".join(metricsReportList))
+                if dump_model_every_epoch:
+                    self.dumpResults(prefix=f"epoch_{epochIdx}_", model_only=True)
             if self.outputFolder:
                 self.dumpResults()
         except KeyboardInterrupt:
@@ -212,11 +240,12 @@ class ModelTrainer(object):
             self.predProbs.extend(predProbs)
         
         metricsValues = self.getMetrics(np.array(self.trueLabels), np.array(self.predProbs))
-        self.testTPRs, self.testF1s = metricsValues[:,0], metricsValues[:,1]
+        self.test_tprs, self.test_f1s = metricsValues[:,0], metricsValues[:,1]
+        self.test_auc = roc_auc_score(self.trueLabels, self.predProbs)
         if metrics == "array":
-            return self.testLoss, self.testTPRs, self.testF1s
+            return self.testLoss, self.test_tprs, self.test_f1s, self.test_auc
         elif metrics == "json":
-            return self.metricsToJSON([self.testLoss, self.testTPRs, self.testF1s])
+            return self.metricsToJSON([self.testLoss, self.test_tprs, self.test_f1s, self.test_auc])
         else:
             raise ValueError("evaluate(): Inappropriate metrics value, must be in: ['array', 'json']")
 
@@ -245,10 +274,12 @@ class ModelTrainer(object):
         return (logits > threshold).astype(np.int_)
     
     def metricsToJSON(self, metrics):
+        assert len(metrics) == 4, "metricsToJSON(): metrics must be a list of length 4"
         tprs = dict(zip(["fpr_"+str(x) for x in self.falsePositiveRates], metrics[1]))
         f1s = dict(zip(["fpr_"+str(x) for x in self.falsePositiveRates], metrics[2]))
         metricDict = DataFrame([tprs, f1s], index=["tpr", "f1"]).to_dict()
         metricDict['loss'] = metrics[0]
+        metricDict['auc'] = metrics[3]
         return metricDict
 
 
