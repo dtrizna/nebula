@@ -43,7 +43,10 @@ class ModelTrainer(object):
         elif optimSchedulerClass == "gpt":
             self.optimScheduler = OptimSchedulerGPT(self.optimizer)
         elif optimSchedulerClass == "step":
-            self.optimScheduler = OptimSchedulerStep(self.optimizer, step_size=optim_step_size)
+            if optim_step_size:
+                self.optimScheduler = OptimSchedulerStep(self.optimizer, step_size=optim_step_size)
+            else:
+                self.optimScheduler = None
         else:
             self.optimScheduler = optimSchedulerClass(self.optimizer)
 
