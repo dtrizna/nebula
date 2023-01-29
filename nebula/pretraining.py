@@ -9,7 +9,7 @@ class MaskedLanguageModel(object):
                     vocab,
                     mask_probability=0.15,
                     random_state=None,
-                    token_id_type="onehot"):
+                    masked_target_type="onehot"):
         super(MaskedLanguageModel, self).__init__()
         self.__name__ = "MaskedLanguageModel"
         
@@ -18,8 +18,8 @@ class MaskedLanguageModel(object):
         self.random_state = random_state
         np.random.seed(self.random_state)
 
-        assert token_id_type in ["onehot", "count"], "token_id_type must be either 'onehot' or 'count'"
-        self.token_id_type = token_id_type
+        assert masked_target_type in ["onehot", "count"], "masked_target_type must be either 'onehot' or 'count'"
+        self.masked_target_type = masked_target_type
 
     def maskSequence(self, sequence):
         """
@@ -52,7 +52,7 @@ class MaskedLanguageModel(object):
         for idx in np.where(maskIdxs)[0]:
             # prepare array of vocabSize that specifies which tokens were masked
             tokenId = maskedSequence[idx]
-            if self.token_id_type == "count":
+            if self.masked_target_type == "count":
                 maskedTokenIds[tokenId] += 1
             else:
                 maskedTokenIds[tokenId] = 1
@@ -74,20 +74,40 @@ class MaskedLanguageModel(object):
         return maskedSequence, maskedTokenIds
 
     def maskSequenceArr(self, sequence):
-        self.seq_masked = []
-        self.target = []
+        seq_masked = []
+        target = []
         for seq in tqdm(sequence):
             masked_local, target_local = self.maskSequence(seq)
-            self.seq_masked.append(masked_local)
-            self.target.append(target_local)
+            seq_masked.append(masked_local)
+            target.append(target_local)
         # U_masked shape: (n_sequences, max_len)
         # U_target shape: (n_sequences, vocab_size)
-        self.seq_masked = np.vstack(self.seq_masked)
-        self.target = np.vstack(self.target)
+        seq_masked = np.vstack(seq_masked)
+        target = np.vstack(target)
+        return seq_masked, target
 
-    def pretrain(self, unlabeledData, modelTrainerConfig, pretrainEpochs=5):
-        logging.warning(' [*] Masking sequences...')
-        self.maskSequenceArr(unlabeledData)
-        # stored in self.seq_masked, self.target
+    def pretrain(
+        self, 
+        unlabeledData, 
+        modelTrainerConfig, 
+        pretrainEpochs=5, 
+        dump_model_every_epoch=False,
+        remask_every_epoch=False
+    ):
+        assert isinstance(pretrainEpochs, int), "pretrainEpochs must be an integer"
         modelTrainer = ModelTrainer(**modelTrainerConfig)
-        modelTrainer.fit(self.seq_masked, self.target, epochs=pretrainEpochs)
+        if remask_every_epoch:
+            # to avoid dumping results every time
+            outFolder = modelTrainer.outputFolder
+            modelTrainer.outputFolder = None
+            for i in range(pretrainEpochs):
+                if i == pretrainEpochs-1:
+                    modelTrainer.outputFolder = outFolder
+                logging.warning(f' [*] Masking sequences: iteration {i+1}...')
+                x_masked, y_masked = self.maskSequenceArr(unlabeledData)
+                modelTrainer.fit(x_masked, y_masked, epochs=1, dump_model_every_epoch=dump_model_every_epoch, overwrite_epoch_idx=i)
+        else:
+            logging.warning(' [*] Masking sequences...')
+            x_masked, y_masked = self.maskSequenceArr(unlabeledData)
+            modelTrainer.fit(x_masked, y_masked, epochs=pretrainEpochs, dump_model_every_epoch=dump_model_every_epoch)
+        return modelTrainer.model
