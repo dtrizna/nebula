@@ -3,8 +3,6 @@ import json
 import logging
 import numpy as np
 from collections import defaultdict
-from torch import cuda
-import gc
 
 from time import sleep, time
 from torch.optim import Adam
@@ -13,7 +11,6 @@ from sklearn.model_selection import train_test_split, KFold
 from sklearn.metrics import f1_score
 
 from nebula import ModelTrainer
-from nebula.optimization import OptimSchedulerStep
 from nebula.misc import dictToString, get_tpr_at_fpr, clear_cuda_cache
 
 
@@ -24,6 +21,7 @@ class SelfSupervisedPretraining:
                     pretrainingTaskClass,
                     pretrainingTaskConfig,
                     device = 'auto',
+                    training_types=['pretrained', 'non_pretrained', 'full_data'],
                     falsePositiveRates=[0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
                     unlabeledDataSize=0.8,
                     randomState=None,
@@ -35,35 +33,43 @@ class SelfSupervisedPretraining:
                     outputFolder=None,
                     dump_model_every_epoch=False,
                     dump_data_splits=True,
-                    remask_every_epoch=False):
+                    remask_every_epoch=False,
+                    downsample_unlabeled_data=False):
         self.modelClass = modelClass
         self.modelConfig = modelConfig
+        self.pretrainingTask = pretrainingTaskClass(**pretrainingTaskConfig)
+        self.device = device
+        self.training_types = training_types
         self.falsePositiveRates = falsePositiveRates
         self.unlabeledDataSize = unlabeledDataSize
         self.randomState = randomState
-        self.batchSize = batchSize
         self.pretrainingEpochs = pretraingEpochs
         self.downstreamEpochs = downstreamEpochs
-        self.device = device
+        self.batchSize = batchSize
         self.verbosityBatches = verbosityBatches
-        self.pretrainingTask = pretrainingTaskClass(**pretrainingTaskConfig)
         self.optimizerStep = optimizerStep
         self.outputFolder = outputFolder
         self.dump_model_every_epoch = dump_model_every_epoch
         self.dump_data_splits = dump_data_splits
         self.remask_every_epoch = remask_every_epoch
-
-        self.trainingTypes = ['pretrained', 'non_pretrained', 'full_data']
+        self.downsample_unlabeled_data = downsample_unlabeled_data
+        if self.downsample_unlabeled_data:
+            assert isinstance(downsample_unlabeled_data, float) and 0 < downsample_unlabeled_data < 1
 
     def run(self, x, y, x_test, y_test):
-        models = {k: None for k in self.trainingTypes}
-        modelInterfaces = {k: None for k in self.trainingTypes}
-        metrics = {k: None for k in self.trainingTypes}
+        models = {k: None for k in self.training_types}
+        modelInterfaces = {k: None for k in self.training_types}
+        metrics = {k: None for k in self.training_types}
         
         # split x and y into train and validation sets
         unlabeled_data, labeled_x, _, labeled_y = train_test_split(
             x, y, train_size=self.unlabeledDataSize, random_state=self.randomState
         )
+        if self.downsample_unlabeled_data:
+            # sample N random samples from unlabeled data which is numpy array
+            unlabeled_size = unlabeled_data.shape[0]
+            indices = np.random.choice(unlabeled_size, int(self.downsample_unlabeled_data*unlabeled_size), replace=False)
+            unlabeled_data = unlabeled_data[indices].copy()
         if self.dump_data_splits:
             np.savez_compressed(
                 os.path.join(self.outputFolder, f"dataset_splits_{int(time())}.npz"), 
@@ -103,7 +109,7 @@ class SelfSupervisedPretraining:
         modelTrainerConfig['lossFunction'] = BCEWithLogitsLoss()
         modelTrainerConfig['modelForwardPass'] = None
 
-        for model in self.trainingTypes:
+        for model in self.training_types:
             logging.warning(f' [!] Training {model} model on downstream task...')
             if model != 'pretrained': # if not pretrained -- create a new model
                 models[model] = self.modelClass(**self.modelConfig).to(self.device)
@@ -127,20 +133,20 @@ class SelfSupervisedPretraining:
                 f1 = metrics[model]["fpr_"+str(reportingFPR)]["f1"]
                 tpr = metrics[model]["fpr_"+str(reportingFPR)]["tpr"]
                 logging.warning(f'\t[!] Test set scores at FPR: {reportingFPR:>6} --> TPR: {tpr:.4f} | F1: {f1:.4f}')
-        del models, modelInterfaces, pre_trained_model # cleanup to not accidentaly reuse 
+        del models, modelInterfaces # cleanup to not accidentaly reuse 
         clear_cuda_cache()
         return metrics
 
     def run_splits(self, x, y, x_test, y_test, nSplits=5, rest=None):
-        metrics = {k: {"fpr_"+str(fpr): {"f1": [], "tpr": []} for fpr in self.falsePositiveRates} for k in self.trainingTypes}
-        for trainingType in self.trainingTypes:
+        metrics = {k: {"fpr_"+str(fpr): {"f1": [], "tpr": []} for fpr in self.falsePositiveRates} for k in self.training_types}
+        for trainingType in self.training_types:
             metrics[trainingType]['auc'] = []
         # collect metrics for number of iterations
         for i in range(nSplits):
             self.randomState += i # to get different splits
             logging.warning(f' [!] Running pre-training split {i+1}/{nSplits}')
             splitMetrics = self.run(x, y, x_test, y_test)
-            for trainingType in self.trainingTypes:
+            for trainingType in self.training_types:
                 metrics[trainingType]['auc'].append(splitMetrics[trainingType]['auc'])
                 for fpr in self.falsePositiveRates:
                     metrics[trainingType]["fpr_"+str(fpr)]["f1"].append(splitMetrics[trainingType]["fpr_"+str(fpr)]["f1"])
@@ -149,7 +155,7 @@ class SelfSupervisedPretraining:
                 sleep(rest)
 
         # compute mean and std for each metric
-        for trainingType in self.trainingTypes:
+        for trainingType in self.training_types:
             for fpr in self.falsePositiveRates:
                 metrics[trainingType]["fpr_"+str(fpr)]["f1_mean"] = np.nanmean(metrics[trainingType]["fpr_"+str(fpr)]["f1"])
                 metrics[trainingType]["fpr_"+str(fpr)]["f1_std"] = np.nanstd(metrics[trainingType]["fpr_"+str(fpr)]["f1"])
