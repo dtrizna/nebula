@@ -275,3 +275,19 @@
 	{'vocabSize': 50002, 'maxLen': 512, 'dModel': 64, 'nHeads': 8, 'dHidden': 256, 'nLayers': 2, 'numClasses': 1, 'hiddenNeurons': [64], 'dropout': 0.3}
 
 01/29/2023 08:40:55 PM  [!] Running pre-training split 1/3
+01/29/2023 08:42:47 PM  [!] Starting uSize 0.9 evaluation!
+01/29/2023 08:42:48 PM  [!] Starting Masked Language Model evaluation over 3 splits!
+01/29/2023 08:42:48 PM  [!] Loaded data and vocab. X train size: (76126, 512), X test size: (17407, 512), vocab size: 50002
+01/29/2023 08:42:48 PM  [!] Initiating Self-Supervised Learning Pretraining
+     Language Modeling MaskedLanguageModel
+     Model TransformerEncoderLM with config:
+	{'vocabSize': 50002, 'maxLen': 512, 'dModel': 64, 'nHeads': 8, 'dHidden': 256, 'nLayers': 2, 'numClasses': 1, 'hiddenNeurons': [64], 'dropout': 0.3}
+
+01/29/2023 08:42:48 PM  [!] Running pre-training split 1/3
+01/29/2023 08:42:51 PM  [!] Pre-training model...
+01/29/2023 08:42:51 PM  [*] Masking sequences...
+01/29/2023 08:43:12 PM  [*] Started epoch: 1
+01/29/2023 08:43:14 PM  [*] Sun Jan 29 20:43:14 2023: Train Epoch: 1 [  0  /68513 (0 %)]	Loss: 436.780579 | Elapsed: 2.29s
+01/29/2023 08:43:27 PM  [*] Sun Jan 29 20:43:27 2023: Train Epoch: 1 [6400 /68513 (9 %)]	Loss: 222.408737 | Elapsed: 12.11s
+01/29/2023 08:43:39 PM  [*] Sun Jan 29 20:43:39 2023: Train Epoch: 1 [12800/68513 (19%)]	Loss: 183.367874 | Elapsed: 12.11s
+01/29/2023 08:43:51 PM  [*] Sun Jan 29 20:43:51 2023: Train Epoch: 1 [19200/68513 (28%)]	Loss: 205.750671 | Elapsed: 12.28s
