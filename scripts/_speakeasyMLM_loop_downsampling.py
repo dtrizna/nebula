@@ -41,10 +41,9 @@ yTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset_
 yTest = np.load(yTestFile)
 
 # ==== uSize Loop =======
-#for uSize in [0.9]: # [0.7, 0,75, 0.8, 0.85, 0.9, 0.95, 0.97]:
-for downsample_unlabeled_data in [x/10 for x in list(range(2, 10))]:
+for downsample_unlabeled_data in [0.9]:# [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
     logging.warning(f" [!] Starting uSize downsample {downsample_unlabeled_data} evaluation!")
-    random_state = 42
+    random_state = 43
     set_random_seed(random_state)
 
     modelClass = TransformerEncoderLM
