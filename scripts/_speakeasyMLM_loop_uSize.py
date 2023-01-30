@@ -15,9 +15,13 @@ SCRIPT_PATH = get_path(type="script")
 REPO_ROOT = os.path.join(SCRIPT_PATH, "..")
 
 # ===== LOGGING SETUP =====
-logFile = f"uSize_evaluation_v2.log"
+outputFolder = os.path.join(SCRIPT_PATH, "..", "evaluation", "MaskedLanguageModeling", "uSize_loop")
+os.makedirs(outputFolder, exist_ok=True)
+
+timestamp = int(time.time())
+logFile = f"uSize_evaluation_{timestamp}.log"
 logging.basicConfig(
-    filename=os.path.join(SCRIPT_PATH, "..", "evaluation", "MaskedLanguageModeling", logFile),
+    filename=os.path.join(outputFolder, logFile),
     level=logging.WARNING,
     format='%(asctime)s %(message)s',
     datefmt='%m/%d/%Y %I:%M:%S %p'
@@ -37,17 +41,16 @@ yTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset_
 yTest = np.load(yTestFile)
 
 # ==== uSize Loop =======
-for uSize in [0.9]: # [0.7, 0,75, 0.8, 0.85, 0.9, 0.95, 0.97]:
+for uSize in [0.7, 0,75, 0.8, 0.85, 0.9, 0.95, 0.97]:
     logging.warning(f" [!] Starting uSize {uSize} evaluation!")
-    random_state = 43
+    random_state = 1763
     set_random_seed(random_state)
 
     modelClass = TransformerEncoderLM
     run_name = f"uSize_{uSize}"
     timestamp = int(time.time())
 
-    outputFolder = os.path.join(SCRIPT_PATH, "..", "evaluation", "MaskedLanguageModeling", "uSize_loop",
-        f"{run_name}_{timestamp}")
+    outputFolder = os.path.join(outputFolder, f"{run_name}_{timestamp}")
     os.makedirs(outputFolder, exist_ok=True)
 
     config = {
@@ -123,7 +126,8 @@ for uSize in [0.9]: # [0.7, 0,75, 0.8, 0.85, 0.9, 0.95, 0.97]:
         "falsePositiveRates": config["falsePositiveRates"],
         "optimizerStep": config["optimizerStep"],
         "outputFolder": outputFolder,
-        "dump_data_splits": True
+        "dump_data_splits": True,
+        "training_types": config["training_types"]
     }
 
     # =========== PRETRAINING RUN ===========

@@ -15,9 +15,13 @@ SCRIPT_PATH = get_path(type="script")
 REPO_ROOT = os.path.join(SCRIPT_PATH, "..")
 
 # ===== LOGGING SETUP =====
-logFile = f"downsample_U.log"
+outputFolder = os.path.join(SCRIPT_PATH, "..", "evaluation", "MaskedLanguageModeling", "downsample_tests")
+os.makedirs(outputFolder, exist_ok=True)
+
+timestamp = int(time.time())
+logFile = f"downsample_{timestamp}.log"
 logging.basicConfig(
-    filename=os.path.join(SCRIPT_PATH, "..", "evaluation", "MaskedLanguageModeling", logFile),
+    filename=os.path.join(outputFolder, logFile),
     level=logging.WARNING,
     format='%(asctime)s %(message)s',
     datefmt='%m/%d/%Y %I:%M:%S %p'
@@ -38,17 +42,16 @@ yTest = np.load(yTestFile)
 
 # ==== uSize Loop =======
 #for uSize in [0.9]: # [0.7, 0,75, 0.8, 0.85, 0.9, 0.95, 0.97]:
-for donwsample_unlabeled_data in [x/10 for x in list(range(2, 10))]:
-    logging.warning(f" [!] Starting uSize downsample {donwsample_unlabeled_data} evaluation!")
+for downsample_unlabeled_data in [x/10 for x in list(range(2, 10))]:
+    logging.warning(f" [!] Starting uSize downsample {downsample_unlabeled_data} evaluation!")
     random_state = 42
     set_random_seed(random_state)
 
     modelClass = TransformerEncoderLM
-    run_name = f"downsample_U_{donwsample_unlabeled_data}"
+    run_name = f"downsample_U_{downsample_unlabeled_data}"
     timestamp = int(time.time())
 
-    outputFolder = os.path.join(SCRIPT_PATH, "..", "evaluation", "MaskedLanguageModeling", "downsample_tests",  
-        f"{run_name}_{timestamp}")
+    outputFolder = os.path.join(outputFolder,  f"{run_name}_{timestamp}")
     os.makedirs(outputFolder, exist_ok=True)
 
     run_config = {
@@ -63,8 +66,8 @@ for donwsample_unlabeled_data in [x/10 for x in list(range(2, 10))]:
         "batchSize": 64,
         "optimizerStep": 0, #5000,
         "verbosity_batches": 100,
-        "donwsample_unlabeled_data": donwsample_unlabeled_data, #False
-        "training_types": ['pretrained', 'non_pretrained']
+        "downsample_unlabeled_data": downsample_unlabeled_data, #False
+        "training_types": ['pretrained']
     }
     with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
         json.dump(run_config, f, indent=4)
@@ -126,7 +129,7 @@ for donwsample_unlabeled_data in [x/10 for x in list(range(2, 10))]:
         "optimizerStep": run_config["optimizerStep"],
         "outputFolder": outputFolder,
         "dump_data_splits": True,
-        "downsample_unlabeled": run_config["donwsample_unlabeled_data"],
+        "downsample_unlabeled_data": run_config["downsample_unlabeled_data"],
         "training_types": run_config["training_types"]
     }
 
@@ -141,7 +144,7 @@ for donwsample_unlabeled_data in [x/10 for x in list(range(2, 10))]:
     metricsOutFile = f"{outputFolder}/metrics_{languageModelClass.__name__}_nSplits_{run_config['nSplits']}_limit_{run_config['train_limit']}.json"
     with open(metricsOutFile, 'w') as f:
         json.dump(metrics, f, indent=4)
-    logging.warning(f" [!] Finished pre-training evaluation over {run_config['nSplits']} splits! Saved metrics to:\n\t{metricsOutFile}")
+    logging.warning(f" [!] Finished pre-training evaluation over {run_config['nSplits']} splits! Saved metrics to:\n\t{metricsOutFile}\n\n")
 
     del pretrain
     clear_cuda_cache()

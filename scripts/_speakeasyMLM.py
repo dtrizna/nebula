@@ -1,18 +1,12 @@
-import os
 import json
 import time
+import os
+import sys
 import logging
 import numpy as np
-from collections import defaultdict
+from torch import cuda
 from sklearn.utils import shuffle
-
-import torch
-from torch.optim import Adam
-from torch.nn import BCEWithLogitsLoss
-
-import sys
 sys.path.extend(['../..', '.'])
-from nebula import ModelTrainer
 from nebula.attention import TransformerEncoderLM
 from nebula.pretraining import MaskedLanguageModel
 from nebula.evaluation import SelfSupervisedPretraining
@@ -20,18 +14,28 @@ from nebula.misc import get_path, set_random_seed, clear_cuda_cache
 SCRIPT_PATH = get_path(type="script")
 REPO_ROOT = os.path.join(SCRIPT_PATH, "..")
 
-random_state = 42
-set_random_seed(random_state)
-
-run_name = "pretrain_epoch_analysis_mask_every_epoch"
+# ===== LOGGING SETUP =====
+modelClass = TransformerEncoderLM
+run_name = f"{modelClass.__name_}"
 timestamp = int(time.time())
 
 outputFolder = os.path.join(SCRIPT_PATH, "..", "evaluation", "MaskedLanguageModeling", 
     f"{run_name}_{timestamp}")
 os.makedirs(outputFolder, exist_ok=True)
 
-# ===== LOGGING SETUP =====
-modelClass = TransformerEncoderLM
+logFile = f"{run_name}.log"
+logging.basicConfig(
+    filename=os.path.join(outputFolder, logFile),
+    level=logging.WARNING,
+    format='%(asctime)s %(message)s',
+    datefmt='%m/%d/%Y %I:%M:%S %p'
+)
+logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+
+# ====== SCRIPT CONFIG =====
+
+random_state = 42
+set_random_seed(random_state)
 
 run_config = {
     "unlabeledDataSize": 0.8,
@@ -42,8 +46,8 @@ run_config = {
     "modelType": modelClass.__name__,
     "train_limit": None,
     "random_state": random_state,
-    'batchSize': 64,
-    'optimizerStep': 10000, # 5000 is too small for 30 epochs
+    "batchSize": 64,
+    "optimizerStep": 5000,
     'verbosity_batches': 100,
     "dump_model_every_epoch": True,
     "dump_data_splits": True,
@@ -54,21 +58,9 @@ run_config = {
 with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
     json.dump(run_config, f, indent=4)
 
-# ===== LOGGING SETUP =====
-logFile = f"{run_name}.log"
-
-logging.basicConfig(
-    filename=os.path.join(outputFolder, logFile),
-    level=logging.WARNING,
-    format='%(asctime)s %(message)s',
-    datefmt='%m/%d/%Y %I:%M:%S %p'
-)
-logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
-
 logging.warning(f" [!] Starting Masked Language Model evaluation over {run_config['nSplits']} splits!")
 
 # ===== LOADING DATA ==============
-
 vocabSize = 50000
 maxLen = 512
 xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE", f"speakeasy_VocabSize_50000_maxLen_{maxLen}_x.npy")
@@ -95,8 +87,7 @@ vocabSize = len(vocab) # adjust it to exact number of tokens in the vocabulary
 
 logging.warning(f" [!] Loaded data and vocab. X train size: {xTrain.shape}, X test size: {xTest.shape}, vocab size: {len(vocab)}")
 
-# ============ MODEL ============
-
+# =========== PRETRAINING CONFIG ===========
 modelConfig = {
     "vocabSize": vocabSize,  # size of vocabulary
     "maxLen": maxLen,  # maximum length of the input sequence
@@ -108,18 +99,18 @@ modelConfig = {
     "hiddenNeurons": [64],
     "dropout": 0.3
 }
-
-# ======= PRETRAINING =========
+# dump model config as json
+with open(os.path.join(outputFolder, f"model_config.json"), "w") as f:
+    json.dump(modelConfig, f, indent=4)
 
 languageModelClass = MaskedLanguageModel
 languageModelClassConfig = {
     "vocab": vocab, # needs vocab to mask sequences
-    "mask_probability": run_config["mask_probability"],
+    "mask_probability": 0.15,
     "random_state": random_state,
 }
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
+device = "cuda" if cuda.is_available() else "cpu"
 pretrainingConfig = {
     "modelClass": modelClass,
     "modelConfig": modelConfig,
@@ -148,80 +139,10 @@ logging.warning(msg)
 
 pretrain = SelfSupervisedPretraining(**pretrainingConfig)
 metrics = pretrain.run_splits(xTrain, yTrain, xTest, yTest, nSplits=run_config['nSplits'], rest=0)
-
-metricsOutFile = f"{outputFolder}/results_full.json"
+metricsOutFile = f"{outputFolder}/metrics_{languageModelClass.__name__}_nSplits_{run_config['nSplits']}_limit_{run_config['train_limit']}.json"
 with open(metricsOutFile, 'w') as f:
     json.dump(metrics, f, indent=4)
-logging.warning(f" [!] Finished pre-training evaluation over {run_config['nSplits']} splits! Saved metrics to:\n\t{metricsOutFile}")
+logging.warning(f" [!] Finished pre-training evaluation over {run_config['nSplits']} splits! Saved metrics to:\n\t{metricsOutFile}\n\n")
 
-# ========= EVALUATING PRE-TRAIN LENGTH UTILITY =========
 del pretrain
 clear_cuda_cache()
-
-logging.warning(f" [*] Evaluating pre-training length utility -- looping over per-epoch models...")
-split_data = [x for x in os.listdir(outputFolder) if x.endswith(".npz")]
-split_data = [os.path.join(outputFolder, x) for x in split_data]
-
-pretrainFileFolder = os.path.join(outputFolder, "preTraining", "training_files")
-pretrainModelFiles = [x for x in os.listdir(pretrainFileFolder) if x.startswith("epoch_")]
-pretrainModelFiles = [os.path.join(pretrainFileFolder, x) for x in pretrainModelFiles]
-
-modelTrainerConfig = {
-            "device": device,
-            "model": None,
-            "lossFunction": BCEWithLogitsLoss(),
-            "optimizerClass": Adam,
-            "optimizerConfig": {"lr": 2.5e-4},
-            "optimSchedulerClass": "step",
-            "optim_step_size": run_config["optimizerStep"],
-            "verbosityBatches": run_config["verbosity_batches"],
-            "batchSize": run_config["batchSize"],
-            "falsePositiveRates": run_config["falsePositiveRates"],
-        }
-
-epochs = len(pretrainModelFiles)//len(split_data)
-tprs, f1s, aucs = defaultdict(list), defaultdict(list), defaultdict(list)
-for split in range(len(split_data)):
-    loaded = np.load(split_data[split])
-    labeled_x = loaded['labeled_x']
-    labeled_y = loaded['labeled_y']
-    models = []
-    for epoch in range(1,epochs+1):
-        logging.warning(f" [!] Evaluating model from split: {split} | epoch: {epoch}")
-        model_file = [x for x in pretrainModelFiles if f"epoch_{epoch}" in x][split]
-        model = modelClass(**modelConfig)
-        model.load_state_dict(torch.load(model_file))
-        
-        # finetune model
-        modelTrainerConfig['model'] = model
-        modelTrainer = ModelTrainer(**modelTrainerConfig)
-        modelTrainer.fit(labeled_x, labeled_y, epochs=run_config['downStreamEpochs'])
-
-        _, tpr, f1, auc = modelTrainer.evaluate(xTest, yTest)
-        tprs[epoch].append(tpr)
-        f1s[epoch].append(f1)
-        aucs[epoch].append(auc)
-
-        del modelTrainer
-        clear_cuda_cache()
-
-results = {}
-
-# create a dict from tprs and f1s means and std, and dump as json
-for epoch in range(1, epochs+1):
-    tprs_mean = np.nanmean(np.array(tprs[epoch]), axis=0)
-    tprs_std = np.nanstd(np.array(tprs[epoch]), axis=0)
-    f1s_mean = np.nanmean(np.array(f1s[epoch]), axis=0)
-    f1s_std = np.nanstd(np.array(f1s[epoch]), axis=0)
-
-    results[epoch] = {}
-    # zip to dict values in tprs_mean with false positive rates
-    results[epoch]['tpr_mean'] = dict(zip(run_config["falsePositiveRates"], tprs_mean.tolist()))
-    results[epoch]['tpr_std'] = dict(zip(run_config["falsePositiveRates"], tprs_std.tolist()))
-    results[epoch]['f1_mean'] = dict(zip(run_config["falsePositiveRates"], f1s_mean.tolist()))
-    results[epoch]['f1_std'] = dict(zip(run_config["falsePositiveRates"], f1s_std.tolist()))
-    results[epoch]['auc_mean'] = np.nanmean(aucs[epoch], axis=0)
-    results[epoch]['auc_std'] = np.nanstd(aucs[epoch], axis=0)
-
-with open(os.path.join(outputFolder, "results_per_epoch.json"), "w") as f:
-    json.dump(results, f, indent=4)
