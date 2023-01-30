@@ -129,6 +129,7 @@ class SelfSupervisedPretraining:
         for model in models:
             logging.warning(f' [*] Evaluating {model} model on test set...')
             metrics[model] = modelInterfaces[model].evaluate(x_test, y_test, metrics="json")
+            logging.warning(f"\t[!] Test set AUC: {metrics[model]['auc']:.4f}")
             for reportingFPR in self.falsePositiveRates:
                 f1 = metrics[model]["fpr_"+str(reportingFPR)]["f1"]
                 tpr = metrics[model]["fpr_"+str(reportingFPR)]["tpr"]
