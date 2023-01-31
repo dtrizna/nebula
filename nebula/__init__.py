@@ -30,12 +30,14 @@ class ModelTrainer(object):
                     falsePositiveRates=[0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
                     modelForwardPass=None,
                     stateDict = None,
+                    timestamp = None,
                     optim_step_size=1000):
         self.model = model    
         self.optimizer = optimizerClass(self.model.parameters(), **optimizerConfig)
         self.lossFunction = lossFunction
         self.verbosityBatches = verbosityBatches
         self.batchSize = batchSize
+        self.reporting_timestamp = timestamp
 
         # lr scheduling setup
         if optimSchedulerClass is None:
@@ -68,12 +70,21 @@ class ModelTrainer(object):
             self.model.forwardPass = modelForwardPass
         else:
             self.model.forwardPass = self.model.forward
+        
+        trainable_params = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
+        # if .name in self.model attributes
+        if not hasattr(self.model, "__name__"):
+            self.model.__name__ = "model"
+        logging.warning(f" [!] Iniatialized {self.model.__name__}. Total trainable parameters: {trainable_params/1e6:.4f}e6")
 
     def loadState(self, stateDict):
         self.model.load_state_dict(torch.load(stateDict))
 
     def dumpResults(self, prefix="", model_only=False):
-        prefix = os.path.join(self.trainingFileFolder, f"{prefix}{int(time.time())}")
+        if self.reporting_timestamp:
+            prefix = os.path.join(self.trainingFileFolder, f"{prefix}{self.reporting_timestamp}")
+        else:
+            prefix = os.path.join(self.trainingFileFolder, f"{prefix}{int(time.time())}")
         
         modelFile = f"{prefix}-model.torch"
         torch.save(self.model.state_dict(), modelFile)
@@ -148,8 +159,14 @@ class ModelTrainer(object):
                     metricsReport = f"FPR {self.falsePositiveRates[self.fprReportingIdx]} -> "
                     metricsReport += f"TPR {currentTPR:.4f} & F1 {currentF1:.4f}"
                     metricsReportList.append(metricsReport)
-                    # calculate auc 
-                    batch_auc = roc_auc_score(targets[-self.verbosityBatches:], epochProbs[-self.verbosityBatches:])
+                    try: # calculate auc for last set of batches
+                        batch_auc = roc_auc_score(
+                            targets[-self.verbosityBatches:], 
+                            epochProbs[-self.verbosityBatches:]
+                        )
+                    # Only one class present in y_true. ROC AUC score is not defined in that case.
+                    except ValueError:
+                        batch_auc = np.nan
                     metricsReportList.append(f"AUC {batch_auc:.4f}")
                 logging.warning(" [*] {}: Train Epoch: {} [{:^5}/{:^5} ({:^2.0f}%)]\t".format(
                     time.ctime(), epochId, batchIdx * len(data), len(trainLoader.dataset),
@@ -165,7 +182,10 @@ class ModelTrainer(object):
         else:
             return epoch_losses, None, None, None
 
-    def fit(self, X, y, epochs=10, dump_model_every_epoch=False, overwrite_epoch_idx=False):
+    def fit(self, X, y, epochs=10, dump_model_every_epoch=False, overwrite_epoch_idx=False, reporting_timestamp=None):
+        if reporting_timestamp:
+            self.reporting_timestamp = reporting_timestamp
+
         trainLoader = torch.utils.data.DataLoader(
             torch.utils.data.TensorDataset(torch.from_numpy(X).long(), torch.from_numpy(y).float()),
             batch_size=self.batchSize,

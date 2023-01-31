@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split, KFold
 from sklearn.metrics import f1_score, roc_auc_score
 
 from nebula import ModelTrainer
-from nebula.misc import dictToString, get_tpr_at_fpr, clear_cuda_cache
+from nebula.misc import get_tpr_at_fpr, clear_cuda_cache
 
 
 class SelfSupervisedPretraining:
@@ -56,10 +56,11 @@ class SelfSupervisedPretraining:
         if self.downsample_unlabeled_data:
             assert isinstance(downsample_unlabeled_data, float) and 0 < downsample_unlabeled_data < 1
 
-    def run(self, x, y, x_test, y_test):
+    def run_one_split(self, x, y, x_test, y_test):
         models = {k: None for k in self.training_types}
         modelInterfaces = {k: None for k in self.training_types}
         metrics = {k: None for k in self.training_types}
+        timestamp = int(time())
         
         # split x and y into train and validation sets
         unlabeled_data, labeled_x, _, labeled_y = train_test_split(
@@ -71,12 +72,14 @@ class SelfSupervisedPretraining:
             indices = np.random.choice(unlabeled_size, int(self.downsample_unlabeled_data*unlabeled_size), replace=False)
             unlabeled_data = unlabeled_data[indices].copy()
         if self.dump_data_splits:
+            splitData = f"dataset_splits_{timestamp}.npz"
             np.savez_compressed(
-                os.path.join(self.outputFolder, f"dataset_splits_{int(time())}.npz"), 
+                os.path.join(self.outputFolder, splitData),
                 unlabeled_data=unlabeled_data,
                 labeled_x=labeled_x,
                 labeled_y=labeled_y
             )
+            logging.warning(f" [!] Saved dataset splits to {splitData}")
 
         logging.warning(' [!] Pre-training model...')
         # create a pretraining model and task
@@ -121,10 +124,10 @@ class SelfSupervisedPretraining:
             modelInterfaces[model] = ModelTrainer(**modelTrainerConfig)
             if model == 'full_data':
                 modelTrainerConfig['optim_step_size'] = self.optimizerStep//2
-                modelInterfaces[model].fit(x, y, self.downstreamEpochs)
+                modelInterfaces[model].fit(x, y, self.downstreamEpochs, reporting_timestamp=timestamp)
             else:
                 modelTrainerConfig['optim_step_size'] = self.optimizerStep//10
-                modelInterfaces[model].fit(labeled_x, labeled_y, self.downstreamEpochs)
+                modelInterfaces[model].fit(labeled_x, labeled_y, self.downstreamEpochs, reporting_timestamp=timestamp)
         
         for model in models:
             logging.warning(f' [*] Evaluating {model} model on test set...')
@@ -146,7 +149,7 @@ class SelfSupervisedPretraining:
         for i in range(nSplits):
             self.randomState += i # to get different splits
             logging.warning(f' [!] Running pre-training split {i+1}/{nSplits}')
-            splitMetrics = self.run(x, y, x_test, y_test)
+            splitMetrics = self.run_one_split(x, y, x_test, y_test)
             for trainingType in self.training_types:
                 metrics[trainingType]['auc'].append(splitMetrics[trainingType]['auc'])
                 for fpr in self.falsePositiveRates:
@@ -171,11 +174,13 @@ class CrossValidation(object):
                  modelInterfaceConfig,
                  modelClass,
                  modelConfig,
-                 outputRootFolder):
+                 outputRootFolder,
+                 dump_data_splits=True):
         self.modelInterfaceClass = modelInterfaceClass
         self.modelInterfaceConfig = modelInterfaceConfig
         self.modelClass = modelClass
         self.modelConfig = modelConfig
+        self.dump_data_splits = dump_data_splits
 
         self.outputRootFolder = outputRootFolder
         os.makedirs(self.outputRootFolder, exist_ok=True)
@@ -209,9 +214,20 @@ class CrossValidation(object):
         training_time = np.empty(shape=(folds, epochs))
         # Iterate over the folds
         for i, (train_index, test_index) in enumerate(kf.split(X)):
+            timestamp = int(time())
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
             logging.warning(f" [!] Fold {i+1}/{self.nFolds} | Train set size: {len(X_train)}, Validation set size: {len(X_test)}")
+            if self.dump_data_splits:
+                splitData = f"dataset_splits_{timestamp}.npz"
+                np.savez_compressed(
+                    os.path.join(self.outputRootFolder, splitData),
+                    X_train=X_train,
+                    y_train=y_train,
+                    X_test=X_test,
+                    y_test=y_test
+                )
+                logging.warning(f" [!] Saved dataset splits to {splitData}")
             # Create the model
             model = self.modelClass(**self.modelConfig)
 
@@ -222,7 +238,7 @@ class CrossValidation(object):
 
             # Train the model
             try:
-                modelTrainer.fit(X_train, y_train, epochs=self.epochs)
+                modelTrainer.fit(X_train, y_train, epochs=self.epochs, reporting_timestamp=timestamp)
                 training_time[i,:] = np.pad(modelTrainer.training_time, (0, epochs-len(modelTrainer.training_time)), 'constant', constant_values=(0,0))
             except RuntimeError as e: # cuda outofmemory
                 logging.warning(f" [!] Exception: {e}")
@@ -241,7 +257,7 @@ class CrossValidation(object):
                 f1 = f1_score(y[test_index], predicted_probs >= threshold)
                 self.metrics[fpr]["tpr"].append(tpr)
                 self.metrics[fpr]["f1"].append(f1)
-                logging.warning(f" [!] FPR: {fpr} | TPR: {tpr} | F1: {f1}")
+                logging.warning(f" [!] FPR: {fpr} | TPR: {tpr:.4f} | F1: {f1:.4f}")
             
             # cleanup
             del model, modelTrainer, modelInterfaceConfig
@@ -275,6 +291,7 @@ class CrossValidation(object):
 
     def log_avg_metrics(self):
         msg = f" [!] Average epoch time: {self.metrics['epoch_time_avg']:.2f}s | Mean values over {self.nFolds} folds:\n"
+        msg += f"\tAUC: {self.metrics['auc_avg']:.4f}\n"
         for fpr in self.fprValues:
             msg += f"\tFPR: {fpr:>6} -- TPR: {self.metrics[fpr]['tpr_avg']:.4f} -- F1: {self.metrics[fpr]['f1_avg']:.4f}\n"
         logging.warning(msg)
