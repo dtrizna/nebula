@@ -8,7 +8,7 @@ from time import sleep, time
 from torch.optim import Adam
 from torch.nn import BCEWithLogitsLoss, CrossEntropyLoss
 from sklearn.model_selection import train_test_split, KFold
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, roc_auc_score
 
 from nebula import ModelTrainer
 from nebula.misc import dictToString, get_tpr_at_fpr, clear_cuda_cache
@@ -181,6 +181,7 @@ class CrossValidation(object):
         os.makedirs(self.outputRootFolder, exist_ok=True)
         
         self.metrics = defaultdict(lambda: defaultdict(list))
+        self.aucs = []
 
     def run_folds(self, X, y, folds=3, epochs=5, fprValues=[0.0001, 0.001, 0.01, 0.1], random_state=42):
         """
@@ -205,7 +206,7 @@ class CrossValidation(object):
         kf.get_n_splits(X)
 
         # Create the output
-        trainingTime = np.empty(shape=(folds, epochs))
+        training_time = np.empty(shape=(folds, epochs))
         # Iterate over the folds
         for i, (train_index, test_index) in enumerate(kf.split(X)):
             X_train, X_test = X[train_index], X[test_index]
@@ -222,7 +223,7 @@ class CrossValidation(object):
             # Train the model
             try:
                 modelTrainer.fit(X_train, y_train, epochs=self.epochs)
-                trainingTime[i,:] = np.pad(modelTrainer.trainingTime, (0, epochs-len(modelTrainer.trainingTime)), 'constant', constant_values=(0,0))
+                training_time[i,:] = np.pad(modelTrainer.training_time, (0, epochs-len(modelTrainer.training_time)), 'constant', constant_values=(0,0))
             except RuntimeError as e: # cuda outofmemory
                 logging.warning(f" [!] Exception: {e}")
                 break
@@ -231,6 +232,10 @@ class CrossValidation(object):
             logging.warning(f" [!] Evaluating model on validation set...")
             predicted_probs = modelTrainer.predict_proba(X_test)
             logging.warning(f" [!] This fold metrics on validation set:")
+            # calculate auc 
+            auc = roc_auc_score(y_test, predicted_probs)
+            self.aucs.append(auc)
+            logging.warning(f" [!] AUC: {auc:.4f}")
             for fpr in self.fprValues:
                 tpr, threshold = get_tpr_at_fpr(y_test, predicted_probs, fpr)
                 f1 = f1_score(y[test_index], predicted_probs >= threshold)
@@ -244,19 +249,25 @@ class CrossValidation(object):
             if singleFold:
                 break
 
+        # add AUC to metrics
+        self.metrics["auc"] = self.aucs
+        self.metrics["auc_avg"] = np.nanmean(self.aucs)
+        self.metrics["auc_std"] = np.nanstd(self.aucs)
+
         # take means over all folds        
         for fpr in self.fprValues:
             self.metrics[fpr]["tpr_avg"] = np.nanmean(self.metrics[fpr]["tpr"])
+            self.metrics[fpr]["tpr_std"] = np.nanstd(self.metrics[fpr]["tpr"])
             self.metrics[fpr]["f1_avg"] = np.nanmean(self.metrics[fpr]["f1"])
+            self.metrics[fpr]["f1_std"] = np.nanstd(self.metrics[fpr]["f1"])
 
         # Add the average epoch time
-        self.metrics["epoch_time_avg"] = np.nanmean(trainingTime)
+        self.metrics["epoch_time_avg"] = np.nanmean(training_time)
 
     def dump_metrics(self, prefix="", suffix=""):
-        configStr = dictToString(self.modelConfig)
         prefix = prefix.rstrip('_').lstrip('_') + '_' if prefix else ''
         suffix = f"_{suffix.rstrip('_').lstrip('_')}" if suffix else ''
-        metricFilename = f"metrics_{prefix}trainSize_{self.trainSize}_ep_{self.epochs}_cv_{self.nFolds}_{configStr}{suffix}.json"
+        metricFilename = f"{prefix}cv_metrics{suffix}.json"
         metricFileFullpath = os.path.join(self.outputRootFolder, metricFilename)
         with open(metricFileFullpath, "w") as f:
             json.dump(self.metrics, f, indent=4)
