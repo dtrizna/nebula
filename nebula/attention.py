@@ -28,7 +28,7 @@ class TransformerEncoderLM(nn.Module):
         self.__name__ = 'Transformer'
         self.encoder = nn.Embedding(vocabSize, dModel)
         self.pos_encoder = PositionalEncoding(dModel, dropout)
-        encoder_layers = TransformerEncoderLayer(dModel, nHeads, dHidden, dropout)
+        encoder_layers = TransformerEncoderLayer(dModel, nHeads, dHidden, dropout, batch_first=True)
         self.transformer_encoder = TransformerEncoder(encoder_layers, nLayers)
         self.d_model = dModel
 
@@ -117,7 +117,7 @@ class TransformerEncoderModel(nn.Module):
         self.__name__ = 'Transformer'
         self.encoder = nn.Embedding(vocabSize, dModel)
         self.pos_encoder = PositionalEncoding(dModel, dropout)
-        encoder_layers = TransformerEncoderLayer(dModel, nHeads, dHidden, dropout)
+        encoder_layers = TransformerEncoderLayer(dModel, nHeads, dHidden, dropout, batch_first=True)
         self.transformer_encoder = TransformerEncoder(encoder_layers, nLayers)
         self.d_model = dModel
         
