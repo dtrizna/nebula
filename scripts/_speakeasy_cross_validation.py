@@ -1,34 +1,39 @@
 import numpy as np
-import torch
 import logging
 import os
-import sys
+import json
 import time
 from sklearn.utils import shuffle
+
+import sys
 sys.path.extend(['..', '.'])
 from nebula import ModelTrainer
 from nebula.models import Cnn1DLinear, Cnn1DLSTM, LSTM
-from nebula.attention import TransformerEncoderModel, ReformerLM
+from nebula.attention import TransformerEncoderModel, ReformerLM, TransformerEncoderWithChunking
 from nebula.evaluation import CrossValidation
-from nebula.misc import get_path
+from nebula.misc import get_path, set_random_seed
+
+from torch import cuda
+from torch.nn import BCEWithLogitsLoss
+from torch.optim import Adam
 
 # supress UndefinedMetricWarning, which appears when a batch has only one class
-import warnings
-warnings.filterwarnings("ignore")
-
-# ============== SCRIPT CONFIG
-train_limit = None
-train_folder = "speakeasy_trainset_BPE"
-runType = "Transformer_512_BPE"
-runName = f"longRun_30_epochs"
+# import warnings
+# warnings.filterwarnings("ignore")
 
 # ============== REPORTING CONFIG
 
+modelClass = TransformerEncoderWithChunking
+runType = f"Trainsformer_wChunks"
+maxLen = 512
+timestamp = int(time.time())
+runName = f"maxLen_{maxLen}_30_epochs_{timestamp}"
+
 SCRIPT_PATH = get_path(type="script")
 REPO_ROOT = os.path.join(SCRIPT_PATH, "..")
-outputFolder = os.path.join(REPO_ROOT, "evaluation", "crossValidation", runType)
-os.makedirs(outputFolder, exist_ok=True)
-outputFolder = os.path.join(outputFolder, runName)
+outputFolder = os.path.join(REPO_ROOT, "evaluation", "crossValidation", runType, runName)
+# os.makedirs(outputFolder, exist_ok=True)
+# outputFolder = os.path.join(outputFolder, runName)
 os.makedirs(outputFolder, exist_ok=True)
 
 # loging setup
@@ -42,21 +47,45 @@ logging.basicConfig(
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 # ============== Cross-Valiation CONFIG
-nFolds = 3
-epochs = 30
-fprValues = [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1]
-rest = 30 # seconds to rest between folds (to cool down the GPU)
-
-vocabSize = 50000
-maxLen = 512
-
-batchSize = 16 # 16 for Transformer; 192 for CNNLinear
-optim_step_size = 10000 # 1000-2000 for Transformer; 500 for CNNLinear
-
 random_state = 42
-metricFilePrefix = f""
+set_random_seed(random_state)
 
-logging.warning(f" [!] Cross-Validation config: {vocabSize} vocab size, {maxLen} maxLen, {train_limit} train_limit, {train_folder} train_folder, {random_state} random_state, {batchSize} batchSize, {optim_step_size} optim_step_size")
+# transform above variables to dict
+run_config = {
+    "train_limit": None, #500,
+    "nFolds": 3,
+    "epochs": 30,
+    "fprValues": [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
+    "rest": 0,
+    "maxLen": maxLen,
+    "batchSize": 64,
+    # 1000-2000 for 10 epochs; 10000 for 30 epochs
+    "optim_step_size": 10000,
+    "random_state": random_state,
+    "chunk_size": 128,
+    "verbosity_batches": 10
+}
+with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
+    json.dump(run_config, f, indent=4)
+
+# ===== LOADING DATA ==============
+vocabSize = 50000
+xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE", f"speakeasy_VocabSize_50000_maxLen_{maxLen}_x.npy")
+x_train = np.load(xTrainFile)
+yTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE", "speakeasy_y.npy")
+y_train = np.load(yTrainFile)
+
+if run_config['train_limit']:
+    x_train, y_train = shuffle(x_train, y_train, random_state=random_state)
+    x_train = x_train[:run_config['train_limit']]
+    y_train = y_train[:run_config['train_limit']]
+
+vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", "speakeasy_BPE_50000_vocab.json")
+with open(vocabFile, 'r') as f:
+    vocab = json.load(f)
+vocabSize = len(vocab) # adjust it to exact number of tokens in the vocabulary
+
+logging.warning(f" [!] Loaded data and vocab. X train size: {x_train.shape}, vocab size: {len(vocab)}")
 
 # =============== MODEL CONFIG
 
@@ -71,10 +100,10 @@ logging.warning(f" [!] Cross-Validation config: {vocabSize} vocab size, {maxLen}
 #     "filterSizes": [2, 3, 4, 5],
 #     "dropout": 0.3
 # }
-modelClass = TransformerEncoderModel
 modelArch = {
     "vocabSize": vocabSize,  # size of vocabulary
     "maxLen": maxLen,  # maximum length of the input sequence
+    "chunk_size": run_config["chunk_size"],
     "dModel": 64,  # embedding & transformer dimension
     "nHeads": 8,  # number of heads in nn.MultiheadAttention
     "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
@@ -105,20 +134,23 @@ modelArch = {
 #     "hiddenNeurons": [256, 128],
 #     "batchNormFFNN": False,
 # }
+# dump model config as json
+with open(os.path.join(outputFolder, f"model_config.json"), "w") as f:
+    json.dump(modelArch, f, indent=4)
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = "cuda" if cuda.is_available() else "cpu"
 modelInterfaceClass = ModelTrainer
 modelInterfaceConfig = {
     "device": device,
     "model": None, # will be set later within CrossValidation class
-    "lossFunction": torch.nn.BCEWithLogitsLoss(),
-    "optimizerClass": torch.optim.Adam,
+    "lossFunction": BCEWithLogitsLoss(),
+    "optimizerClass": Adam,
     "optimizerConfig": {"lr": 2.5e-4},
     "optimSchedulerClass": "step",
-    "optim_step_size": optim_step_size,
+    "optim_step_size": run_config["optim_step_size"],
     "outputFolder": None, # will be set later
-    "batchSize": batchSize,
-    "verbosityBatches": 100,
+    "batchSize": run_config["batchSize"],
+    "verbosityBatches": run_config["verbosity_batches"],
 }
 
 # =============== CROSS-VALIDATION LOOP
@@ -153,8 +185,6 @@ modelInterfaceConfig = {
 #     logging.warning(f" [!] Running Cross Validation with vocabSize: {vocabSize} | maxLen: {maxLen}")
 
 # 2. CROSS VALIDATION OVER DIFFERENT MODEL CONFIGRATIONS
-x_train = np.load(os.path.join(REPO_ROOT, "data", "data_filtered", train_folder, f"speakeasy_VocabSize_{vocabSize}_maxLen_{maxLen}_x.npy"))
-y_train = np.load(os.path.join(REPO_ROOT, "data", "data_filtered", train_folder, "speakeasy_y.npy"))
 
 # for heads in [2, 4, 8, 16]:
 #     modelArch["nHeads"] = heads
@@ -167,18 +197,23 @@ y_train = np.load(os.path.join(REPO_ROOT, "data", "data_filtered", train_folder,
 # for hiddenLayer in [[256, 64], [512, 256, 64]]:
 #     modelArch["hiddenNeurons"] = hiddenLayer
 for _ in [1]:
-    if train_limit:
-        x_train, y_train = shuffle(x_train, y_train, random_state=random_state)
-        x_train = x_train[:train_limit]
-        y_train = y_train[:train_limit]
+    # to differentiate different run results -- use this
+    metricFilePrefix = f"" 
 
     logging.warning(f" [!] Using device: {device} | Dataset size: {len(x_train)}")
     
     # =============== DO Cross Validation
     cv = CrossValidation(modelInterfaceClass, modelInterfaceConfig, modelClass, modelArch, outputFolder)
-    cv.run_folds(x_train, y_train, epochs=epochs, folds=nFolds, fprValues=fprValues, random_state=random_state)
+    cv.run_folds(
+        x_train, 
+        y_train, 
+        epochs=run_config["epochs"], 
+        folds=run_config["nFolds"], 
+        fprValues=run_config["fprValues"], 
+        random_state=random_state
+    )
     cv.dump_metrics(prefix=metricFilePrefix)
     cv.log_avg_metrics()
 
-    if rest:
-        time.sleep(rest)
+    if run_config["rest"]:
+        time.sleep(run_config["rest"])
