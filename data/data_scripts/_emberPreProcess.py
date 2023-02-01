@@ -10,6 +10,8 @@ import subprocess
 from _lzma import LZMAError
 BROKEN_FILES = []
 
+BATCH = 50
+
 import sys
 sys.path.extend([".", "../.."])
 from nebula.misc import get_path
@@ -90,10 +92,9 @@ if __name__ == "__main__":
     # sanity check
     print(arr[existingIdx-50:existingIdx+3,0:3])
 
-    batch = 10
     i = 0
     py7zr_failed = False
-    print(f"[*] Collecting samples with batch size: {batch}")
+    print(f"[*] Collecting samples with batch size: {BATCH}")
     while i < len(yHashes):
         samples = defaultdict(list)
         for i, sampleHash in enumerate(yHashes):
@@ -108,7 +109,7 @@ if __name__ == "__main__":
             samples[archive].append(sample)
 
             # batch collected
-            if i == existingIdx + batch:
+            if i == existingIdx + BATCH:
                 existingIdx = i
                 break
 
@@ -129,7 +130,7 @@ if __name__ == "__main__":
             
             # add timestamp to log
             now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-            print(f" {now}: [*] Extracting Ember features for {batch} samples from {archive}...")
+            print(f" {now}: [*] Extracting Ember features for {BATCH} samples from {archive}...")
             for pe in tqdm(peBytes):
                 vector = extractor.feature_vector(peBytes[pe])
                 peHash = pe.split("/")[-1]
@@ -152,7 +153,7 @@ if __name__ == "__main__":
         del samples
         # delete file with previous index
         try:
-            os.remove(os.path.join(f"{outPath}", f"x_{dataset}_{i-batch}.npy"))
+            os.remove(os.path.join(f"{outPath}", f"x_{dataset}_{i-BATCH}.npy"))
         except FileNotFoundError:
             pass
         if i % 100 == 0: # reset py7zr failed flag after some time
