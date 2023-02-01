@@ -3,7 +3,7 @@ import logging
 
 
 class OptimSchedulerStep:
-    def __init__(self, optimizer, step_size=2000, gamma=0.1, last_epoch=-1):
+    def __init__(self, optimizer, step_size=2000, gamma=0.5, last_epoch=-1):
         self.step_size = step_size
         self.gamma = gamma
         self.last_epoch = last_epoch

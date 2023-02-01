@@ -92,6 +92,7 @@ class Cnn1DLinearLM(nn.Module):
     def __init__(self, 
                 # embedding params
                 vocabSize = None,
+                maxLen = None,
                 embeddingDim = 64,
                 paddingIdx = 0,
                 # conv params
@@ -322,7 +323,7 @@ class LSTM(nn.Module):
                     dropout=0.5,
                     numClasses = 1):
         super(LSTM, self).__init__()
-
+        self.__name__ = "LSTM"
         self.embedding = nn.Embedding(vocabSize, embeddingDim)
         self.lstm = nn.LSTM(embeddingDim, lstmHidden, lstmLayers, bidirectional=lstmBidirectional, dropout=lstmDropout)
         #self.linear = nn.Linear(hiddenDim * 2 if bidirectionalLSTM else hiddenDim, outputDim)
@@ -365,6 +366,7 @@ class MLP(nn.Module):
                 layer_sizes = [1024, 512, 256],
                 dropout=0.5):
         super(MLP,self).__init__()
+        self.__name__ = "MLP"
         layers = []
         for i,ls in enumerate(layer_sizes):
             if i == 0:

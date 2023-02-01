@@ -25,7 +25,7 @@ class TransformerEncoderLM(nn.Module):
                     dropout: float = 0.3):
         super().__init__()
         assert dModel % nHeads == 0, "nheads must divide evenly into d_model"
-        self.__name__ = 'Transformer'
+        self.__name__ = 'TransformerEncoder'
         self.encoder = nn.Embedding(vocabSize, dModel)
         self.pos_encoder = PositionalEncoding(dModel, dropout)
         encoder_layers = TransformerEncoderLayer(dModel, nHeads, dHidden, dropout, batch_first=True)
@@ -114,7 +114,7 @@ class TransformerEncoderModel(nn.Module):
                     dropout: float = 0.5):
         super().__init__()
         assert dModel % nHeads == 0, "nheads must divide evenly into d_model"
-        self.__name__ = 'Transformer'
+        self.__name__ = 'TransformerEncoder'
         self.encoder = nn.Embedding(vocabSize, dModel)
         self.pos_encoder = PositionalEncoding(dModel, dropout)
         encoder_layers = TransformerEncoderLayer(dModel, nHeads, dHidden, dropout, batch_first=True)
@@ -179,10 +179,11 @@ class TransformerEncoderWithChunking(nn.Module):
                     hiddenNeurons: list = [64], # decoder's classifier FFNN complexity
                     layerNorm: bool = False, # whether to normalize decoder's FFNN layers
                     pretrainLayers: list = [1024], # pretrain layers
-                    dropout: float = 0.3):
+                    dropout: float = 0.3,
+                    mean_over_sequence=False):
         super().__init__()
         assert dModel % nHeads == 0, "nheads must divide evenly into d_model"
-        self.__name__ = 'Transformer_With_Chunking'
+        self.__name__ = 'TransformerEncoder_wSplits'
         self.encoder = nn.Embedding(vocabSize, dModel)
         self.pos_encoder = PositionalEncoding(dModel, dropout)
         encoder_layers = TransformerEncoderLayer(dModel, nHeads, dHidden, dropout, batch_first=True)
@@ -190,11 +191,15 @@ class TransformerEncoderWithChunking(nn.Module):
         self.d_model = dModel
         self.chunk_size = chunk_size
         self.nr_of_chunks = maxLen/self.chunk_size
+        self.meanOverSeq = mean_over_sequence
         # add 1 if nr_of_chunks is not scalar to account for the padding
         if self.nr_of_chunks != int(self.nr_of_chunks):
             self.nr_of_chunks = int(self.nr_of_chunks) + 1
 
-        input_neurons = int(self.chunk_size * self.nr_of_chunks * dModel)
+        if mean_over_sequence:
+            input_neurons = dModel
+        else:
+            input_neurons = int(self.chunk_size * self.nr_of_chunks * dModel)
         self.ffnn = []
         for i,h in enumerate(hiddenNeurons):
             self.ffnnBlock = []
@@ -259,7 +264,11 @@ class TransformerEncoderWithChunking(nn.Module):
         # after cat it'd be: (batch_size, chunk_size * nr_of_chunks * d_model, d_model)
         # where nr_of_chunks = int(maxLen/self.chunk_size) + 1
         x = torch.cat(chunks, dim=1)
-        x = x.view(x.size(0), -1)
+        if self.meanOverSeq:
+            x = torch.mean(x, dim=1)
+        else:
+            x = x.view(x.size(0), -1)
+        #x = x.view(x.size(0), -1)
         x = self.ffnn(x)
         return x
     
@@ -319,6 +328,7 @@ class ReformerLM(nn.Module):
         numClasses = 1, # binary classification
     ):
         super().__init__()
+        self.__name__ = "Reformer"
         emb_dim = default(emb_dim, dim)
         self.max_seq_len = maxLen
         self.meanOverSeq = meanOverSequence
