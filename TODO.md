@@ -1,5 +1,17 @@
 # Future Work
 
+## Immediate ToDo list
+
+- ~~Experiments with same downstream task dataset size, and variable pre-training size.~~
+- ~~Cross-Validation bug with low FP~~
+- ~~Visualize attention weights.~~
+- Compare different Transformer setups (regular, windowed, reformer) with each other and with NeurLux / Ember.
+  - ~~Run windowed CV over 3 folds~~
+  - **Create config for NeurLux -- (a) model (b) data**
+  - Finalize ember data preprocessing
+  - complete `_speakeasy_cv_final.py`
+- Solve Bug with "mask_every_epoch" and learning rate scheduler.
+
 ## Short ToDo list
 
 1. Build malware classifier class with convenient API
@@ -10,30 +22,32 @@
    - Add pre-trained models to package.
      - Organize a dedicated server suitable for: (a) storing malware dataset; (b) GPU training
      - Download raw PE data, build dataset, and train classifier.
-1. Try attention models:
+2. Try attention models:
+   - input chunking to windows:
+     - ~~flat architecture~~
    - ~~Transformer: re-run tests after fix of positional embeddings~~
    - ~~Reformer~~ Implemented `nebula.attention.ReformerLM` class. Takes ~80min per epoch with 50k samples on GPU if sample length 2048.  
      - ~~Try lower learning rate -- training seems to hit plateau and fluctuate strongly after ~500 batches.~~ Loss still doesn't fall below ~0.13-0.2, even with scheduling of LR to $n\times10^{-7}$ scale.
+     - ~~Try Reformer with comparable param sizes~~ Previous runs had them in similar ranges.
    - Star transformer (?)
    - Longformer (?)
-1. Pre-training routines on unlabeled data according to CEF-SSL framework:
-   - naive methods:
-     - expectation minimization (?)
-   - language modeling:
-     - ~~MLM~~ (see `nebula.pretraining.MaskedLanguageModel` class)
-     - **GPT like $p(x_{t+1}|x_{t}\ ...\ x_{0})$**
-   - embedding pretraining:
+3. Pre-training routines on unlabeled data according to CEF-SSL framework:
+   - naive embedding methods:
      - CBOW embedding langauge modeling
      - fastText
+   - language modeling:
+     - ~~MLM~~ (see `nebula.pretraining.MaskedLanguageModel` class)
+     - **GPT like $p(x_{t+1}|x_{t}\ ...\ x_{0})$**  
    - evaluate:
      - ~~pre-trained vs non-pretrained: TPR, F1, LOSS~~
-       - different pretraining methods for these
-     - pre-training epochs
-     - unlabeled/labeled data ratio
-1. Data prep:
-   - **try 50k vocab size for all promising models**
+     - ~~pre-training epochs~~ Done: see `evaluation/MaskedLanguageModeling/pretrain_epochs_analysis*` folders.
+     - ~~unlabeled/labeled data ratio~~ Done: see `evaluation/MaskedLanguageModeling/uSize*` folders.
+4. Data prep:
+   - ~~try 50k vocab size for all promising models~~ DONE: see results under `evaluation/crossvalidation/_modelSelection_50k` folder.
    - 3D data : `(batch_size, seq_len, features)` -- first learn representation for event (`features`), then for sequence of events (`seq_len`)
-1. Evaluate preprocessing with BPE tokenizer instead of JSON cleanup + whitespace
+5. ~~Evaluate preprocessing with BPE tokenizer instead of JSON cleanup + whitespace~~  
+   DONE: See `nebula.preprocess.JSONTokenizerBPE` and tests under `evaluation/crossvalidation/_modelSelection_BPE`
+6. **`auditd`/`windows` labeled dataset collection/preparation**
 
 ## Detailed ToDo list
 
