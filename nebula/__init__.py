@@ -88,24 +88,24 @@ class ModelTrainer(object):
         
         modelFile = f"{prefix}-model.torch"
         torch.save(self.model.state_dict(), modelFile)
-        dumpString = f"""[!] {time.ctime()}: Dumped results:
-                model     : {os.path.basename(modelFile)}"""
+        dumpString = f""" [!] {time.ctime()}: Dumped results:
+                model       : {os.path.basename(modelFile)}"""
         if not model_only:
             np.save(f"{prefix}-trainTime.npy", np.array(self.training_time))
-            dumpString += f"\n\t\ttrain time: {os.path.basename(prefix)}-trainTime.npy"
+            dumpString += f"\n\t\ttrain time  : {os.path.basename(prefix)}-trainTime.npy"
 
             np.save(f"{prefix}-trainLosses.npy", np.array(self.train_losses))
             dumpString += f"\n\t\ttrain losses: {os.path.basename(prefix)}-trainLosses.npy"
 
             np.save(f"{prefix}-auc.npy", np.array(self.auc))
-            dumpString += f"\n\t\ttrain AUC: {os.path.basename(prefix)}-auc.npy"
+            dumpString += f"\n\t\ttrain AUC   : {os.path.basename(prefix)}-auc.npy"
 
             if not np.isnan(self.train_f1s).all():
                 np.save(f"{prefix}-trainF1s.npy", self.train_f1s)
-                dumpString += f"\n\t\ttrain F1s : {os.path.basename(prefix)}-trainF1s.npy"
+                dumpString += f"\n\t\ttrain F1s   : {os.path.basename(prefix)}-trainF1s.npy"
             if not np.isnan(self.train_tprs).all():
                 np.save(f"{prefix}-trainTPRs.npy", self.train_tprs)
-                dumpString += f"\n\t\ttrain TPRs: {os.path.basename(prefix)}-trainTPRs.npy"
+                dumpString += f"\n\t\ttrain TPRs  : {os.path.basename(prefix)}-trainTPRs.npy"
         logging.warning(dumpString)
     
     def getMetrics(self, target, predProbs):
@@ -168,8 +168,8 @@ class ModelTrainer(object):
                     except ValueError:
                         batch_auc = np.nan
                     metricsReportList.append(f"AUC {batch_auc:.4f}")
-                logging.warning(" [*] {}: Train Epoch: {} [{:^5}/{:^5} ({:^2.0f}%)]\t".format(
-                    time.ctime(), epochId, batchIdx * len(data), len(trainLoader.dataset),
+                logging.warning(" [*] {}: Train Epoch: {} [{:^5}/{:^5} ({:^2.0f}%)] | ".format(
+                    time.ctime().split()[3], epochId, batchIdx * len(data), len(trainLoader.dataset),
                 100. * batchIdx / len(trainLoader)) + " | ".join(metricsReportList))
                 now = time.time()
 
@@ -286,7 +286,7 @@ class ModelTrainer(object):
                 logits = self.model(torch.Tensor(data[0]).long().to(self.device))
                 out = torch.vstack([out, logits])
             if batch_idx % self.verbosityBatches == 0:
-                logging.warning(f" [*] Predicting batch: {batch_idx}/{len(loader)}")
+                print(f" [*] Predicting batch: {batch_idx}/{len(loader)}", end="\r")
 
         return torch.sigmoid(out).clone().detach().cpu().numpy()
     

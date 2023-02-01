@@ -276,13 +276,16 @@ class JSONTokenizerBPE:
         self.unk_token_id = self.specialTokens[self.unk_token]
         self.mask_token_id = self.specialTokens[self.mask_token]
 
-        if model_path:
-            self.tokenizer = spm.SentencePieceProcessor(model_file=model_path.rstrip(".model")+".model")
-            self.model_path = model_path
-        else:
-            self.tokenizer = spm.SentencePieceTrainer
         self.vocab = None
         self.reverse_vocab = None
+        if model_path:
+            self.tokenizer = spm.SentencePieceProcessor(model_file=model_path.rstrip(".model")+".model")
+            logging.warning(" [!] Successfully loaded pre-trained tokenizer model!")
+            self.model_path = model_path
+            self.load_vocab()
+        else:
+            self.tokenizer = spm.SentencePieceTrainer
+            logging.warning(" [!] You need to train tokenizer with .train() or specify 'model_path=' during initialization!")
     
     def split_string_to_chunks(self, s, chunkSize=4192):
         """This function should split a long string into smaller chunks of size chunkSize, 
@@ -318,13 +321,18 @@ class JSONTokenizerBPE:
         jsonData = [get_alphanum_chars(x) for x in jsonData.split(" ") if x not in self.stopwords]
         return ' '.join(jsonData)
 
-    def load_vocab(self):
-        with open(self.model_path.rstrip(".model")+".vocab", encoding="utf-8") as f:
-            vocab = f.read().splitlines()
+    def load_vocab(self, vocabPath=None):
+        if not vocabPath:
+            vocabPath = self.model_path.rstrip(".model")+"_vocab.json"
+            if not os.path.exists(vocabPath): # default sentencepiece -- after training
+                vocabPath = self.model_path.rstrip(".model")+".vocab"
+        with open(vocabPath, encoding="utf-8") as f:
+            vocab = json.load(f)
         vocab = [x.split("\t")[0] for x in vocab]
         self.vocab = {k:i for i,k in enumerate(vocab)}
         self.vocab.update(self.specialTokens)
         self.reverse_vocab = {v:k for k,v in self.vocab.items()}
+        logging.warning(f" [!] Loaded vocab with size {len(self.vocab)} from {vocabPath}")
         
     def dump_vocab(self):
         vocabFileName = self.model_path.rstrip(".model") + "_vocab.json"
@@ -371,7 +379,7 @@ class JSONTokenizerBPE:
             jsonData = [jsonData]
         jsonDataClean = [self.clear_json_event(x) for x in jsonData]
         return [self.tokenizer.encode_as_pieces(x) for x in jsonDataClean]
-    
+
     def encode(self, jsonData):
         """
         Encodes the given json data.

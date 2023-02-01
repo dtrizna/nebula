@@ -185,8 +185,10 @@ class CrossValidation(object):
         self.outputRootFolder = outputRootFolder
         os.makedirs(self.outputRootFolder, exist_ok=True)
         
-        self.metrics = defaultdict(lambda: defaultdict(list))
-        self.aucs = []
+        self.metrics_val = defaultdict(lambda: defaultdict(list))
+        self.aucs_val = []
+        self.metrics_train = defaultdict(lambda: defaultdict(list))
+        self.aucs_train = []
 
     def run_folds(self, X, y, folds=3, epochs=5, fprValues=[0.0001, 0.001, 0.01, 0.1], random_state=42):
         """
@@ -211,13 +213,13 @@ class CrossValidation(object):
         kf.get_n_splits(X)
 
         # Create the output
-        training_time = np.empty(shape=(folds, epochs))
+        self.training_time = np.empty(shape=(folds, epochs))
         # Iterate over the folds
         for i, (train_index, test_index) in enumerate(kf.split(X)):
             timestamp = int(time())
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
-            logging.warning(f" [!] Fold {i+1}/{self.nFolds} | Train set size: {len(X_train)}, Validation set size: {len(X_test)}")
+            logging.warning(f"\n[!!!] Fold {i+1}/{self.nFolds} | Train set size: {len(X_train)}, Validation set size: {len(X_test)}")
             if self.dump_data_splits:
                 splitData = f"dataset_splits_{timestamp}.npz"
                 np.savez_compressed(
@@ -239,59 +241,87 @@ class CrossValidation(object):
             # Train the model
             try:
                 modelTrainer.fit(X_train, y_train, epochs=self.epochs, reporting_timestamp=timestamp)
-                training_time[i,:] = np.pad(modelTrainer.training_time, (0, epochs-len(modelTrainer.training_time)), 'constant', constant_values=(0,0))
+                self.training_time[i,:] = np.pad(modelTrainer.training_time, (0, epochs-len(modelTrainer.training_time)), 'constant', constant_values=(0,0))
             except RuntimeError as e: # cuda outofmemory
                 logging.warning(f" [!] Exception: {e}")
                 break
-
-            # Evaluate the model
-            logging.warning(f" [!] Evaluating model on validation set...")
-            predicted_probs = modelTrainer.predict_proba(X_test)
-            logging.warning(f" [!] This fold metrics on validation set:")
-            # calculate auc 
-            auc = roc_auc_score(y_test, predicted_probs)
-            self.aucs.append(auc)
-            logging.warning(f" [!] AUC: {auc:.4f}")
-            for fpr in self.fprValues:
-                tpr, threshold = get_tpr_at_fpr(y_test, predicted_probs, fpr)
-                f1 = f1_score(y[test_index], predicted_probs >= threshold)
-                self.metrics[fpr]["tpr"].append(tpr)
-                self.metrics[fpr]["f1"].append(f1)
-                logging.warning(f" [!] FPR: {fpr} | TPR: {tpr:.4f} | F1: {f1:.4f}")
             
+            # collect stats of this run
+            aucs_train, tprs_train, f1_train = self.collect_stats(modelTrainer, X_train, y_train, name="training")
+            aucs_val, tprs_val, f1_val = self.collect_stats(modelTrainer, X_test, y_test, name="validation")
+            self.aucs_train.append(aucs_train)
+            self.aucs_val.append(aucs_val)
+            for fpr in self.fprValues:
+                self.metrics_train[fpr]["tpr"].append(tprs_train[fpr])
+                self.metrics_train[fpr]["f1"].append(f1_train[fpr])
+                self.metrics_val[fpr]["tpr"].append(tprs_val[fpr])
+                self.metrics_val[fpr]["f1"].append(f1_val[fpr])
+
             # cleanup
             del model, modelTrainer, modelInterfaceConfig
             clear_cuda_cache()
             if singleFold:
                 break
+        # calculate average metrics
+        self.average_stats()
 
+    def average_stats(self):
         # add AUC to metrics
-        self.metrics["auc"] = self.aucs
-        self.metrics["auc_avg"] = np.nanmean(self.aucs)
-        self.metrics["auc_std"] = np.nanstd(self.aucs)
+        self.metrics_val["auc"] = self.aucs_val
+        self.metrics_val["auc_avg"] = np.nanmean(self.aucs_val)
+        self.metrics_val["auc_std"] = np.nanstd(self.aucs_val)
+        self.metrics_train["auc"] = self.aucs_train
+        self.metrics_train["auc_avg"] = np.nanmean(self.aucs_train)
+        self.metrics_train["auc_std"] = np.nanstd(self.aucs_train)
 
         # take means over all folds        
         for fpr in self.fprValues:
-            self.metrics[fpr]["tpr_avg"] = np.nanmean(self.metrics[fpr]["tpr"])
-            self.metrics[fpr]["tpr_std"] = np.nanstd(self.metrics[fpr]["tpr"])
-            self.metrics[fpr]["f1_avg"] = np.nanmean(self.metrics[fpr]["f1"])
-            self.metrics[fpr]["f1_std"] = np.nanstd(self.metrics[fpr]["f1"])
+            self.metrics_val[fpr]["tpr_avg"] = np.nanmean(self.metrics_val[fpr]["tpr"])
+            self.metrics_val[fpr]["tpr_std"] = np.nanstd(self.metrics_val[fpr]["tpr"])
+            self.metrics_val[fpr]["f1_avg"] = np.nanmean(self.metrics_val[fpr]["f1"])
+            self.metrics_val[fpr]["f1_std"] = np.nanstd(self.metrics_val[fpr]["f1"])
+            self.metrics_train[fpr]["tpr_avg"] = np.nanmean(self.metrics_train[fpr]["tpr"])
+            self.metrics_train[fpr]["tpr_std"] = np.nanstd(self.metrics_train[fpr]["tpr"])
+            self.metrics_train[fpr]["f1_avg"] = np.nanmean(self.metrics_train[fpr]["f1"])
+            self.metrics_train[fpr]["f1_std"] = np.nanstd(self.metrics_train[fpr]["f1"])
 
         # Add the average epoch time
-        self.metrics["epoch_time_avg"] = np.nanmean(training_time)
+        self.metrics_val["epoch_time_avg"] = np.nanmean(self.training_time)
+
+    def collect_stats(self, model_trainer, X, y, name="validation"):
+        logging.warning(f"\n [!] Evaluating model on {name} set...")
+        probs = model_trainer.predict_proba(X)
+        logging.warning(f" [!] This fold metrics on {name} set:")
+        # calculate auc 
+        auc = roc_auc_score(y, probs)
+        logging.warning(f"\tAUC: {auc:.4f}")
+        trps, f1s = {}, {}
+        for fpr in self.fprValues:
+            tpr, threshold = get_tpr_at_fpr(y, probs, fpr)
+            f1 = f1_score(y, probs >= threshold)
+            trps[fpr], f1s[fpr] = tpr, f1
+            logging.warning(f"\tFPR: {fpr} | TPR: {tpr:.4f} | F1: {f1:.4f}")
+        return auc, trps, f1s
 
     def dump_metrics(self, prefix="", suffix=""):
         prefix = prefix.rstrip('_').lstrip('_') + '_' if prefix else ''
         suffix = f"_{suffix.rstrip('_').lstrip('_')}" if suffix else ''
-        metricFilename = f"{prefix}cv_metrics{suffix}.json"
+        
+        metricFilename = f"{prefix}metrics_validation{suffix}.json"
         metricFileFullpath = os.path.join(self.outputRootFolder, metricFilename)
         with open(metricFileFullpath, "w") as f:
-            json.dump(self.metrics, f, indent=4)
+            json.dump(self.metrics_val, f, indent=4)
         logging.warning(f" [!] Metrics saved to {metricFileFullpath}")
 
+        metricFilename = f"{prefix}metrics_training{suffix}.json"
+        metricFileFullpath = os.path.join(self.outputRootFolder, metricFilename)
+        with open(metricFileFullpath, "w") as f:
+            json.dump(self.metrics_train, f, indent=4)
+        logging.warning(f" [!] Metrics saved to {metricFileFullpath}")        
+
     def log_avg_metrics(self):
-        msg = f" [!] Average epoch time: {self.metrics['epoch_time_avg']:.2f}s | Mean values over {self.nFolds} folds:\n"
-        msg += f"\tAUC: {self.metrics['auc_avg']:.4f}\n"
+        msg = f" [!] Average epoch time: {self.metrics_val['epoch_time_avg']:.2f}s | Mean values over {self.nFolds} folds:\n"
+        msg += f"\tAUC: {self.metrics_val['auc_avg']:.4f}\n"
         for fpr in self.fprValues:
-            msg += f"\tFPR: {fpr:>6} -- TPR: {self.metrics[fpr]['tpr_avg']:.4f} -- F1: {self.metrics[fpr]['f1_avg']:.4f}\n"
+            msg += f"\tFPR: {fpr:>6} -- TPR: {self.metrics_val[fpr]['tpr_avg']:.4f} -- F1: {self.metrics_val[fpr]['f1_avg']:.4f}\n"
         logging.warning(msg)
