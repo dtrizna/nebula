@@ -250,17 +250,29 @@ def readCrossValidationMetricFile(file):
             metrics = json.load(f)
     cols = ["tpr_avg", "tpr_std", "f1_avg", "f1_std"]
     dfMetrics = DataFrame(columns=cols)
-    for fpr in metrics:
-        if fpr in ("avg_epoch_time", "epoch_time_avg"):
-            timeValue = metrics[fpr]
+    timeValue = None
+    aucs = None
+    for key in metrics:
+        if key in ("avg_epoch_time", "epoch_time_avg"):
+            timeValue = metrics[key]
+        elif key.startswith("auc"):
+            if key == "auc":
+                aucs = metrics[key]
         else:
-            if isinstance(metrics[fpr], dict):
-                tpr_avg = metrics[fpr]["tpr_avg"]
-                tpr_std = np.std(metrics[fpr]["tpr"])
-                f1_avg = metrics[fpr]["f1_avg"]
-                f1_std = np.std(metrics[fpr]["f1"])
-            else:
-                arr = np.array(metrics[fpr]).squeeze()
+            # false positive rate reporting
+            if isinstance(metrics[key], dict):
+                # take mean, ignore 0.
+                tprs = metrics[key]['tpr']
+                tprs[tprs == 0] = np.nan
+                tpr_avg = np.nanmean(tprs)
+                tpr_std = np.nanstd(tprs)
+                # same for f1
+                f1s = metrics[key]['f1']
+                f1s[f1s == 0] = np.nan
+                f1_avg = np.nanmean(f1s)
+                f1_std = np.nanstd(f1s)
+            else: # legacy trp/f1 reporting
+                arr = np.array(metrics[key]).squeeze()
                 if arr.ndim == 1:
                     tpr_avg = arr[0]
                     tpr_std = 0
@@ -271,8 +283,8 @@ def readCrossValidationMetricFile(file):
                     tpr_std = np.nanstd(arr[:, 0])
                     f1_avg = np.nanmean(arr[:, 1])
                     f1_std = np.nanstd(arr[:, 1])
-            dfMetrics.loc[fpr] = [tpr_avg, tpr_std, f1_avg, f1_std]
-    return dfMetrics, timeValue
+            dfMetrics.loc[key] = [tpr_avg, tpr_std, f1_avg, f1_std]
+    return dfMetrics, aucs, timeValue
 
 def readCrossValidationFolder(folder, diffExtractor, extraFileFilter=None):
     if extraFileFilter:
