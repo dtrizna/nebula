@@ -1,0 +1,14 @@
+{
+    "vocabSize": 50002,
+    "embeddingDim": 64,
+    "lstmHidden": 256,
+    "lstmLayers": 1,
+    "lstmDropout": 0.1,
+    "lstmBidirectional": true,
+    "hiddenNeurons": [
+        512,
+        256,
+        128
+    ],
+    "batchNormFFNN": false
+}

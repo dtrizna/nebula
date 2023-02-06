@@ -1,0 +1,12 @@
+{
+    "vocabSize": 50002,
+    "maxLen": 512,
+    "dim": 64,
+    "heads": 4,
+    "depth": 2,
+    "hiddenNeurons": [
+        64
+    ],
+    "meanOverSequence": true,
+    "classifierDropout": 0.3
+}
