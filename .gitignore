@@ -17,6 +17,7 @@ data/data_raw/windows_emulation*7z
 data/data_filtered/speakeasy_data_filtered.7z
 evaluation/MaskedLanguageModeling/*/downstreamTask*
 evaluation/MaskedLanguageModeling/*/preTraining/
+*npy
 *npz
 
 # models
