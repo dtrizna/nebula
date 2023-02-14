@@ -13,9 +13,9 @@ from nebula import PEDynamicFeatureExtractor, JSONTokenizerBPE
 
 # SCRIPT CONFIG
 
-OUTFOLDER_SUFFIX = "_BPE"
+OUTFOLDER_SUFFIX = "_BPE_10k"
 LOGFILE = f"PreProcessing{OUTFOLDER_SUFFIX}_{int(time.time())}.log"
-VOCAB_SIZES = [50000]
+VOCAB_SIZES = [10000]#[50000]
 MAX_SEQ_LENGTHS = [512, 2048]
 
 # from nebula.constants import *
@@ -80,8 +80,8 @@ def main(limit=None):
         json.dump(yHashesTest, f, indent=4)
 
     # dump y
-    np.save(os.path.join(TRAIN_OUT_FOLDER, "speakeasy_y.npy"), np.array(yTrain, dtype=np.int8))
-    np.save(os.path.join(TEST_OUT_FOLDER, "speakeasy_y.npy"), np.array(yTest, dtype=np.int8))
+    np.save(os.path.join(TRAIN_OUT_FOLDER, f"speakeasy_y.npy"), np.array(yTrain, dtype=np.int8))
+    np.save(os.path.join(TEST_OUT_FOLDER, f"speakeasy_y.npy"), np.array(yTest, dtype=np.int8))
 
     # ======= ENCODING REPORTS WITH DIFFERENT MAX SEQ LENGTHS & VOCAB SIZES =====
 
