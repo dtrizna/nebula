@@ -23,11 +23,11 @@ warnings.filterwarnings("ignore")
 clear_cuda_cache()
 
 # ============== REPORTING CONFIG
-modelClass = TransformerEncoderWithChunking
-maxLen = 512
-runType = f"TEST_Final_BPE_len{maxLen}_CV"
+modelClass = Cnn1DLinear
+maxLen = 2048
+runType = f"Neurlux_vocab_10k"
 timestamp = int(time.time())
-runName = f"wChunks_maxLen_{maxLen}_5_epochs_{timestamp}"
+runName = f"Cnn1DLinear_maxLen_{maxLen}_6_epochs_{timestamp}"
 
 SCRIPT_PATH = get_path(type="script")
 REPO_ROOT = os.path.join(SCRIPT_PATH, "..")
@@ -47,14 +47,14 @@ logging.basicConfig(
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 # ============== Cross-Valiation CONFIG
-random_state = 42
+random_state = 1783
 set_random_seed(random_state)
 
 # transform above variables to dict
 run_config = {
-    "train_limit": 5000,
+    "train_limit": None,
     "nFolds": 3,
-    "epochs": 2,
+    "epochs": 6,
     "fprValues": [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
     "rest": 0,
     "maxLen": maxLen,
@@ -63,16 +63,16 @@ run_config = {
     "optim_step_size": 3000,
     "random_state": random_state,
     "chunk_size": 64,
-    "verbosity_batches": 10
+    "verbosity_batches": 100
 }
 with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
     json.dump(run_config, f, indent=4)
 
 # ===== LOADING DATA ==============
-vocabSize = 50000
-xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE", f"speakeasy_VocabSize_50000_maxLen_{maxLen}_x.npy")
+vocabSize = 10000
+xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_10k", f"speakeasy_VocabSize_{vocabSize}_maxLen_{maxLen}_x.npy")
 x_train = np.load(xTrainFile)
-yTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE", "speakeasy_y.npy")
+yTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_10k", "speakeasy_y.npy")
 y_train = np.load(yTrainFile)
 
 if run_config['train_limit']:
@@ -80,7 +80,7 @@ if run_config['train_limit']:
     x_train = x_train[:run_config['train_limit']]
     y_train = y_train[:run_config['train_limit']]
 
-vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", "speakeasy_BPE_50000_vocab.json")
+vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", f"speakeasy_BPE_{vocabSize}_vocab.json")
 with open(vocabFile, 'r') as f:
     vocab = json.load(f)
 vocabSize = len(vocab) # adjust it to exact number of tokens in the vocabulary
@@ -88,31 +88,29 @@ vocabSize = len(vocab) # adjust it to exact number of tokens in the vocabulary
 logging.warning(f" [!] Loaded data and vocab. X train size: {x_train.shape}, vocab size: {len(vocab)}")
 
 # =============== MODEL CONFIG
-
-# modelClass = Cnn1DLinear
-# modelArch = {
-#     "vocabSize": vocabSize,
-#     "maxLen": maxLen,
-#     "embeddingDim": 64,
-#     "hiddenNeurons": [512, 256, 128],
-#     "batchNormConv": False,
-#     "batchNormFFNN": False,
-#     "filterSizes": [2, 3, 4, 5],
-#     "dropout": 0.3
-# }
 modelArch = {
-    "vocabSize": vocabSize,  # size of vocabulary
-    "maxLen": maxLen,  # maximum length of the input sequence
-    "chunk_size": run_config["chunk_size"],
-    "dModel": 64,  # embedding & transformer dimension
-    "nHeads": 8,  # number of heads in nn.MultiheadAttention
-    "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
-    "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
-    "numClasses": 1, # binary classification
-    "hiddenNeurons": [64],
-    "layerNorm": False,
-    "dropout": 0.3
+    "vocabSize": vocabSize,
+    "maxLen": maxLen,
+    "embeddingDim": 64,
+    "hiddenNeurons": [512, 256, 128],
+    "batchNormConv": False,
+    "batchNormFFNN": False,
+    "filterSizes": [2, 3, 4, 5],
+    "dropout": 0.2
 }
+# modelArch = {
+#     "vocabSize": vocabSize,  # size of vocabulary
+#     "maxLen": maxLen,  # maximum length of the input sequence
+#     "chunk_size": run_config["chunk_size"],
+#     "dModel": 64,  # embedding & transformer dimension
+#     "nHeads": 8,  # number of heads in nn.MultiheadAttention
+#     "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
+#     "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+#     "numClasses": 1, # binary classification
+#     "hiddenNeurons": [64],
+#     "layerNorm": False,
+#     "dropout": 0.2
+# }
 # modelClass = ReformerLM
 # modelArch = {
 #     "vocabSize": vocabSize,

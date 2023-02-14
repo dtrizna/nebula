@@ -1,0 +1,658 @@
+02/13/2023 05:24:02 PM Initialized ...
+02/13/2023 05:24:02 PM Filtering and normalizing C:\Users\dtrizna\Code\nebula\scripts\..\data\data_raw\windows_emulation_trainset\report_backdoor...
+02/13/2023 05:28:52 PM Finished... Took: 290.53s
+02/13/2023 05:28:52 PM Filtering and normalizing C:\Users\dtrizna\Code\nebula\scripts\..\data\data_raw\windows_emulation_trainset\report_clean...
+02/13/2023 05:35:15 PM Finished... Took: 382.19s
+02/13/2023 05:35:15 PM Filtering and normalizing C:\Users\dtrizna\Code\nebula\scripts\..\data\data_raw\windows_emulation_trainset\report_coinminer...
+02/13/2023 05:37:24 PM Finished... Took: 129.45s
+02/13/2023 05:37:24 PM Filtering and normalizing C:\Users\dtrizna\Code\nebula\scripts\..\data\data_raw\windows_emulation_trainset\report_dropper...
+02/13/2023 05:39:16 PM Finished... Took: 112.22s
+02/13/2023 05:39:16 PM Filtering and normalizing C:\Users\dtrizna\Code\nebula\scripts\..\data\data_raw\windows_emulation_trainset\report_keylogger...
+02/13/2023 05:40:35 PM Finished... Took: 79.12s
+02/13/2023 05:40:35 PM Filtering and normalizing C:\Users\dtrizna\Code\nebula\scripts\..\data\data_raw\windows_emulation_trainset\report_ransomware...
+02/13/2023 05:44:24 PM Finished... Took: 228.24s
+02/13/2023 05:44:24 PM Filtering and normalizing C:\Users\dtrizna\Code\nebula\scripts\..\data\data_raw\windows_emulation_trainset\report_rat...
+02/13/2023 05:45:22 PM Finished... Took: 58.15s
+02/13/2023 05:45:22 PM Filtering and normalizing C:\Users\dtrizna\Code\nebula\scripts\..\data\data_raw\windows_emulation_trainset\report_trojan...
+02/13/2023 05:47:31 PM Finished... Took: 128.86s
+02/13/2023 05:47:31 PM Filtering and normalizing C:\Users\dtrizna\Code\nebula\scripts\..\data\data_raw\windows_emulation_trainset\report_windows_syswow64...
+02/13/2023 05:47:32 PM Finished... Took: 1.12s
+02/13/2023 05:47:32 PM Filtering and normalizing C:\Users\dtrizna\Code\nebula\scripts\..\data\data_raw\windows_emulation_testset\report_backdoor...
+02/13/2023 05:48:01 PM Finished... Took: 29.41s
+02/13/2023 05:48:01 PM Filtering and normalizing C:\Users\dtrizna\Code\nebula\scripts\..\data\data_raw\windows_emulation_testset\report_clean...
+02/13/2023 05:49:12 PM Finished... Took: 70.93s
+02/13/2023 05:49:12 PM Filtering and normalizing C:\Users\dtrizna\Code\nebula\scripts\..\data\data_raw\windows_emulation_testset\report_coinminer...
+02/13/2023 05:49:42 PM Finished... Took: 29.59s
+02/13/2023 05:49:42 PM Filtering and normalizing C:\Users\dtrizna\Code\nebula\scripts\..\data\data_raw\windows_emulation_testset\report_dropper...
+02/13/2023 05:49:45 PM Finished... Took: 3.39s
+02/13/2023 05:49:45 PM Filtering and normalizing C:\Users\dtrizna\Code\nebula\scripts\..\data\data_raw\windows_emulation_testset\report_keylogger...
+02/13/2023 05:49:53 PM Finished... Took: 8.13s
+02/13/2023 05:49:53 PM Filtering and normalizing C:\Users\dtrizna\Code\nebula\scripts\..\data\data_raw\windows_emulation_testset\report_ransomware...
+02/13/2023 05:52:25 PM Finished... Took: 151.93s
+02/13/2023 05:52:25 PM Filtering and normalizing C:\Users\dtrizna\Code\nebula\scripts\..\data\data_raw\windows_emulation_testset\report_rat...
+02/13/2023 05:52:38 PM Finished... Took: 12.40s
+02/13/2023 05:52:38 PM Filtering and normalizing C:\Users\dtrizna\Code\nebula\scripts\..\data\data_raw\windows_emulation_testset\report_trojan...
+02/13/2023 05:52:46 PM Finished... Took: 8.36s
+02/13/2023 05:52:46 PM Filtering and normalizing C:\Users\dtrizna\Code\nebula\scripts\..\data\data_raw\windows_emulation_testset\report_windows_syswow64...
+02/13/2023 05:52:46 PM Finished... Took: 0.34s
+02/13/2023 05:52:46 PM  [!] You need to train tokenizer with .train() or specify 'model_path=' during initialization!
+02/13/2023 05:52:46 PM Training tokenizer with vocab size: 10000...
+trainer_interface.cc(350) LOG(INFO) SentenceIterator is not specified. Using MultiFileSentenceIterator.
+trainer_interface.cc(181) LOG(INFO) Loading corpus: C:\Users\dtrizna\Code\nebula\scripts\..\data\data_filtered\speakeasy_trainset_BPE_10k\speakeasy_VocabSize_10000_tokenizer_trainset_1676308122.txt
+trainer_interface.cc(406) LOG(INFO) Loaded all 286676 sentences
+trainer_interface.cc(422) LOG(INFO) Adding meta_piece: <unk>
+trainer_interface.cc(422) LOG(INFO) Adding meta_piece: <s>
+trainer_interface.cc(422) LOG(INFO) Adding meta_piece: </s>
+trainer_interface.cc(427) LOG(INFO) Normalizing sentences...
+trainer_interface.cc(536) LOG(INFO) all chars count=790695971
+trainer_interface.cc(547) LOG(INFO) Done: 99.9584% characters are covered.
+trainer_interface.cc(557) LOG(INFO) Alphabet size=54
+trainer_interface.cc(558) LOG(INFO) Final character coverage=0.999584
+trainer_interface.cc(590) LOG(INFO) Done! preprocessed 286676 sentences.
+trainer_interface.cc(596) LOG(INFO) Tokenizing input sentences with whitespace: 286676
+trainer_interface.cc(607) LOG(INFO) Done! 342447
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=43379081 min_freq=305
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=6787713 size=20 all=2720 active=1719 piece=000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2608755 size=40 all=3624 active=2623 piece=getproc
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1972123 size=60 all=4266 active=3264 piece=readp
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1492151 size=80 all=4765 active=3763 piece=de
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1074796 size=100 all=5844 active=4842 piece=heap
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=1023052 min_freq=25563
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=831673 size=120 all=6403 active=1533 piece=lo
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=622466 size=140 all=7515 active=2644 piece=ta
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=529031 size=160 all=8111 active=3240 piece=Γûü0x45
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=440680 size=180 all=9033 active=4162 piece=Γûü0xff
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=372714 size=200 all=10043 active=5171 piece=Γûüs
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=370685 min_freq=30744
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=338179 size=220 all=11013 active=1905 piece=window
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=290809 size=240 all=12275 active=3167 piece=deco
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=259276 size=260 all=13345 active=4237 piece=Γûü0x1211f
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=227223 size=280 all=14336 active=5228 piece=Γûüg
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=203628 size=300 all=15409 active=6301 piece=charnex
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=203002 min_freq=28290
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=187831 size=320 all=17075 active=2663 piece=ystem32
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=166262 size=340 all=17738 active=3326 piece=ize
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=153957 size=360 all=18485 active=4073 piece=a8
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=143105 size=380 all=19787 active=5375 piece=Γûü0x4690
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=140514 size=400 all=20144 active=5732 piece=tor
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=140354 min_freq=23341
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=128555 size=420 all=21385 active=2195 piece=fe
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=127277 size=440 all=22028 active=2838 piece=Γûü0x40a5
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=121122 size=460 all=22802 active=3612 piece=da
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=112272 size=480 all=24431 active=5241 piece=6000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=106425 size=500 all=25382 active=6192 piece=environ
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=106337 min_freq=14242
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=96583 size=520 all=25803 active=1681 piece=of
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=90502 size=540 all=27455 active=3333 piece=charnexta
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=85186 size=560 all=28410 active=4288 piece=24
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=82355 size=580 all=29549 active=5427 piece=isdbc
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=77763 size=600 all=30891 active=6769 piece=Γûü0x7de
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=77673 min_freq=10379
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=72202 size=620 all=31641 active=2268 piece=valid
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=67796 size=640 all=32432 active=3059 piece=Γûücrea
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=64659 size=660 all=33493 active=4120 piece=type
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=63799 size=680 all=33978 active=4605 piece=$%&
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=60282 size=700 all=34934 active=5561 piece=Γûü0x73
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=60185 min_freq=8617
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=57602 size=720 all=36205 active=2946 piece=Γûü0xfeee0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=55759 size=740 all=37791 active=4531 piece=icon
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=53443 size=760 all=39003 active=5743 piece=0x1
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=51619 size=780 all=40187 active=6927 piece=Γûügetcurrent
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=50140 size=800 all=41413 active=8153 piece=Γûü0x7d91
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=50072 min_freq=7025
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=48351 size=820 all=42630 active=3288 piece=Γûü0x4c42
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=45628 size=840 all=43539 active=4197 piece=ting
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=43982 size=860 all=44762 active=5420 piece=Γûü0x42c
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=42020 size=880 all=46019 active=6677 piece=Γûügoog
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=39710 size=900 all=46679 active=7337 piece=bject
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=39701 min_freq=5340
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=38241 size=920 all=47570 active=3213 piece=Γûü0x8d
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=36917 size=940 all=48926 active=4568 piece=xmmi64_
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=35263 size=960 all=51147 active=6789 piece=25
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=34199 size=980 all=52885 active=8527 piece=Γûü0xfffffff5
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=33081 size=1000 all=54045 active=9687 piece=l1-1-
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=32985 min_freq=4294
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=31524 size=1020 all=55286 active=3940 piece=Γûü0x4ab0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=30556 size=1040 all=56397 active=5050 piece=section
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=29472 size=1060 all=57532 active=6185 piece=getstartupinfoa
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=28108 size=1080 all=58483 active=7136 piece=308
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=27013 size=1100 all=60000 active=8653 piece=version
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=26995 min_freq=4128
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=26058 size=1120 all=61356 active=4291 piece=ase
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=25007 size=1140 all=62954 active=5889 piece=Γûü0x5265c14
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=24391 size=1160 all=64042 active=6977 piece=getconsole
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=23890 size=1180 all=65069 active=8004 piece=mac
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=23365 size=1200 all=66194 active=9128 piece=resource
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=23363 min_freq=3505
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=22774 size=1220 all=67013 active=4105 piece=vicec
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=22117 size=1240 all=68379 active=5471 piece=flo
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=21408 size=1260 all=69039 active=6131 piece=e7
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=20903 size=1280 all=70610 active=7702 piece=Γûücreatethreadpool
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=19747 size=1300 all=71428 active=8520 piece=Γûü0x80c0
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=19711 min_freq=3088
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=19060 size=1320 all=73166 active=5305 piece=ink
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=18635 size=1340 all=73794 active=5933 piece=Γûü0x4305
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=17997 size=1360 all=74339 active=6478 piece=Γûü0x64
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=17552 size=1380 all=75509 active=7648 piece=Γûü0x43b7
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=17036 size=1400 all=76664 active=8803 piece=Γûü0xfeee0020
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=16960 min_freq=2708
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=16553 size=1420 all=77826 active=4995 piece=df
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=15947 size=1440 all=80134 active=7303 piece=oy
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=15682 size=1460 all=81054 active=8223 piece=loadcursora
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=15073 size=1480 all=82203 active=9371 piece=Γûü0xf0019
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=14603 size=1500 all=83578 active=10746 piece=73
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=14594 min_freq=2236
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=14315 size=1520 all=84976 active=5213 piece=Γûü0x42a1
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=14087 size=1540 all=85274 active=5511 piece=iled
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=13879 size=1560 all=85664 active=5901 piece=480
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=13506 size=1580 all=87046 active=7283 piece=onne
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=13276 size=1600 all=87699 active=7936 piece=Γûü0xfeee005f
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=13261 min_freq=1969
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=12881 size=1620 all=89289 active=5975 piece=Γûü0x1211728
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=12668 size=1640 all=90547 active=7233 piece=Γûü0x78a0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=12244 size=1660 all=91353 active=8039 piece=Γûügetcurrentprocess
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=12052 size=1680 all=91962 active=8648 piece=devicecaps
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=11852 size=1700 all=92850 active=9536 piece=Γûü0x60
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=11848 min_freq=1715
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=11648 size=1720 all=94790 active=6413 piece=Γûüreadfile
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=11361 size=1740 all=95810 active=7433 piece=getdevicecaps
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=11160 size=1760 all=96847 active=8470 piece=a04
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=10975 size=1780 all=97797 active=9420 piece=Γûü0x9010
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=10712 size=1800 all=98205 active=9828 piece=Γûü0xfeee0035
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=10699 min_freq=1515
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=10595 size=1820 all=98608 active=5314 piece=Γûü0xfeee0042
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=10433 size=1840 all=98626 active=5332 piece=Γûü0x72a0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=10379 size=1860 all=99073 active=5779 piece=Γûü0xfeee0057
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=10285 size=1880 all=100212 active=6918 piece=Γûü0xfeee0064
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=10125 size=1900 all=100571 active=7277 piece=leex
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=10125 min_freq=1430
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=10028 size=1920 all=100820 active=5269 piece=52
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=9885 size=1940 all=101795 active=6244 piece=heck
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=9741 size=1960 all=103356 active=7805 piece=Γûü0x1211bc0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=9620 size=1980 all=104190 active=8638 piece=Γûü0x40a5d8
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=9527 size=2000 all=105649 active=10097 piece=keallc
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=9527 min_freq=1287
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=9378 size=2020 all=106231 active=5862 piece=Γûüht
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=9259 size=2040 all=107697 active=7328 piece=ont
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=9137 size=2060 all=108336 active=7967 piece=base
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=8996 size=2080 all=108947 active=8578 piece=Γûü0x3f34
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=8978 size=2100 all=108955 active=8586 piece=whencallback
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=8978 min_freq=1186
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=8893 size=2120 all=109473 active=5964 piece=2w
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=8787 size=2140 all=110492 active=6982 piece=Γûüop
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=8722 size=2160 all=111208 active=7698 piece=trol
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=8624 size=2180 all=112122 active=8612 piece=Γûügetprocaddress
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=8489 size=2200 all=113499 active=9989 piece=lect
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=8489 min_freq=1080
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=8388 size=2220 all=114377 active=6535 piece=Γûü0x4371
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=8320 size=2240 all=115395 active=7553 piece=Γûüpost
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=8289 size=2260 all=116335 active=8493 piece=loadlibraryw
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=8220 size=2280 all=117275 active=9433 piece=696e6b692e6669)
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=8077 size=2300 all=117962 active=10120 piece=spac
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=8077 min_freq=991
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=7941 size=2320 all=119616 active=7543 piece=2b
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=7818 size=2340 all=120459 active=8386 piece=Γûüregisterclass
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=7687 size=2360 all=121982 active=9909 piece=Γûü0x7270
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=7555 size=2380 all=122394 active=10321 piece=wc
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=7459 size=2400 all=122887 active=10814 piece=Γûü0x9a
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=7444 min_freq=919
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=7343 size=2420 all=124610 active=7806 piece=privi
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=7290 size=2440 all=124863 active=8059 piece=Γûü0x7330
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=7257 size=2460 all=124980 active=8176 piece=Γûü0x7420
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=7202 size=2480 all=125296 active=8492 piece=lecs
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=7035 size=2500 all=126098 active=9294 piece=referredu
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=7035 min_freq=860
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=6970 size=2520 all=126426 active=6631 piece=62
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=6867 size=2540 all=127611 active=7816 piece=Γûü0x44f8e0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=6782 size=2560 all=128402 active=8607 piece=e00
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=6682 size=2580 all=129191 active=9396 piece=f0(0d0a
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=6583 size=2600 all=130123 active=10328 piece=Γûü0x47c0
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=6581 min_freq=803
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=6520 size=2620 all=131187 active=7567 piece=Γûüwritec
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=6458 size=2640 all=131830 active=8210 piece=item
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=6370 size=2660 all=132662 active=9042 piece=008
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=6320 size=2680 all=133490 active=9870 piece=Γûüwed
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=6256 size=2700 all=134890 active=11270 piece=foregroundwindow
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=6255 min_freq=751
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=6190 size=2720 all=136493 active=8344 piece=Γûügetstdhandle
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=6146 size=2740 all=136692 active=8543 piece=Γûügetlogicalprocessorinformation
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=6081 size=2760 all=137636 active=9487 piece=Γûü0x40933e
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=6020 size=2780 all=138352 active=10203 piece=Γûü0x37
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=5934 size=2800 all=138982 active=10833 piece=createeventw
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=5927 min_freq=711
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=5823 size=2820 all=139423 active=7391 piece=driv
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=5740 size=2840 all=140854 active=8822 piece=Γûü0x60000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=5671 size=2860 all=141408 active=9376 piece=e08
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=5607 size=2880 all=142260 active=10228 piece=getsystemdirectorya
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=5489 size=2900 all=142961 active=10929 piece=Γûü0x8815
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=5484 min_freq=673
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=5431 size=2920 all=143905 active=8091 piece=140
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=5364 size=2940 all=144756 active=8942 piece=setinformation
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=5268 size=2960 all=146223 active=10409 piece=Γûü0x7e74
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=5209 size=2980 all=147032 active=11218 piece=Γûü0x55
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=5134 size=3000 all=147851 active=12037 piece=Γûüsethandlecount
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=5130 min_freq=633
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=5093 size=3020 all=148230 active=7772 piece=l1-1-0.
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=5032 size=3040 all=148480 active=8022 piece=Γûü0x4340c8
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4970 size=3060 all=149959 active=9501 piece=Γûüshowwindow
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4925 size=3080 all=150488 active=10030 piece=servicectrldispatch
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4857 size=3100 all=151012 active=10554 piece=dinthe
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=4856 min_freq=602
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4812 size=3120 all=151825 active=8358 piece=Γûü0x40a5dc
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4773 size=3140 all=152286 active=8819 piece=initializesid
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4748 size=3160 all=152790 active=9323 piece=Γûü0x41d8
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4699 size=3180 all=154382 active=10915 piece=dib
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4659 size=3200 all=155774 active=12307 piece=uspend
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=4657 min_freq=566
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4624 size=3220 all=156818 active=8828 piece=Γûü0x7dc0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4584 size=3240 all=157561 active=9571 piece=Γûü0x48f898
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4553 size=3260 all=158777 active=10787 piece=couldnotbelocatedinthe
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4518 size=3280 all=159471 active=11481 piece=registerclassexw
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4476 size=3300 all=159876 active=11886 piece=108
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=4475 min_freq=543
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4442 size=3320 all=161010 active=8688 piece=Γûü0x43d
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4427 size=3340 all=161535 active=9213 piece=cancelc
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4405 size=3360 all=161549 active=9227 piece=Γûü0x41dec8
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4371 size=3380 all=162167 active=9845 piece=Γûü0x40a2d5
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4355 size=3400 all=162180 active=9858 piece=octls
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=4355 min_freq=525
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4327 size=3420 all=162177 active=8104 piece=11000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4289 size=3440 all=163061 active=8988 piece=ff000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4245 size=3460 all=163944 active=9871 piece=lstrcpy
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4207 size=3480 all=164097 active=10024 piece=a6e6
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4181 size=3500 all=164548 active=10475 piece=entriesinac
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=4177 min_freq=504
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4143 size=3520 all=166119 active=9795 piece=Γûürtlntstatustodoserror
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3540 all=166119 active=9795 piece=Γûü0x7700f000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3560 all=166099 active=9775 piece=Γûü0x77023000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3580 all=166079 active=9755 piece=Γûü0x77037000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3600 all=166059 active=9735 piece=Γûü0x7704b000
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=4128 min_freq=491
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3620 all=166039 active=8283 piece=Γûü0x7705f000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3640 all=166019 active=8263 piece=Γûü0x77073000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3660 all=165999 active=8243 piece=Γûü0x77087000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3680 all=165979 active=8223 piece=Γûü0x7709b000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3700 all=165959 active=8203 piece=Γûü0x770af000
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=4128 min_freq=481
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3720 all=165939 active=8278 piece=Γûü0x770c3000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3740 all=165919 active=8258 piece=Γûü0x770d7000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3760 all=165899 active=8238 piece=Γûü0x770eb000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3780 all=165879 active=8218 piece=Γûü0x770ff000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3800 all=165859 active=8198 piece=Γûü0x77113000
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=4128 min_freq=474
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3820 all=165839 active=8273 piece=Γûü0x77127000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3840 all=165819 active=8253 piece=Γûü0x7713b000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3860 all=165799 active=8233 piece=Γûü0x7714f000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3880 all=165779 active=8213 piece=Γûü0x77163000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3900 all=165759 active=8193 piece=Γûü0x77177000
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=4128 min_freq=466
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3920 all=165739 active=8268 piece=Γûü0x7718b000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3940 all=165719 active=8248 piece=Γûü0x7719f000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3960 all=165699 active=8228 piece=Γûü0x771b3000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4128 size=3980 all=165679 active=8208 piece=getsecurityinfo
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4106 size=4000 all=165752 active=8281 piece=Γûü0x437a
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=4093 min_freq=460
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=4057 size=4020 all=167484 active=9996 piece=Γûü0x43d390
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3984 size=4040 all=168463 active=10975 piece=Γûü0x4febf0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3923 size=4060 all=169367 active=11879 piece=Γûü0x40a58
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3866 size=4080 all=170524 active=13036 piece=Γûü0x43b7c3
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3775 size=4100 all=172479 active=14991 piece=a81
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=3772 min_freq=425
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3714 size=4120 all=173226 active=9118 piece=numberofconsole
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3677 size=4140 all=173596 active=9488 piece=Γûü0x7a10
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3603 size=4160 all=174630 active=10522 piece=(0x
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3537 size=4180 all=175425 active=11317 piece=d88
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3482 size=4200 all=176867 active=12759 piece=Γûülcmap
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=3482 min_freq=400
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3416 size=4220 all=177397 active=9373 piece=Γûügetstringtypea
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3362 size=4240 all=179466 active=11442 piece=Γûüprograminternalerrornumberis6.
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3343 size=4260 all=181214 active=13190 piece=Γûügetdiskfreespaceexw
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3306 size=4280 all=182741 active=14717 piece=Γûü0x71c0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3259 size=4300 all=183501 active=15477 piece=Γûüju
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=3256 min_freq=374
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3230 size=4320 all=184028 active=9697 piece=vem
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3213 size=4340 all=184173 active=9842 piece=ied
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3192 size=4360 all=184331 active=10000 piece=ember
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3181 size=4380 all=184393 active=10062 piece=Γûü0x1211c80
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3163 size=4400 all=184999 active=10668 piece=Γûüfebruary
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=3162 min_freq=363
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3156 size=4420 all=185010 active=9261 piece=turday
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3140 size=4440 all=185134 active=9385 piece=drl6660drl6660drl6660drl6660
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3122 size=4460 all=185610 active=9861 piece=Γûüasser
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3112 size=4480 all=185631 active=9882 piece=Γûü0x1211f6c
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3098 size=4500 all=185647 active=9898 piece=bool
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=3098 min_freq=356
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3089 size=4520 all=185690 active=9321 piece=classtypecast
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3087 size=4540 all=185709 active=9340 piece=pointeroperation
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3084 size=4560 all=185709 active=9340 piece=numeric
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3078 size=4580 all=185741 active=9372 piece=common
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3058 size=4600 all=186299 active=9930 piece=Γûüvarsub
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=3057 min_freq=351
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3057 size=4620 all=186285 active=9301 piece=Γûüvarboolfromstr
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=3024 size=4640 all=187276 active=10292 piece=Γûü0x8c30
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2995 size=4660 all=188308 active=11324 piece=3f0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2969 size=4680 all=189143 active=12159 piece=Γûüwakeconditionvariable
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2947 size=4700 all=189711 active=12727 piece=lasses
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=2947 min_freq=339
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2930 size=4720 all=190136 active=9909 piece=Γûü0x7edc
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2902 size=4740 all=191451 active=11224 piece=f00
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2871 size=4760 all=193354 active=13127 piece=3c8
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2840 size=4780 all=195381 active=15154 piece=Γûü0x7ed9
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2806 size=4800 all=196458 active=16231 piece=358
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=2804 min_freq=319
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2777 size=4820 all=197254 active=10279 piece=Γûü0x41a
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2735 size=4840 all=198576 active=11601 piece=b2acb2afcdffceffc7ffd1ffcaffcbff
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2705 size=4860 all=200009 active=13034 piece=Γûüregcreate
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2678 size=4880 all=201806 active=14831 piece=Γûü0x41c
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2642 size=4900 all=202382 active=15407 piece=Γûü0x8bb0
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=2641 min_freq=302
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2618 size=4920 all=203142 active=10880 piece=remove
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2588 size=4940 all=204406 active=12144 piece=c44
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2566 size=4960 all=206489 active=14227 piece=isspace
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2531 size=4980 all=206543 active=14281 piece=aa4
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2513 size=5000 all=207724 active=15462 piece=Γûü0x4338
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=2513 min_freq=290
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2485 size=5020 all=208114 active=10757 piece=Γûü0x8818
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2462 size=5040 all=208207 active=10850 piece=Γûü0x881d
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2444 size=5060 all=210480 active=13123 piece=formata
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2418 size=5080 all=210906 active=13549 piece=Γûücreatewindowexw
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2400 size=5100 all=211910 active=14553 piece=Γûü0x1211e30
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=2400 min_freq=279
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2383 size=5120 all=212625 active=11310 piece=Γûü0xffd0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2368 size=5140 all=213075 active=11760 piece=Γûüwsprintfw
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2345 size=5160 all=214369 active=13054 piece=Γûü0x107
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2318 size=5180 all=215368 active=14053 piece=Γûü0xffae
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2298 size=5200 all=216035 active=14720 piece=c4c
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=2298 min_freq=270
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2281 size=5220 all=217799 active=12266 piece=adapter
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2245 size=5240 all=219916 active=14383 piece=Γûü0x4225
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2225 size=5260 all=220774 active=15241 piece=getkeyboardtype
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2214 size=5280 all=221678 active=16145 piece=Γûü0x43781a
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2195 size=5300 all=223230 active=17697 piece=Γûü0xfeee018
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=2194 min_freq=259
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2181 size=5320 all=225807 active=13727 piece=uninitialize
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2156 size=5340 all=228088 active=16008 piece=Γûü0x59bf
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2129 size=5360 all=228806 active=16726 piece=928
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2087 size=5380 all=232056 active=19976 piece=Γûü0x4378c8
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2055 size=5400 all=233219 active=21139 piece=758
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=2051 min_freq=244
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2027 size=5420 all=234566 active=12689 piece=strings
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=2009 size=5440 all=234942 active=13065 piece=Γûü0x882c
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1985 size=5460 all=236553 active=14676 piece=Γûü0x1211fa0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1968 size=5480 all=238862 active=16985 piece=Γûü0x42a731
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1953 size=5500 all=239736 active=17859 piece=Γûü0x438c18
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=1953 min_freq=235
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1944 size=5520 all=240556 active=12807 piece=Γûü0x437ad3
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1939 size=5540 all=240934 active=13185 piece=Γûü0x4c5158
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1933 size=5560 all=241211 active=13461 piece=Γûü0x43b7ba
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1902 size=5580 all=242347 active=14597 piece=545
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1886 size=5600 all=242884 active=15134 piece=Γûüfindnextfilea
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=1886 min_freq=232
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1868 size=5620 all=244750 active=14011 piece=Γûüsetfilepointerex
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1858 size=5640 all=246274 active=15535 piece=fe0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1840 size=5660 all=248161 active=17422 piece=Γûü0x3f75f30
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1823 size=5680 all=249151 active=18412 piece=fa2
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1800 size=5700 all=252134 active=21395 piece=ba0
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=1800 min_freq=221
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1778 size=5720 all=254857 active=14992 piece=3e0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1764 size=5740 all=257229 active=17364 piece=Γûü0x4254
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1745 size=5760 all=258833 active=18968 piece=Γûü0x1b1
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1730 size=5780 all=260517 active=20652 piece=Γûüdialogbox
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1725 size=5800 all=260618 active=20753 piece=Γûücreatehardlinkw
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=1724 min_freq=210
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1711 size=5820 all=262214 active=14627 piece=Γûüprocess32firstw
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1697 size=5840 all=263665 active=16078 piece=b50
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1681 size=5860 all=266146 active=18559 piece=Γûüheapdestroy
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1664 size=5880 all=269082 active=21495 piece=720
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1651 size=5900 all=272259 active=24672 piece=Γûü0x4fe6e8
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=1650 min_freq=199
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1633 size=5920 all=273384 active=14738 piece=3b8
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1617 size=5940 all=274399 active=15753 piece=Γûü0x4096
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1608 size=5960 all=275257 active=16611 piece=Γûü0x53ba10
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1591 size=5980 all=278159 active=19513 piece=amet
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1570 size=6000 all=280496 active=21850 piece=af4
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=1570 min_freq=192
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1560 size=6020 all=282286 active=15501 piece=Γûü0x42b36f
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1544 size=6040 all=283982 active=17197 piece=944
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1530 size=6060 all=285983 active=19198 piece=Γûü0x9210
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1516 size=6080 all=287677 active=20892 piece=381
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1500 size=6100 all=289114 active=22329 piece=Γûü0x41a8a8
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=1500 min_freq=185
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1489 size=6120 all=290570 active=15912 piece=ass
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1475 size=6140 all=291709 active=17051 piece=3a4
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1464 size=6160 all=292881 active=18223 piece=566
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1456 size=6180 all=294245 active=19587 piece=Γûü0x41300b
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1446 size=6200 all=296650 active=21992 piece=Γûü0x1211c40
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=1445 min_freq=183
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1437 size=6220 all=297959 active=16142 piece=Γûü0x1211900
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1425 size=6240 all=299460 active=17643 piece=quire
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1418 size=6260 all=299930 active=18113 piece=utdow
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1408 size=6280 all=300682 active=18865 piece=71c
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1402 size=6300 all=302267 active=20450 piece=Γûüaddace
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=1401 min_freq=180
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1396 size=6320 all=302913 active=15760 piece=iocounters
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1379 size=6340 all=304465 active=17312 piece=998
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1365 size=6360 all=305806 active=18653 piece=Γûü0xc94
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1359 size=6380 all=307304 active=20151 piece=Γûü0x45f8
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1352 size=6400 all=308543 active=21390 piece=rss
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=1352 min_freq=175
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1341 size=6420 all=309121 active=16005 piece=1c0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1330 size=6440 all=311960 active=18844 piece=Γûü0x4233
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1316 size=6460 all=313453 active=20337 piece=Γûü12
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1305 size=6480 all=315783 active=22667 piece=Γûü0x4a7
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1299 size=6500 all=318416 active=25300 piece=dc9
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=1299 min_freq=168
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1290 size=6520 all=321118 active=18334 piece=Γûü0x40e7
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1282 size=6540 all=323386 active=20602 piece=seek
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1270 size=6560 all=325315 active=22531 piece=9c6
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1261 size=6580 all=328447 active=25663 piece=dee
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1252 size=6600 all=329732 active=26948 piece=Γûü28
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=1252 min_freq=161
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1248 size=6620 all=330118 active=16777 piece=Γûü0x46b400
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1236 size=6640 all=331638 active=18297 piece=Γûü0x80c458
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1225 size=6660 all=333624 active=20283 piece=Γûü0x9730
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1214 size=6680 all=335054 active=21713 piece=su
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1203 size=6700 all=336822 active=23481 piece=vie
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=1203 min_freq=156
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1192 size=6720 all=338325 active=18337 piece=Γûü0x99c0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1184 size=6740 all=340292 active=20304 piece=dd7
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1167 size=6760 all=342948 active=22960 piece=5.
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1159 size=6780 all=344476 active=24488 piece=Γûü0x560
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1151 size=6800 all=347144 active=27156 piece=a02
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=1151 min_freq=150
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1141 size=6820 all=350251 active=20219 piece=db8
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1129 size=6840 all=352107 active=22075 piece=Γûü0x4feaac
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1120 size=6860 all=352562 active=22530 piece=Γûü0x42f1
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1113 size=6880 all=354614 active=24582 piece=Γûücorexitprocess
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1103 size=6900 all=356564 active=26532 piece=76c
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=1103 min_freq=145
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1099 size=6920 all=358569 active=19450 piece=Γûü0x414138
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1092 size=6940 all=360038 active=20919 piece=Γûü0x120e6dc
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1083 size=6960 all=362102 active=22983 piece=Γûü0x53b5
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1078 size=6980 all=363669 active=24550 piece=Γûü0x59bf7c
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1072 size=7000 all=366436 active=27317 piece=Γûü0x1211d44
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=1071 min_freq=140
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1062 size=7020 all=367416 active=19302 piece=Γûü0x4ac
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1054 size=7040 all=369230 active=21116 piece=Γûünsis
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1046 size=7060 all=370593 active=22479 piece=Γûüdb
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1040 size=7080 all=371787 active=23673 piece=Γûü0x4350c8
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1032 size=7100 all=373337 active=25223 piece=Γûü0x419ce0
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=1031 min_freq=136
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1025 size=7120 all=375752 active=21082 piece=Γûü0xe4
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1020 size=7140 all=377358 active=22688 piece=startof
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1013 size=7160 all=378325 active=23655 piece=nd
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=1008 size=7180 all=380007 active=25337 piece=Γûü0x4217
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=999 size=7200 all=382507 active=27837 piece=a9a
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=999 min_freq=131
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=992 size=7220 all=385224 active=21729 piece=_164637
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=985 size=7240 all=387565 active=24070 piece=Γûü0x2010
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=980 size=7260 all=388909 active=25414 piece=7a7
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=974 size=7280 all=391146 active=27651 piece=Γûü0x7dc9
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=970 size=7300 all=391880 active=28385 piece=Γûü0x64000
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=970 min_freq=127
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=966 size=7320 all=391979 active=19693 piece=Γûü0x7f800b
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=960 size=7340 all=392977 active=20691 piece=Γûü0x3f2000(3a5265706561740d0a64656c2022433a
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=950 size=7360 all=395804 active=23518 piece=Γûü0x44b7
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=942 size=7380 all=396702 active=24416 piece=33c4
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=937 size=7400 all=397562 active=25276 piece=Γûü0x7ddc
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=937 min_freq=125
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=931 size=7420 all=399812 active=22127 piece=Γûü0x4298d8
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=922 size=7440 all=401390 active=23705 piece=enable
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=914 size=7460 all=404018 active=26333 piece=Γûücocreateinst
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=907 size=7480 all=406116 active=28431 piece=a55
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=900 size=7500 all=408125 active=30440 piece=302
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=900 min_freq=121
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=895 size=7520 all=409699 active=21758 piece=onfig
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=889 size=7540 all=411389 active=23448 piece=b16
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=882 size=7560 all=414419 active=26478 piece=Γûü0x4b7
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=874 size=7580 all=417120 active=29179 piece=Γûü0x41e9
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=866 size=7600 all=418271 active=30330 piece=686
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=866 min_freq=118
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=862 size=7620 all=422023 active=24393 piece=723
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=859 size=7640 all=423480 active=25850 piece=Γûü0x565868
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=853 size=7660 all=424462 active=26832 piece=Γûü0x1906000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=847 size=7680 all=426897 active=29267 piece=addresses
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=838 size=7700 all=428751 active=31121 piece=96c
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=838 min_freq=117
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=833 size=7720 all=431732 active=24199 piece=ptr
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=829 size=7740 all=433532 active=25999 piece=Γûü0x509e4
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=824 size=7760 all=435312 active=27779 piece=Γûü0x4af4
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=819 size=7780 all=437725 active=30192 piece=bf6
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=814 size=7800 all=439196 active=31663 piece=Γûü0x700
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=814 min_freq=114
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=810 size=7820 all=440963 active=23647 piece=Γûü0x43500c
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=805 size=7840 all=442140 active=24824 piece=Γûü0xdf
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=800 size=7860 all=443483 active=26167 piece=Γûü0x4255f0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=796 size=7880 all=444085 active=26769 piece=Γûücomparestringa
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=790 size=7900 all=445634 active=28318 piece=691
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=790 min_freq=111
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=786 size=7920 all=447758 active=24205 piece=ab1
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=783 size=7940 all=449051 active=25498 piece=f86
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=780 size=7960 all=450279 active=26726 piece=Γûü0x423850
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=776 size=7980 all=451430 active=27877 piece=Γûü0x169be
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=773 size=8000 all=452820 active=29267 piece=basenamew
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=773 min_freq=108
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=769 size=8020 all=454692 active=24511 piece=profil
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=766 size=8040 all=456012 active=25831 piece=Γûügetmessagepos
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=759 size=8060 all=458248 active=28067 piece=eac
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=755 size=8080 all=460414 active=30233 piece=e9c
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=750 size=8100 all=462037 active=31856 piece=Γûü0x408c8e
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=750 min_freq=105
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=744 size=8120 all=463604 active=24669 piece=ctrlid
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=740 size=8140 all=464446 active=25511 piece=Γûü0x435022
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=738 size=8160 all=464859 active=25924 piece=Γûüregisterwindowmessagew
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=734 size=8180 all=467159 active=28224 piece=Γûüdrawtextw
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=730 size=8200 all=468118 active=29183 piece=direct
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=730 min_freq=102
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=726 size=8220 all=470386 active=25657 piece=d12
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=722 size=8240 all=472537 active=27808 piece=Γûühi
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=718 size=8260 all=473726 active=28997 piece=Γûücryptgethashparam
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=713 size=8280 all=474151 active=29422 piece=wm
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=709 size=8300 all=476365 active=31636 piece=911
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=709 min_freq=100
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=707 size=8320 all=477718 active=24960 piece=Γûüsetwindowshookexw
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=704 size=8340 all=479999 active=27241 piece=Γûü0x40a5b2
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=702 size=8360 all=481177 active=28419 piece=Γûü0x4355c8
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=699 size=8380 all=482052 active=29294 piece=Γûü0xfeee00ed
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=695 size=8400 all=483664 active=30906 piece=Γûü0x6f00
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=694 min_freq=97
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=692 size=8420 all=486007 active=26522 piece=ongle
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=689 size=8440 all=487024 active=27539 piece=tem32
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=683 size=8460 all=487876 active=28391 piece=170
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=681 size=8480 all=490654 active=31169 piece=Γûüsetmenuitembitmaps
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=678 size=8500 all=492587 active=33102 piece=winmain
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=678 min_freq=94
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=676 size=8520 all=492955 active=24992 piece=Γûü0x4912d0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=673 size=8540 all=494786 active=26823 piece=Γûü0x43b3c0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=671 size=8560 all=495723 active=27760 piece=Γûü0x89e0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=668 size=8580 all=495758 active=27795 piece=Γûü0x4bc298
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=662 size=8600 all=496732 active=28769 piece=3ff
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=661 min_freq=92
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=659 size=8620 all=497970 active=25767 piece=Γûü0x1211db4
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=654 size=8640 all=499776 active=27573 piece=Γûü0x1210d90
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=651 size=8660 all=500569 active=28366 piece=Γûü0x3f75f8c
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=647 size=8680 all=501761 active=29558 piece=Γûü0x430fec
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=645 size=8700 all=502705 active=30502 piece=Γûü0x44f940
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=645 min_freq=91
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=643 size=8720 all=503006 active=25437 piece=3f5
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=642 size=8740 all=504574 active=27005 piece=windoww
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=640 size=8760 all=505584 active=28015 piece=Γûü0x7f8010
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=636 size=8780 all=507369 active=29800 piece=Γûü0x1211f08
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=633 size=8800 all=508683 active=31114 piece=Γûü0x169b834
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=632 min_freq=89
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=630 size=8820 all=510966 active=27718 piece=Γûü0x42cdf8
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=627 size=8840 all=512680 active=29432 piece=fileattributes
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=625 size=8860 all=514136 active=30888 piece=Γûü0x4229c2
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=623 size=8880 all=514629 active=31381 piece=369
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=620 size=8900 all=516974 active=33726 piece=Γûüab
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=620 min_freq=86
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=618 size=8920 all=518421 active=27203 piece=Γûü0x40ad
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=615 size=8940 all=519641 active=28423 piece=Γûü0x4034
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=611 size=8960 all=521060 active=29842 piece=Γûü0x1211ca4
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=608 size=8980 all=523731 active=32513 piece=f19
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=605 size=9000 all=525335 active=34117 piece=Γûü0x320
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=605 min_freq=84
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=602 size=9020 all=526835 active=27731 piece=toredc
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=599 size=9040 all=527451 active=28347 piece=Γûü0x1211e68
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=595 size=9060 all=528597 active=29493 piece=v1.0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=592 size=9080 all=529548 active=30444 piece=Γûügetclipbox
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=589 size=9100 all=531405 active=32301 piece=Γûü0x42ce24
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=589 min_freq=83
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=586 size=9120 all=532094 active=27260 piece=ible
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=584 size=9140 all=532758 active=27924 piece=2e5
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=583 size=9160 all=534090 active=29256 piece=Γûü0x68f720
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=581 size=9180 all=534362 active=29528 piece=Γûü0x4feb90
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=579 size=9200 all=534946 active=30112 piece=Γûü0x4640
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=579 min_freq=81
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=576 size=9220 all=536048 active=27839 piece=kg
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=575 size=9240 all=536153 active=27944 piece=Γûü0x42e640
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=572 size=9260 all=538377 active=30168 piece=Γûü0x1828
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=568 size=9280 all=540345 active=32136 piece=e31
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=565 size=9300 all=542671 active=34462 piece=d32
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=565 min_freq=79
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=563 size=9320 all=543811 active=27993 piece=e85
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=563 size=9340 all=544087 active=28269 piece=Γûü0x417aac
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=562 size=9360 all=544951 active=29133 piece=Γûü0x420c01
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=561 size=9380 all=545189 active=29371 piece=d0000
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=560 size=9400 all=545860 active=30042 piece=Γûü0x439440
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=560 min_freq=78
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=558 size=9420 all=546627 active=28060 piece=Γûü0x42cdd0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=556 size=9440 all=547268 active=28701 piece=fb9
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=555 size=9460 all=547866 active=29299 piece=Γûü0x4fea80
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=553 size=9480 all=548121 active=29554 piece=Γûü0x5265d40
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=550 size=9500 all=549759 active=31192 piece=Γûü0x500448
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=550 min_freq=77
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=548 size=9520 all=550444 active=28173 piece=Γûü0x5265d7c
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=547 size=9540 all=550735 active=28464 piece=Γûü0x5265e6c
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=546 size=9560 all=550791 active=28520 piece=findfirst
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=546 size=9580 all=550774 active=28503 piece=Γûü0x52660b0
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=544 size=9600 all=551178 active=28907 piece=a75
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=544 min_freq=77
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=542 size=9620 all=553838 active=29890 piece=Γûü0x4e39
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=540 size=9640 all=555004 active=31056 piece=Γûü0x4df00
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=540 size=9660 all=554986 active=31038 piece=Γûü0x5266290
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=538 size=9680 all=555582 active=31634 piece=tter
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=536 size=9700 all=556096 active=32148 piece=Γûü0x464ac4
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=536 min_freq=75
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=535 size=9720 all=557009 active=28718 piece=ten
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=532 size=9740 all=557594 active=29303 piece=Γûü0x437116
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=528 size=9760 all=559567 active=31276 piece=2f1
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=525 size=9780 all=561838 active=33547 piece=guid
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=523 size=9800 all=562424 active=34133 piece=2da
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=523 min_freq=74
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=519 size=9820 all=564642 active=30143 piece=2fe
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=516 size=9840 all=566323 active=31824 piece=e11
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=515 size=9860 all=566943 active=32444 piece=d56
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=512 size=9880 all=568557 active=34058 piece=Γûü0x5f3c24
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=510 size=9900 all=569445 active=34946 piece=Γûü0x138
+bpe_model_trainer.cc(167) LOG(INFO) Updating active symbols. max_freq=510 min_freq=72
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=507 size=9920 all=570104 active=29036 piece=Γûü0x42dfe8
+bpe_model_trainer.cc(258) LOG(INFO) Added: freq=505 size=9940 all=571533 active=30465 piece=drl6660drl6660drl6660drl6660drl6660
+trainer_interface.cc(685) LOG(INFO) Saving model: C:\Users\dtrizna\Code\nebula\scripts\..\data\data_filtered\speakeasy_trainset_BPE_10k\speakeasy_VocabSize_10000_tokenizer.model
+trainer_interface.cc(697) LOG(INFO) Saving vocabs: C:\Users\dtrizna\Code\nebula\scripts\..\data\data_filtered\speakeasy_trainset_BPE_10k\speakeasy_VocabSize_10000_tokenizer.vocab
+02/13/2023 06:10:34 PM  [!] Loaded vocab with size 10003 from C:\Users\dtrizna\Code\nebula\scripts\..\data\data_filtered\speakeasy_trainset_BPE_10k\speakeasy_VocabSize_10000_tokenizer.vocab
+02/13/2023 06:10:34 PM Encoding...
+02/13/2023 06:29:10 PM Padding with maxLen=512...
+02/13/2023 06:29:13 PM Saving files with prefix: speakeasy_VocabSize_10000_maxLen_512
+02/13/2023 06:29:14 PM Padding with maxLen=2048...
+02/13/2023 06:29:25 PM Saving files with prefix: speakeasy_VocabSize_10000_maxLen_2048
