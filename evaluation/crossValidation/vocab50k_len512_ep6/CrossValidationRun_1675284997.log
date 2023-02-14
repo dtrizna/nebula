@@ -1050,7 +1050,7 @@
 02/01/2023 11:20:51 PM 
 [!!!] Fold 1/3 | Train set size: 50750, Validation set size: 25376
 02/01/2023 11:20:53 PM  [!] Saved dataset splits to dataset_splits_1675290051.npz
-02/01/2023 11:20:54 PM  [!] Iniatialized TransformerEncoder_wSplits. Total trainable parameters: 56.7160e6
+02/01/2023 11:20:54 PM  [!] Iniatialized TransformerEncoder_wSplits. Total trainable parameters: 2.8374e6
 02/01/2023 11:20:54 PM  [*] Started epoch: 1
 02/01/2023 11:20:55 PM  [*] 23:20:55: Train Epoch: 1 [  0  /50750 (0 %)] | Loss: 1.129737 | Elapsed: 0.32s | FPR 0.0003 -> TPR 0.0392 & F1 0.0755 | AUC 0.5445
 02/01/2023 11:21:02 PM  [*] 23:21:02: Train Epoch: 1 [6400 /50750 (13%)] | Loss: 0.305339 | Elapsed: 7.00s | FPR 0.0003 -> TPR 0.6176 & F1 0.7636 | AUC 0.9269
@@ -1144,7 +1144,7 @@
 02/01/2023 11:27:00 PM 
 [!!!] Fold 2/3 | Train set size: 50751, Validation set size: 25375
 02/01/2023 11:27:02 PM  [!] Saved dataset splits to dataset_splits_1675290420.npz
-02/01/2023 11:27:03 PM  [!] Iniatialized TransformerEncoder_wSplits. Total trainable parameters: 56.7160e6
+02/01/2023 11:27:03 PM  [!] Iniatialized TransformerEncoder_wSplits. Total trainable parameters: 2.8374e6
 02/01/2023 11:27:03 PM  [*] Started epoch: 1
 02/01/2023 11:27:03 PM  [*] 23:27:03: Train Epoch: 1 [  0  /50751 (0 %)] | Loss: 1.977310 | Elapsed: 0.24s | FPR 0.0003 -> TPR 0.0000 & F1 0.0000 | AUC 0.4104
 02/01/2023 11:27:10 PM  [*] 23:27:10: Train Epoch: 1 [6400 /50751 (13%)] | Loss: 0.447526 | Elapsed: 7.07s | FPR 0.0003 -> TPR 0.4328 & F1 0.6042 | AUC 0.8123
@@ -1238,7 +1238,7 @@
 02/01/2023 11:33:10 PM 
 [!!!] Fold 3/3 | Train set size: 50751, Validation set size: 25375
 02/01/2023 11:33:12 PM  [!] Saved dataset splits to dataset_splits_1675290789.npz
-02/01/2023 11:33:12 PM  [!] Iniatialized TransformerEncoder_wSplits. Total trainable parameters: 56.7160e6
+02/01/2023 11:33:12 PM  [!] Iniatialized TransformerEncoder_wSplits. Total trainable parameters: 2.8374e6
 02/01/2023 11:33:12 PM  [*] Started epoch: 1
 02/01/2023 11:33:13 PM  [*] 23:33:13: Train Epoch: 1 [  0  /50751 (0 %)] | Loss: 2.438816 | Elapsed: 0.30s | FPR 0.0003 -> TPR 0.0500 & F1 0.0952 | AUC 0.5365
 02/01/2023 11:33:20 PM  [*] 23:33:20: Train Epoch: 1 [6400 /50751 (13%)] | Loss: 0.440075 | Elapsed: 7.09s | FPR 0.0003 -> TPR 0.3636 & F1 0.5333 | AUC 0.8632

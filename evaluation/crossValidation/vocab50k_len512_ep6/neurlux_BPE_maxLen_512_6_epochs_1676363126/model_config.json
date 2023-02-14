@@ -1,0 +1,5 @@
+{
+    "embedding_dim": 256,
+    "vocab_size": 50002,
+    "max_len": 512
+}
