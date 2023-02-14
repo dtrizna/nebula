@@ -166,7 +166,7 @@ class TransformerEncoderModel(nn.Module):
         return out
 
 
-class TransformerEncoderWithChunking(nn.Module):
+class TransformerEncoderWithChunkingLM(nn.Module):
     def __init__(self,
                     vocabSize: int, # size of vocabulary
                     maxLen: int, # maximum length of input sequence
@@ -183,7 +183,7 @@ class TransformerEncoderWithChunking(nn.Module):
                     mean_over_sequence=False):
         super().__init__()
         assert dModel % nHeads == 0, "nheads must divide evenly into d_model"
-        self.__name__ = 'TransformerEncoder_wSplits'
+        self.__name__ = 'Transformer_wSplits'
         self.encoder = nn.Embedding(vocabSize, dModel)
         self.pos_encoder = PositionalEncoding(dModel, dropout)
         encoder_layers = TransformerEncoderLayer(dModel, nHeads, dHidden, dropout, batch_first=True)
@@ -277,6 +277,100 @@ class TransformerEncoderWithChunking(nn.Module):
         x = self.preTrainLayers(x)
         return x
 
+    def forward(self, x: Tensor) -> Tensor:
+        x = self.core(x)
+        out = self.fcOutput(x)
+        return out
+
+
+class TransformerEncoderWithChunking(nn.Module):
+    def __init__(self,
+                    vocabSize: int, # size of vocabulary
+                    maxLen: int, # maximum length of input sequence
+                    chunk_size: int, # what lengths input sequence should be chunked to
+                    dModel: int = 32, # embedding & transformer dimension
+                    nHeads: int = 8, # number of heads in nn.MultiheadAttention
+                    dHidden: int = 200, # dimension of the feedforward network model in nn.TransformerEncoder
+                    nLayers: int = 2, # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+                    numClasses: int = 1, # 1 ==> binary classification 
+                    hiddenNeurons: list = [64], # decoder's classifier FFNN complexity
+                    layerNorm: bool = False, # whether to normalize decoder's FFNN layers
+                    dropout: float = 0.3,
+                    mean_over_sequence=False):
+        super().__init__()
+        assert dModel % nHeads == 0, "nheads must divide evenly into d_model"
+        self.__name__ = 'Transformer_wSplits'
+        self.encoder = nn.Embedding(vocabSize, dModel)
+        self.pos_encoder = PositionalEncoding(dModel, dropout)
+        encoder_layers = TransformerEncoderLayer(dModel, nHeads, dHidden, dropout, batch_first=True)
+        self.transformer_encoder = TransformerEncoder(encoder_layers, nLayers)
+        self.d_model = dModel
+        self.chunk_size = chunk_size
+        self.nr_of_chunks = maxLen/self.chunk_size
+        self.meanOverSeq = mean_over_sequence
+        # add 1 if nr_of_chunks is not scalar to account for the padding
+        if self.nr_of_chunks != int(self.nr_of_chunks):
+            self.nr_of_chunks = int(self.nr_of_chunks) + 1
+
+        if mean_over_sequence:
+            input_neurons = dModel
+        else:
+            input_neurons = int(self.chunk_size * self.nr_of_chunks * dModel)
+        self.ffnn = []
+        for i,h in enumerate(hiddenNeurons):
+            self.ffnnBlock = []
+            if i == 0:
+                self.ffnnBlock.append(nn.Linear(input_neurons, h))
+            else:
+                self.ffnnBlock.append(nn.Linear(hiddenNeurons[i-1], h))
+
+            # add BatchNorm to every layer except last
+            if layerNorm and i < len(hiddenNeurons)-1:
+                self.ffnnBlock.append(nn.LayerNorm(h))
+
+            self.ffnnBlock.append(nn.ReLU())
+
+            if dropout:
+                self.ffnnBlock.append(nn.Dropout(dropout))
+            
+            self.ffnn.append(nn.Sequential(*self.ffnnBlock))
+        self.ffnn = nn.Sequential(*self.ffnn)
+        self.fcOutput = nn.Linear(hiddenNeurons[-1], numClasses)
+        self.init_weights()
+
+    def init_weights(self) -> None:
+        initrange = 0.1
+        self.encoder.weight.data.uniform_(-initrange, initrange)
+        for block in self.ffnn:
+            for layer in block:
+                if isinstance(layer, nn.Linear):
+                    layer.bias.data.zero_()
+                    layer.weight.data.uniform_(-initrange, initrange)
+
+    def core(self, src: Tensor) -> Tensor:
+        chunks = []
+        for chunk in torch.split(src, split_size_or_sections=self.chunk_size, dim=1):
+        # how to pad mask works -- (left, 0, right -- up to chunk_size from existing)
+            if chunk.shape[1] < self.chunk_size:
+                pad_mask = (0,self.chunk_size-chunk.shape[1])
+                chunk = torch.nn.functional.pad(chunk, pad=pad_mask)
+    
+            chunk = self.encoder(chunk) * math.sqrt(self.d_model)
+            chunk = self.pos_encoder(chunk)        
+            chunk = self.transformer_encoder(chunk)
+            # at this stage each chunk is: (batch_size, chunk_size, d_model)
+            chunks.append(chunk)
+        # after cat it'd be: (batch_size, chunk_size * nr_of_chunks * d_model, d_model)
+        # where nr_of_chunks = int(maxLen/self.chunk_size) + 1
+        x = torch.cat(chunks, dim=1)
+        if self.meanOverSeq:
+            x = torch.mean(x, dim=1)
+        else:
+            x = x.view(x.size(0), -1)
+        #x = x.view(x.size(0), -1)
+        x = self.ffnn(x)
+        return x
+    
     def forward(self, x: Tensor) -> Tensor:
         x = self.core(x)
         out = self.fcOutput(x)
