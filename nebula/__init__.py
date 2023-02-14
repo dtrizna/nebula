@@ -137,7 +137,7 @@ class ModelTrainer(object):
 
             self.optimizer.zero_grad()
             loss.backward() # derivatives
-            self.optimizer.step() # parameter update 
+            self.optimizer.step() # parameter update
             
             # learning rate update
             self.globalBatchCounter += 1
@@ -236,7 +236,7 @@ class ModelTrainer(object):
                 self.dumpResults()
 
     def train(self, X, y, epochs=10):
-        self.fit(self, X, y, epochs=epochs)
+        self.fit(X, y, epochs=epochs)
 
     def evaluate(self, X, y, metrics="array"):
         testLoader = torch.utils.data.DataLoader(
