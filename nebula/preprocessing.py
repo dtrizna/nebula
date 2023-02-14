@@ -327,9 +327,12 @@ class JSONTokenizerBPE:
             if not os.path.exists(vocabPath): # default sentencepiece -- after training
                 vocabPath = self.model_path.rstrip(".model")+".vocab"
         with open(vocabPath, encoding="utf-8") as f:
-            vocab = json.load(f)
-        vocab = [x.split("\t")[0] for x in vocab]
-        self.vocab = {k:i for i,k in enumerate(vocab)}
+            if vocabPath.endswith(".json"):
+                self.vocab = json.load(f)
+            else:
+                data = f.read()
+                vocab = [x.split("\t")[0] for x in data.split("\n")]
+                self.vocab = {k:i for i,k in enumerate(vocab)}
         self.vocab.update(self.specialTokens)
         self.reverse_vocab = {v:k for k,v in self.vocab.items()}
         logging.warning(f" [!] Loaded vocab with size {len(self.vocab)} from {vocabPath}")
