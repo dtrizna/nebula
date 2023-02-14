@@ -96,14 +96,17 @@ if __name__ == "__main__":
     py7zr_failed = False
     print(f"[*] Collecting samples with batch size: {BATCH}")
     while i < len(yHashes):
+        non_archive_samples = []
         samples = defaultdict(list)
         for i, sampleHash in enumerate(yHashes):
             print(f"Reading hash location: {i}/{len(yHashes)}", end="\r")
             if i <= existingIdx:
                 continue # skip if done
-
             
             directory = getHashDirectory(sampleHash, dataset=dataset)
+            if not directory:
+                non_archive_samples.append(sampleHash)
+                continue
             archive = directory + ".7z"
             sample = f"PeX86Exe/{directory}/{sampleHash}"
             samples[archive].append(sample)
@@ -112,43 +115,56 @@ if __name__ == "__main__":
             if i == existingIdx + BATCH:
                 existingIdx = i
                 break
+        
+        peBytes = {}
+        if non_archive_samples:
+            for sampleHash in non_archive_samples:
+                if sampleHash == "cacl": # TODO: ugly hack, fix
+                    sampleHash = "cacls"
+                path = os.path.join(r"C:\windows\syswow64", sampleHash+".exe")
+                assert os.path.exists(path), f"File {path} does not exist"
+                print("[*] Reading", path)
+                with open(path, "rb") as f:
+                    peBytes.update({sampleHash: f.read()})
 
         for archive in samples:
             now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
             try:
                 if py7zr_failed != archive: 
                     # py7zr is faster for batch extraction
-                    peBytes = extractSamplesWithPy7zr(os.path.join(archivePath, archive), archive, samples)
+                    peBytes.update(extractSamplesWithPy7zr(os.path.join(archivePath, archive), archive, samples))
                 else:
-                    peBytes = extractSamplesWith7z(archivePath, archive, samples)
+                    peBytes.update(extractSamplesWith7z(archivePath, archive, samples))
             except (py7zr.exceptions.CrcError, LZMAError) as e:
                 print(f"[-] '{e}': extration failed, falling back to 7z")
                 # one (or more) of the PEs is corrupted, in that case py7zr fails to extract it
                 # using cmdline 7z to extract them, which do not cares
-                peBytes = extractSamplesWith7z(archivePath, archive, samples)
+                peBytes.update(extractSamplesWith7z(archivePath, archive, samples))
                 py7zr_failed = archive # py7zr will fail for next X (?) files in this archive
             
-            # add timestamp to log
-            now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-            print(f" {now}: [*] Extracting Ember features for {BATCH} samples from {archive}...")
-            for pe in tqdm(peBytes):
-                vector = extractor.feature_vector(peBytes[pe])
-                peHash = pe.split("/")[-1]
-                arr[yHashes.index(peHash)] = vector
-            
-            # dump BROKEN_FILES
-            if BROKEN_FILES:
-                # read existing broken files and apped new ones
-                if os.path.exists(os.path.join(outPath, f"broken_files.json")):
-                    with open(os.path.join(outPath, f"broken_files.json"), "r") as f:
-                        old = json.load(f)
-                    BROKEN_FILES = sorted((set(old + BROKEN_FILES)))
-                with open(os.path.join(outPath, f"broken_files.json"), "w") as f:
-                    json.dump(BROKEN_FILES, f, indent=4)
-                print(f"[!] Updated broken files list, current list length: {len(BROKEN_FILES)}")
-                BROKEN_FILES = []
-                
+        # add timestamp to log
+        now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        print(f" {now}: [*] Extracting Ember features for {BATCH} samples from {archive}...")
+        for pe in tqdm(peBytes):
+            vector = extractor.feature_vector(peBytes[pe])
+            if "/" in pe:
+                peName = pe.split("/")[-1]
+            else:
+                peName = pe
+            arr[yHashes.index(peName)] = vector
         
+        # dump BROKEN_FILES
+        if BROKEN_FILES:
+            # read existing broken files and apped new ones
+            if os.path.exists(os.path.join(outPath, f"broken_files.json")):
+                with open(os.path.join(outPath, f"broken_files.json"), "r") as f:
+                    old = json.load(f)
+                BROKEN_FILES = sorted((set(old + BROKEN_FILES)))
+            with open(os.path.join(outPath, f"broken_files.json"), "w") as f:
+                json.dump(BROKEN_FILES, f, indent=4)
+            print(f"[!] Updated broken files list, current list length: {len(BROKEN_FILES)}")
+            BROKEN_FILES = []
+                
         np.save(os.path.join(f"{outPath}", f"x_{dataset}_{i}.npy"), arr)
         del samples
         # delete file with previous index
