@@ -1,0 +1,19 @@
+{
+    "vocabSize": 10003,
+    "maxLen": 512,
+    "embeddingDim": 64,
+    "hiddenNeurons": [
+        512,
+        256,
+        128
+    ],
+    "batchNormConv": false,
+    "batchNormFFNN": false,
+    "filterSizes": [
+        2,
+        3,
+        4,
+        5
+    ],
+    "dropout": 0.2
+}
