@@ -1,6 +1,6 @@
 import nebula
 from nebula.preprocessing import JSONTokenizerBPE, PEDynamicFeatureExtractor, PEStaticFeatureExtractor
-from nebula.optimization import OptimSchedulerGPT, OptimSchedulerStep
+from nebula.optimization import OptimSchedulerGPT, OptimSchedulerStep, CosineSchedule
 from nebula.models import Cnn1DLinearLM, MLP
 
 import os
@@ -41,17 +41,20 @@ class ModelTrainer(object):
         self.verbosityBatches = verbosityBatches
         self.batchSize = batchSize
         self.reporting_timestamp = timestamp
+        self.globalBatchCounter = 0
 
-        # lr scheduling setup
+        # lr scheduling setup, for visulaizations see:
+        # https://towardsdatascience.com/a-visual-guide-to-learning-rate-schedulers-in-pytorch-24bbb262c863
         if optimSchedulerClass is None:
             self.optimScheduler = None
         elif optimSchedulerClass == "gpt":
             self.optimScheduler = OptimSchedulerGPT(self.optimizer)
         elif optimSchedulerClass == "step":
-            if optim_step_size:
-                self.optimScheduler = OptimSchedulerStep(self.optimizer, step_size=optim_step_size)
-            else:
-                self.optimScheduler = None
+            self.optimScheduler = OptimSchedulerStep(self.optimizer, step_size=optim_step_size)
+        elif optimSchedulerClass == "triangular":
+            raise NotImplementedError
+        elif optimSchedulerClass == "cosine":
+            self.optimScheduler = CosineSchedule(self.optimizer)
         else:
             self.optimScheduler = optimSchedulerClass(self.optimizer)
 
@@ -61,10 +64,10 @@ class ModelTrainer(object):
         self.device = device
         self.model.to(self.device)
 
-        self.outputFolder = outputFolder
-        if self.outputFolder is not None:
-            self.trainingFileFolder = os.path.join(self.outputFolder, "training_files")
-            os.makedirs(self.outputFolder, exist_ok=True)
+        self.output_folder = outputFolder
+        if self.output_folder is not None:
+            self.trainingFileFolder = os.path.join(self.output_folder, "training_files")
+            os.makedirs(self.output_folder, exist_ok=True)
             os.makedirs(self.trainingFileFolder, exist_ok=True)
             
         if stateDict:
@@ -200,7 +203,6 @@ class ModelTrainer(object):
         self.train_losses = []
         self.training_time = []
         self.auc = []
-        self.globalBatchCounter = 0
         try:
             for epochIdx in range(1, epochs + 1):
                 if overwrite_epoch_idx:
@@ -232,10 +234,10 @@ class ModelTrainer(object):
                 logging.warning(f" [*] {time.ctime()}: " + " | ".join(metricsReportList))
                 if dump_model_every_epoch:
                     self.dumpResults(prefix=f"epoch_{epochIdx}_", model_only=True)
-            if self.outputFolder:
+            if self.output_folder:
                 self.dumpResults()
         except KeyboardInterrupt:
-            if self.outputFolder:
+            if self.output_folder:
                 self.dumpResults()
 
     def train(self, X, y, epochs=10):
