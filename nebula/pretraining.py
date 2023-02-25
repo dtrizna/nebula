@@ -101,7 +101,8 @@ class MaskedLanguageModel(object):
             outFolder = modelTrainer.outputFolder
             modelTrainer.outputFolder = None
             for i in range(pretrainEpochs):
-                if i == pretrainEpochs-1:
+                # set output folder back to original value on last iteration
+                if i == pretrainEpochs-1: 
                     modelTrainer.outputFolder = outFolder
                 logging.warning(f' [*] Masking sequences: iteration {i+1}...')
                 x_masked, y_masked = self.maskSequenceArr(unlabeledData)

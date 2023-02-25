@@ -8,9 +8,10 @@ from sklearn.utils import shuffle
 import sys
 sys.path.extend(['..', '.'])
 from nebula import ModelTrainer
-from nebula.models import Cnn1DLinearLM, Cnn1DLinear, Cnn1DLSTM, LSTM
+from nebula.models import Cnn1DLinear, LSTM
 from nebula.models.reformer import ReformerLM
-from nebula.attention import TransformerEncoderModel, TransformerEncoderWithChunking, TransformerEncoderLM
+from nebula.models.attention import TransformerEncoderModel, TransformerEncoderChunks
+from nebula.models.neurlux import NeurLuxModel
 from nebula.evaluation import CrossValidation
 from nebula.misc import get_path, set_random_seed,clear_cuda_cache
 
@@ -24,12 +25,13 @@ warnings.filterwarnings("ignore")
 clear_cuda_cache()
 
 # ============== REPORTING CONFIG
-maxLen = 512
-epochs = 6
-runType = f"_Final_BPE_len{maxLen}_ep{epochs}_CV"
+maxlen = 512
+epochs = 2
+LIMIT = 1000 # None
+runType = f"TEST_len{maxlen}_ep{epochs}_CV"
 
 SCRIPT_PATH = get_path(type="script")
-REPO_ROOT = os.path.join(SCRIPT_PATH, "..")
+REPO_ROOT = os.path.join(SCRIPT_PATH, "..", "..")
 outputFolder = os.path.join(REPO_ROOT, "evaluation", "crossValidation", runType)
 os.makedirs(outputFolder, exist_ok=True)
 
@@ -48,12 +50,12 @@ random_state = 1763
 
 # transform above variables to dict
 run_config = {
-    "train_limit": None,
+    "train_limit": LIMIT,
     "nFolds": 3,
     "epochs": epochs,
     "fprValues": [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
-    "rest": 30,
-    "maxLen": maxLen,
+    "rest": 0,
+    "maxlen": maxlen,
     "batchSize": 64,
     # 3000 with 64 batch size will make steps each ~4.5 epoch
     "optim_step_size": 3000,
@@ -65,10 +67,10 @@ with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
     json.dump(run_config, f, indent=4)
 
 # ===== LOADING DATA ==============
-vocabSize = 50000
-xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE", f"speakeasy_VocabSize_50000_maxLen_{maxLen}_x.npy")
+vocab_size = 50000
+xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k", f"speakeasy_vocab_size_50000_maxlen_{maxlen}_x.npy")
 x_train = np.load(xTrainFile)
-yTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE", "speakeasy_y.npy")
+yTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k", "speakeasy_y.npy")
 y_train = np.load(yTrainFile)
 
 # TODO: add ember and neurlux data
@@ -81,7 +83,7 @@ if run_config['train_limit']:
 vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", "speakeasy_BPE_50000_vocab.json")
 with open(vocabFile, 'r') as f:
     vocab = json.load(f)
-vocabSize = len(vocab) # adjust it to exact number of tokens in the vocabulary
+vocab_size = len(vocab) # adjust it to exact number of tokens in the vocabulary
 
 logging.warning(f" [!] Loaded data and vocab. X train size: {x_train.shape}, vocab size: {len(vocab)}")
 
@@ -92,8 +94,8 @@ models = []
 
 modelClass = Cnn1DLinear
 modelArch = {
-    "vocabSize": vocabSize,
-    "maxLen": maxLen,
+    "vocab_size": vocab_size,
+    "maxlen": maxlen,
     "embeddingDim": 96,
     "hiddenNeurons": [512, 256, 128],
     "batchNormConv": False,
@@ -105,7 +107,7 @@ models.append((modelClass, modelArch))
 
 modelClass = LSTM
 modelArch = {
-    "vocabSize": vocabSize,
+    "vocab_size": vocab_size,
     "embeddingDim": 64,
     "lstmHidden": 256,
     "lstmLayers": 1,
@@ -118,8 +120,8 @@ models.append((modelClass, modelArch))
 
 modelClass = TransformerEncoderModel
 modelArch = {
-    "vocabSize": vocabSize,  # size of vocabulary
-    "maxLen": maxLen,  # maximum length of the input sequence
+    "vocab_size": vocab_size,  # size of vocabulary
+    "maxlen": maxlen,  # maximum length of the input sequence
     "dModel": 64,  # embedding & transformer dimension
     "nHeads": 8,  # number of heads in nn.MultiheadAttention
     "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
@@ -131,10 +133,10 @@ modelArch = {
 }
 models.append((modelClass, modelArch))
 
-modelClass = TransformerEncoderWithChunking
+modelClass = TransformerEncoderChunks
 modelArch = {
-    "vocabSize": vocabSize,  # size of vocabulary
-    "maxLen": maxLen,  # maximum length of the input sequence
+    "vocab_size": vocab_size,  # size of vocabulary
+    "maxlen": maxlen,  # maximum length of the input sequence
     "chunk_size": run_config["chunk_size"],
     "dModel": 64,  # embedding & transformer dimension
     "nHeads": 8,  # number of heads in nn.MultiheadAttention
@@ -148,10 +150,18 @@ modelArch = {
 }
 models.append((modelClass, modelArch))
 
+modelClass = NeurLuxModel
+modelArch = {
+    "embedding_dim": 256,
+    "vocab_size": vocab_size,
+    "maxlen": run_config["maxlen"],
+}
+models.append((modelClass, modelArch))
+
 modelClass = ReformerLM
 modelArch = {
-    "vocabSize": vocabSize,
-    "maxLen": maxLen,
+    "vocab_size": vocab_size,
+    "maxlen": maxlen,
     "dim": 64,
     "heads": 4,
     "depth": 2,
@@ -211,7 +221,7 @@ for modelClass, modelArch in models:
     )
     cv.dump_metrics()
     cv.log_avg_metrics()
-    del cv
+    del cv, modelClass, modelArch
     clear_cuda_cache()
 
     if run_config["rest"]:

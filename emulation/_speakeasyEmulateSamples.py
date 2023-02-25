@@ -10,7 +10,7 @@ sys.path.append(".")
 sys.path.append("..\\..\\")
 from nebula.preprocessing import PEDynamicFeatureExtractor
 
-CONFIG = r"C:\Users\dtrizna\Code\nebula\preprocessing\_speakeasyConfig.json"
+CONFIG = r"C:\Users\dtrizna\Code\nebula\objects\speakeasy_config.json"
 
 if __name__ == "__main__":
     # E.G. RUN AS:

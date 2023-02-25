@@ -32,7 +32,7 @@ class PEDynamicFeatureExtractor(object):
         
         # setup speakseasy config
         if speakeasyConfig is None:
-            speakeasyConfig = os.path.join(os.path.dirname(nebula.__file__), "configs", "speakeasyConfig.json")
+            speakeasyConfig = os.path.join(os.path.dirname(nebula.__file__), "objects", "speakeasy_config.json")
         if isinstance(speakeasyConfig, dict):
             self.speakeasyConfig = speakeasyConfig
         else:

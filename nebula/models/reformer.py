@@ -20,8 +20,8 @@ TOKEN_SELF_ATTN_VALUE = -5e4 # carefully set for half precision to work
 class ReformerLM(nn.Module):
     def __init__(
         self,
-        vocabSize,
-        maxLen = None,
+        vocab_size,
+        maxlen = None,
         dim = 64,
         depth = 4,
         heads = 4,
@@ -64,10 +64,10 @@ class ReformerLM(nn.Module):
         super().__init__()
         self.__name__ = "Reformer"
         emb_dim = default(emb_dim, dim)
-        self.max_seq_len = maxLen
+        self.max_seq_len = maxlen
         self.meanOverSeq = meanOverSequence
 
-        self.token_emb = nn.Embedding(vocabSize, emb_dim)
+        self.token_emb = nn.Embedding(vocab_size, emb_dim)
 
         self.to_model_dim = Identity() if emb_dim == dim else nn.Linear(emb_dim, dim)
 
@@ -75,10 +75,10 @@ class ReformerLM(nn.Module):
         self.layer_pos_emb = Always(None)
 
         if axial_position_emb:
-            axial_position_shape = default(axial_position_shape, (math.ceil(maxLen / bucket_size), bucket_size))
+            axial_position_shape = default(axial_position_shape, (math.ceil(maxlen / bucket_size), bucket_size))
             self.pos_emb = AxialPositionalEmbedding(emb_dim, axial_position_shape)
         elif absolute_position_emb:
-            self.pos_emb = AbsolutePositionalEmbedding(emb_dim, maxLen)
+            self.pos_emb = AbsolutePositionalEmbedding(emb_dim, maxlen)
         elif fixed_position_emb:
             self.pos_emb = FixedPositionalEmbedding(emb_dim)
         else:
@@ -93,7 +93,7 @@ class ReformerLM(nn.Module):
 
         self.preTrainLayers = nn.Sequential(
             nn.Linear(dim, emb_dim) if emb_dim != dim else Identity(),
-            nn.Linear(emb_dim, vocabSize) if not weight_tie_embedding else MatrixMultiply(self.token_emb.weight, transpose=True, normalize=True)
+            nn.Linear(emb_dim, vocab_size) if not weight_tie_embedding else MatrixMultiply(self.token_emb.weight, transpose=True, normalize=True)
         )
 
         self.ffnn = []
@@ -103,7 +103,7 @@ class ReformerLM(nn.Module):
                 if self.meanOverSeq:
                     self.ffnnBlock.append(nn.Linear(dim, h))
                 else:
-                    self.ffnnBlock.append(nn.Linear(dim * maxLen, h))
+                    self.ffnnBlock.append(nn.Linear(dim * maxlen, h))
             else:
                 self.ffnnBlock.append(nn.Linear(hiddenNeurons[i-1], h))
 
