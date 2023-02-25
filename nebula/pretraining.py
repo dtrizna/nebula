@@ -39,39 +39,39 @@ class MaskedLanguageModel(object):
         - a tuple with the masked sequence, the mask, and the input size sequence
         """
         vocabSize=len(self.vocab)
-        maskedTokenIds = np.zeros(vocabSize, dtype=np.int32)
+        masked_token_idxs = np.zeros(vocabSize, dtype=np.int32)
 
         # limit sequence till first padding token to avoid masking padding
         if self.vocab["<pad>"] in sequence:
-            maskedSequence = sequence[:np.where(sequence == self.vocab["<pad>"])[0][0]].copy()
+            masked_sequence = sequence[:np.where(sequence == self.vocab["<pad>"])[0][0]].copy()
         else:
-            maskedSequence = sequence.copy()
+            masked_sequence = sequence.copy()
 
         # find out which tokens to mask and loop over    
-        maskIdxs = np.random.uniform(size=maskedSequence.shape) < self.mask_probability
+        maskIdxs = np.random.uniform(size=masked_sequence.shape) < self.mask_probability
         for idx in np.where(maskIdxs)[0]:
             # prepare array of vocabSize that specifies which tokens were masked
-            tokenId = maskedSequence[idx]
+            tokenId = masked_sequence[idx]
             if self.masked_target_type == "count":
-                maskedTokenIds[tokenId] += 1
+                masked_token_idxs[tokenId] += 1
             else:
-                maskedTokenIds[tokenId] = 1
+                masked_token_idxs[tokenId] = 1
 
             # actually mask the token with distribution (80% mask, 10% random, 10% same)
             sample = np.random.sample()
             if sample < 0.8:
-                maskedSequence[idx] = self.vocab["<mask>"]
+                masked_sequence[idx] = self.vocab["<mask>"]
             elif sample < 0.9:
-                maskedSequence[idx] = np.random.randint(0, vocabSize)
+                masked_sequence[idx] = np.random.randint(0, vocabSize)
             else:
-                maskedSequence[idx] = sequence[idx]
+                masked_sequence[idx] = sequence[idx]
 
         # pad masked sequence to be the same length as original sequence
         origSequenceLength = sequence.squeeze().shape[0]
-        padWidth = origSequenceLength - maskedSequence.shape[0]
-        maskedSequence = np.pad(maskedSequence, (0, padWidth), 'constant', constant_values=self.vocab["<pad>"])
+        padWidth = origSequenceLength - masked_sequence.shape[0]
+        masked_sequence = np.pad(masked_sequence, (0, padWidth), 'constant', constant_values=self.vocab["<pad>"])
 
-        return maskedSequence, maskedTokenIds
+        return masked_sequence, masked_token_idxs
 
     def maskSequenceArr(self, sequence):
         seq_masked = []
@@ -92,23 +92,31 @@ class MaskedLanguageModel(object):
         modelTrainerConfig, 
         pretrainEpochs=5, 
         dump_model_every_epoch=False,
-        remask_every_epoch=False
+        remask_epochs=False
     ):
         assert isinstance(pretrainEpochs, int), "pretrainEpochs must be an integer"
-        modelTrainer = ModelTrainer(**modelTrainerConfig)
-        if remask_every_epoch:
-            # to avoid dumping results every time
-            outFolder = modelTrainer.outputFolder
-            modelTrainer.outputFolder = None
+        model_trainer = ModelTrainer(**modelTrainerConfig)
+        if remask_epochs:
+            assert isinstance(remask_epochs, int), "remask_epochs must be an integer"
+            
+            # remove output folder to avoid dumping results every remasking
+            orig_out_folder = model_trainer.output_folder
+            model_trainer.output_folder = None
+
             for i in range(pretrainEpochs):
                 # set output folder back to original value on last iteration
                 if i == pretrainEpochs-1: 
-                    modelTrainer.outputFolder = outFolder
-                logging.warning(f' [*] Masking sequences: iteration {i+1}...')
-                x_masked, y_masked = self.maskSequenceArr(unlabeledData)
-                modelTrainer.fit(x_masked, y_masked, epochs=1, dump_model_every_epoch=dump_model_every_epoch, overwrite_epoch_idx=i)
+                    model_trainer.output_folder = orig_out_folder
+                
+                if i % remask_epochs == 0:
+                    logging.warning(f' [*] Re-masking sequences...')
+                    x_masked, y_masked = self.maskSequenceArr(unlabeledData)
+        
+                model_trainer.fit(x_masked, y_masked, epochs=1, dump_model_every_epoch=dump_model_every_epoch, overwrite_epoch_idx=i)
         else:
             logging.warning(' [*] Masking sequences...')
             x_masked, y_masked = self.maskSequenceArr(unlabeledData)
-            modelTrainer.fit(x_masked, y_masked, epochs=pretrainEpochs, dump_model_every_epoch=dump_model_every_epoch)
-        return modelTrainer.model
+            
+            model_trainer.fit(x_masked, y_masked, epochs=pretrainEpochs, dump_model_every_epoch=dump_model_every_epoch)
+        
+        return model_trainer.model

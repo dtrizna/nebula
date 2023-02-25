@@ -53,8 +53,8 @@
      - fastText
    - language modeling:
      - ~~MLM~~ (see `nebula.pretraining.MaskedLanguageModel` class)
-       - Mask Every Epoch -- try variable N masking epochs;
-       > NOTE: Bug with `mask_every_epoch=True` and learning rate scheduler?
+       - ~~Mask Every Epoch -- try variable N masking epochs;~~
+       ~~> NOTE: Bug with `mask_every_epoch=True` and learning rate scheduler?~~
      - **GPT like $p(x_{t+1}|x_{t}\ ...\ x_{0})$**  
      - denoising autoencoder (see BART, etc.)
    - evaluate:

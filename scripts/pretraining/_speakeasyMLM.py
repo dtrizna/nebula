@@ -53,8 +53,7 @@ run_config = {
     'verbosity_batches': 100,
     "dump_model_every_epoch": True,
     "dump_data_splits": True,
-    # TODO: lr is not stepping correctly if "remask_every_epoch": True,
-    "remask_every_epoch": True,
+    "remask_epochs": 2,
     "mask_probability": 0.15
 }
 with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
@@ -130,7 +129,7 @@ pretrainingConfig = {
     "outputFolder": outputFolder,
     "dump_model_every_epoch": run_config["dump_model_every_epoch"],
     "dump_data_splits": run_config["dump_data_splits"],
-    "remask_every_epoch": run_config["remask_every_epoch"],
+    "remask_epochs": run_config["remask_epochs"],
 }
 
 # =========== PRETRAINING RUN ===========

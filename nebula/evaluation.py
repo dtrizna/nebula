@@ -33,11 +33,11 @@ class SelfSupervisedPretraining:
                     outputFolder=None,
                     dump_model_every_epoch=False,
                     dump_data_splits=True,
-                    remask_every_epoch=False,
+                    remask_epochs=False,
                     downsample_unlabeled_data=False):
         self.modelClass = modelClass
         self.modelConfig = modelConfig
-        self.pretrainingTask = pretrainingTaskClass(**pretrainingTaskConfig)
+        self.pretraining_task = pretrainingTaskClass(**pretrainingTaskConfig)
         self.device = device
         self.training_types = training_types
         self.falsePositiveRates = falsePositiveRates
@@ -48,17 +48,17 @@ class SelfSupervisedPretraining:
         self.batchSize = batchSize
         self.verbosityBatches = verbosityBatches
         self.optimizerStep = optimizerStep
-        self.outputFolder = outputFolder
+        self.output_folder = outputFolder
         self.dump_model_every_epoch = dump_model_every_epoch
         self.dump_data_splits = dump_data_splits
-        self.remask_every_epoch = remask_every_epoch
+        self.remask_epochs = remask_epochs
         self.downsample_unlabeled_data = downsample_unlabeled_data
         if self.downsample_unlabeled_data:
             assert isinstance(downsample_unlabeled_data, float) and 0 < downsample_unlabeled_data < 1
 
     def run_one_split(self, x, y, x_test, y_test):
         models = {k: None for k in self.training_types}
-        modelInterfaces = {k: None for k in self.training_types}
+        model_trainer = {k: None for k in self.training_types}
         metrics = {k: None for k in self.training_types}
         timestamp = int(time())
         
@@ -74,7 +74,7 @@ class SelfSupervisedPretraining:
         if self.dump_data_splits:
             splitData = f"dataset_splits_{timestamp}.npz"
             np.savez_compressed(
-                os.path.join(self.outputFolder, splitData),
+                os.path.join(self.output_folder, splitData),
                 unlabeled_data=unlabeled_data,
                 labeled_x=labeled_x,
                 labeled_y=labeled_y
@@ -84,7 +84,7 @@ class SelfSupervisedPretraining:
         logging.warning(' [!] Pre-training model...')
         # create a pretraining model and task
         models['pretrained'] = self.modelClass(**self.modelConfig).to(self.device)
-        modelTrainerConfig = {
+        model_trainer_config = {
             "device": self.device,
             "model": models['pretrained'],
             "modelForwardPass": models['pretrained'].pretrain,
@@ -97,47 +97,49 @@ class SelfSupervisedPretraining:
             "batchSize": self.batchSize,
             "falsePositiveRates": self.falsePositiveRates,
         }
-        if self.outputFolder:
-            modelTrainerConfig["outputFolder"] = os.path.join(self.outputFolder, "preTraining")
+        if self.output_folder:
+            model_trainer_config["outputFolder"] = os.path.join(self.output_folder, "preTraining")
 
-        self.pretrainingTask.pretrain(
+        self.pretraining_task.pretrain(
             unlabeled_data, 
-            modelTrainerConfig, 
+            model_trainer_config, 
             pretrainEpochs=self.pretrainingEpochs,
             dump_model_every_epoch=self.dump_model_every_epoch,
-            remask_every_epoch=self.remask_every_epoch
+            remask_epochs=self.remask_epochs
         )
 
         # downstream task for pretrained model
-        modelTrainerConfig['lossFunction'] = BCEWithLogitsLoss()
-        modelTrainerConfig['modelForwardPass'] = None
+        model_trainer_config['lossFunction'] = BCEWithLogitsLoss()
+        model_trainer_config['modelForwardPass'] = None
 
         for model in self.training_types:
             logging.warning(f' [!] Training {model} model on downstream task...')
             if model != 'pretrained': # if not pretrained -- create a new model
                 models[model] = self.modelClass(**self.modelConfig).to(self.device)
-            modelTrainerConfig['model'] = models[model]
+            model_trainer_config['model'] = models[model]
             
-            if self.outputFolder:
-                modelTrainerConfig["outputFolder"] = os.path.join(self.outputFolder, f"downstreamTask_{model}")
+            if self.output_folder:
+                model_trainer_config["outputFolder"] = os.path.join(self.output_folder, f"downstreamTask_{model}")
             
-            modelInterfaces[model] = ModelTrainer(**modelTrainerConfig)
+            model_trainer[model] = ModelTrainer(**model_trainer_config)
             if model == 'full_data':
-                modelTrainerConfig['optim_step_size'] = self.optimizerStep//2
-                modelInterfaces[model].fit(x, y, self.downstreamEpochs, reporting_timestamp=timestamp)
+                # TODO: don't like how step is calculated here
+                model_trainer_config['optim_step_size'] = self.optimizerStep//2
+                model_trainer[model].fit(x, y, self.downstreamEpochs, reporting_timestamp=timestamp)
             else:
-                modelTrainerConfig['optim_step_size'] = self.optimizerStep//10
-                modelInterfaces[model].fit(labeled_x, labeled_y, self.downstreamEpochs, reporting_timestamp=timestamp)
+                # TODO: don't like how step is calculated here
+                model_trainer_config['optim_step_size'] = self.optimizerStep//10
+                model_trainer[model].fit(labeled_x, labeled_y, self.downstreamEpochs, reporting_timestamp=timestamp)
         
         for model in models:
             logging.warning(f' [*] Evaluating {model} model on test set...')
-            metrics[model] = modelInterfaces[model].evaluate(x_test, y_test, metrics="json")
+            metrics[model] = model_trainer[model].evaluate(x_test, y_test, metrics="json")
             logging.warning(f"\t[!] Test set AUC: {metrics[model]['auc']:.4f}")
             for reportingFPR in self.falsePositiveRates:
                 f1 = metrics[model]["fpr_"+str(reportingFPR)]["f1"]
                 tpr = metrics[model]["fpr_"+str(reportingFPR)]["tpr"]
                 logging.warning(f'\t[!] Test set scores at FPR: {reportingFPR:>6} --> TPR: {tpr:.4f} | F1: {f1:.4f}')
-        del models, modelInterfaces # cleanup to not accidentaly reuse 
+        del models, model_trainer # cleanup to not accidentaly reuse 
         clear_cuda_cache()
         return metrics
 
