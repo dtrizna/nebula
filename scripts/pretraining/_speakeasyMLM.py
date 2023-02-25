@@ -6,20 +6,22 @@ import logging
 import numpy as np
 from torch import cuda
 from sklearn.utils import shuffle
-sys.path.extend(['../..', '.'])
-from nebula.attention import TransformerEncoderLM
+sys.path.extend([r"..\..", '.'])
+from nebula.models.attention import TransformerEncoderChunksLM
 from nebula.pretraining import MaskedLanguageModel
 from nebula.evaluation import SelfSupervisedPretraining
 from nebula.misc import get_path, set_random_seed, clear_cuda_cache
 SCRIPT_PATH = get_path(type="script")
-REPO_ROOT = os.path.join(SCRIPT_PATH, "..")
+REPO_ROOT = os.path.join(SCRIPT_PATH, "..", "..")
 
 # ===== LOGGING SETUP =====
-modelClass = TransformerEncoderLM
-run_name = f"{modelClass.__name_}"
+modelClass = TransformerEncoderChunksLM
+run_name = f"{modelClass.__name__}"
 timestamp = int(time.time())
 
-outputFolder = os.path.join(SCRIPT_PATH, "..", "evaluation", "MaskedLanguageModeling", 
+LIMIT = 1000
+PREFIX = "TEST_"
+outputFolder = os.path.join(REPO_ROOT, "evaluation", f"{PREFIX}MaskedLanguageModeling", 
     f"{run_name}_{timestamp}")
 os.makedirs(outputFolder, exist_ok=True)
 
@@ -41,13 +43,13 @@ run_config = {
     "unlabeledDataSize": 0.8,
     "nSplits": 3,
     "downStreamEpochs": 3,
-    "preTrainEpochs": 30,
+    "preTrainEpochs": 10, # 10
     "falsePositiveRates": [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
     "modelType": modelClass.__name__,
-    "train_limit": None,
+    "train_limit": LIMIT,
     "random_state": random_state,
     "batchSize": 64,
-    "optimizerStep": 5000,
+    "optimizerStep": 50, # 5000
     'verbosity_batches': 100,
     "dump_model_every_epoch": True,
     "dump_data_splits": True,
@@ -61,15 +63,15 @@ with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
 logging.warning(f" [!] Starting Masked Language Model evaluation over {run_config['nSplits']} splits!")
 
 # ===== LOADING DATA ==============
-vocabSize = 50000
-maxLen = 512
-xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE", f"speakeasy_VocabSize_50000_maxLen_{maxLen}_x.npy")
+vocab_size = 50000
+maxlen = 512
+xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k", f"speakeasy_vocab_size_50000_maxlen_{maxlen}_x.npy")
 xTrain = np.load(xTrainFile)
-yTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE", "speakeasy_y.npy")
+yTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k", "speakeasy_y.npy")
 yTrain = np.load(yTrainFile)
-xTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset_BPE", f"speakeasy_VocabSize_50000_maxLen_{maxLen}_x.npy")
+xTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset_BPE_50k", f"speakeasy_vocab_size_50000_maxlen_{maxlen}_x.npy")
 xTest = np.load(xTestFile)
-yTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset_BPE", "speakeasy_y.npy")
+yTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset_BPE_50k", "speakeasy_y.npy")
 yTest = np.load(yTestFile)
 
 if run_config['train_limit']:
@@ -83,14 +85,14 @@ if run_config['train_limit']:
 vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", "speakeasy_BPE_50000_vocab.json")
 with open(vocabFile, 'r') as f:
     vocab = json.load(f)
-vocabSize = len(vocab) # adjust it to exact number of tokens in the vocabulary
+vocab_size = len(vocab) # adjust it to exact number of tokens in the vocabulary
 
 logging.warning(f" [!] Loaded data and vocab. X train size: {xTrain.shape}, X test size: {xTest.shape}, vocab size: {len(vocab)}")
 
 # =========== PRETRAINING CONFIG ===========
 modelConfig = {
-    "vocabSize": vocabSize,  # size of vocabulary
-    "maxLen": maxLen,  # maximum length of the input sequence
+    "vocab_size": vocab_size,  # size of vocabulary
+    "maxlen": maxlen,  # maximum length of the input sequence
     "dModel": 64,  # embedding & transformer dimension
     "nHeads": 8,  # number of heads in nn.MultiheadAttention
     "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder

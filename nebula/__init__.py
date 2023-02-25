@@ -14,6 +14,7 @@ import torch
 from torch import nn
 from torch.nn import BCEWithLogitsLoss
 from torch.optim import AdamW
+from torch.utils.data import DataLoader, TensorDataset
 from sklearn.metrics import f1_score, roc_auc_score
 from nebula.misc import get_tpr_at_fpr
 from tqdm import tqdm
@@ -188,8 +189,8 @@ class ModelTrainer(object):
         if reporting_timestamp:
             self.reporting_timestamp = reporting_timestamp
 
-        trainLoader = torch.utils.data.DataLoader(
-            torch.utils.data.TensorDataset(torch.from_numpy(X).long(), torch.from_numpy(y).float()),
+        trainLoader = DataLoader(
+            TensorDataset(torch.from_numpy(X).long(), torch.from_numpy(y).float()),
             batch_size=self.batchSize,
             shuffle=True
         )
@@ -321,7 +322,7 @@ class PEHybridClassifier(nn.Module):
         super(PEHybridClassifier, self).__init__()
         
         if speakeasyConfig is None:
-            speakeasyConfigFile = os.path.join(os.path.dirname(nebula.__file__), "configs", "speakeasyConfig.json")
+            speakeasyConfigFile = os.path.join(os.path.dirname(nebula.__file__), "objects", "speakeasy_config.json")
             with open(speakeasyConfigFile, "r") as f:
                 speakeasyConfig = json.load(f)
         if vocab is None:

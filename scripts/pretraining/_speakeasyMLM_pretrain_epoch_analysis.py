@@ -13,19 +13,19 @@ from torch.nn import BCEWithLogitsLoss
 import sys
 sys.path.extend(['../..', '.'])
 from nebula import ModelTrainer
-from nebula.attention import TransformerEncoderLM
+from nebula.models.attention import TransformerEncoderChunksLM
 from nebula.pretraining import MaskedLanguageModel
 from nebula.evaluation import SelfSupervisedPretraining
 from nebula.misc import get_path, set_random_seed, clear_cuda_cache
 SCRIPT_PATH = get_path(type="script")
-REPO_ROOT = os.path.join(SCRIPT_PATH, "..")
+REPO_ROOT = os.path.join(SCRIPT_PATH, "..", "..")
 
 random_state = 42
 set_random_seed(random_state)
 
 uSize = 0.8
 run_name = f"uSize_{uSize}_mask_every_epoch"
-modelClass = TransformerEncoderLM
+modelClass = TransformerEncoderChunksLM
 
 run_config = {
     "unlabeledDataSize": uSize,
@@ -47,7 +47,7 @@ run_config = {
 }
 
 timestamp = int(time.time())
-outputFolder = os.path.join(SCRIPT_PATH, "..", "evaluation", "MaskedLanguageModeling", "pretrain_epoch_analysis",
+outputFolder = os.path.join(REPO_ROOT, "evaluation", "MaskedLanguageModeling", "pretrain_epoch_analysis",
     f"{run_name}_{timestamp}")
 os.makedirs(outputFolder, exist_ok=True)
 
@@ -68,15 +68,15 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 logging.warning(f" [!] Starting Masked Language Model evaluation over {run_config['nSplits']} splits!")
 
 # ===== LOADING DATA ==============
-vocabSize = 50000
-maxLen = 512
-xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE", f"speakeasy_VocabSize_50000_maxLen_{maxLen}_x.npy")
+vocab_size = 50000
+maxlen = 512
+xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k", f"speakeasy_vocab_size_50000_maxlen_{maxlen}_x.npy")
 xTrain = np.load(xTrainFile)
-yTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE", "speakeasy_y.npy")
+yTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k", "speakeasy_y.npy")
 yTrain = np.load(yTrainFile)
-xTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset_BPE", f"speakeasy_VocabSize_50000_maxLen_{maxLen}_x.npy")
+xTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset_BPE_50k", f"speakeasy_vocab_size_50000_maxlen_{maxlen}_x.npy")
 xTest = np.load(xTestFile)
-yTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset_BPE", "speakeasy_y.npy")
+yTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset_BPE_50k", "speakeasy_y.npy")
 yTest = np.load(yTestFile)
 
 if run_config['train_limit']:
@@ -90,14 +90,14 @@ if run_config['train_limit']:
 vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", "speakeasy_BPE_50000_vocab.json")
 with open(vocabFile, 'r') as f:
     vocab = json.load(f)
-vocabSize = len(vocab) # adjust it to exact number of tokens in the vocabulary
+vocab_size = len(vocab) # adjust it to exact number of tokens in the vocabulary
 
 logging.warning(f" [!] Loaded data and vocab. X train size: {xTrain.shape}, X test size: {xTest.shape}, vocab size: {len(vocab)}")
 
 # ============ MODEL ============
 modelConfig = {
-    "vocabSize": vocabSize,  # size of vocabulary
-    "maxLen": maxLen,  # maximum length of the input sequence
+    "vocab_size": vocab_size,  # size of vocabulary
+    "maxlen": maxlen,  # maximum length of the input sequence
     "dModel": 64,  # embedding & transformer dimension
     "nHeads": 8,  # number of heads in nn.MultiheadAttention
     "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder

@@ -9,7 +9,8 @@ import sys
 sys.path.extend(['..', '.'])
 from nebula import ModelTrainer
 from nebula.models import Cnn1DLinear, Cnn1DLSTM, LSTM
-from nebula.attention import TransformerEncoderModel, TransformerEncoderWithChunking, TransformerEncoderLM
+from nebula.models.attention import TransformerEncoderModel, TransformerEncoderChunks, TransformerEncoderModelLM
+from nebula.models.reformer import ReformerLM
 from nebula.evaluation import CrossValidation
 from nebula.misc import get_path, set_random_seed,clear_cuda_cache
 
@@ -22,18 +23,18 @@ import warnings
 warnings.filterwarnings("ignore")
 clear_cuda_cache()
 
+
 # ============== REPORTING CONFIG
-modelClass = TransformerEncoderWithChunking
-maxLen = 2048
-runType = f"TEST_Neurlux_vocab_10k"
+LIMIT = 1000 # None
+EPOCHS = 2
+maxlen = 512
+modelClass = TransformerEncoderChunks
+runType = f"TEST_{modelClass.__name__}"
 timestamp = int(time.time())
-runName = f"Cnn1DLinear_maxLen_{maxLen}_6_epochs_{timestamp}"
 
 SCRIPT_PATH = get_path(type="script")
-REPO_ROOT = os.path.join(SCRIPT_PATH, "..")
-outputFolder = os.path.join(REPO_ROOT, "evaluation", "crossValidation", runType, runName)
-# os.makedirs(outputFolder, exist_ok=True)
-# outputFolder = os.path.join(outputFolder, runName)
+REPO_ROOT = os.path.join(SCRIPT_PATH, "..", "..")
+outputFolder = os.path.join(REPO_ROOT, "evaluation", "crossValidation", runType)
 os.makedirs(outputFolder, exist_ok=True)
 
 # loging setup
@@ -52,12 +53,12 @@ set_random_seed(random_state)
 
 # transform above variables to dict
 run_config = {
-    "train_limit": None,
+    "train_limit": LIMIT,
     "nFolds": 3,
-    "epochs": 6,
+    "epochs": EPOCHS,
     "fprValues": [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
     "rest": 0,
-    "maxLen": maxLen,
+    "maxlen": maxlen,
     "batchSize": 64,
     # 1000-2000 for 10 epochs; 10000 for 30 epochs
     "optim_step_size": 3000,
@@ -69,8 +70,8 @@ with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
     json.dump(run_config, f, indent=4)
 
 # ===== LOADING DATA ==============
-vocabSize = 10000
-xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_10k", f"speakeasy_VocabSize_{vocabSize}_maxLen_{maxLen}_x.npy")
+vocab_size = 10000
+xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_10k", f"speakeasy_vocab_size_{vocab_size}_maxlen_{maxlen}_x.npy")
 x_train = np.load(xTrainFile)
 yTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_10k", "speakeasy_y.npy")
 y_train = np.load(yTrainFile)
@@ -80,17 +81,18 @@ if run_config['train_limit']:
     x_train = x_train[:run_config['train_limit']]
     y_train = y_train[:run_config['train_limit']]
 
-vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", f"speakeasy_BPE_{vocabSize}_vocab.json")
+vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", f"speakeasy_BPE_{vocab_size}_vocab.json")
 with open(vocabFile, 'r') as f:
     vocab = json.load(f)
-vocabSize = len(vocab) # adjust it to exact number of tokens in the vocabulary
+vocab_size = len(vocab) # adjust it to exact number of tokens in the vocabulary
 
 logging.warning(f" [!] Loaded data and vocab. X train size: {x_train.shape}, vocab size: {len(vocab)}")
 
 # =============== MODEL CONFIG
+# modelClass = Cnn1DLinear
 # modelArch = {
-#     "vocabSize": vocabSize,
-#     "maxLen": maxLen,
+#     "vocab_size": vocab_size,
+#     "maxlen": maxlen,
 #     "embeddingDim": 64,
 #     "hiddenNeurons": [512, 256, 128],
 #     "batchNormConv": False,
@@ -98,9 +100,11 @@ logging.warning(f" [!] Loaded data and vocab. X train size: {x_train.shape}, voc
 #     "filterSizes": [2, 3, 4, 5],
 #     "dropout": 0.2
 # }
+
+#modelClass = TransformerEncoderChunks
 modelArch = {
-    "vocabSize": vocabSize,  # size of vocabulary
-    "maxLen": maxLen,  # maximum length of the input sequence
+    "vocab_size": vocab_size,  # size of vocabulary
+    "maxlen": maxlen,  # maximum length of the input sequence
     "chunk_size": run_config["chunk_size"],
     "dModel": 64,  # embedding & transformer dimension
     "nHeads": 8,  # number of heads in nn.MultiheadAttention
@@ -111,19 +115,21 @@ modelArch = {
     "layerNorm": False,
     "dropout": 0.2
 }
+
 # modelClass = ReformerLM
 # modelArch = {
-#     "vocabSize": vocabSize,
-#     "maxLen": maxLen,
+#     "vocab_size": vocab_size,
+#     "maxlen": maxlen,
 #     "dim": 64,
 #     "heads": 4,
 #     "depth": 4,
 #     "meanOverSequence": True,
 #     "classifierDropout": 0.3,
 # }
+
 # modelClass = LSTM
 # modelArch = {
-#     "vocabSize": vocabSize,
+#     "vocab_size": vocab_size,
 #     "embeddingDim": 64,
 #     "lstmHidden": 256,
 #     "lstmLayers": 1,
@@ -132,6 +138,7 @@ modelArch = {
 #     "hiddenNeurons": [256, 128],
 #     "batchNormFFNN": False,
 # }
+
 # dump model config as json
 with open(os.path.join(outputFolder, f"model_config.json"), "w") as f:
     json.dump(modelArch, f, indent=4)
@@ -163,15 +170,15 @@ modelInterfaceConfig = {
 # for i, file in enumerate(trainSetsFiles):
 #     x_train = np.load(os.path.join(trainSetPath, file))
 
-#     vocabSize = int(file.split("_")[2])
-#     modelArch["vocabSize"] = vocabSize
-#     maxLen = int(file.split("_")[4])
-#     metricFilePrefix = f"maxLen_{maxLen}_"
-#     existingRunPrefix = f"maxLen_{maxLen}_vocabSize_{vocabSize}_"
+#     vocab_size = int(file.split("_")[2])
+#     modelArch["vocab_size"] = vocab_size
+#     maxlen = int(file.split("_")[4])
+#     metricFilePrefix = f"maxlen_{maxlen}_"
+#     existingRunPrefix = f"maxlen_{maxlen}_vocab_size_{vocab_size}_"
 #     logging.warning(f" [!] Starting valiation of file {i}/{len(trainSetsFiles)}: {file}")
     
 #     # what to skip
-#     if maxLen not in [2048] or vocabSize not in [10000, 15000]:
+#     if maxlen not in [2048] or vocab_size not in [10000, 15000]:
 #         logging.warning(f" [!] Skipping {existingRunPrefix} as it is not in the list of parameters to test")
 #         continue
 
@@ -180,7 +187,7 @@ modelInterfaceConfig = {
 #         logging.warning(f" [!] Skipping {existingRunPrefix} as it already exists")
 #         continue
     
-#     logging.warning(f" [!] Running Cross Validation with vocabSize: {vocabSize} | maxLen: {maxLen}")
+#     logging.warning(f" [!] Running Cross Validation with vocab_size: {vocab_size} | maxlen: {maxlen}")
 
 # 2. CROSS VALIDATION OVER DIFFERENT MODEL CONFIGRATIONS
 
@@ -195,6 +202,11 @@ modelInterfaceConfig = {
 # for hiddenLayer in [[256, 64], [512, 256, 64]]:
 #     modelArch["hiddenNeurons"] = hiddenLayer
 for _ in [1]:
+    runName = f"maxlen_{maxlen}_{EPOCHS}_epochs_{timestamp}" # TODO
+    outputFolder = os.path.join(REPO_ROOT, "evaluation", "crossValidation", runType, runName)
+    os.makedirs(outputFolder, exist_ok=True)
+
+    logging.warning(f" [!] Starting valiation of model: {modelClass.__name__}")
     # to differentiate different run results -- use this
     metricFilePrefix = f"" 
 

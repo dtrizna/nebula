@@ -10,7 +10,6 @@ import sys
 sys.path.extend(['..', '.'])
 from nebula import ModelTrainer
 from nebula.models.neurlux import NeurLuxModel
-from nebula.models.neurlux.preprocessor import NeurLuxPreprocessor
 from nebula.evaluation import CrossValidation
 from nebula.misc import get_path, set_random_seed,clear_cuda_cache
 
@@ -42,7 +41,7 @@ clear_cuda_cache()
 
 runType = f"vocab50k_len512_ep6"
 SCRIPT_PATH = get_path(type="script")
-REPO_ROOT = os.path.join(SCRIPT_PATH, "..")
+REPO_ROOT = os.path.join(SCRIPT_PATH, "..", "..")
 outputFolder = os.path.join(REPO_ROOT, "evaluation", "crossValidation", runType)
 os.makedirs(outputFolder, exist_ok=True)
 
@@ -91,13 +90,13 @@ for maxLen in maxLens:
 
     # ============== PreProcessing Reports NeurLux style
     # logging.warning("[*] Reading trainset reports...")
-    # yHashes_train = json.load(open(os.path.join(REPO_ROOT, r"data\data_filtered\speakeasy_trainset_BPE\speakeasy_yHashes.json")))
+    # yHashes_train = json.load(open(os.path.join(REPO_ROOT, r"data\data_filtered\speakeasy_trainset_BPE_50k\speakeasy_yHashes.json")))
     # root_train = os.path.join(REPO_ROOT, r"data\data_raw\windows_emulation_trainset")
     # reports_train = read_reports_from_root(root_train, yHashes_train, limit=run_config['train_limit'])
     # logging.warning("[!] Got {} training reports!".format(len(reports_train)))
     
     # logging.warning("[*] Reading testset reports...")
-    # yHashes_test = json.load(open(os.path.join(REPO_ROOT, r"data\data_filtered\speakeasy_testset_BPE\speakeasy_yHashes.json")))
+    # yHashes_test = json.load(open(os.path.join(REPO_ROOT, r"data\data_filtered\speakeasy_testset_BPE_50k\speakeasy_yHashes.json")))
     # root_test = os.path.join(REPO_ROOT, r"data\data_raw\windows_emulation_testset")
     # reports_test = read_reports_from_root(root_test, yHashes_test, limit=run_config['train_limit'])
     # logging.warning("[!] Got {} test reports!".format(len(reports_test)))
@@ -114,10 +113,10 @@ for maxLen in maxLens:
     # x_test = p.pad_sequence(x_test)
     
     # using BPE arrays
-    x_train = np.load(os.path.join(REPO_ROOT, rf"data\data_filtered\speakeasy_trainset_BPE\speakeasy_VocabSize_50000_maxLen_{maxLen}_x.npy"))
-    x_test = np.load(os.path.join(REPO_ROOT, rf"data\data_filtered\speakeasy_testset_BPE\speakeasy_VocabSize_50000_maxLen_{maxLen}_x.npy"))
-    y_train = np.load(os.path.join(REPO_ROOT, r"data\data_filtered\speakeasy_trainset_BPE\speakeasy_y.npy"))
-    y_test = np.load(os.path.join(REPO_ROOT, r"data\data_filtered\speakeasy_testset_BPE\speakeasy_y.npy"))
+    x_train = np.load(os.path.join(REPO_ROOT, rf"data\data_filtered\speakeasy_trainset_BPE_50k\speakeasy_VocabSize_50000_maxLen_{maxLen}_x.npy"))
+    x_test = np.load(os.path.join(REPO_ROOT, rf"data\data_filtered\speakeasy_testset_BPE_50k\speakeasy_VocabSize_50000_maxLen_{maxLen}_x.npy"))
+    y_train = np.load(os.path.join(REPO_ROOT, r"data\data_filtered\speakeasy_trainset_BPE_50k\speakeasy_y.npy"))
+    y_test = np.load(os.path.join(REPO_ROOT, r"data\data_filtered\speakeasy_testset_BPE_50k\speakeasy_y.npy"))
 
     logging.warning("[!] Shape of padded training X and y: {} | {}".format(x_train.shape, y_train.shape))
     logging.warning("[!] Shape of padded test X and y: {} | {}".format(x_test.shape, y_test.shape))

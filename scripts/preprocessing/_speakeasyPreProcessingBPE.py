@@ -13,9 +13,11 @@ from nebula import PEDynamicFeatureExtractor, JSONTokenizerBPE
 
 # SCRIPT CONFIG
 
-OUTFOLDER_SUFFIX = "_BPE_10k"
-LOGFILE = f"PreProcessing{OUTFOLDER_SUFFIX}_{int(time.time())}.log"
+LIMIT = 1000 # None
 VOCAB_SIZES = [10000]#[50000]
+VOCABS = {10000: "10k", 50000: "50k"}
+OUTFOLDER_SUFFIX = "TEST" # f"_BPE_{VOCABS[VOCAB_SIZES[0]]}"
+LOGFILE = f"PreProcessing{OUTFOLDER_SUFFIX}_{int(time.time())}.log"
 MAX_SEQ_LENGTHS = [512, 2048]
 
 # from nebula.constants import *
@@ -41,7 +43,7 @@ SPEAKEASY_TOKEN_STOPWORDS = ['api_name', 'args', 'ret_val', 'event', 'path', 'op
 
 # DATA CONFIG
 SCRIPT_PATH = get_path(type="script")
-REPO_ROOT = os.path.join(SCRIPT_PATH, "..")
+REPO_ROOT = os.path.join(SCRIPT_PATH, "..", "..")
 EMULATION_TRAINSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_trainset")
 EMULATION_TESTSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_testset")
 
@@ -167,5 +169,5 @@ if __name__ == "__main__":
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
     # ===============
-    #main(limit=100)
-    main()
+    main(limit=LIMIT)
+    #main()
