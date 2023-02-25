@@ -9,8 +9,8 @@ from sklearn.utils import shuffle
 import sys
 sys.path.extend(['..', '.'])
 from nebula import ModelTrainer
-from nebula.neurlux.model import NeurLuxModel
-from nebula.neurlux.preprocessor import NeurLuxPreprocessor
+from nebula.models.neurlux import NeurLuxModel
+from nebula.models.neurlux.preprocessor import NeurLuxPreprocessor
 from nebula.evaluation import CrossValidation
 from nebula.misc import get_path, set_random_seed,clear_cuda_cache
 

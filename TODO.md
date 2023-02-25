@@ -1,19 +1,34 @@
 # Future Work
 
-## Immediate ToDo list
+## Next ToDo list
 
-- ~~Experiments with same downstream task dataset size, and variable pre-training size.~~
-- ~~Cross-Validation bug with low FP~~
-- ~~Visualize attention weights.~~
-- ~~Compare different Transformer setups (regular, windowed, reformer) with each other and with NeurLux / Ember.~~ Ember skipped -- not relevant?.
-  - ~~Run windowed CV over 3 folds~~
-  - ~~Create config for NeurLux -- (a) model (b) data~~
-  - ~~Finalize ember data preprocessing~~
-  - ~~complete TODOs in `_speakeasy_cv_final.py`~~
-- Try BETH dataset
-- Try adversarial setup -- some attacks?
+- Transformer engineering:
+  - Optimization:
+    - AdamW
+    - weight decay 0.1
+    - gradient clipping 1.0
+    - Learning rate schedules:
+      - Cosine (used in "LLaMA: Open and Efficient Foundation Language Models" paper)
+      - Triangular <https://arxiv.org/pdf/2212.14034.pdf> -- code with time budget as follows: <https://github.com/JonasGeiping/cramming/blob/50bd06a65a4cd4a3dd6ee9ecce1809e1a9085374/cramming/backend/optimizers/schedulers.py#L323>
+  - micro-batch summarization for gradient updates
+  - Non-linearity:
+    - GELU --> in <https://arxiv.org/pdf/2212.14034.pdf> they've seen no benefits from GELU over ReLU.
+    - SwiGLU?
+  - Embeddings:
+    - Rotary --> in <https://arxiv.org/pdf/2212.14034.pdf> they've seen small benefits from rotary embeddings, but are slower to train.
+    - scaled sinusoidal?
+  - Normalization -- pre or post?
+    - RMSNorm --> in <https://arxiv.org/pdf/2212.14034.pdf> they've seen no benefits from replacing LayerNorm with RMSNorm.
+
+- Plots:
+  - Lineplot loss vs. nr. of tokens (unique?)
+  - Performance vs vocab size
 
 ## Short ToDo list
+
+0. Paper:
+   - Try BETH dataset
+   - Try adversarial setup -- some attacks?
 
 1. Build malware classifier class with convenient API
    - ~~Add ember feature extraction to sequential emulation model.~~
@@ -27,7 +42,7 @@
    - ~~input chunking to windows~~:
      - ~~flat architecture~~
    - ~~Transformer: re-run tests after fix of positional embeddings~~
-   - ~~Reformer~~ Implemented `nebula.attention.ReformerLM` class. Takes ~80min per epoch with 50k samples on GPU if sample length 2048.  
+   - ~~Reformer~~ Implemented `nebula.models.reformer.ReformerLM` class. Takes ~80min per epoch with 50k samples on GPU if sample length 2048.  
      - ~~Try lower learning rate -- training seems to hit plateau and fluctuate strongly after ~500 batches.~~ Loss still doesn't fall below ~0.13-0.2, even with scheduling of LR to $n\times10^{-7}$ scale.
      - ~~Try Reformer with comparable param sizes~~ Previous runs had them in similar ranges.
    - Star transformer (?)
@@ -38,7 +53,10 @@
      - fastText
    - language modeling:
      - ~~MLM~~ (see `nebula.pretraining.MaskedLanguageModel` class)
+       - Mask Every Epoch -- try variable N masking epochs;
+       > NOTE: Bug with `mask_every_epoch=True` and learning rate scheduler?
      - **GPT like $p(x_{t+1}|x_{t}\ ...\ x_{0})$**  
+     - denoising autoencoder (see BART, etc.)
    - evaluate:
      - ~~pre-trained vs non-pretrained: TPR, F1, LOSS~~
      - ~~pre-training epochs~~ Done: see `evaluation/MaskedLanguageModeling/pretrain_epochs_analysis*` folders.
@@ -51,9 +69,15 @@
 6. **`auditd`/`windows` labeled dataset collection/preparation**
 7. Other directions to consider:
    - Multiclass performance (?)
-   - Solve Bug with "mask_every_epoch" and learning rate scheduler.
-   - Triangular LR schedule:
-     - With time budget as follows: <https://github.com/JonasGeiping/cramming/blob/50bd06a65a4cd4a3dd6ee9ecce1809e1a9085374/cramming/backend/optimizers/schedulers.py#L323>
+8. Else:
+    - ~~Experiments with same downstream task dataset size, and variable pre-training size.~~
+    - ~~Cross-Validation bug with low FP~~
+    - ~~Visualize attention weights.~~
+    - ~~Compare different Transformer setups (regular, windowed, reformer) with each other and with NeurLux / Ember.~~ Ember skipped -- not relevant?.
+      - ~~Run windowed CV over 3 folds~~
+      - ~~Create config for NeurLux -- (a) model (b) data~~
+      - ~~Finalize ember data preprocessing~~
+      - ~~complete TODOs in `_speakeasy_cv_final.py`~~
 
 ## Detailed ToDo list
 

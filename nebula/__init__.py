@@ -12,6 +12,8 @@ from pandas import DataFrame
 
 import torch
 from torch import nn
+from torch.nn import BCEWithLogitsLoss
+from torch.optim import AdamW
 from sklearn.metrics import f1_score, roc_auc_score
 from nebula.misc import get_tpr_at_fpr
 from tqdm import tqdm
@@ -19,13 +21,13 @@ from tqdm import tqdm
 class ModelTrainer(object):
     def __init__(self, 
                     model,
-                    device, 
-                    lossFunction,
-                    optimizerClass,
-                    optimizerConfig,
+                    device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), 
+                    lossFunction=BCEWithLogitsLoss(),
+                    optimizerClass=AdamW,
+                    optimizerConfig={"lr": 2.5e-4},
                     optimSchedulerClass=None,
                     batchSize=64,
-                    verbosityBatches = 100,
+                    verbosityBatches=100,
                     outputFolder=None,
                     falsePositiveRates=[0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
                     modelForwardPass=None,
