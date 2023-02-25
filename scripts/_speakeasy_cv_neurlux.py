@@ -40,7 +40,7 @@ import warnings
 warnings.filterwarnings("ignore")
 clear_cuda_cache()
 
-runType = f"Neurlux_vocab_10k"
+runType = f"vocab50k_len512_ep6"
 SCRIPT_PATH = get_path(type="script")
 REPO_ROOT = os.path.join(SCRIPT_PATH, "..")
 outputFolder = os.path.join(REPO_ROOT, "evaluation", "crossValidation", runType)
@@ -62,7 +62,7 @@ modelClass = NeurLuxModel
 maxLens = [512, 2048]#, 4096]
 for maxLen in maxLens:
     timestamp = int(time.time())
-    runName = f"neurlux_BPE_maxLens_{maxLen}_6_epochs_{timestamp}"
+    runName = f"neurlux_BPE_maxLen_{maxLen}_6_epochs_{timestamp}"
     outputFolder = os.path.join(REPO_ROOT, "evaluation", "crossValidation", runType)
     outputFolder = os.path.join(outputFolder, runName)
     os.makedirs(outputFolder, exist_ok=True)
@@ -84,7 +84,7 @@ for maxLen in maxLens:
         "chunk_size": 64,
         "verbosity_batches": 100,
         "maxLen": maxLen,
-        "vocab_size": 10000,
+        "vocab_size": 50000,
     }
     with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
         json.dump(run_config, f, indent=4)
@@ -114,10 +114,10 @@ for maxLen in maxLens:
     # x_test = p.pad_sequence(x_test)
     
     # using BPE arrays
-    x_train = np.load(os.path.join(REPO_ROOT, rf"data\data_filtered\speakeasy_trainset_BPE_10k\speakeasy_VocabSize_10000_maxLen_{maxLen}_x.npy"))
-    x_test = np.load(os.path.join(REPO_ROOT, rf"data\data_filtered\speakeasy_testset_BPE_10k\speakeasy_VocabSize_10000_maxLen_{maxLen}_x.npy"))
-    y_train = np.load(os.path.join(REPO_ROOT, r"data\data_filtered\speakeasy_trainset_BPE_10k\speakeasy_y.npy"))
-    y_test = np.load(os.path.join(REPO_ROOT, r"data\data_filtered\speakeasy_testset_BPE_10k\speakeasy_y.npy"))
+    x_train = np.load(os.path.join(REPO_ROOT, rf"data\data_filtered\speakeasy_trainset_BPE\speakeasy_VocabSize_50000_maxLen_{maxLen}_x.npy"))
+    x_test = np.load(os.path.join(REPO_ROOT, rf"data\data_filtered\speakeasy_testset_BPE\speakeasy_VocabSize_50000_maxLen_{maxLen}_x.npy"))
+    y_train = np.load(os.path.join(REPO_ROOT, r"data\data_filtered\speakeasy_trainset_BPE\speakeasy_y.npy"))
+    y_test = np.load(os.path.join(REPO_ROOT, r"data\data_filtered\speakeasy_testset_BPE\speakeasy_y.npy"))
 
     logging.warning("[!] Shape of padded training X and y: {} | {}".format(x_train.shape, y_train.shape))
     logging.warning("[!] Shape of padded test X and y: {} | {}".format(x_test.shape, y_test.shape))
@@ -138,7 +138,7 @@ for maxLen in maxLens:
     # with open(os.path.join(outputFolder, f"vocab.json"), "w") as f:
     #     json.dump(p.vocab, f, indent=4)
     # vocab = p.vocab
-    with open(os.path.join(SCRIPT_PATH, r"..\nebula\objects\speakeasy_BPE_10000_vocab.json")) as f:
+    with open(os.path.join(SCRIPT_PATH, r"..\nebula\objects\speakeasy_BPE_50000_vocab.json")) as f:
         vocab = json.load(f)
     vocabSize = len(vocab)
     logging.warning(f" [!] Loaded data and vocab. X train size: {x_train.shape}, vocab size: {vocabSize}")

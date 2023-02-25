@@ -5,12 +5,13 @@
 - ~~Experiments with same downstream task dataset size, and variable pre-training size.~~
 - ~~Cross-Validation bug with low FP~~
 - ~~Visualize attention weights.~~
-- Compare different Transformer setups (regular, windowed, reformer) with each other and with NeurLux / Ember.
+- ~~Compare different Transformer setups (regular, windowed, reformer) with each other and with NeurLux / Ember.~~ Ember skipped -- not relevant?.
   - ~~Run windowed CV over 3 folds~~
-  - **Create config for NeurLux -- (a) model (b) data**
-  - Finalize ember data preprocessing
-  - complete `_speakeasy_cv_final.py`
-- Solve Bug with "mask_every_epoch" and learning rate scheduler.
+  - ~~Create config for NeurLux -- (a) model (b) data~~
+  - ~~Finalize ember data preprocessing~~
+  - ~~complete TODOs in `_speakeasy_cv_final.py`~~
+- Try BETH dataset
+- Try adversarial setup -- some attacks?
 
 ## Short ToDo list
 
@@ -19,11 +20,11 @@
    - ~~Provide it as `pip` package.~~ Can be installed as: `python -m pip install git+https://github.com/dtrizna/nebula`
      - ~~Add vocab and speakeasy config files to package.~~
      - ~~Optimize JSON parsing.~~ Done in `JSONParser` class.
-   - Add pre-trained models to package.
+   - Add pre-trained models to package (?)
      - Organize a dedicated server suitable for: (a) storing malware dataset; (b) GPU training
      - Download raw PE data, build dataset, and train classifier.
 2. Try attention models:
-   - input chunking to windows:
+   - ~~input chunking to windows~~:
      - ~~flat architecture~~
    - ~~Transformer: re-run tests after fix of positional embeddings~~
    - ~~Reformer~~ Implemented `nebula.attention.ReformerLM` class. Takes ~80min per epoch with 50k samples on GPU if sample length 2048.  
@@ -48,6 +49,11 @@
 5. ~~Evaluate preprocessing with BPE tokenizer instead of JSON cleanup + whitespace~~  
    DONE: See `nebula.preprocess.JSONTokenizerBPE` and tests under `evaluation/crossvalidation/_modelSelection_BPE`
 6. **`auditd`/`windows` labeled dataset collection/preparation**
+7. Other directions to consider:
+   - Multiclass performance (?)
+   - Solve Bug with "mask_every_epoch" and learning rate scheduler.
+   - Triangular LR schedule:
+     - With time budget as follows: <https://github.com/JonasGeiping/cramming/blob/50bd06a65a4cd4a3dd6ee9ecce1809e1a9085374/cramming/backend/optimizers/schedulers.py#L323>
 
 ## Detailed ToDo list
 

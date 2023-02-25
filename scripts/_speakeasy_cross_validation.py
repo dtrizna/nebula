@@ -23,9 +23,9 @@ warnings.filterwarnings("ignore")
 clear_cuda_cache()
 
 # ============== REPORTING CONFIG
-modelClass = Cnn1DLinear
+modelClass = TransformerEncoderWithChunking
 maxLen = 2048
-runType = f"Neurlux_vocab_10k"
+runType = f"TEST_Neurlux_vocab_10k"
 timestamp = int(time.time())
 runName = f"Cnn1DLinear_maxLen_{maxLen}_6_epochs_{timestamp}"
 
@@ -88,29 +88,29 @@ vocabSize = len(vocab) # adjust it to exact number of tokens in the vocabulary
 logging.warning(f" [!] Loaded data and vocab. X train size: {x_train.shape}, vocab size: {len(vocab)}")
 
 # =============== MODEL CONFIG
-modelArch = {
-    "vocabSize": vocabSize,
-    "maxLen": maxLen,
-    "embeddingDim": 64,
-    "hiddenNeurons": [512, 256, 128],
-    "batchNormConv": False,
-    "batchNormFFNN": False,
-    "filterSizes": [2, 3, 4, 5],
-    "dropout": 0.2
-}
 # modelArch = {
-#     "vocabSize": vocabSize,  # size of vocabulary
-#     "maxLen": maxLen,  # maximum length of the input sequence
-#     "chunk_size": run_config["chunk_size"],
-#     "dModel": 64,  # embedding & transformer dimension
-#     "nHeads": 8,  # number of heads in nn.MultiheadAttention
-#     "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
-#     "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
-#     "numClasses": 1, # binary classification
-#     "hiddenNeurons": [64],
-#     "layerNorm": False,
+#     "vocabSize": vocabSize,
+#     "maxLen": maxLen,
+#     "embeddingDim": 64,
+#     "hiddenNeurons": [512, 256, 128],
+#     "batchNormConv": False,
+#     "batchNormFFNN": False,
+#     "filterSizes": [2, 3, 4, 5],
 #     "dropout": 0.2
 # }
+modelArch = {
+    "vocabSize": vocabSize,  # size of vocabulary
+    "maxLen": maxLen,  # maximum length of the input sequence
+    "chunk_size": run_config["chunk_size"],
+    "dModel": 64,  # embedding & transformer dimension
+    "nHeads": 8,  # number of heads in nn.MultiheadAttention
+    "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
+    "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+    "numClasses": 1, # binary classification
+    "hiddenNeurons": [64],
+    "layerNorm": False,
+    "dropout": 0.2
+}
 # modelClass = ReformerLM
 # modelArch = {
 #     "vocabSize": vocabSize,
