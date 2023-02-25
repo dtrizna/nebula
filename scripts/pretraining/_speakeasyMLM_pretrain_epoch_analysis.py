@@ -7,7 +7,7 @@ from collections import defaultdict
 from sklearn.utils import shuffle
 
 import torch
-from torch.optim import Adam
+from torch.optim import Adam, AdamW
 from torch.nn import BCEWithLogitsLoss
 
 import sys
@@ -166,9 +166,9 @@ modelTrainerConfig = {
             "device": device,
             "model": None,
             "lossFunction": BCEWithLogitsLoss(),
-            "optimizerClass": Adam,
+            "optimizerClass": AdamW,
             "optimizerConfig": {"lr": 2.5e-4},
-            "optimSchedulerClass": "step",
+            "optim_scheduler": "step",
             "optim_step_size": run_config["optimizerStep"],
             "verbosityBatches": run_config["verbosity_batches"],
             "batchSize": run_config["batchSize"],

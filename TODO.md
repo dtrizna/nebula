@@ -3,13 +3,18 @@
 ## Next ToDo list
 
 - Transformer engineering:
+  - Sliding window model, use: `work\speakeasy_5_Preprocess_Improve\sliding_window.py`
+  - ~~Normalization -- pre or post?~~
+    - RMSNorm?
+    > NOTE: In <https://arxiv.org/pdf/2212.14034.pdf> they've seen no benefits from replacing LayerNorm with RMSNorm.
   - Optimization:
-    - AdamW
-    - weight decay 0.1
-    - gradient clipping 1.0
+    - ~~AdamW~~
+    - ~~weight decay 0.1~~
+    - ~~gradient clipping 1.0~~
     - Learning rate schedules:
-      - Cosine (used in "LLaMA: Open and Efficient Foundation Language Models" paper)
-      - Triangular <https://arxiv.org/pdf/2212.14034.pdf> -- code with time budget as follows: <https://github.com/JonasGeiping/cramming/blob/50bd06a65a4cd4a3dd6ee9ecce1809e1a9085374/cramming/backend/optimizers/schedulers.py#L323>
+      - Take into account training budget (micro-batches / epochs / time) and adjust accordingly
+      - ~~Cosine (used in "LLaMA: Open and Efficient Foundation Language Models" paper)~~
+      - ~~Triangular <https://arxiv.org/pdf/2212.14034.pdf> -- code with time budget as follows: <https://github.com/JonasGeiping/cramming/blob/50bd06a65a4cd4a3dd6ee9ecce1809e1a9085374/cramming/backend/optimizers/schedulers.py#L323>~~
   - micro-batch summarization for gradient updates
   - Non-linearity:
     - GELU --> in <https://arxiv.org/pdf/2212.14034.pdf> they've seen no benefits from GELU over ReLU.
@@ -17,8 +22,6 @@
   - Embeddings:
     - Rotary --> in <https://arxiv.org/pdf/2212.14034.pdf> they've seen small benefits from rotary embeddings, but are slower to train.
     - scaled sinusoidal?
-  - Normalization -- pre or post?
-    - RMSNorm --> in <https://arxiv.org/pdf/2212.14034.pdf> they've seen no benefits from replacing LayerNorm with RMSNorm.
 
 - Plots:
   - Lineplot loss vs. nr. of tokens (unique?)

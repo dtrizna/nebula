@@ -15,7 +15,7 @@ from nebula.misc import get_path, set_random_seed,clear_cuda_cache
 
 from torch import cuda
 from torch.nn import BCEWithLogitsLoss
-from torch.optim import Adam
+from torch.optim import Adam, AdamW
 
 def read_reports_from_root(root_repo, hashList, limit=None):
     reports_train = []
@@ -158,9 +158,9 @@ for maxLen in maxLens:
         "device": device,
         "model": None, # will be set later within CrossValidation class
         "lossFunction": BCEWithLogitsLoss(),
-        "optimizerClass": Adam,
+        "optimizerClass": AdamW,
         "optimizerConfig": {"lr": 2.5e-4},
-        "optimSchedulerClass": "step",
+        "optim_scheduler": "step",
         "optim_step_size": run_config["optim_step_size"],
         "outputFolder": None, # will be set later
         "batchSize": run_config["batchSize"],
