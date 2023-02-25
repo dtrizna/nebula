@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from nebula.constants import *
+from ..constants import *
 
 class Cnn1DLinear(nn.Module):
     def __init__(self, 

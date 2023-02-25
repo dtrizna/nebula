@@ -9,7 +9,7 @@ import sys
 sys.path.extend(['..', '.'])
 from nebula import ModelTrainer
 from nebula.models import Cnn1DLinear, Cnn1DLSTM, LSTM
-from nebula.attention import TransformerEncoderModel, ReformerLM, TransformerEncoderWithChunking, TransformerEncoderLM
+from nebula.attention import TransformerEncoderModel, TransformerEncoderWithChunking, TransformerEncoderLM
 from nebula.evaluation import CrossValidation
 from nebula.misc import get_path, set_random_seed,clear_cuda_cache
 

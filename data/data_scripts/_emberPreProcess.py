@@ -15,7 +15,7 @@ BATCH = 50
 import sys
 sys.path.extend([".", "../.."])
 from nebula.misc import get_path
-from nebula.ember import PEFeatureExtractor
+from nebula.models.ember import PEFeatureExtractor
 from nebula.constants import STATIC_FEATURE_VECTOR_LENGTH
 
 SCRIPT_PATH = get_path(type="script")

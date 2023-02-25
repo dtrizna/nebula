@@ -2,7 +2,8 @@ import torch
 
 import sys
 sys.path.extend(['.', '..\\..'])
-from nebula.attention import TransformerEncoderModel, ReformerLM
+from nebula.attention import TransformerEncoderModel
+from nebula.models.reformer import ReformerLM
 
 model = TransformerEncoderModel(
     vocabSize=10000,
