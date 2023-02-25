@@ -19,10 +19,11 @@ from nebula.models.ember import PEFeatureExtractor
 from nebula.constants import STATIC_FEATURE_VECTOR_LENGTH
 
 SCRIPT_PATH = get_path(type="script")
+REPO_ROOT = os.path.join(SCRIPT_PATH, "..", "..")
 #SCRIPT_PATH = getRealPath(type="notebook")
 
 def getHashDirectory(h, dataset):
-    emulationSetPath = os.path.join(SCRIPT_PATH, "..", "data_raw", f"windows_emulation_{dataset}")
+    emulationSetPath = os.path.join(REPO_ROOT, "data", "data_raw", f"windows_emulation_{dataset}")
     for root, dirs, files in os.walk(emulationSetPath):
         if h+".json" in files or h+".err" in files:
             return root.split("\\")[-1].split("_")[1]
@@ -67,9 +68,9 @@ def extractSamplesWith7z(archivePath, archive, samples):
 
 if __name__ == "__main__":
     dataset = "trainset"
-    yHashesFiles = os.path.join(SCRIPT_PATH, "..", "data_filtered", f"speakeasy_{dataset}", "speakeasy_yHashes.json")
-    archivePath = os.path.join(SCRIPT_PATH, "..", "data_raw", f"windows_raw_pe_{dataset}")
-    outPath = os.path.join(SCRIPT_PATH, "..", "data_filtered", "ember")
+    yHashesFiles = os.path.join(REPO_ROOT, "data", "data_filtered", f"speakeasy_{dataset}", "speakeasy_yHashes.json")
+    archivePath = os.path.join(REPO_ROOT, "data", "data_raw", f"windows_raw_pe_{dataset}")
+    outPath = os.path.join(REPO_ROOT, "data", "data_filtered", "ember")
     os.makedirs(outPath, exist_ok=True)
     extractor = PEFeatureExtractor(print_feature_warning=False)
     print("[*] Loading yHashes from", yHashesFiles)
