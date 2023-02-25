@@ -16,25 +16,27 @@ from nebula.misc import get_path, set_random_seed,clear_cuda_cache
 
 from torch import cuda
 from torch.nn import BCEWithLogitsLoss
-from torch.optim import Adam
+from torch.optim import Adam, AdamW
 
 # supress UndefinedMetricWarning, which appears when a batch has only one class
 import warnings
 warnings.filterwarnings("ignore")
 clear_cuda_cache()
 
-
-# ============== REPORTING CONFIG
-LIMIT = 1000 # None
-EPOCHS = 2
-maxlen = 512
-modelClass = TransformerEncoderChunks
-runType = f"TEST_{modelClass.__name__}"
-timestamp = int(time.time())
-
 SCRIPT_PATH = get_path(type="script")
 REPO_ROOT = os.path.join(SCRIPT_PATH, "..", "..")
-outputFolder = os.path.join(REPO_ROOT, "evaluation", "crossValidation", runType)
+
+# ============== REPORTING CONFIG
+LIMIT = None
+EPOCHS = 6
+maxlen = 512
+modelClass = TransformerEncoderChunks
+
+runType = f"Transformer_Engineering"
+timestamp = int(time.time())
+
+runName = f"norm_first_AdamW_GradClip_limit_{LIMIT}_{timestamp}"
+outputFolder = os.path.join(REPO_ROOT, "evaluation", "crossValidation", runType, runName)
 os.makedirs(outputFolder, exist_ok=True)
 
 # loging setup
@@ -48,7 +50,7 @@ logging.basicConfig(
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 # ============== Cross-Valiation CONFIG
-random_state = 1783
+random_state = 1763
 set_random_seed(random_state)
 
 # transform above variables to dict
@@ -70,10 +72,10 @@ with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
     json.dump(run_config, f, indent=4)
 
 # ===== LOADING DATA ==============
-vocab_size = 10000
-xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_10k", f"speakeasy_vocab_size_{vocab_size}_maxlen_{maxlen}_x.npy")
+vocab_size = 50000
+xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k", f"speakeasy_vocab_size_{vocab_size}_maxlen_{maxlen}_x.npy")
 x_train = np.load(xTrainFile)
-yTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_10k", "speakeasy_y.npy")
+yTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k", "speakeasy_y.npy")
 y_train = np.load(yTrainFile)
 
 if run_config['train_limit']:
@@ -113,7 +115,8 @@ modelArch = {
     "numClasses": 1, # binary classification
     "hiddenNeurons": [64],
     "layerNorm": False,
-    "dropout": 0.2
+    "dropout": 0.3,
+    "mean_over_sequence": False
 }
 
 # modelClass = ReformerLM
@@ -149,9 +152,9 @@ modelInterfaceConfig = {
     "device": device,
     "model": None, # will be set later within CrossValidation class
     "lossFunction": BCEWithLogitsLoss(),
-    "optimizerClass": Adam,
+    "optimizerClass": AdamW,
     "optimizerConfig": {"lr": 2.5e-4},
-    "optimSchedulerClass": "step",
+    "optim_scheduler": "step",
     "optim_step_size": run_config["optim_step_size"],
     "outputFolder": None, # will be set later
     "batchSize": run_config["batchSize"],
@@ -202,9 +205,6 @@ modelInterfaceConfig = {
 # for hiddenLayer in [[256, 64], [512, 256, 64]]:
 #     modelArch["hiddenNeurons"] = hiddenLayer
 for _ in [1]:
-    runName = f"maxlen_{maxlen}_{EPOCHS}_epochs_{timestamp}" # TODO
-    outputFolder = os.path.join(REPO_ROOT, "evaluation", "crossValidation", runType, runName)
-    os.makedirs(outputFolder, exist_ok=True)
 
     logging.warning(f" [!] Starting valiation of model: {modelClass.__name__}")
     # to differentiate different run results -- use this

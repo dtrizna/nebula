@@ -1,6 +1,6 @@
 import nebula
 from nebula.preprocessing import JSONTokenizerBPE, PEDynamicFeatureExtractor, PEStaticFeatureExtractor
-from nebula.optimization import OptimSchedulerGPT, OptimSchedulerStep, CosineSchedule
+from nebula.optimization import OptimSchedulerGPT, OptimSchedulerStep, CosineSchedule, TriangularSchedule, OneCycleSchedule
 from nebula.models import Cnn1DLinearLM, MLP
 
 import os
@@ -13,8 +13,9 @@ from pandas import DataFrame
 import torch
 from torch import nn
 from torch.nn import BCEWithLogitsLoss
-from torch.optim import AdamW
+from torch.optim import Adam, AdamW
 from torch.utils.data import DataLoader, TensorDataset
+from torch.nn.utils import clip_grad_norm_
 from sklearn.metrics import f1_score, roc_auc_score
 from nebula.misc import get_tpr_at_fpr
 from tqdm import tqdm
@@ -26,7 +27,7 @@ class ModelTrainer(object):
                     lossFunction=BCEWithLogitsLoss(),
                     optimizerClass=AdamW,
                     optimizerConfig={"lr": 2.5e-4},
-                    optimSchedulerClass=None,
+                    optim_scheduler=None,
                     batchSize=64,
                     verbosityBatches=100,
                     outputFolder=None,
@@ -34,29 +35,37 @@ class ModelTrainer(object):
                     modelForwardPass=None,
                     stateDict = None,
                     timestamp = None,
-                    optim_step_size=1000):
+                    clip_grad_norm = 0.5,
+                    # TODO: rename to be suitable for all schedulers
+                    optim_step_budget = 1000):
         self.model = model    
         self.optimizer = optimizerClass(self.model.parameters(), **optimizerConfig)
         self.lossFunction = lossFunction
         self.verbosityBatches = verbosityBatches
         self.batchSize = batchSize
         self.reporting_timestamp = timestamp
+        self.clip_grad_norm = clip_grad_norm
         self.globalBatchCounter = 0
 
         # lr scheduling setup, for visulaizations see:
         # https://towardsdatascience.com/a-visual-guide-to-learning-rate-schedulers-in-pytorch-24bbb262c863
-        if optimSchedulerClass is None:
-            self.optimScheduler = None
-        elif optimSchedulerClass == "gpt":
-            self.optimScheduler = OptimSchedulerGPT(self.optimizer)
-        elif optimSchedulerClass == "step":
-            self.optimScheduler = OptimSchedulerStep(self.optimizer, step_size=optim_step_size)
-        elif optimSchedulerClass == "triangular":
-            raise NotImplementedError
-        elif optimSchedulerClass == "cosine":
-            self.optimScheduler = CosineSchedule(self.optimizer)
+        if optim_scheduler is None:
+            self.optim_scheduler = None
+        elif optim_scheduler == "gpt":
+            self.optim_scheduler = OptimSchedulerGPT(self.optimizer)
+        elif optim_scheduler == "step":
+            self.optim_scheduler = OptimSchedulerStep(self.optimizer, step_size=optim_step_budget)
+        elif optim_scheduler == "triangular":
+            # TODO: base_lr, max_lr, step_size_up -- make variable
+            self.optim_scheduler = TriangularSchedule(self.optimizer, base_lr=1e-6, max_lr=1e-4, step_size_up=optim_step_budget)
+        elif optim_scheduler == "onecycle":
+            # TODO: max_lr, step_size -- make variable
+            self.optim_scheduler = OneCycleSchedule(self.optimizer, max_lr=1e-4, steps_per_epoch=optim_step_budget, epochs=10)
+        elif optim_scheduler == "cosine":
+            # TODO: T_max=2000, eta_min=1e-7 -- make variable
+            self.optim_scheduler = CosineSchedule(self.optimizer)
         else:
-            self.optimScheduler = optimSchedulerClass(self.optimizer)
+            self.optim_scheduler = optim_scheduler(self.optimizer)
 
         self.falsePositiveRates = falsePositiveRates
         self.fprReportingIdx = 1 # what FPR stats to report every epoch
@@ -143,12 +152,16 @@ class ModelTrainer(object):
 
             self.optimizer.zero_grad()
             loss.backward() # derivatives
+
+            if self.clip_grad_norm is not None:
+                torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.clip_grad_norm)
+
             self.optimizer.step() # parameter update
             
             # learning rate update
             self.globalBatchCounter += 1
-            if self.optimScheduler is not None:
-                self.optimScheduler.step(self.globalBatchCounter)
+            if self.optim_scheduler is not None:
+                self.optim_scheduler.step(self.globalBatchCounter)
 
             predProbs = torch.sigmoid(logits).clone().detach().cpu().numpy()
             epochProbs.extend(predProbs)

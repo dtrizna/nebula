@@ -5,7 +5,7 @@ import numpy as np
 from collections import defaultdict
 
 from time import sleep, time
-from torch.optim import Adam
+from torch.optim import Adam, AdamW
 from torch.nn import BCEWithLogitsLoss, CrossEntropyLoss
 from sklearn.model_selection import train_test_split, KFold
 from sklearn.metrics import f1_score, roc_auc_score
@@ -89,9 +89,9 @@ class SelfSupervisedPretraining:
             "model": models['pretrained'],
             "modelForwardPass": models['pretrained'].pretrain,
             "lossFunction": CrossEntropyLoss(),
-            "optimizerClass": Adam,
+            "optimizerClass": AdamW,
             "optimizerConfig": {"lr": 2.5e-4},
-            "optimSchedulerClass": "step",
+            "optim_scheduler": "step",
             "optim_step_size": self.optimizerStep,
             "verbosityBatches": self.verbosityBatches,
             "batchSize": self.batchSize,

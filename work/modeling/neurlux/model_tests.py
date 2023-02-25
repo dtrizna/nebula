@@ -1,15 +1,14 @@
 import os
 import sys
-#REPO_ROOT = r"..\.."
-REPO_ROOT = r"."
+REPO_ROOT = r"../../.."
 sys.path.append(REPO_ROOT)
 import numpy as np
 from tqdm import tqdm
-from nebula.neurlux.preprocessor import NeurLuxPreprocessor
-from nebula.neurlux.model import NeurLuxModel
+from nebula.models.neurlux.preprocessor import NeurLuxPreprocessor
+from nebula.models.neurlux import NeurLuxModel
 from nebula import ModelTrainer
 
-from torch.optim import Adam
+from torch.optim import AdamW
 from torch.nn import BCEWithLogitsLoss
 
 EMBEDDING_DIM = 256
@@ -68,7 +67,7 @@ trainer = ModelTrainer(
     device=device,
     lossFunction=loss,
     optimizerConfig=optimizerConfig,
-    optimizerClass=Adam,
+    optimizerClass=AdamW,
     batchSize=16
 )
 trainer.train(X, y, epochs=1)
