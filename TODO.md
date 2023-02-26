@@ -11,11 +11,11 @@
     - ~~AdamW~~
     - ~~weight decay 0.1~~
     - ~~gradient clipping~~
-    - Learning rate schedules:
-      - Take into account training budget (micro-batches / epochs / time) and adjust accordingly
+    - ~~Learning rate schedules:~~
+      - ~~Take into account training budget (micro-batches / epochs / time) and adjust accordingly~~
       - ~~Cosine (used in "LLaMA: Open and Efficient Foundation Language Models" paper)~~
-      - ~~Triangular <https://arxiv.org/pdf/2212.14034.pdf> -- code with time budget as follows: <https://github.com/JonasGeiping/cramming/blob/50bd06a65a4cd4a3dd6ee9ecce1809e1a9085374/cramming/backend/optimizers/schedulers.py#L323>~~
-  - micro-batch summarization for gradient updates
+      - ~~Triangular <https://arxiv.org/pdf/2212.14034.pdf>
+  - ~~micro-batch summarization for gradient updates~~
   - Non-linearity:
     - GELU --> in <https://arxiv.org/pdf/2212.14034.pdf> they've seen no benefits from GELU over ReLU.
     - SwiGLU?
