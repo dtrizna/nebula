@@ -81,7 +81,7 @@ def plot_cv_metrics_dict(metric_dict, key='tpr', ax=None, legendTitle=None, lege
         plt.savefig(savePath)
     return ax
 
-def plot_roc_curves(fpr, tpr, tpr_std=None, model_name="", axs=None, roc_auc=None, xlim=[-0.0005, 0.003], ylim=[0.3, 1.0]):
+def plot_roc_curves(fpr, tpr, tpr_std=None, model_name="", axs=None, roc_auc=None, xlim=[-0.0005, 0.003], ylim=[0.3, 1.0], plot_random=False):
     if axs is None:
         fig, axs = plt.subplots(1, 2, figsize=(16, 8))
         axs[0].set_title("ROC Curve")
@@ -96,7 +96,6 @@ def plot_roc_curves(fpr, tpr, tpr_std=None, model_name="", axs=None, roc_auc=Non
     else:
         label = model_name
     axs[0].plot(fpr, tpr, lw=2, label=label)
-    axs[0].plot([0, 1], [0, 1], lw=2, linestyle="--")
     if tpr_std is not None:
         tprs_upper = np.minimum(tpr + tpr_std, 1)
         tprs_lower = tpr - tpr_std
@@ -108,7 +107,6 @@ def plot_roc_curves(fpr, tpr, tpr_std=None, model_name="", axs=None, roc_auc=Non
     
     # plot zoomed in ROC curve x-axis from 0 to 0.2
     axs[1].plot(fpr, tpr, lw=2, label=label)
-    axs[1].plot([0, 1], [0, 1], lw=2, linestyle="--")
     if tpr_std is not None:
         tprs_upper = np.minimum(tpr + tpr_std, 1)
         tprs_lower = tpr - tpr_std
@@ -117,6 +115,10 @@ def plot_roc_curves(fpr, tpr, tpr_std=None, model_name="", axs=None, roc_auc=Non
         axs[1].fill_between(fpr, tprs_lower, tprs_upper, alpha=.2)
     axs[1].set_xlim(xlim)
     axs[1].set_ylim(ylim)
+    
+    if plot_random:
+        axs[0].plot([0, 1], [0, 1], lw=2, linestyle="--")
+        axs[1].plot([0, 1], [0, 1], lw=2, linestyle="--")
     return axs
 
 def plot_roc_curve(fpr, tpr, model_name, ax, xlim=[-0.0005, 0.003], ylim=[0.3, 1.0], roc_auc=None):

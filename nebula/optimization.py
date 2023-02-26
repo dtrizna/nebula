@@ -1,83 +1,71 @@
 from torch.optim import lr_scheduler
 import logging
 
-class OptimSchedulerStep:
-    def __init__(self, optimizer, step_size=1000, gamma=0.5):
-        self.step_size = step_size
+VERBOSITY=1000
+
+class BaseScheduler:
+    def __init__(self, optimizer, verbosity=VERBOSITY):
         self.optimizer = optimizer
-        self.optimizerScheduler = lr_scheduler.StepLR(optimizer, step_size, gamma)
+        self.verbosity = verbosity
+        self.scheduler = None
     
     def step(self, idx=None):
-        self.optimizerScheduler.step()
-        if idx % self.step_size == 0:
-            for param_group in self.optimizer.param_groups:
-                logging.warning(f"[!] Learning rate: {param_group['lr']}")
+        assert self.scheduler is not None, "Scheduler not initialized"
+        self.scheduler.step()
+        if self.verbosity and idx % self.verbosity == 0:
+            logging.warning(f"[!] Learning rate: {self.optimizer.param_groups[0]['lr']}")
+    
+    def get_lr(self):
+        return self.optimizer.param_groups[0]['lr']
 
-class OptimSchedulerGPT:
-    def __init__(self, optimizer, batches=2000, verbosity=10):
-        self.linear_scheduler = lr_scheduler.LambdaLR(optimizer, lambda x: 2.5e-4 * x / batches)
-        self.cosine_scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=batches)
-        self.batches = batches
-        self.verbosity = verbosity
+class OptimSchedulerStep(BaseScheduler):
+    def __init__(self, optimizer, step_size, gamma=0.5, verbosity=VERBOSITY):
+        super().__init__(optimizer, verbosity)
+        self.step_size = step_size
+        self.optimizer = optimizer
+        self.scheduler = lr_scheduler.StepLR(optimizer, step_size, gamma)
+    
+class OptimSchedulerGPT(BaseScheduler):
+    def __init__(self, optimizer, max_lr, half_cycle_batches, verbosity=VERBOSITY):
+        super().__init__(optimizer, verbosity)
+        self.linear_scheduler = lr_scheduler.LambdaLR(optimizer, lambda x: max_lr * x / half_cycle_batches)
+        self.cosine_scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=half_cycle_batches, eta_min=max_lr / 10)
+        self.half_cycle_batches = half_cycle_batches
     
     def step(self, idx):
-        if idx < self.batches:
+        if idx < self.half_cycle_batches:
             self.linear_scheduler.step()
         else:
             self.cosine_scheduler.step()
-        if idx % (self.batches//self.verbosity) == 0:
-            for param_group in self.optimizer.param_groups:
-                logging.warning(f"[!] Learning rate: {param_group['lr']}")
+        if idx % self.verbosity == 0:
+            logging.warning(f"[!] Learning rate: {self.optimizer.param_groups[0]['lr']}")
 
-
-class CosineSchedule:
-    def __init__(self, optimizer, T_max=2000, eta_min=1e-7, verbose=False, verbosity=10):
-        self.optimizer = optimizer
+class CosineSchedule(BaseScheduler):
+    def __init__(self, optimizer, T_max, eta_min, verbose=False, verbosity=VERBOSITY):
+        super().__init__(optimizer, verbosity)
         self.T_max = T_max
-        self.verbosity = verbosity
         self.scheduler = lr_scheduler.CosineAnnealingLR(
             optimizer, T_max, eta_min, verbose=verbose
         )
 
-    def step(self, idx):
-        self.scheduler.step()
-        if idx % (self.T_max//self.verbosity) == 0:
-            for param_group in self.optimizer.param_groups:
-                logging.warning(f"[!] Learning rate: {param_group['lr']}")
-
-
-class TriangularSchedule:
-    def __init__(self, optimizer, base_lr, max_lr, step_size_up, verbosity=10):
+class TriangularSchedule(BaseScheduler):
+    def __init__(self, optimizer, base_lr, max_lr, step_size_up, verbosity=VERBOSITY):
+        super().__init__(optimizer, verbosity)
         self.scheduler = lr_scheduler.CyclicLR(
             optimizer, base_lr, max_lr, 
             step_size_up=step_size_up, 
-            model="triangular"
+            mode="triangular",
+            cycle_momentum=False
         )
-        self.optimizer = optimizer
         self.step_size_up = step_size_up
-        self.verbose = verbosity
-    
-    def step(self, idx):
-        self.scheduler.step()
-        if idx % (self.step_size_up//self.verbosity) == 0:
-            for param_group in self.optimizer.param_groups:
-                logging.warning(f"[!] Learning rate: {param_group['lr']}")
 
-
-class OneCycleSchedule:
-    def __init__(self, optimizer, max_lr, steps_per_epoch, epochs, verbosity=10):
+class OneCycleSchedule(BaseScheduler):
+    def __init__(self, optimizer, max_lr, total_steps, verbosity=VERBOSITY):
+        super().__init__(optimizer, verbosity)
         self.scheduler = lr_scheduler.OneCycleLR(
-            optimizer, max_lr, 
-            steps_per_epoch=steps_per_epoch,
-            epochs=epochs,
+            optimizer, 
+            max_lr, 
+            total_steps,
             anneal_strategy="linear"
         )
-        self.optimizer = optimizer
-        self.steps_per_epoch = steps_per_epoch
-        self.verbose = verbosity
-    
-    def step(self, idx): # TODO: Fix correct reporting
-        self.scheduler.step()
-        if idx % (self.steps_per_epoch//self.verbosity) == 0:
-            for param_group in self.optimizer.param_groups:
-                logging.warning(f"[!] Learning rate: {param_group['lr']}")
+        self.total_steps = total_steps

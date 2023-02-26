@@ -67,7 +67,7 @@ run_config = {
     "optim_step_budget": 3000,
     "random_state": random_state,
     "chunk_size": 64,
-    "verbosity_batches": 100,
+    "verbosity_n_batches": 100,
     "clip_grad_norm": [None, 0.1, 0.5, 1]
 }
 with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
@@ -99,14 +99,14 @@ model_trainer_class = ModelTrainer
 model_trainer_config = {
     "device": device,
     "model": None, # will be set later within CrossValidation class
-    "lossFunction": BCEWithLogitsLoss(),
-    "optimizerClass": AdamW,
-    "optimizerConfig": {"lr": 2.5e-4},
+    "loss_function": BCEWithLogitsLoss(),
+    "optimizer_class": AdamW,
+    "optimizer_config": {"lr": 2.5e-4},
     "optim_scheduler": "step",
     "optim_step_budget": run_config["optim_step_budget"],
     "outputFolder": None, # will be set later
     "batchSize": run_config["batchSize"],
-    "verbosityBatches": run_config["verbosity_batches"],
+    "verbosity_n_batches": run_config["verbosity_n_batches"],
     "clip_grad_norm": None
 }
 

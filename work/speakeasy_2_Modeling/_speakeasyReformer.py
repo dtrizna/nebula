@@ -105,10 +105,10 @@ from transformers import Trainer, TrainingArguments
 # modelConfig = {
 #     "device": device,
 #     "model": model,
-#     "lossFunction": torch.nn.BCEWithLogitsLoss(),
+#     "loss_function": torch.nn.BCEWithLogitsLoss(),
 #     "optimizer": torch.optim.Adam(model.parameters(), lr=0.001),
 #     "outputFolder": None,
-#     "verbosityBatches": 10
+#     "verbosity_n_batches": 10
 # }
 args = TrainingArguments(
     output_dir=outputFolder,

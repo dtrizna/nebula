@@ -64,7 +64,7 @@ for downsample_unlabeled_data in [0.9]:# [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9
         "random_state": random_state,
         "batchSize": 64,
         "optim_step_budget": 0, #5000,
-        "verbosity_batches": 100,
+        "verbosity_n_batches": 100,
         "downsample_unlabeled_data": downsample_unlabeled_data, #False
         "training_types": ['pretrained']
     }
@@ -121,7 +121,7 @@ for downsample_unlabeled_data in [0.9]:# [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9
         "unlabeledDataSize": run_config["unlabeledDataSize"],
         "pretraingEpochs": run_config["preTrainEpochs"],
         "downstreamEpochs": run_config["downStreamEpochs"],
-        "verbosityBatches": run_config["verbosity_batches"],
+        "verbosity_n_batches": run_config["verbosity_n_batches"],
         "batchSize": run_config["batchSize"],
         "randomState": random_state,
         "falsePositiveRates": run_config["falsePositiveRates"],

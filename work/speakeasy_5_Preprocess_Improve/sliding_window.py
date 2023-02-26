@@ -86,14 +86,14 @@ device = "cuda" if cuda.is_available() else "cpu"
 modelInterfaceConfig = {
     "device": device,
     "model": model, 
-    "lossFunction": BCEWithLogitsLoss(),
-    "optimizerClass": AdamW,
-    "optimizerConfig": {"lr": 2.5e-4},
+    "loss_function": BCEWithLogitsLoss(),
+    "optimizer_class": AdamW,
+    "optimizer_config": {"lr": 2.5e-4},
     "optim_scheduler": "step",
     "optim_step_budget": run_config["optim_step_budget"],
     "outputFolder": None, # will be set later
     "batchSize": run_config["batch_size"],
-    "verbosityBatches": 100,
+    "verbosity_n_batches": 100,
 }
 
 # ===== TRAINING ==============

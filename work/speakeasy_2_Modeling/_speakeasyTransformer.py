@@ -56,10 +56,10 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 modelConfig = {
     "device": device,
     "model": model,
-    "lossFunction": torch.nn.BCEWithLogitsLoss(),
+    "loss_function": torch.nn.BCEWithLogitsLoss(),
     "optimizer": torch.optim.Adam(model.parameters(), lr=0.001),
     "outputFolder": None,
-    "verbosityBatches": 10
+    "verbosity_n_batches": 10
 }
 
 ModelTrainer(**modelConfig).fit(x_train, y_train, epochs=3)
