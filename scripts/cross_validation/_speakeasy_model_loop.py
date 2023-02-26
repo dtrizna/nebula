@@ -61,7 +61,7 @@ run_config = {
     "optim_step_budget": 3000,
     "random_state": random_state,
     "chunk_size": 64,
-    "verbosity_batches": 100
+    "verbosity_n_batches": 100
 }
 with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
     json.dump(run_config, f, indent=4)
@@ -177,14 +177,14 @@ modelInterfaceClass = ModelTrainer
 modelInterfaceConfig = {
     "device": device,
     "model": None, # will be set later within CrossValidation class
-    "lossFunction": BCEWithLogitsLoss(),
-    "optimizerClass": AdamW,
-    "optimizerConfig": {"lr": 2.5e-4},
+    "loss_function": BCEWithLogitsLoss(),
+    "optimizer_class": AdamW,
+    "optimizer_config": {"lr": 2.5e-4},
     "optim_scheduler": "step",
     "optim_step_budget": run_config["optim_step_budget"],
     "outputFolder": None, # will be set later
     "batchSize": None, #run_config["batchSize"],
-    "verbosityBatches": run_config["verbosity_batches"],
+    "verbosity_n_batches": run_config["verbosity_n_batches"],
 }
 
 # ====== CROSS-VALIDATION LOOP =========

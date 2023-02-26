@@ -29,7 +29,7 @@ class SelfSupervisedPretraining:
                     pretraingEpochs=5,
                     downstreamEpochs=5,
                     batchSize=256,
-                    verbosityBatches=100,
+                    verbosity_n_batches=100,
                     optim_step_budget=5000,
                     outputFolder=None,
                     dump_model_every_epoch=False,
@@ -47,7 +47,7 @@ class SelfSupervisedPretraining:
         self.pretrainingEpochs = pretraingEpochs
         self.downstreamEpochs = downstreamEpochs
         self.batchSize = batchSize
-        self.verbosityBatches = verbosityBatches
+        self.verbosity_n_batches = verbosity_n_batches
         self.optim_step_budget = optim_step_budget
         self.output_folder = outputFolder
         self.dump_model_every_epoch = dump_model_every_epoch
@@ -89,12 +89,12 @@ class SelfSupervisedPretraining:
             "device": self.device,
             "model": models['pretrained'],
             "modelForwardPass": models['pretrained'].pretrain,
-            "lossFunction": CrossEntropyLoss(),
-            "optimizerClass": AdamW,
-            "optimizerConfig": {"lr": 2.5e-4},
+            "loss_function": CrossEntropyLoss(),
+            "optimizer_class": AdamW,
+            "optimizer_config": {"lr": 2.5e-4},
             "optim_scheduler": "step",
             "optim_step_budget": self.optim_step_budget,
-            "verbosityBatches": self.verbosityBatches,
+            "verbosity_n_batches": self.verbosity_n_batches,
             "batchSize": self.batchSize,
             "falsePositiveRates": self.falsePositiveRates,
         }
@@ -110,7 +110,7 @@ class SelfSupervisedPretraining:
         )
 
         # downstream task for pretrained model
-        model_trainer_config['lossFunction'] = BCEWithLogitsLoss()
+        model_trainer_config['loss_function'] = BCEWithLogitsLoss()
         model_trainer_config['modelForwardPass'] = None
 
         for model in self.training_types:
@@ -125,10 +125,12 @@ class SelfSupervisedPretraining:
             model_trainer[model] = ModelTrainer(**model_trainer_config)
             if model == 'full_data':
                 # TODO: don't like how step is calculated here
+                # use size of x and self.unlabeledDataSize to calculate step
                 model_trainer_config['optim_step_budget'] = self.optim_step_budget//2
                 model_trainer[model].fit(x, y, self.downstreamEpochs, reporting_timestamp=timestamp)
             else:
                 # TODO: don't like how step is calculated here
+                # use size of x and self.unlabeledDataSize to calculate step
                 model_trainer_config['optim_step_budget'] = self.optim_step_budget//10
                 model_trainer[model].fit(labeled_x, labeled_y, self.downstreamEpochs, reporting_timestamp=timestamp)
         
@@ -173,20 +175,20 @@ class SelfSupervisedPretraining:
 
 class CrossValidation(object):
     def __init__(self,
-                 modelInterfaceClass,
-                 modelInterfaceConfig,
-                 modelClass,
-                 modelConfig,
-                 outputRootFolder,
+                 model_trainer_class,
+                 model_trainer_config,
+                 model_class,
+                 model_config,
+                 output_folder_root,
                  dump_data_splits=True):
-        self.modelInterfaceClass = modelInterfaceClass
-        self.modelInterfaceConfig = modelInterfaceConfig
-        self.modelClass = modelClass
-        self.modelConfig = modelConfig
+        self.model_trainer_class = model_trainer_class
+        self.model_trainer_config = model_trainer_config
+        self.model_class = model_class
+        self.model_config = model_config
         self.dump_data_splits = dump_data_splits
 
-        self.outputRootFolder = outputRootFolder
-        os.makedirs(self.outputRootFolder, exist_ok=True)
+        self.output_folder_root = output_folder_root
+        os.makedirs(self.output_folder_root, exist_ok=True)
         
         self.metrics_val = defaultdict(lambda: defaultdict(list))
         self.aucs_val = []
@@ -210,7 +212,7 @@ class CrossValidation(object):
             self.nFolds = folds
             singleFold = False
 
-        logging.warning(f" [!] Epochs per fold: {epochs} | Model config: {self.modelConfig}")
+        logging.warning(f" [!] Epochs per fold: {epochs} | Model config: {self.model_config}")
 
         kf = KFold(n_splits=self.nFolds, shuffle=True, random_state=random_state)
         kf.get_n_splits(X)
@@ -226,7 +228,7 @@ class CrossValidation(object):
             if self.dump_data_splits:
                 splitData = f"dataset_splits_{timestamp}.npz"
                 np.savez_compressed(
-                    os.path.join(self.outputRootFolder, splitData),
+                    os.path.join(self.output_folder_root, splitData),
                     X_train=X_train,
                     y_train=y_train,
                     X_test=X_test,
@@ -234,12 +236,12 @@ class CrossValidation(object):
                 )
                 logging.warning(f" [!] Saved dataset splits to {splitData}")
             # Create the model
-            model = self.modelClass(**self.modelConfig)
+            model = self.model_class(**self.model_config)
 
-            modelInterfaceConfig = self.modelInterfaceConfig
+            modelInterfaceConfig = self.model_trainer_config
             modelInterfaceConfig["model"] = model
-            modelInterfaceConfig["outputFolder"] = self.outputRootFolder
-            modelTrainer = self.modelInterfaceClass(**modelInterfaceConfig)
+            modelInterfaceConfig["outputFolder"] = self.output_folder_root
+            modelTrainer = self.model_trainer_class(**modelInterfaceConfig)
 
             # Train the model
             try:
@@ -311,13 +313,13 @@ class CrossValidation(object):
         suffix = f"_{suffix.rstrip('_').lstrip('_')}" if suffix else ''
         
         metricFilename = f"{prefix}metrics_validation{suffix}.json"
-        metricFileFullpath = os.path.join(self.outputRootFolder, metricFilename)
+        metricFileFullpath = os.path.join(self.output_folder_root, metricFilename)
         with open(metricFileFullpath, "w") as f:
             json.dump(self.metrics_val, f, indent=4)
         logging.warning(f" [!] Metrics saved to {metricFileFullpath}")
 
         metricFilename = f"{prefix}metrics_training{suffix}.json"
-        metricFileFullpath = os.path.join(self.outputRootFolder, metricFilename)
+        metricFileFullpath = os.path.join(self.output_folder_root, metricFilename)
         with open(metricFileFullpath, "w") as f:
             json.dump(self.metrics_train, f, indent=4)
         logging.warning(f" [!] Metrics saved to {metricFileFullpath}")        

@@ -50,7 +50,7 @@ run_config = {
     "random_state": random_state,
     "batchSize": 64,
     "optim_step_budget": 50, # 5000
-    'verbosity_batches': 100,
+    'verbosity_n_batches': 100,
     "dump_model_every_epoch": True,
     "dump_data_splits": True,
     "remask_epochs": 2,
@@ -121,7 +121,7 @@ pretrainingConfig = {
     "unlabeledDataSize": run_config["unlabeledDataSize"],
     "pretraingEpochs": run_config["preTrainEpochs"],
     "downstreamEpochs": run_config["downStreamEpochs"],
-    "verbosityBatches": run_config["verbosity_batches"],
+    "verbosity_n_batches": run_config["verbosity_n_batches"],
     "batchSize": run_config["batchSize"],
     "randomState": random_state,
     "falsePositiveRates": run_config["falsePositiveRates"],

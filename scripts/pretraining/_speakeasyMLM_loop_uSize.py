@@ -64,7 +64,7 @@ for uSize in [0.7, 0,75, 0.8, 0.85, 0.9, 0.95, 0.97]:
         "random_state": random_state,
         "batchSize": 64,
         "optim_step_budget": 5000,
-        'verbosity_batches': 100,
+        'verbosity_n_batches': 100,
         "training_types": ['pretrained', 'non_pretrained']
     }
     with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
@@ -120,7 +120,7 @@ for uSize in [0.7, 0,75, 0.8, 0.85, 0.9, 0.95, 0.97]:
         "unlabeledDataSize": config["unlabeledDataSize"],
         "pretraingEpochs": config["preTrainEpochs"],
         "downstreamEpochs": config["downStreamEpochs"],
-        "verbosityBatches": config["verbosity_batches"],
+        "verbosity_n_batches": config["verbosity_n_batches"],
         "batchSize": config["batchSize"],
         "randomState": random_state,
         "falsePositiveRates": config["falsePositiveRates"],

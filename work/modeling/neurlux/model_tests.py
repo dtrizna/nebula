@@ -55,7 +55,7 @@ y = np.array(y, dtype=np.float16)
 print("y:", y.shape, y[0:10])
 
 loss = BCEWithLogitsLoss()
-optimizerConfig = {"lr": 2.5e-4}
+optimizer_config = {"lr": 2.5e-4}
 model = NeurLuxModel(
     embedding_dim=EMBEDDING_DIM,
     vocab_size=VOCAB_SIZE,
@@ -65,9 +65,9 @@ device = "cuda"
 trainer = ModelTrainer(
     model=model,
     device=device,
-    lossFunction=loss,
-    optimizerConfig=optimizerConfig,
-    optimizerClass=AdamW,
+    loss_function=loss,
+    optimizer_config=optimizer_config,
+    optimizer_class=AdamW,
     batchSize=16
 )
 trainer.train(X, y, epochs=1)

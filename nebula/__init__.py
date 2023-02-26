@@ -24,48 +24,70 @@ class ModelTrainer(object):
     def __init__(self, 
                     model,
                     device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), 
-                    lossFunction=BCEWithLogitsLoss(),
-                    optimizerClass=AdamW,
-                    optimizerConfig={"lr": 2.5e-4},
+                    loss_function=BCEWithLogitsLoss(),
+                    optimizer_class=AdamW,
+                    optimizer_config={"lr": 2.5e-4, "weight_decay": 1e-2},
                     optim_scheduler=None,
                     batchSize=64,
-                    verbosityBatches=100,
+                    verbosity_n_batches=100,
                     outputFolder=None,
                     falsePositiveRates=[0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
                     modelForwardPass=None,
                     stateDict = None,
                     timestamp = None,
                     clip_grad_norm = 0.5,
-                    optim_step_budget = 1000):
+                    optim_step_budget = 1000,
+                    n_batches_grad_update = 1):
         self.model = model    
-        self.optimizer = optimizerClass(self.model.parameters(), **optimizerConfig)
-        self.lossFunction = lossFunction
-        self.verbosityBatches = verbosityBatches
+        self.optimizer = optimizer_class(self.model.parameters(), **optimizer_config)
+        self.loss_function = loss_function
+        self.verbosity_n_batches = verbosity_n_batches
         self.batchSize = batchSize
         self.reporting_timestamp = timestamp
         self.clip_grad_norm = clip_grad_norm
-        self.globalBatchCounter = 0
+        self.global_batch_idx = 0
+        self.n_batches_grad_update = n_batches_grad_update
 
         # lr scheduling setup, for visulaizations see:
         # https://towardsdatascience.com/a-visual-guide-to-learning-rate-schedulers-in-pytorch-24bbb262c863
         if optim_scheduler is None:
             self.optim_scheduler = None
         elif optim_scheduler == "gpt":
-            self.optim_scheduler = OptimSchedulerGPT(self.optimizer)
+            # TODO: broken
+            self.optim_scheduler = OptimSchedulerGPT(
+                self.optimizer, 
+                max_lr=optimizer_config['lr'],
+                half_cycle_batches=optim_step_budget//2
+            )
         elif optim_scheduler == "step":
-            self.optim_scheduler = OptimSchedulerStep(self.optimizer, step_size=optim_step_budget)
+            nr_of_steps = 3
+            self.optim_scheduler = OptimSchedulerStep(
+                self.optimizer, 
+                step_size=optim_step_budget//nr_of_steps
+            )
         elif optim_scheduler == "triangular":
-            # TODO: base_lr, max_lr, step_size_up -- make variable
-            self.optim_scheduler = TriangularSchedule(self.optimizer, base_lr=1e-6, max_lr=1e-4, step_size_up=optim_step_budget)
+            self.optim_scheduler = TriangularSchedule(
+                self.optimizer,
+                base_lr=optimizer_config['lr']/10,
+                max_lr=optimizer_config['lr'],
+                step_size_up=optim_step_budget//2
+            )
         elif optim_scheduler == "onecycle":
-            # TODO: max_lr, step_size -- make variable
-            self.optim_scheduler = OneCycleSchedule(self.optimizer, max_lr=1e-4, steps_per_epoch=optim_step_budget, epochs=10)
+            self.optim_scheduler = OneCycleSchedule(
+                self.optimizer,
+                max_lr=optimizer_config['lr'],
+                total_steps=optim_step_budget
+            )
         elif optim_scheduler == "cosine":
-            # TODO: T_max=2000, eta_min=1e-7 -- make variable
-            self.optim_scheduler = CosineSchedule(self.optimizer)
+            self.optim_scheduler = CosineSchedule(
+                self.optimizer,
+                T_max=optim_step_budget,
+                eta_min=optimizer_config['lr']/10
+            )
         else:
             self.optim_scheduler = optim_scheduler(self.optimizer)
-
+        
+        self.learning_rates = []
         self.falsePositiveRates = falsePositiveRates
         self.fprReportingIdx = 1 # what FPR stats to report every epoch
 
@@ -120,6 +142,10 @@ class ModelTrainer(object):
             if not np.isnan(self.train_tprs).all():
                 np.save(f"{prefix}-trainTPRs.npy", self.train_tprs)
                 dumpString += f"\n\t\ttrain TPRs  : {os.path.basename(prefix)}-trainTPRs.npy"
+
+            if self.learning_rates:
+                np.save(f"{prefix}-learning_rates.npy", np.array(self.learning_rates))
+                dumpString += f"\n\t\tlearning rates: {os.path.basename(prefix)}-learning_rates.npy"
         logging.warning(dumpString)
     
     def getMetrics(self, target, predProbs):
@@ -131,13 +157,13 @@ class ModelTrainer(object):
             metrics.append([tpr, f1_at_fpr])
         return np.array(metrics)
 
-    def trainOneEpoch(self, trainLoader, epochId):
+    def trainOneEpoch(self, train_loader, epochId):
         epoch_losses = []
         epochProbs = []
         targets = []
         now = time.time()
 
-        for batchIdx, (data, target) in enumerate(trainLoader):
+        for batch_idx, (data, target) in enumerate(train_loader):
             targets.extend(target)
             data, target = data.to(self.device), target.to(self.device)
 
@@ -145,32 +171,36 @@ class ModelTrainer(object):
             # if dimension of target is 1, reshape to (-1,1)
             if target.dim() == 1:
                 target = target.reshape(-1, 1)
-            loss = self.lossFunction(logits, target)
+            loss = self.loss_function(logits, target)
 
             epoch_losses.append(loss.item())
 
-            self.optimizer.zero_grad()
-            loss.backward() # derivatives
+            # +1 to skip update at first batch since not yet accumulated gradients
+            if ((batch_idx + 1) % self.n_batches_grad_update == 0) or \
+                (batch_idx + 1 == len(train_loader)): # to update at last batch
+                self.optimizer.zero_grad()
+                loss.backward() # derivatives
 
-            if self.clip_grad_norm is not None:
-                torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.clip_grad_norm)
+                if self.clip_grad_norm is not None:
+                    clip_grad_norm_(self.model.parameters(), self.clip_grad_norm)
 
-            self.optimizer.step() # parameter update
+                self.optimizer.step()
             
             # learning rate update
-            self.globalBatchCounter += 1
+            self.global_batch_idx += 1
             if self.optim_scheduler is not None:
-                self.optim_scheduler.step(self.globalBatchCounter)
-
+                self.optim_scheduler.step(self.global_batch_idx)
+                self.learning_rates.append(self.optim_scheduler.get_lr())
+            
             predProbs = torch.sigmoid(logits).clone().detach().cpu().numpy()
             epochProbs.extend(predProbs)
             
-            if batchIdx % self.verbosityBatches == 0:
+            if batch_idx % self.verbosity_n_batches == 0:
                 metricsReportList = [f"Loss: {loss.item():.6f}", f"Elapsed: {time.time() - now:.2f}s"]
                 if target.shape[1] == 1: # report TPR & F1 only for binary classification
                     batchSetMetrics = self.getMetrics(
-                        np.array(targets[-self.verbosityBatches:]), 
-                        np.array(epochProbs[-self.verbosityBatches:])
+                        np.array(targets[-self.verbosity_n_batches:]), 
+                        np.array(epochProbs[-self.verbosity_n_batches:])
                     )
                     currentTPR = batchSetMetrics[self.fprReportingIdx, 0]
                     currentF1 = batchSetMetrics[self.fprReportingIdx, 1]
@@ -179,16 +209,16 @@ class ModelTrainer(object):
                     metricsReportList.append(metricsReport)
                     try: # calculate auc for last set of batches
                         batch_auc = roc_auc_score(
-                            targets[-self.verbosityBatches:], 
-                            epochProbs[-self.verbosityBatches:]
+                            targets[-self.verbosity_n_batches:], 
+                            epochProbs[-self.verbosity_n_batches:]
                         )
                     # Only one class present in y_true. ROC AUC score is not defined in that case.
                     except ValueError:
                         batch_auc = np.nan
                     metricsReportList.append(f"AUC {batch_auc:.4f}")
                 logging.warning(" [*] {}: Train Epoch: {} [{:^5}/{:^5} ({:^2.0f}%)] | ".format(
-                    time.ctime().split()[3], epochId, batchIdx * len(data), len(trainLoader.dataset),
-                100. * batchIdx / len(trainLoader)) + " | ".join(metricsReportList))
+                    time.ctime().split()[3], epochId, batch_idx * len(data), len(train_loader.dataset),
+                100. * batch_idx / len(train_loader)) + " | ".join(metricsReportList))
                 now = time.time()
 
         if target.shape[1] == 1: # calculate TRP & F1 only for binary classification
@@ -273,7 +303,7 @@ class ModelTrainer(object):
             with torch.no_grad():
                 logits = self.model.forwardPass(data)
 
-            loss = self.lossFunction(logits, target.float().reshape(-1,1))
+            loss = self.loss_function(logits, target.float().reshape(-1,1))
             self.testLoss.append(loss.item())
 
             predProbs = torch.sigmoid(logits).clone().detach().cpu().numpy()
@@ -302,7 +332,7 @@ class ModelTrainer(object):
             with torch.no_grad():
                 logits = self.model(torch.Tensor(data[0]).long().to(self.device))
                 out = torch.vstack([out, logits])
-            if batch_idx % self.verbosityBatches == 0:
+            if batch_idx % self.verbosity_n_batches == 0:
                 print(f" [*] Predicting batch: {batch_idx}/{len(loader)}", end="\r")
 
         return torch.sigmoid(out).clone().detach().cpu().numpy()
