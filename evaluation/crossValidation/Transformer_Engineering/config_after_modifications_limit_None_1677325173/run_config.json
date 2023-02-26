@@ -1,0 +1,24 @@
+{
+    "train_limit": null,
+    "nFolds": 3,
+    "epochs": 6,
+    "fprValues": [
+        0.0001,
+        0.0003,
+        0.001,
+        0.003,
+        0.01,
+        0.03,
+        0.1
+    ],
+    "rest": 0,
+    "maxlen": 512,
+    "batchSize": 64,
+    "optim_step_size": 3000,
+    "random_state": 1763,
+    "chunk_size": 64,
+    "verbosity_batches": 100,
+    "clip_grad_norm": 0.5,
+    "optim": "adamw",
+    "norm_first": true
+}

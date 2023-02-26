@@ -63,7 +63,7 @@ for uSize in [0.7, 0,75, 0.8, 0.85, 0.9, 0.95, 0.97]:
         "train_limit": None,
         "random_state": random_state,
         "batchSize": 64,
-        "optimizerStep": 5000,
+        "optim_step_budget": 5000,
         'verbosity_batches': 100,
         "training_types": ['pretrained', 'non_pretrained']
     }
@@ -124,7 +124,7 @@ for uSize in [0.7, 0,75, 0.8, 0.85, 0.9, 0.95, 0.97]:
         "batchSize": config["batchSize"],
         "randomState": random_state,
         "falsePositiveRates": config["falsePositiveRates"],
-        "optimizerStep": config["optimizerStep"],
+        "optim_step_budget": config["optim_step_budget"],
         "outputFolder": outputFolder,
         "dump_data_splits": True,
         "training_types": config["training_types"]

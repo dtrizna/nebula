@@ -29,14 +29,14 @@ REPO_ROOT = os.path.join(SCRIPT_PATH, "..", "..")
 # ============== REPORTING CONFIG
 LIMIT = None
 EPOCHS = 6
-maxlen = 512
+runType = f"BPE_50k"
+vocab_size = 50000
+DATA_FOLDER = os.path.join(REPO_ROOT, "data", "data_filtered", f"speakeasy_trainset_{runType}")
 modelClass = TransformerEncoderChunks
-random_state = 1763
 
-runType = f"Transformer_Engineering"
 timestamp = int(time.time())
 
-runName = f"norm_first_limit_{LIMIT}_{timestamp}"
+runName = f"norm_first_AdamW_limit_{LIMIT}_{timestamp}"
 outputFolder = os.path.join(REPO_ROOT, "evaluation", "crossValidation", runType, runName)
 os.makedirs(outputFolder, exist_ok=True)
 
@@ -51,49 +51,32 @@ logging.basicConfig(
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 # ============== Cross-Valiation CONFIG
+random_state = 1763
+set_random_seed(random_state)
+
 # transform above variables to dict
 run_config = {
     "train_limit": LIMIT,
     "nFolds": 3,
     "epochs": EPOCHS,
     "fprValues": [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
-    "rest": 10,
-    "maxlen": maxlen,
+    "rest": 0,
+    "maxlen": None,
     "batchSize": 64,
     # 1000-2000 for 10 epochs; 10000 for 30 epochs
     "optim_step_budget": 3000,
     "random_state": random_state,
     "chunk_size": 64,
     "verbosity_batches": 100,
-    "clip_grad_norm": None,
-    "norm_first": [True, False],
+    "clip_grad_norm": [None, 0.1, 0.5, 1]
 }
 with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
     json.dump(run_config, f, indent=4)
 
-# ===== LOADING DATA ==============
-vocab_size = 50000
-xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k", f"speakeasy_vocab_size_{vocab_size}_maxlen_{maxlen}_x.npy")
-x_train = np.load(xTrainFile)
-yTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k", "speakeasy_y.npy")
-y_train = np.load(yTrainFile)
-
-if run_config['train_limit']:
-    x_train, y_train = shuffle(x_train, y_train, random_state=random_state)
-    x_train = x_train[:run_config['train_limit']]
-    y_train = y_train[:run_config['train_limit']]
-
-vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", f"speakeasy_BPE_{vocab_size}_vocab.json")
-with open(vocabFile, 'r') as f:
-    vocab = json.load(f)
-vocab_size = len(vocab) # adjust it to exact number of tokens in the vocabulary
-
-logging.warning(f" [!] Loaded data and vocab. X train size: {x_train.shape}, vocab size: {len(vocab)}")
-
 # =============== MODEL CONFIG
 model_config = {
-    "vocab_size": vocab_size,  # size of vocabulary
-    "maxlen": maxlen,  # maximum length of the input sequence
+    "vocab_size": None,  # size of vocabulary
+    "maxlen": None,  # maximum length of the input sequence
     "chunk_size": run_config["chunk_size"],
     "dModel": 64,  # embedding & transformer dimension
     "nHeads": 8,  # number of heads in nn.MultiheadAttention
@@ -103,8 +86,7 @@ model_config = {
     "hiddenNeurons": [64],
     "layerNorm": False,
     "dropout": 0.3,
-    "mean_over_sequence": False,
-    "norm_first": None,
+    "mean_over_sequence": False
 }
 
 # dump model config as json
@@ -125,33 +107,50 @@ model_trainer_config = {
     "outputFolder": None, # will be set later
     "batchSize": run_config["batchSize"],
     "verbosityBatches": run_config["verbosity_batches"],
-    "clip_grad_norm": run_config["clip_grad_norm"]
+    "clip_grad_norm": None
 }
 
 # =============== CROSS-VALIDATION LOOP
-# CROSS VALIDATION OVER DIFFERENT MODEL CONFIGRATIONS
-logging.warning(f" [!] Using device: {device} | Dataset size: {len(x_train)}")
 
-# GRADIENT CLIPS RUN
-# for grad_clips in [None, 0.1, 0.5, 1]:
-#     metricFilePrefix =f"grad_clip_{grad_clips}"
-#     model_trainer_config["clip_grad_norm"] = grad_clips 
-#     logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with grad clip: {grad_clips}")
+# CROSS VALIDATING OVER DIFFERENT VOCABULARY AND PADDING SIZES
+trainSetsFiles = sorted([x for x in os.listdir(DATA_FOLDER) if x.endswith("_x.npy")])
+y_train = np.load(os.path.join(DATA_FOLDER, "speakeasy_y.npy"))
 
-# OPTIMIZER RUN
-# optim_dict = {"adamw": AdamW, "adam": Adam}
-# for optim_class in optim_dict:
-#     metricFilePrefix =f"optimizier_{optim_class}"
-#     model_trainer_config['optimizerClass'] = optim_dict[optim_class]
-#     logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with optimizer: {optim_class}")
+existingRuns = [x for x in os.listdir(outputFolder) if x.endswith(".json")]
 
-# PRE/POST LAYER NORM RUN
-for norm in run_config["norm_first"]:
-    metricFilePrefix = f"norm_first_{norm}"
-    model_config["norm_first"] = norm
-    logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with layer input normalization: {norm}")
+for i, file in enumerate(trainSetsFiles):
+    logging.warning(f" [!] Starting valiation of file {i}/{len(trainSetsFiles)}: {file}")
+    
+    x_train = np.load(os.path.join(DATA_FOLDER, file))
 
-    set_random_seed(random_state)
+    if run_config['train_limit']:
+        x_train, y_train = shuffle(x_train, y_train, random_state=random_state)
+        x_train = x_train[:run_config['train_limit']]
+        y_train = y_train[:run_config['train_limit']]
+
+    vocab_size = int(file.split("_")[2])
+    model_config["vocab_size"] = vocab_size
+    model_config["vocab_size"] = vocab_size
+    
+    maxlen = int(file.split("_")[4])
+    model_config["maxlen"] = maxlen
+
+    vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", f"speakeasy_BPE_{vocab_size}_vocab.json")
+    with open(vocabFile, 'r') as f:
+        vocab = json.load(f)
+    vocab_size = len(vocab) # adjust it to exact number of tokens in the vocabulary
+
+    existingRunPrefix = f"maxlen_{maxlen}_vocab_size_{vocab_size}_"
+    # skip if already exists
+    if any([x for x in existingRuns if existingRunPrefix in x]):
+        logging.warning(f" [!] Skipping {existingRunPrefix} as it already exists")
+        continue
+    
+    # =============== DO Cross Validation
+    logging.warning(f" [!] Starting valiation of model: {modelClass.__name__}")
+    logging.warning(f" [!] Running Cross Validation with vocab_size: {vocab_size} | maxlen: {maxlen}")
+    logging.warning(f" [!] Using device: {device} | Dataset size: {len(x_train)}")
+    
     cv = CrossValidation(model_trainer_class, model_trainer_config, modelClass, model_config, outputFolder)
     cv.run_folds(
         x_train, 
@@ -161,7 +160,7 @@ for norm in run_config["norm_first"]:
         fprValues=run_config["fprValues"], 
         random_state=random_state
     )
-    cv.dump_metrics(prefix=metricFilePrefix)
+    cv.dump_metrics(prefix=existingRunPrefix)
     cv.log_avg_metrics()
 
     if run_config["rest"]:

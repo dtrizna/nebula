@@ -58,7 +58,7 @@ run_config = {
     "maxlen": maxlen,
     "batchSize": 64,
     # 3000 with 64 batch size will make steps each ~4.5 epoch
-    "optim_step_size": 3000,
+    "optim_step_budget": 3000,
     "random_state": random_state,
     "chunk_size": 64,
     "verbosity_batches": 100
@@ -181,7 +181,7 @@ modelInterfaceConfig = {
     "optimizerClass": AdamW,
     "optimizerConfig": {"lr": 2.5e-4},
     "optim_scheduler": "step",
-    "optim_step_size": run_config["optim_step_size"],
+    "optim_step_budget": run_config["optim_step_budget"],
     "outputFolder": None, # will be set later
     "batchSize": None, #run_config["batchSize"],
     "verbosityBatches": run_config["verbosity_batches"],

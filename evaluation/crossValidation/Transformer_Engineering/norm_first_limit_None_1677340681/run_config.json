@@ -11,11 +11,16 @@
         0.03,
         0.1
     ],
-    "rest": 0,
+    "rest": 10,
     "maxlen": 512,
     "batchSize": 64,
-    "optim_step_size": 3000,
+    "optim_step_budget": 3000,
     "random_state": 1763,
     "chunk_size": 64,
-    "verbosity_batches": 100
+    "verbosity_batches": 100,
+    "clip_grad_norm": null,
+    "norm_first": [
+        true,
+        false
+    ]
 }

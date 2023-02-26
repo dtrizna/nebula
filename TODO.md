@@ -10,7 +10,7 @@
   - Optimization:
     - ~~AdamW~~
     - ~~weight decay 0.1~~
-    - ~~gradient clipping 1.0~~
+    - ~~gradient clipping~~
     - Learning rate schedules:
       - Take into account training budget (micro-batches / epochs / time) and adjust accordingly
       - ~~Cosine (used in "LLaMA: Open and Efficient Foundation Language Models" paper)~~
@@ -24,6 +24,7 @@
     - scaled sinusoidal?
 
 - Plots:
+  - ~~Standartize CV plot functions~~
   - Lineplot loss vs. nr. of tokens (unique?)
   - Performance vs vocab size
 

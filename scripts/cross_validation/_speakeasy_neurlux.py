@@ -78,7 +78,7 @@ for maxLen in maxLens:
         "fprValues": [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
         "rest": 30,
         "batchSize": 64,
-        "optim_step_size": 3000,
+        "optim_step_budget": 3000,
         "random_state": random_state,
         "chunk_size": 64,
         "verbosity_batches": 100,
@@ -161,7 +161,7 @@ for maxLen in maxLens:
         "optimizerClass": AdamW,
         "optimizerConfig": {"lr": 2.5e-4},
         "optim_scheduler": "step",
-        "optim_step_size": run_config["optim_step_size"],
+        "optim_step_budget": run_config["optim_step_budget"],
         "outputFolder": None, # will be set later
         "batchSize": run_config["batchSize"],
         "verbosityBatches": run_config["verbosity_batches"],

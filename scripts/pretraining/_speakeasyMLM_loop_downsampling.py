@@ -63,7 +63,7 @@ for downsample_unlabeled_data in [0.9]:# [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9
         "train_limit": None,
         "random_state": random_state,
         "batchSize": 64,
-        "optimizerStep": 0, #5000,
+        "optim_step_budget": 0, #5000,
         "verbosity_batches": 100,
         "downsample_unlabeled_data": downsample_unlabeled_data, #False
         "training_types": ['pretrained']
@@ -125,7 +125,7 @@ for downsample_unlabeled_data in [0.9]:# [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9
         "batchSize": run_config["batchSize"],
         "randomState": random_state,
         "falsePositiveRates": run_config["falsePositiveRates"],
-        "optimizerStep": run_config["optimizerStep"],
+        "optim_step_budget": run_config["optim_step_budget"],
         "outputFolder": outputFolder,
         "dump_data_splits": True,
         "downsample_unlabeled_data": run_config["downsample_unlabeled_data"],
