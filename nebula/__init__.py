@@ -36,7 +36,6 @@ class ModelTrainer(object):
                     stateDict = None,
                     timestamp = None,
                     clip_grad_norm = 0.5,
-                    # TODO: rename to be suitable for all schedulers
                     optim_step_budget = 1000):
         self.model = model    
         self.optimizer = optimizerClass(self.model.parameters(), **optimizerConfig)

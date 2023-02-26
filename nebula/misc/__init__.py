@@ -103,3 +103,10 @@ def json_unnormalize(df, sep="."):
         # save
         result.append(parsed_row)
     return result
+
+def read_model_files_flom_log(logfile=None, folder="."):
+    if logfile is None:
+        logfile = [x for x in os.listdir(folder) if x.endswith(".log")][0]
+    with open(logfile) as f:
+        log = f.read()
+    return [os.path.join(folder, "training_files", x.split(": ")[1]) for x in log.split("\n") if ".torch" in x]

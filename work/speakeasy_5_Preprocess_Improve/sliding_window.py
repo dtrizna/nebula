@@ -35,7 +35,7 @@ set_random_seed(random_state)
 
 run_config = {
     "train_limit": 1000,
-    "optim_step_size": 1000,
+    "optim_step_budget": 1000,
     "batch_size": 64,
     "chunk_size": 96
 }
@@ -90,7 +90,7 @@ modelInterfaceConfig = {
     "optimizerClass": AdamW,
     "optimizerConfig": {"lr": 2.5e-4},
     "optim_scheduler": "step",
-    "optim_step_size": run_config["optim_step_size"],
+    "optim_step_budget": run_config["optim_step_budget"],
     "outputFolder": None, # will be set later
     "batchSize": run_config["batch_size"],
     "verbosityBatches": 100,

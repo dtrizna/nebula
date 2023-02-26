@@ -3,6 +3,7 @@ import json
 import logging
 import numpy as np
 from collections import defaultdict
+from pandas import DataFrame
 
 from time import sleep, time
 from torch.optim import Adam, AdamW
@@ -29,7 +30,7 @@ class SelfSupervisedPretraining:
                     downstreamEpochs=5,
                     batchSize=256,
                     verbosityBatches=100,
-                    optimizerStep=5000,
+                    optim_step_budget=5000,
                     outputFolder=None,
                     dump_model_every_epoch=False,
                     dump_data_splits=True,
@@ -47,7 +48,7 @@ class SelfSupervisedPretraining:
         self.downstreamEpochs = downstreamEpochs
         self.batchSize = batchSize
         self.verbosityBatches = verbosityBatches
-        self.optimizerStep = optimizerStep
+        self.optim_step_budget = optim_step_budget
         self.output_folder = outputFolder
         self.dump_model_every_epoch = dump_model_every_epoch
         self.dump_data_splits = dump_data_splits
@@ -92,7 +93,7 @@ class SelfSupervisedPretraining:
             "optimizerClass": AdamW,
             "optimizerConfig": {"lr": 2.5e-4},
             "optim_scheduler": "step",
-            "optim_step_size": self.optimizerStep,
+            "optim_step_budget": self.optim_step_budget,
             "verbosityBatches": self.verbosityBatches,
             "batchSize": self.batchSize,
             "falsePositiveRates": self.falsePositiveRates,
@@ -124,11 +125,11 @@ class SelfSupervisedPretraining:
             model_trainer[model] = ModelTrainer(**model_trainer_config)
             if model == 'full_data':
                 # TODO: don't like how step is calculated here
-                model_trainer_config['optim_step_size'] = self.optimizerStep//2
+                model_trainer_config['optim_step_budget'] = self.optim_step_budget//2
                 model_trainer[model].fit(x, y, self.downstreamEpochs, reporting_timestamp=timestamp)
             else:
                 # TODO: don't like how step is calculated here
-                model_trainer_config['optim_step_size'] = self.optimizerStep//10
+                model_trainer_config['optim_step_budget'] = self.optim_step_budget//10
                 model_trainer[model].fit(labeled_x, labeled_y, self.downstreamEpochs, reporting_timestamp=timestamp)
         
         for model in models:
@@ -288,7 +289,7 @@ class CrossValidation(object):
             self.metrics_train[fpr]["f1_std"] = np.nanstd(self.metrics_train[fpr]["f1"])
 
         # Add the average epoch time
-        self.metrics_val["epoch_time_avg"] = np.nanmean(self.training_time)
+        self.metrics_train["epoch_time_avg"] = np.nanmean(self.training_time)
 
     def collect_stats(self, model_trainer, X, y, name="validation"):
         logging.warning(f"\n [!] Evaluating model on {name} set...")
@@ -322,8 +323,97 @@ class CrossValidation(object):
         logging.warning(f" [!] Metrics saved to {metricFileFullpath}")        
 
     def log_avg_metrics(self):
-        msg = f" [!] Average epoch time: {self.metrics_val['epoch_time_avg']:.2f}s | Mean values over {self.nFolds} folds:\n"
+        msg = f" [!] Average epoch time: {self.metrics_train['epoch_time_avg']:.2f}s | Mean values over {self.nFolds} folds:\n"
         msg += f"\tAUC: {self.metrics_val['auc_avg']:.4f}\n"
         for fpr in self.fprValues:
             msg += f"\tFPR: {fpr:>6} -- TPR: {self.metrics_val[fpr]['tpr_avg']:.4f} -- F1: {self.metrics_val[fpr]['f1_avg']:.4f}\n"
         logging.warning(msg)
+
+
+def read_cv_metrics_file(file):
+    with open(file, "r") as f:
+            metrics = json.load(f)
+    cols = ["tpr_avg", "tpr_std", "f1_avg", "f1_std"]
+    dfMetrics = DataFrame(columns=cols)
+    timeValue = None
+    aucs = None
+    for key in metrics:
+        if key in ("avg_epoch_time", "epoch_time_avg"):
+            timeValue = metrics[key]
+        elif key.startswith("auc"):
+            if key == "auc":
+                aucs = metrics[key]
+        else:
+            # false positive rate reporting
+            if isinstance(metrics[key], dict):
+                # take mean, ignore 0.
+                tprs = np.array(metrics[key]['tpr'])
+                tprs[tprs == 0] = np.nan
+                tpr_avg = np.nanmean(tprs)
+                tpr_std = np.nanstd(tprs)
+                # same for f1
+                f1s = metrics[key]['f1']
+                f1s[f1s == 0] = np.nan
+                f1_avg = np.nanmean(f1s)
+                f1_std = np.nanstd(f1s)
+            else: # legacy trp/f1 reporting
+                arr = np.array(metrics[key]).squeeze()
+                if arr.ndim == 1:
+                    tpr_avg = arr[0]
+                    tpr_std = 0
+                    f1_avg = arr[1]
+                    f1_std = 0
+                elif arr.ndim == 2:
+                    tpr_avg = np.nanmean(arr[:, 0])
+                    tpr_std = np.nanstd(arr[:, 0])
+                    f1_avg = np.nanmean(arr[:, 1])
+                    f1_std = np.nanstd(arr[:, 1])
+            dfMetrics.loc[key] = [tpr_avg, tpr_std, f1_avg, f1_std]
+    return dfMetrics, aucs, timeValue
+
+
+def read_cv_metrics_folder(folder, key_lambda, extra_file_filter=None):
+    """Example:
+        def training_filter(file):
+            return file.endswith("training.json")
+
+        def validation_filter(file):
+            return file.endswith("validation.json")
+        
+        def key_extractor(file):
+            return "_".join(file.split("_")[0:3])
+        
+        training_metrics = read_cv_metrics_folder(".", key_extractor, training_filter)
+        validation_metrics = read_cv_metrics_folder(".", key_extractor, validation_filter)
+    """
+    if extra_file_filter:
+        metricFiles = [x for x in os.listdir(folder) if x.endswith(".json") and extra_file_filter(x)]
+    else:
+        metricFiles = [x for x in os.listdir(folder) if x.endswith(".json")]
+    key_to_file = dict(zip([key_lambda(x) for x in metricFiles], metricFiles))
+    try:
+        key_to_file = {k: v for k, v in sorted(key_to_file.items(), key=lambda item: int(item[0]))}
+    except ValueError:
+        key_to_file = {k: v for k, v in sorted(key_to_file.items(), key=lambda item: item[0])}
+
+    metric_dict = dict()
+    for key in key_to_file:
+        metrics, _, _ = read_cv_metrics_file(os.path.join(folder, key_to_file[key]))
+        metric_dict[key] = metrics
+        
+    return metric_dict
+
+
+def read_cv_data_split(npz_file):
+    with np.load(npz_file) as data:
+        X_train = data['X_train']
+        y_train = data['y_train']
+        X_test = data['X_test']
+        y_test = data['y_test']
+    return {"X_train": X_train, "y_train": y_train, "X_test": X_test, "y_test": y_test}
+
+
+def read_cv_data_splits(folder):
+    fold_files = [os.path.join(folder, x) for x in os.listdir(folder) if x.endswith(".npz")][0:3]
+    fold_sets = [read_cv_data_split(f) for f in fold_files]
+    return fold_sets

@@ -49,7 +49,7 @@ run_config = {
     "train_limit": LIMIT,
     "random_state": random_state,
     "batchSize": 64,
-    "optimizerStep": 50, # 5000
+    "optim_step_budget": 50, # 5000
     'verbosity_batches': 100,
     "dump_model_every_epoch": True,
     "dump_data_splits": True,
@@ -125,7 +125,7 @@ pretrainingConfig = {
     "batchSize": run_config["batchSize"],
     "randomState": random_state,
     "falsePositiveRates": run_config["falsePositiveRates"],
-    "optimizerStep": run_config["optimizerStep"],
+    "optim_step_budget": run_config["optim_step_budget"],
     "outputFolder": outputFolder,
     "dump_model_every_epoch": run_config["dump_model_every_epoch"],
     "dump_data_splits": run_config["dump_data_splits"],

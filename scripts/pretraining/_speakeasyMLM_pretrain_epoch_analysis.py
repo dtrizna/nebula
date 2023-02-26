@@ -37,7 +37,7 @@ run_config = {
     "train_limit": None,
     "random_state": random_state,
     'batchSize': 64,
-    'optimizerStep': 10000, # 5000 is too small for 30 epochs
+    'optim_step_budget': 10000, # 5000 is too small for 30 epochs
     'verbosity_batches': 100,
     "dump_model_every_epoch": True,
     "dump_data_splits": True,
@@ -129,7 +129,7 @@ pretrainingConfig = {
     "batchSize": run_config["batchSize"],
     "randomState": random_state,
     "falsePositiveRates": run_config["falsePositiveRates"],
-    "optimizerStep": run_config["optimizerStep"],
+    "optim_step_budget": run_config["optim_step_budget"],
     "outputFolder": outputFolder,
     "dump_model_every_epoch": run_config["dump_model_every_epoch"],
     "dump_data_splits": run_config["dump_data_splits"],
@@ -169,7 +169,7 @@ modelTrainerConfig = {
             "optimizerClass": AdamW,
             "optimizerConfig": {"lr": 2.5e-4},
             "optim_scheduler": "step",
-            "optim_step_size": run_config["optimizerStep"],
+            "optim_step_budget": run_config["optim_step_budget"],
             "verbosityBatches": run_config["verbosity_batches"],
             "batchSize": run_config["batchSize"],
             "falsePositiveRates": run_config["falsePositiveRates"],

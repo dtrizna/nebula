@@ -150,7 +150,10 @@ class TransformerEncoderChunksLM(TransformerEncoderChunks):
             if dropout:
                 self.preTrainBlock.append(nn.Dropout(dropout))
             self.preTrainLayers.append(nn.Sequential(*self.preTrainBlock))
-        self.preTrainLayers.append(nn.Linear(pretrainLayers[-1], vocab_size))
+        if self.preTrainLayers:
+            self.preTrainLayers.append(nn.Linear(pretrainLayers[-1], vocab_size))
+        else:
+            self.preTrainLayers.append(nn.Linear(hiddenNeurons[-1], vocab_size))
         self.preTrainLayers = nn.Sequential(*self.preTrainLayers)
     
     def pretrain(self, x: Tensor) -> Tensor:
