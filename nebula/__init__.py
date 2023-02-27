@@ -16,8 +16,7 @@ from torch.nn import BCEWithLogitsLoss
 from torch.optim import Adam, AdamW
 from torch.utils.data import DataLoader, TensorDataset
 from torch.nn.utils import clip_grad_norm_
-from sklearn.metrics import f1_score, roc_auc_score
-from nebula.misc import get_tpr_at_fpr
+from sklearn.metrics import f1_score, roc_auc_score, roc_curve
 from tqdm import tqdm
 
 class ModelTrainer(object):
@@ -37,6 +36,7 @@ class ModelTrainer(object):
                     timestamp = None,
                     clip_grad_norm = 0.5,
                     optim_step_budget = 1000,
+                    time_budget = None,
                     n_batches_grad_update = 1):
         self.model = model    
         self.optimizer = optimizer_class(self.model.parameters(), **optimizer_config)
@@ -88,8 +88,10 @@ class ModelTrainer(object):
             self.optim_scheduler = optim_scheduler(self.optimizer)
         
         self.learning_rates = []
-        self.falsePositiveRates = falsePositiveRates
-        self.fprReportingIdx = 1 # what FPR stats to report every epoch
+        self.time_budget = time_budget
+
+        self.fp_rates = falsePositiveRates
+        self.fp_reporting_idx = 1 # what FPR stats to report every epoch
 
         self.device = device
         self.model.to(self.device)
@@ -148,12 +150,15 @@ class ModelTrainer(object):
                 dumpString += f"\n\t\tlearning rates: {os.path.basename(prefix)}-learning_rates.npy"
         logging.warning(dumpString)
     
-    def getMetrics(self, target, predProbs):
-        assert isinstance(target, np.ndarray) and isinstance(predProbs, np.ndarray)
+    def getMetrics(self, true_labels, predicted_probs):
+        assert isinstance(true_labels, np.ndarray) and isinstance(predicted_probs, np.ndarray)
+        assert len(true_labels) == len(predicted_probs)
         metrics = []
-        for fpr in self.falsePositiveRates:
-            tpr, threshold = get_tpr_at_fpr(target, predProbs, fpr)
-            f1_at_fpr = f1_score(target, predProbs >= threshold)
+        fprs, tprs, thresholds = roc_curve(true_labels, predicted_probs)
+        for fpr in self.fp_rates:
+            tpr = tprs[fprs <= fpr][-1]
+            threshold = thresholds[fprs <= fpr][-1]
+            f1_at_fpr = f1_score(true_labels, predicted_probs >= threshold)
             metrics.append([tpr, f1_at_fpr])
         return np.array(metrics)
 
@@ -202,9 +207,11 @@ class ModelTrainer(object):
                         np.array(targets[-self.verbosity_n_batches:]), 
                         np.array(epochProbs[-self.verbosity_n_batches:])
                     )
-                    currentTPR = batchSetMetrics[self.fprReportingIdx, 0]
-                    currentF1 = batchSetMetrics[self.fprReportingIdx, 1]
-                    metricsReport = f"FPR {self.falsePositiveRates[self.fprReportingIdx]} -> "
+                    # TODO: check if this is correct
+                    # TODO: unify code with reporting at .fit()
+                    currentTPR = batchSetMetrics[self.fp_reporting_idx, 0]
+                    currentF1 = batchSetMetrics[self.fp_reporting_idx, 1]
+                    metricsReport = f"FPR {self.fp_rates[self.fp_reporting_idx]} -> "
                     metricsReport += f"TPR {currentTPR:.4f} & F1 {currentF1:.4f}"
                     metricsReportList.append(metricsReport)
                     try: # calculate auc for last set of batches
@@ -220,6 +227,10 @@ class ModelTrainer(object):
                     time.ctime().split()[3], epochId, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader)) + " | ".join(metricsReportList))
                 now = time.time()
+            
+            if self.time_budget is not None and (time.time() - self.training_start_time) > self.time_budget:
+                logging.warning(" [!] Time budget exceeded, training stopped.")
+                raise KeyboardInterrupt
 
         if target.shape[1] == 1: # calculate TRP & F1 only for binary classification
             epochMetrics = self.getMetrics(np.array(targets), np.array(epochProbs))
@@ -230,7 +241,16 @@ class ModelTrainer(object):
         else:
             return epoch_losses, None, None, None
 
-    def fit(self, X, y, epochs=10, dump_model_every_epoch=False, overwrite_epoch_idx=False, reporting_timestamp=None):
+    def fit(self, X, y, epochs=10, time_budget=None, dump_model_every_epoch=False, overwrite_epoch_idx=False, reporting_timestamp=None):
+        assert (epochs is not None) ^ (time_budget is not None), \
+            "Either epochs or time_budget should be specified"
+        if time_budget or self.time_budget:
+            self.time_budget = time_budget if time_budget else self.time_budget
+            assert isinstance(self.time_budget, int), "time_budget must be an integer"
+            self.training_start_time = time.time()
+            logging.warning(f" [*] Training time budget set: {self.time_budget/60} min")
+        self.epochs = int(1e4) if self.time_budget else epochs
+
         if reporting_timestamp:
             self.reporting_timestamp = reporting_timestamp
 
@@ -240,8 +260,8 @@ class ModelTrainer(object):
             shuffle=True
         )
         self.model.train()
-        self.train_tprs = np.empty(shape=(epochs, len(self.falsePositiveRates)))
-        self.train_f1s = np.empty(shape=(epochs, len(self.falsePositiveRates)))
+        self.train_tprs = np.empty(shape=(self.epochs, len(self.fp_rates)))
+        self.train_f1s = np.empty(shape=(self.epochs, len(self.fp_rates)))
         self.train_losses = []
         self.training_time = []
         self.auc = []
@@ -267,10 +287,11 @@ class ModelTrainer(object):
                 timeElapsed = time.time() - epochStartTime
                 self.training_time.append(timeElapsed)
                 
+                # TODO: unify code with reporting at .trainOneEpoch()
                 metricsReportList = [f"{epochIdx:^7}", f"Tr.loss: {np.nanmean(epoch_train_loss):.6f}", f"Elapsed: {timeElapsed:^9.2f}s"]
                 if epoch_tprs is not None and epoch_f1s is not None and epoch_auc is not None:
-                    metricsReport = f"FPR {self.falsePositiveRates[self.fprReportingIdx]} -> "
-                    metricsReport += f"TPR: {epoch_tprs[self.fprReportingIdx]:.2f} & F1: {epoch_f1s[self.fprReportingIdx]:.2f}"
+                    metricsReport = f"FPR {self.fp_rates[self.fp_reporting_idx]} -> "
+                    metricsReport += f"TPR: {epoch_tprs[self.fp_reporting_idx]:.2f} & F1: {epoch_f1s[self.fp_reporting_idx]:.2f}"
                     metricsReportList.append(metricsReport)
                     metricsReportList.append(f"AUC: {epoch_auc:.4f}")
                 logging.warning(f" [*] {time.ctime()}: " + " | ".join(metricsReportList))
@@ -282,12 +303,19 @@ class ModelTrainer(object):
             if self.output_folder:
                 self.dumpResults()
 
-    def train(self, X, y, epochs=10):
-        self.fit(X, y, epochs=epochs)
+    def train(self, X, y, epochs=10, time_budget=None, dump_model_every_epoch=False, overwrite_epoch_idx=False, reporting_timestamp=None):
+        self.fit(
+            X, y, 
+            epochs=epochs, 
+            time_budget=time_budget, 
+            dump_model_every_epoch=dump_model_every_epoch, 
+            overwrite_epoch_idx=overwrite_epoch_idx, 
+            reporting_timestamp=reporting_timestamp
+        )
 
     def evaluate(self, X, y, metrics="array"):
-        testLoader = torch.utils.data.DataLoader(
-            torch.utils.data.TensorDataset(torch.from_numpy(X).long(), torch.from_numpy(y).float()),
+        testLoader = DataLoader(
+            TensorDataset(torch.from_numpy(X).long(), torch.from_numpy(y).float()),
             batch_size=self.batchSize,
             shuffle=True
         )
@@ -321,8 +349,8 @@ class ModelTrainer(object):
 
     def predict_proba(self, arr):
         out = torch.empty((0,1)).to(self.device)
-        loader = torch.utils.data.DataLoader(
-            torch.utils.data.TensorDataset(torch.from_numpy(arr).long()),
+        loader = DataLoader(
+            TensorDataset(torch.from_numpy(arr).long()),
             batch_size=self.batchSize,
             shuffle=False
         )
@@ -345,8 +373,8 @@ class ModelTrainer(object):
     
     def metricsToJSON(self, metrics):
         assert len(metrics) == 4, "metricsToJSON(): metrics must be a list of length 4"
-        tprs = dict(zip(["fpr_"+str(x) for x in self.falsePositiveRates], metrics[1]))
-        f1s = dict(zip(["fpr_"+str(x) for x in self.falsePositiveRates], metrics[2]))
+        tprs = dict(zip(["fpr_"+str(x) for x in self.fp_rates], metrics[1]))
+        f1s = dict(zip(["fpr_"+str(x) for x in self.fp_rates], metrics[2]))
         metricDict = DataFrame([tprs, f1s], index=["tpr", "f1"]).to_dict()
         metricDict['loss'] = metrics[0]
         metricDict['auc'] = metrics[3]

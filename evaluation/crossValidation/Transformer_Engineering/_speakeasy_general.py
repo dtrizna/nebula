@@ -14,7 +14,7 @@ from nebula.misc import get_path, set_random_seed,clear_cuda_cache
 
 from torch import cuda
 from torch.nn import BCEWithLogitsLoss
-from torch.optim import Adam, AdamW
+from torch.optim import Adam, AdamW, SGD
 
 # supress UndefinedMetricWarning, which appears when a batch has only one class
 import warnings
@@ -25,7 +25,7 @@ SCRIPT_PATH = get_path(type="script")
 REPO_ROOT = os.path.join(SCRIPT_PATH, "..", "..", "..")
 
 # ============== REPORTING CONFIG
-LIMIT = None # 1000
+LIMIT = None # 5000
 EPOCHS = 6
 maxlen = 512
 modelClass = TransformerEncoderChunks
@@ -33,8 +33,18 @@ random_state = 1763
 
 runType = f"Transformer_Engineering"
 timestamp = int(time.time())
+runName = f"n_batches_grad_update_limit_{LIMIT}_{timestamp}"
 
-runName = f"optim_scheduler_limit_{LIMIT}_{timestamp}"
+# TODO 1: how to deal with scheduler and time budget?
+# TODO 2: add time budget to cross-validation class
+# time budget
+time_budget = 10 # minutes
+
+# scheduler budget
+batch_size = 64
+trainset_size_in_3_validation_split = LIMIT if LIMIT else 50750 # 50750 is the size of the trainset in 3 validation split
+optim_step_budget = ((trainset_size_in_3_validation_split//batch_size) * EPOCHS) + 50 # 50 extra steps to stabilize schedulers
+
 outputFolder = os.path.join(REPO_ROOT, "evaluation", "crossValidation", runType, runName)
 os.makedirs(outputFolder, exist_ok=True)
 
@@ -49,12 +59,7 @@ logging.basicConfig(
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 # ============== Cross-Valiation CONFIG
-batch_size = 64
-if LIMIT:
-    trainset_size_in_3_validation_split = LIMIT
-else:
-    trainset_size_in_3_validation_split = 50750
-optim_step_budget = ((trainset_size_in_3_validation_split//64) * EPOCHS) + 50 # 50 extra steps
+
 run_config = {
     "train_limit": LIMIT,
     "nFolds": 3,
@@ -69,9 +74,9 @@ run_config = {
     "verbosity_n_batches": 100,
     "clip_grad_norm": 1.0,
     "norm_first": True,
-    "n_batches_grad_update": 1,
-    #"optim_scheduler": ["step", "triangular", "onecycle", "cosine"]
-    "optim_scheduler": ["onecycle", "cosine"]
+    "n_batches_grad_update": [1, 8, 32, 64],
+    "optim_scheduler": None,
+    "time_budget": int(time_budget*60)
 }
 with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
     json.dump(run_config, f, indent=4)
@@ -125,13 +130,14 @@ model_trainer_config = {
     "loss_function": BCEWithLogitsLoss(),
     "optimizer_class": AdamW,
     "optimizer_config": {"lr": 2.5e-4},
-    "optim_scheduler": None,
+    "optim_scheduler": run_config["optim_scheduler"],
     "optim_step_budget": run_config["optim_step_budget"],
     "outputFolder": None, # will be set later
     "batchSize": run_config["batchSize"],
     "verbosity_n_batches": run_config["verbosity_n_batches"],
     "clip_grad_norm": run_config["clip_grad_norm"],
-    "n_batches_grad_update": run_config["n_batches_grad_update"]
+    "n_batches_grad_update": run_config["n_batches_grad_update"],
+    "time_budget": run_config["time_budget"],
 }
 
 # =============== CROSS-VALIDATION LOOP
@@ -158,16 +164,16 @@ logging.warning(f" [!] Using device: {device} | Dataset size: {len(x_train)}")
 #     logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with layer input normalization: {norm}")
 
 # BATCHES GRAD UPDATE RUN
-# for n_batches_grad_update in run_config["n_batches_grad_update"]:
-#     metricFilePrefix = f"n_batches_grad_update_{n_batches_grad_update}"
-#     model_trainer_config["n_batches_grad_update"] = n_batches_grad_update
-#     logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with grad. update after n. batches: {n_batches_grad_update}")
+for n_batches_grad_update in run_config["n_batches_grad_update"]:
+    metricFilePrefix = f"n_batches_grad_update_{n_batches_grad_update}"
+    model_trainer_config["n_batches_grad_update"] = n_batches_grad_update
+    logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with grad. update after n. batches: {n_batches_grad_update}")
 
 # LEARNING RATE SCHEDULES
-for optim_scheduler in run_config["optim_scheduler"]:
-    metricFilePrefix = f"optim_scheduler_{optim_scheduler}"
-    model_trainer_config["optim_scheduler"] = optim_scheduler
-    logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with optimizer scheduler: {optim_scheduler}")
+# for optim_scheduler in run_config["optim_scheduler"]:
+#     metricFilePrefix = f"optim_scheduler_{optim_scheduler}"
+#     model_trainer_config["optim_scheduler"] = optim_scheduler
+#     logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with optimizer scheduler: {optim_scheduler}")
 
     set_random_seed(random_state)
     cv = CrossValidation(model_trainer_class, model_trainer_config, modelClass, model_config, outputFolder)

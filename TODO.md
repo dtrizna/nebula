@@ -4,8 +4,9 @@
 
 - Transformer engineering:
   - Sliding window model, use: `work\speakeasy_5_Preprocess_Improve\sliding_window.py`
+  - Finally fix that TPR under low FPR behavior
   - ~~Normalization -- pre or post?~~
-    - RMSNorm?
+    - ~~RMSNorm?~~ Skipped.
     > NOTE: In <https://arxiv.org/pdf/2212.14034.pdf> they've seen no benefits from replacing LayerNorm with RMSNorm.
   - Optimization:
     - ~~AdamW~~
@@ -16,6 +17,8 @@
       - ~~Cosine (used in "LLaMA: Open and Efficient Foundation Language Models" paper)~~
       - ~~Triangular <https://arxiv.org/pdf/2212.14034.pdf>
   - ~~micro-batch summarization for gradient updates~~
+  - ~~Time-budget:~~
+    - Make LR schedulers compatible with time budget.
   - Non-linearity:
     - GELU --> in <https://arxiv.org/pdf/2212.14034.pdf> they've seen no benefits from GELU over ReLU.
     - SwiGLU?
