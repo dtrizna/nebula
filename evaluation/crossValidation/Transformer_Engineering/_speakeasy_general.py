@@ -6,11 +6,9 @@ import time
 from sklearn.utils import shuffle
 
 import sys
-sys.path.extend(['..', '.'])
+sys.path.extend(['../../..', '.'])
 from nebula import ModelTrainer
-from nebula.models import Cnn1DLinear, Cnn1DLSTM, LSTM
-from nebula.models.attention import TransformerEncoderModel, TransformerEncoderChunks, TransformerEncoderModelLM
-from nebula.models.reformer import ReformerLM
+from nebula.models.attention import TransformerEncoderChunks
 from nebula.evaluation import CrossValidation
 from nebula.misc import get_path, set_random_seed,clear_cuda_cache
 
@@ -24,10 +22,10 @@ warnings.filterwarnings("ignore")
 clear_cuda_cache()
 
 SCRIPT_PATH = get_path(type="script")
-REPO_ROOT = os.path.join(SCRIPT_PATH, "..", "..")
+REPO_ROOT = os.path.join(SCRIPT_PATH, "..", "..", "..")
 
 # ============== REPORTING CONFIG
-LIMIT = None
+LIMIT = None # 1000
 EPOCHS = 6
 maxlen = 512
 modelClass = TransformerEncoderChunks
@@ -36,7 +34,7 @@ random_state = 1763
 runType = f"Transformer_Engineering"
 timestamp = int(time.time())
 
-runName = f"norm_first_limit_{LIMIT}_{timestamp}"
+runName = f"optim_scheduler_limit_{LIMIT}_{timestamp}"
 outputFolder = os.path.join(REPO_ROOT, "evaluation", "crossValidation", runType, runName)
 os.makedirs(outputFolder, exist_ok=True)
 
@@ -51,22 +49,29 @@ logging.basicConfig(
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 # ============== Cross-Valiation CONFIG
-# transform above variables to dict
+batch_size = 64
+if LIMIT:
+    trainset_size_in_3_validation_split = LIMIT
+else:
+    trainset_size_in_3_validation_split = 50750
+optim_step_budget = ((trainset_size_in_3_validation_split//64) * EPOCHS) + 50 # 50 extra steps
 run_config = {
     "train_limit": LIMIT,
     "nFolds": 3,
     "epochs": EPOCHS,
     "fprValues": [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
-    "rest": 10,
+    "rest": 0,
     "maxlen": maxlen,
-    "batchSize": 64,
-    # 1000-2000 for 10 epochs; 10000 for 30 epochs
-    "optim_step_budget": 3000,
+    "batchSize": batch_size,
+    "optim_step_budget": optim_step_budget,
     "random_state": random_state,
     "chunk_size": 64,
-    "verbosity_batches": 100,
-    "clip_grad_norm": None,
-    "norm_first": [True, False],
+    "verbosity_n_batches": 100,
+    "clip_grad_norm": 1.0,
+    "norm_first": True,
+    "n_batches_grad_update": 1,
+    #"optim_scheduler": ["step", "triangular", "onecycle", "cosine"]
+    "optim_scheduler": ["onecycle", "cosine"]
 }
 with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
     json.dump(run_config, f, indent=4)
@@ -104,7 +109,7 @@ model_config = {
     "layerNorm": False,
     "dropout": 0.3,
     "mean_over_sequence": False,
-    "norm_first": None,
+    "norm_first": run_config['norm_first'],
 }
 
 # dump model config as json
@@ -117,15 +122,16 @@ model_trainer_class = ModelTrainer
 model_trainer_config = {
     "device": device,
     "model": None, # will be set later within CrossValidation class
-    "lossFunction": BCEWithLogitsLoss(),
-    "optimizerClass": AdamW,
-    "optimizerConfig": {"lr": 2.5e-4},
-    "optim_scheduler": "step",
+    "loss_function": BCEWithLogitsLoss(),
+    "optimizer_class": AdamW,
+    "optimizer_config": {"lr": 2.5e-4},
+    "optim_scheduler": None,
     "optim_step_budget": run_config["optim_step_budget"],
     "outputFolder": None, # will be set later
     "batchSize": run_config["batchSize"],
-    "verbosityBatches": run_config["verbosity_batches"],
-    "clip_grad_norm": run_config["clip_grad_norm"]
+    "verbosity_n_batches": run_config["verbosity_n_batches"],
+    "clip_grad_norm": run_config["clip_grad_norm"],
+    "n_batches_grad_update": run_config["n_batches_grad_update"]
 }
 
 # =============== CROSS-VALIDATION LOOP
@@ -142,14 +148,26 @@ logging.warning(f" [!] Using device: {device} | Dataset size: {len(x_train)}")
 # optim_dict = {"adamw": AdamW, "adam": Adam}
 # for optim_class in optim_dict:
 #     metricFilePrefix =f"optimizier_{optim_class}"
-#     model_trainer_config['optimizerClass'] = optim_dict[optim_class]
+#     model_trainer_config['optimizer_class'] = optim_dict[optim_class]
 #     logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with optimizer: {optim_class}")
 
 # PRE/POST LAYER NORM RUN
-for norm in run_config["norm_first"]:
-    metricFilePrefix = f"norm_first_{norm}"
-    model_config["norm_first"] = norm
-    logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with layer input normalization: {norm}")
+# for norm in run_config["norm_first"]:
+#     metricFilePrefix = f"norm_first_{norm}"
+#     model_config["norm_first"] = norm
+#     logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with layer input normalization: {norm}")
+
+# BATCHES GRAD UPDATE RUN
+# for n_batches_grad_update in run_config["n_batches_grad_update"]:
+#     metricFilePrefix = f"n_batches_grad_update_{n_batches_grad_update}"
+#     model_trainer_config["n_batches_grad_update"] = n_batches_grad_update
+#     logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with grad. update after n. batches: {n_batches_grad_update}")
+
+# LEARNING RATE SCHEDULES
+for optim_scheduler in run_config["optim_scheduler"]:
+    metricFilePrefix = f"optim_scheduler_{optim_scheduler}"
+    model_trainer_config["optim_scheduler"] = optim_scheduler
+    logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with optimizer scheduler: {optim_scheduler}")
 
     set_random_seed(random_state)
     cv = CrossValidation(model_trainer_class, model_trainer_config, modelClass, model_config, outputFolder)
