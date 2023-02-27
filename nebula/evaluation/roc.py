@@ -63,7 +63,7 @@ def get_model_rocs(run_types, model_class, model_config, data_splits, model_file
             model.eval()
             fpr, tpr, roc_auc = get_roc(
                 model, 
-                data_splits[i]["X_test"], 
+                data_splits[i]["X_test"],
                 data_splits[i]["y_test"],
                 model_name=f"{run_type}_split_{i}"
             )

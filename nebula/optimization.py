@@ -11,7 +11,10 @@ class BaseScheduler:
     
     def step(self, idx=None):
         assert self.scheduler is not None, "Scheduler not initialized"
-        self.scheduler.step()
+        try:
+            self.scheduler.step()
+        except Exception as e:
+            logging.warning(f"[!] Scheduler step failed: {e}")
         if self.verbosity and idx % self.verbosity == 0:
             logging.warning(f"[!] Learning rate: {self.optimizer.param_groups[0]['lr']}")
     
@@ -49,23 +52,25 @@ class CosineSchedule(BaseScheduler):
         )
 
 class TriangularSchedule(BaseScheduler):
-    def __init__(self, optimizer, base_lr, max_lr, step_size_up, verbosity=VERBOSITY):
+    def __init__(self, optimizer, base_lr, max_lr, step_size_up, verbose=False, verbosity=VERBOSITY):
         super().__init__(optimizer, verbosity)
         self.scheduler = lr_scheduler.CyclicLR(
             optimizer, base_lr, max_lr, 
             step_size_up=step_size_up, 
             mode="triangular",
-            cycle_momentum=False
+            cycle_momentum=False,
+            verbose=verbose,
         )
         self.step_size_up = step_size_up
 
 class OneCycleSchedule(BaseScheduler):
-    def __init__(self, optimizer, max_lr, total_steps, verbosity=VERBOSITY):
+    def __init__(self, optimizer, max_lr, total_steps, verbose=False, verbosity=VERBOSITY):
         super().__init__(optimizer, verbosity)
         self.scheduler = lr_scheduler.OneCycleLR(
             optimizer, 
             max_lr, 
             total_steps,
-            anneal_strategy="linear"
+            anneal_strategy="linear",
+            verbose=verbose,
         )
         self.total_steps = total_steps
