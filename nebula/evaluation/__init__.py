@@ -201,7 +201,6 @@ class CrossValidation(object):
         Returns: {fpr1: [mean_tpr, mean_f1], fpr2: [mean_tpr, mean_f1], ...], "avg_epoch_time": N seconds}
         """
         self.fprValues = fprValues
-        self.epochs = epochs
         self.trainSize = X.shape[0]
         if folds == 1:
             # kfold requires at least 2 folds -- this is rude shortcut 
@@ -212,13 +211,20 @@ class CrossValidation(object):
             self.nFolds = folds
             singleFold = False
 
-        logging.warning(f" [!] Epochs per fold: {epochs} | Model config: {self.model_config}")
+        if self.model_trainer_config["time_budget"] is not None:
+            self.epochs = int(1e4)
+            msg = f" [!] Training time budget: {self.model_trainer_config['time_budget']}min"
+            msg += f" | Model config: {self.model_config}"
+            logging.warning(msg)
+        else:
+            self.epochs = epochs
+            logging.warning(f" [!] Epochs per fold: {self.epochs} | Model config: {self.model_config}")
 
         kf = KFold(n_splits=self.nFolds, shuffle=True, random_state=random_state)
         kf.get_n_splits(X)
 
         # Create the output
-        self.training_time = np.empty(shape=(folds, epochs))
+        self.training_time = np.empty(shape=(folds, self.epochs))
         # Iterate over the folds
         for i, (train_index, test_index) in enumerate(kf.split(X)):
             timestamp = int(time())
@@ -238,22 +244,22 @@ class CrossValidation(object):
             # Create the model
             model = self.model_class(**self.model_config)
 
-            modelInterfaceConfig = self.model_trainer_config
-            modelInterfaceConfig["model"] = model
-            modelInterfaceConfig["outputFolder"] = self.output_folder_root
-            modelTrainer = self.model_trainer_class(**modelInterfaceConfig)
+            model_trainer_config = self.model_trainer_config
+            model_trainer_config["model"] = model
+            model_trainer_config["outputFolder"] = self.output_folder_root
+            model_trainer = self.model_trainer_class(**model_trainer_config)
 
             # Train the model
             try:
-                modelTrainer.fit(X_train, y_train, epochs=self.epochs, reporting_timestamp=timestamp)
-                self.training_time[i,:] = np.pad(modelTrainer.training_time, (0, epochs-len(modelTrainer.training_time)), 'constant', constant_values=(0,0))
+                model_trainer.fit(X_train, y_train, epochs=self.epochs, reporting_timestamp=timestamp)
+                self.training_time[i,:] = np.pad(model_trainer.training_time, (0, self.epochs-len(model_trainer.training_time)), 'constant', constant_values=(0,0))
             except RuntimeError as e: # cuda outofmemory
                 logging.warning(f" [!] Exception: {e}")
                 break
             
             # collect stats of this run
-            aucs_train, tprs_train, f1_train = self.collect_stats(modelTrainer, X_train, y_train, name="training")
-            aucs_val, tprs_val, f1_val = self.collect_stats(modelTrainer, X_test, y_test, name="validation")
+            aucs_train, tprs_train, f1_train = self.collect_stats(model_trainer, X_train, y_train, name="training")
+            aucs_val, tprs_val, f1_val = self.collect_stats(model_trainer, X_test, y_test, name="validation")
             self.aucs_train.append(aucs_train)
             self.aucs_val.append(aucs_val)
             for fpr in self.fprValues:
@@ -263,7 +269,7 @@ class CrossValidation(object):
                 self.metrics_val[fpr]["f1"].append(f1_val[fpr])
 
             # cleanup
-            del model, modelTrainer, modelInterfaceConfig
+            del model, model_trainer, model_trainer_config
             clear_cuda_cache()
             if singleFold:
                 break
