@@ -6,6 +6,8 @@
 
 Behavioral intrusion detection system that is capable of self-supervised learning from unlabeled data. **Work in progress.**
 
+Max capacity of testable models: ~64M trainable parameters (limited by GPU memory with batch_size of 64).
+
 Quasi-functional implementation:
 
 - Portable Executable (PE) classifier under `nebula.PEHybridClassifier` class. It uses:
