@@ -1,11 +1,12 @@
 import torch
-import logging
 import numpy as np
 from tqdm import tqdm
+from pandas import DataFrame, concat
 from sklearn.metrics import roc_curve, auc
 from collections import defaultdict
 
-from ..misc import read_model_files_flom_log
+from ..misc import read_files_from_log
+from ..misc.plots import plot_roc_curves
 
 def get_roc(model, X_test, y_test, model_name=None):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -43,11 +44,11 @@ def get_roc(model, X_test, y_test, model_name=None):
 
 def get_model_rocs(run_types, model_class, model_config, data_splits, model_files=None, logfile=None, splits=3, verbose=True):
     if model_files is None:
-        model_files = read_model_files_flom_log(logfile)
+        model_files = read_files_from_log(logfile)
     assert len(model_files) == splits*len(run_types),\
-        "Number of model files does not match number of models"
+        f"Number of model files does not match number of models: {len(model_files)}, {splits*len(run_types)}"
     assert len(data_splits) == splits,\
-        "Number of data splits does not match provided models"
+        f"Number of data splits does not match provided models: {len(data_splits)}, {splits}"
     types_to_model_files = {k: model_files[i*splits:(i+1)*splits] for i, k in enumerate(run_types)}
     if verbose:
         msg = "Model files:\n"
@@ -82,3 +83,31 @@ def allign_metrics(metrics, base_fpr_scale=50001):
     tprs_mean = {k: np.mean([v[i] for i in v.keys()], axis=0) for k, v in trps_same.items()}
     tprs_std = {k: np.std([v[i] for i in v.keys()], axis=0) for k, v in trps_same.items()}
     return base_fpr, tprs_mean, tprs_std
+
+def report_alligned_metrics(base_fpr, tprs_mean, tprs_std, metrics, 
+                            fprs=[0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3], 
+                            xlim=[-0.0005, 0.3], 
+                            ylim=[0.6, 1]):
+    tprsdf = DataFrame()
+    for i, model_type in enumerate(tprs_mean.keys()):
+        if i == 0:
+            axs = None        
+        stds = tprs_std[model_type] if tprs_std else None
+        axs = plot_roc_curves(
+            base_fpr, 
+            tprs_mean[model_type], 
+            tpr_std=stds,
+            model_name=f"{model_type}",
+            axs=axs,
+            roc_auc=metrics[model_type][0][2],
+            xlim=xlim,
+            ylim=ylim
+        )
+        tprs = defaultdict(list)
+        for fpr in fprs:
+            tpr = tprs_mean[model_type][np.argmin(np.abs(base_fpr - fpr))]
+            tprs[fpr].append(tpr)
+        tprsdf = concat([tprsdf, DataFrame(tprs, index=[model_type])])
+    [ax.grid() for ax in axs]
+    _ = [ax.legend(loc='lower right') for ax in axs]
+    return tprsdf, axs
