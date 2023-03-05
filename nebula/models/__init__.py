@@ -2,12 +2,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from nebula.constants import *
+from ..constants import *
 
 class Cnn1DLinear(nn.Module):
     def __init__(self, 
                 # embedding params
-                vocabSize = None,
+                vocab_size = None,
+                maxlen = None,
                 embeddingDim = 64,
                 paddingIdx = 0,
                 # conv params
@@ -23,7 +24,7 @@ class Cnn1DLinear(nn.Module):
         super().__init__()
         self.__name__ = "Cnn1DLinear"
         # embdding
-        self.embedding = nn.Embedding(vocabSize, 
+        self.embedding = nn.Embedding(vocab_size, 
                                   embeddingDim, 
                                   padding_idx=paddingIdx)
 
@@ -90,7 +91,8 @@ class Cnn1DLinear(nn.Module):
 class Cnn1DLinearLM(nn.Module):
     def __init__(self, 
                 # embedding params
-                vocabSize = None,
+                vocab_size = None,
+                maxlen = None,
                 embeddingDim = 64,
                 paddingIdx = 0,
                 # conv params
@@ -108,7 +110,7 @@ class Cnn1DLinearLM(nn.Module):
         super().__init__()
         self.__name__ = "Cnn1DLinear"
         # embdding
-        self.embedding = nn.Embedding(vocabSize, 
+        self.embedding = nn.Embedding(vocab_size, 
                                   embeddingDim, 
                                   padding_idx=paddingIdx)
 
@@ -168,7 +170,7 @@ class Cnn1DLinearLM(nn.Module):
             if dropout:
                 self.preTrainBlock.append(nn.Dropout(dropout))
             self.preTrainLayers.append(nn.Sequential(*self.preTrainBlock))
-        self.preTrainLayers.append(nn.Linear(pretrainLayers[-1], vocabSize))
+        self.preTrainLayers.append(nn.Linear(pretrainLayers[-1], vocab_size))
         self.preTrainLayers = nn.Sequential(*self.preTrainLayers)
 
     @staticmethod
@@ -204,7 +206,7 @@ class Cnn1DLinearLM(nn.Module):
 class Cnn1DLSTM(nn.Module):
     def __init__(self, 
                 # embedding params
-                vocabSize = None,
+                vocab_size = None,
                 embeddingDim = 64,
                 paddingIdx = 0,
                 # conv params
@@ -225,7 +227,7 @@ class Cnn1DLSTM(nn.Module):
         super().__init__()
         self.__name__ = "Cnn1DToLSTM"
         # embdding
-        self.embedding = nn.Embedding(vocabSize, 
+        self.embedding = nn.Embedding(vocab_size, 
                                   embeddingDim, 
                                   padding_idx=paddingIdx)
 
@@ -310,7 +312,7 @@ class Cnn1DLSTM(nn.Module):
 
 class LSTM(nn.Module):
     def __init__(self, 
-                    vocabSize = None,
+                    vocab_size = None,
                     embeddingDim = 64,
                     lstmHidden = 256,
                     lstmLayers = 1,
@@ -321,8 +323,8 @@ class LSTM(nn.Module):
                     dropout=0.5,
                     numClasses = 1):
         super(LSTM, self).__init__()
-
-        self.embedding = nn.Embedding(vocabSize, embeddingDim)
+        self.__name__ = "LSTM"
+        self.embedding = nn.Embedding(vocab_size, embeddingDim)
         self.lstm = nn.LSTM(embeddingDim, lstmHidden, lstmLayers, bidirectional=lstmBidirectional, dropout=lstmDropout)
         #self.linear = nn.Linear(hiddenDim * 2 if bidirectionalLSTM else hiddenDim, outputDim)
         self.ffnn = []
@@ -364,6 +366,7 @@ class MLP(nn.Module):
                 layer_sizes = [1024, 512, 256],
                 dropout=0.5):
         super(MLP,self).__init__()
+        self.__name__ = "MLP"
         layers = []
         for i,ls in enumerate(layer_sizes):
             if i == 0:

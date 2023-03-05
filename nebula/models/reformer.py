@@ -3,9 +3,7 @@ import torch
 import torch.nn as nn
 from torch.nn import Identity
 import torch.nn.functional as F
-from torch.autograd import Function
 from functools import partial, reduce, wraps
-from itertools import chain
 from operator import mul
 
 from local_attention import LocalAttention
@@ -18,6 +16,129 @@ from einops import rearrange, repeat
 #constants
 
 TOKEN_SELF_ATTN_VALUE = -5e4 # carefully set for half precision to work
+
+class ReformerLM(nn.Module):
+    def __init__(
+        self,
+        vocab_size,
+        maxlen = None,
+        dim = 64,
+        depth = 4,
+        heads = 4,
+        dim_head = 64,
+        bucket_size = 64,
+        n_hashes = 4,
+        ff_chunks = 100,
+        attn_chunks = 1,
+        causal = False,
+        weight_tie = False,
+        lsh_dropout = 0.,
+        ff_dropout = 0.,
+        ff_mult = 4,
+        ff_activation = None,
+        ff_glu = False,
+        layer_dropout = 0.,
+        random_rotations_per_head = False,
+        weight_tie_embedding = False,
+        use_scale_norm = False,
+        use_rezero = False,
+        use_full_attn = False,
+        full_attn_thres = 0,
+        reverse_thres = 0,
+        num_mem_kv = 0,
+        one_value_head = False,
+        emb_dim = None,
+        return_embeddings = False,
+        fixed_position_emb = False,
+        absolute_position_emb = False,
+        axial_position_emb = False,
+        axial_position_shape = None,
+        n_local_attn_heads = 0,
+        pkm_layers = tuple(),
+        pkm_num_keys = 128,
+        hiddenNeurons: list = [64], # decoder's classifier FFNN complexity
+        classifierDropout: int = 0.5,
+        meanOverSequence: bool = True,
+        numClasses = 1, # binary classification
+    ):
+        super().__init__()
+        self.__name__ = "Reformer"
+        emb_dim = default(emb_dim, dim)
+        self.max_seq_len = maxlen
+        self.meanOverSeq = meanOverSequence
+
+        self.token_emb = nn.Embedding(vocab_size, emb_dim)
+
+        self.to_model_dim = Identity() if emb_dim == dim else nn.Linear(emb_dim, dim)
+
+        self.pos_emb = Always(0)
+        self.layer_pos_emb = Always(None)
+
+        if axial_position_emb:
+            axial_position_shape = default(axial_position_shape, (math.ceil(maxlen / bucket_size), bucket_size))
+            self.pos_emb = AxialPositionalEmbedding(emb_dim, axial_position_shape)
+        elif absolute_position_emb:
+            self.pos_emb = AbsolutePositionalEmbedding(emb_dim, maxlen)
+        elif fixed_position_emb:
+            self.pos_emb = FixedPositionalEmbedding(emb_dim)
+        else:
+            self.layer_pos_emb = FixedPositionalEmbedding(dim_head)
+
+        self.reformer = Reformer(dim, depth, heads = heads, dim_head = dim_head, bucket_size = bucket_size, n_hashes = n_hashes, ff_chunks = ff_chunks, attn_chunks = attn_chunks, causal = causal, weight_tie = weight_tie, lsh_dropout = lsh_dropout, ff_mult = ff_mult, ff_activation = ff_activation, ff_glu = ff_glu, ff_dropout = ff_dropout, post_attn_dropout = 0., layer_dropout = layer_dropout, random_rotations_per_head = random_rotations_per_head, use_scale_norm = use_scale_norm, use_rezero = use_rezero, use_full_attn = use_full_attn, full_attn_thres = full_attn_thres, reverse_thres = reverse_thres, num_mem_kv = num_mem_kv, one_value_head = one_value_head, n_local_attn_heads = n_local_attn_heads, pkm_layers = pkm_layers, pkm_num_keys = pkm_num_keys)
+        self.norm = nn.LayerNorm(dim)
+
+        if return_embeddings:
+            self.out = Identity()
+            return
+
+        self.preTrainLayers = nn.Sequential(
+            nn.Linear(dim, emb_dim) if emb_dim != dim else Identity(),
+            nn.Linear(emb_dim, vocab_size) if not weight_tie_embedding else MatrixMultiply(self.token_emb.weight, transpose=True, normalize=True)
+        )
+
+        self.ffnn = []
+        for i,h in enumerate(hiddenNeurons):
+            self.ffnnBlock = []
+            if i == 0:
+                if self.meanOverSeq:
+                    self.ffnnBlock.append(nn.Linear(dim, h))
+                else:
+                    self.ffnnBlock.append(nn.Linear(dim * maxlen, h))
+            else:
+                self.ffnnBlock.append(nn.Linear(hiddenNeurons[i-1], h))
+
+            self.ffnnBlock.append(nn.ReLU())
+
+            if classifierDropout:
+                self.ffnnBlock.append(nn.Dropout(classifierDropout))
+            
+            self.ffnn.append(nn.Sequential(*self.ffnnBlock))
+        self.ffnn = nn.Sequential(*self.ffnn)
+        
+        self.fcOutput = nn.Linear(hiddenNeurons[-1], numClasses)
+
+    def core(self, x, **kwargs):
+        x = self.token_emb(x)
+        x = x + self.pos_emb(x)
+        layer_pos_emb = self.layer_pos_emb(x)
+        x = self.to_model_dim(x)
+        x = self.reformer(x, pos_emb = layer_pos_emb, **kwargs)
+        x = self.norm(x)
+        return x
+    
+    def pretrain(self, x):
+        x_core = self.core(x)
+        return self.preTrainLayers(x_core).mean(dim=1)
+    
+    def forward(self, x):
+        x = self.core(x)
+        if self.meanOverSeq:
+            x = torch.mean(x, dim=1)
+        else:
+            x = x.view(x.size(0), -1)
+        x = self.ffnn(x)
+        return self.fcOutput(x)
+
 
 # helper fns
 
@@ -713,7 +834,7 @@ class Reformer(nn.Module):
         x = self.layers(x, **kwargs)
         return torch.stack(x.chunk(2, dim=-1)).mean(dim=0)
 
-class ReformerLM(nn.Module):
+class ReformerLM_orig(nn.Module):
     def __init__(self, num_tokens, dim, depth, max_seq_len, heads = 8, dim_head = 64, bucket_size = 64, n_hashes = 4, ff_chunks = 100, attn_chunks = 1, causal = False, weight_tie = False, lsh_dropout = 0., ff_dropout = 0., ff_mult = 4, ff_activation = None, ff_glu = False, post_attn_dropout = 0., layer_dropout = 0., random_rotations_per_head = False, use_scale_norm = False, use_rezero = False, use_full_attn = False, full_attn_thres = 0, reverse_thres = 0, num_mem_kv = 0, one_value_head = False, emb_dim = None, return_embeddings = False, weight_tie_embedding = False, fixed_position_emb = False, absolute_position_emb = False, axial_position_emb = False, axial_position_shape = None, n_local_attn_heads = 0, pkm_layers = tuple(), pkm_num_keys = 128):
         super().__init__()
         emb_dim = default(emb_dim, dim)

@@ -6,11 +6,17 @@ from sklearn.metrics import roc_curve
 import string
 import torch
 import random
+import gc
 import numpy as np
 
 # supress UndefinedMetricWarning, which appears when a batch has only one class
 import warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning)
+
+def clear_cuda_cache():
+    torch.cuda.empty_cache()
+    gc.collect()
+
 
 def get_tpr_at_fpr(true_labels, predicted_probs, fprNeeded):
         fpr, tpr, thresholds = roc_curve(true_labels, predicted_probs)
@@ -36,7 +42,7 @@ def get_path(type="script"):
     idx = 1 if type == "notebook" else 0
     return os.path.dirname(os.path.realpath(sys.argv[idx]))
 
-def getAlphaNumChars(s):
+def get_alphanum_chars(s):
     return ''.join(filter(lambda x: x in string.ascii_letters + string.digits + string.punctuation, s))
 
 def filterDictByKeys(dict, key_list):
@@ -97,3 +103,10 @@ def json_unnormalize(df, sep="."):
         # save
         result.append(parsed_row)
     return result
+
+def read_files_from_log(logfile=None, folder=".", pattern=".torch"):
+    if logfile is None:
+        logfile = [x for x in os.listdir(folder) if x.endswith(".log")][0]
+    with open(logfile) as f:
+        log = f.read()
+    return [os.path.join(folder, "training_files", x.split(": ")[1]) for x in log.split("\n") if pattern in x]

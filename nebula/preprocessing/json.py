@@ -3,26 +3,22 @@ import os
 import pickle
 import logging
 import json
+import operator
 import numpy as np
 from tqdm import tqdm
 from time import time
-from pathlib import Path
 from copy import deepcopy
-from collections import Counter, defaultdict
 from functools import reduce
-import operator
 from typing import Iterable
-from nltk import WhitespaceTokenizer
+from collections import Counter, defaultdict
 from pandas import json_normalize, concat, DataFrame, merge
 
-import nebula
-from nebula.constants import *
-from nebula.misc import getAlphaNumChars
-from nebula.plots import plotCounterCountsLineplot, plotListElementLengths
-from nebula.normalization import normalizeTableIP, normalizeTablePath
-from nebula.ember import PEFeatureExtractor
+from nltk import WhitespaceTokenizer
+import sentencepiece as spm
 
-import speakeasy
+from nebula.constants import *
+from nebula.misc import get_alphanum_chars
+
 
 class JSONParser:
     def __init__(self,
@@ -105,15 +101,16 @@ class JSONParser:
         return recordDict
 
 
-class JSONTokenizer(object):
+class JSONTokenizer:
     def __init__(self, 
                 sequenceLength = 2048,
                 patternCleanup = JSON_CLEANUP_SYMBOLS,
                 stopwords = SPEAKEASY_TOKEN_STOPWORDS,
-                specialTokens = ["<pad>", "<unk>", "<mask>"]):
-        self.tokenizer = WhitespaceTokenizer()
+                specialTokens = ["<unk>", "<pad>", "<mask>"]):
+        self.sequenceLength = sequenceLength
         self.patternCleanup = patternCleanup
         self.stopwords = stopwords
+        self.tokenizer = WhitespaceTokenizer()
         
         self.specialTokens = dict(zip(specialTokens, range(len(specialTokens))))
         self.pad_token = "<pad>"
@@ -127,8 +124,6 @@ class JSONTokenizer(object):
         self.vocab = None
         self.reverseVocab = None
         self.vocabError = "Vocabulary not initialized! Use buildVocab() first or load it using loadVocab()!"
-
-        self.sequenceLength = sequenceLength
 
     # methods related to tokenization
     def clearJsonEvent(self, jsonEvent):
@@ -241,7 +236,7 @@ class JSONTokenizer(object):
         else:
             raise Exception("detokenize(): " + self.vocabError)
 
-    def dumpTokenizerFiles(self, outFolder, tokenListSequence=None):
+    def dumpTokenizerFiles(self, outFolder):
         file = f"{outFolder}\\speakeasy_VocabSize_{self.vocabSize}.pkl"
         self.dumpVocab(file)
         logging.warning("Dumped vocab to {}".format(file))
@@ -252,132 +247,152 @@ class JSONTokenizer(object):
             pickle.dump(self.counter, f)
 
         file = f"{outFolder}\\speakeasy_counter_plot.png"
-        plotCounterCountsLineplot(self.counter, outfile=file)
         logging.warning("Dumped vocab counter plot to {}".format(file))
 
-        if tokenListSequence:
-            _ = plotListElementLengths(tokenListSequence, outfile=f"{outFolder}\\speakeasy_tokenListLengths.png")
 
+class JSONTokenizerBPE:
+    def __init__(self,
+                model_path=None,
+                patternCleanup=JSON_CLEANUP_SYMBOLS,
+                stopwords=SPEAKEASY_TOKEN_STOPWORDS,
+                specialTokens = ["<unk>", "<pad>", "<mask>"]):
+        self.patternCleanup = patternCleanup
+        self.stopwords = stopwords
 
-class PEStaticFeatureExtractor(object):
-    def __init__(self):
-        self.extractor = PEFeatureExtractor(print_feature_warning=False)
-        
-    def feature_vector(self, bytez):
-        return self.extractor.feature_vector(bytez)
+        self.specialTokens = dict(zip(specialTokens, range(len(specialTokens))))
+        self.pad_token = "<pad>"
+        self.unk_token = "<unk>"
+        self.mask_token = "<mask>"
+        self.pad_token_id = self.specialTokens[self.pad_token]
+        self.unk_token_id = self.specialTokens[self.unk_token]
+        self.mask_token_id = self.specialTokens[self.mask_token]
 
-
-class PEDynamicFeatureExtractor(object):
-    def __init__(self, 
-                    speakeasyConfig=None, 
-                    speakeasyRecordFields=SPEAKEASY_RECORD_FIELDS,
-                    recordLimits=SPEAKEASY_RECORD_LIMITS,
-                    emulationOutputFolder=None
-                ):
-        
-        # setup speakseasy config
-        if speakeasyConfig is None:
-            speakeasyConfig = os.path.join(os.path.dirname(nebula.__file__), "configs", "speakeasyConfig.json")
-        if isinstance(speakeasyConfig, dict):
-            self.speakeasyConfig = speakeasyConfig
+        self.vocab = None
+        self.reverse_vocab = None
+        if model_path:
+            self.tokenizer = spm.SentencePieceProcessor(model_file=model_path.rstrip(".model")+".model")
+            logging.warning(" [!] Successfully loaded pre-trained tokenizer model!")
+            self.model_path = model_path
+            self.load_vocab()
         else:
-            assert os.path.exists(speakeasyConfig), f"Speakeasy config file not found: {speakeasyConfig}"
-            with open(speakeasyConfig, "r") as f:
-                self.speakeasyConfig = json.load(f)
-        
-        self.recordLimits = recordLimits
-        self.parser = JSONParser(fields=speakeasyRecordFields)
-
-        self.outputFolder = emulationOutputFolder
-        if self.outputFolder:
-            os.makedirs(emulationOutputFolder, exist_ok=True)
-
-    def _createErrorFile(self, errfile):
-        # just creating an empty file to incdicate failure
-        Path(errfile).touch()
+            self.tokenizer = spm.SentencePieceTrainer
+            logging.warning(" [!] You need to train tokenizer with .train() or specify 'model_path=' during initialization!")
     
-    def _emulation(self, config, path, data):
-        try:
-            file = path if path else str(data[0:15])
-            se = speakeasy.Speakeasy(config=config)
-            if path:
-                module = se.load_module(path=path)
-            if data:
-                module = se.load_module(data=data)
-            se.run_module(module)
-            return se.get_report()
-        except SPEAKEASY_EXCEPTIONS as ex:
-            logging.error(f" [-] Failed emulation of {file}\nException: {ex}\n")
-            return None
-        except Exception as ex:
-            logging.error(f" [-] Failed emulation, general Exception: {file}\n{ex}\n")
-            return None
-    
-    def emulate(self, path=None, data=None):
-        assert path or data, "Either 'file' or 'data' must be specified."
-        if path:
-            assert os.path.exists(path), f"File {path} does not exist."
-            self.sampleName = os.path.basename(path).replace(".exe", "").replace(".dll", "")
-        else:
-            self.sampleName = f"{int(time())}"
-        report = self._emulation(self.speakeasyConfig, path, data)
-        
-        if self.outputFolder:
-            if report:
-                with open(os.path.join(self.outputFolder, f"{self.sampleName}.json"), "w") as f:
-                    json.dump(report, f, indent=4)
+    def split_string_to_chunks(self, s, chunkSize=4192):
+        """This function should split a long string into smaller chunks of size chunkSize, 
+        but it shouldn't split the string in the middle of a word.
+
+        Args:
+            s (str): Longstring
+            chunkSize (int, optional): _description_. Defaults to 512.
+
+        Returns:
+            list: List of smaller strings
+        """
+        chunks = []
+        words = s.split(" ")
+        currentChunk = ""
+        for word in words:
+            if len(currentChunk) + len(word) < chunkSize:
+                currentChunk += word + " "
             else:
-                self._createErrorFile(os.path.join(self.outputFolder, f"{self.sampleName}.err"))
+                chunks.append(currentChunk)
+                currentChunk = word + " "
+        chunks.append(currentChunk)
+        return chunks
 
-        api_seq_len = sum([len(x["apis"]) for x in report["entry_points"]]) if report else 0
-        return None if api_seq_len == 0 else self.filter_and_normalize_report(report["entry_points"])
-    
-    def filter_and_normalize_report(self, entryPoints):
-        # clean up report
-        recordDict = self.parser.filter_and_concat(entryPoints)
+    def clear_json_event(self, jsonData):
+        """
+        Removes all special characters from the json event.
+        """
+        assert isinstance(jsonData, (str, bytes, list, dict))
+        jsonData = str(jsonData).lower()
+        for pattern in self.patternCleanup:
+            jsonData = jsonData.replace(pattern, " ")
+        jsonData = [get_alphanum_chars(x) for x in jsonData.split(" ") if x not in self.stopwords]
+        return ' '.join(jsonData)
+
+    def load_vocab(self, vocabPath=None):
+        if not vocabPath:
+            vocabPath = self.model_path.rstrip(".model")+"_vocab.json"
+            if not os.path.exists(vocabPath): # default sentencepiece -- after training
+                vocabPath = self.model_path.rstrip(".model")+".vocab"
+        with open(vocabPath, encoding="utf-8") as f:
+            if vocabPath.endswith(".json"):
+                self.vocab = json.load(f)
+            else:
+                data = f.read()
+                vocab = [x.split("\t")[0] for x in data.split("\n")]
+                self.vocab = {k:i for i,k in enumerate(vocab)}
+        self.vocab.update(self.specialTokens)
+        self.reverse_vocab = {v:k for k,v in self.vocab.items()}
+        logging.warning(f" [!] Loaded vocab with size {len(self.vocab)} from {vocabPath}")
         
-        # filter out events with uninformative API sequences
-        # i.e. emulation failed extract valuable info
-        if 'apis' in recordDict and \
-            recordDict['apis'].shape[0] == 1 and \
-            recordDict['apis'].iloc[0].api_name == 'MSVBVM60.ordinal_100':
-                return None
+    def dump_vocab(self):
+        vocabFileName = self.model_path.rstrip(".model") + "_vocab.json"
+        with open(vocabFileName, "w") as f:
+            json.dump(self.vocab, f, indent=4)
 
-        # normalize
-        if 'file_access' in recordDict:
-            recordDict['file_access'] = normalizeTablePath(recordDict['file_access'], col='path')
-        if 'network_events.traffic' in recordDict \
-            and 'server' in recordDict['network_events.traffic'].columns:
-                recordDict['network_events.traffic'] = normalizeTableIP(recordDict['network_events.traffic'], col='server')
-        if 'network_events.dns' in recordDict \
-            and 'query' in recordDict['network_events.dns'].columns:
-            recordDict['network_events.dns']['query'] = recordDict['network_events.dns']['query'].apply(lambda x: ' '.join(x.split('.')))
-        # normalize args to exclude any non-alphanumeric characters
-        if 'args' in recordDict['apis'].columns:
-            # filter unicode '\uXXXX' values from args which is list of strings using re.sub
-            recordDict['apis']['args'] = recordDict['apis']['args'].apply(lambda x: [getAlphaNumChars(y) for y in x])
+    def train(self, jsonData, model_prefix="tokenizer", vocab_size=1024, model_type="bpe", split_by_number=False, spLength=4192, removeTrainFiles=True):
+        """
+        Trains the tokenizer on the given json data.
+        """
+        jsonDataClean = self.clear_json_event(jsonData)
+        # splitting a string into chunks of 4192 characters since this sentencepiece limitation
+        jsonDataChunks = self.split_string_to_chunks(jsonDataClean, chunkSize=spLength)
+        # dump jsonDataClean to file
+        trainFile = f"{model_prefix}_trainset_{int(time())}.txt"
+        with open(trainFile, "w", encoding="utf-8") as f:
+            f.write("\n".join(jsonDataChunks))
+
+        trainCmd = " ".join([
+            f"--input={trainFile}",
+            f"--model_prefix={model_prefix}",
+            f"--vocab_size={vocab_size}",
+            f"--model_type={model_type}",
+            f"--split_by_number={split_by_number}",
+            f"--max_sentence_length={spLength}",
+            f"--max_sentencepiece_length=64"
+        ])
+        print(f"Training tokenizer with command: {trainCmd}")
+        self.tokenizer.Train(trainCmd)
+        self.tokenizer = spm.SentencePieceProcessor(model_file=f"{model_prefix}.model")
+        
+        self.model_path = model_prefix
+        self.load_vocab()
+
+        if removeTrainFiles:
+            os.remove(trainFile)
+            os.remove(f"{model_prefix}.vocab")
     
-        # limit verbose fields to a certain number of records
-        if self.recordLimits:
-            for field in self.recordLimits.keys():
-                if field in recordDict.keys():
-                    recordDict[field] = recordDict[field].head(self.recordLimits[field])
-        # join 
-        recordJson = self.joinRecordsToJSON(recordDict)
-        return recordJson
+    def tokenize(self, jsonData):
+        """
+        Tokenizes the given json data.
+        """
+        if isinstance(jsonData, (str, bytes, dict)):
+            jsonData = [jsonData]
+        jsonDataClean = [self.clear_json_event(x) for x in jsonData]
+        return [self.tokenizer.encode_as_pieces(x) for x in jsonDataClean]
+
+    def encode(self, jsonData):
+        """
+        Encodes the given json data.
+        """
+        if isinstance(jsonData, (str, bytes, dict)):
+            jsonData = [jsonData]
+        jsonDataClean = [self.clear_json_event(x) for x in jsonData]
+        return [self.tokenizer.encode_as_ids(x) for x in jsonDataClean]
+
+    def pad_sequence(self, encodedSequence):
+        if len(encodedSequence) > self.sequenceLength:
+            return encodedSequence[:self.sequenceLength]
+        else:
+            return encodedSequence + [self.pad_token_id] * (self.sequenceLength - len(encodedSequence))
     
-    @staticmethod
-    def joinRecordsToJSON(recordDict):
-        jsonEvent = "{"
-        # sort in order to ensure consistent order of fields, put 'apis' at the end
-        for i, key in enumerate(sorted(recordDict.keys(), reverse=True)):
-            jsonVal = recordDict[key].to_json(orient='records')
-            jsonEvent += f"\"{key}\":{jsonVal}"
+    def pad_sequence_list(self, encodedSequenceList, sequenceLength=512):
+        self.sequenceLength = sequenceLength
+        return np.array([self.pad_sequence(x) for x in encodedSequenceList], dtype=np.int32)
 
-            if i != len(recordDict.keys())-1:
-                jsonEvent += ","
+    def pad_sequences(self, encodedSequences, sequenceLength=512):
+        return self.pad_sequence_list(encodedSequences, sequenceLength=sequenceLength)
 
-        if jsonEvent.endswith(","):
-            jsonEvent = jsonEvent[:-1]
-        jsonEvent += "}"
-        return json.loads(jsonEvent)
