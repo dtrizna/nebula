@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from . import read_files_from_log
 
 def plot3D(arr, labels, title):
     #from mpl_toolkits.mplot3d import Axes3D
@@ -129,4 +130,34 @@ def plot_roc_curve(fpr, tpr, model_name, ax, xlim=[-0.0005, 0.003], ylim=[0.3, 1
     ax.plot(fpr, tpr, lw=2, label=label)
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
+    return ax
+
+def plot_losses(run_types, logfile=None, folder='.', splits=3, start=100, n=20, ax=None, spare_ticks=2, skip_types=[], only_first_loss=False):
+    if ax is None:
+        fig, ax = plt.subplots(1, 1, figsize=(10, 6))
+    
+    losses = read_files_from_log(logfile=logfile, folder=folder, pattern="trainLosses")
+    types_to_losses = {k: losses[i*splits:(i+1)*splits] for i, k in enumerate(run_types)}
+    if only_first_loss:
+        types_to_losses = {k: [v[0]] for k, v in types_to_losses.items()}
+    
+    for run_type in types_to_losses:
+        if run_type in skip_types:
+            continue
+        loss_stack = np.vstack([np.load(x) for x in types_to_losses[run_type]])
+        loss_mean = np.mean(loss_stack, axis=0)[start:]
+        loss_std = np.std(loss_stack, axis=0)[start:]
+        # take every Nth value from loss_mean and loss_std
+        loss_mean = loss_mean[::n]
+        loss_std = loss_std[::n]
+
+        ax.plot(loss_mean, label=run_type)
+        ax.fill_between(np.arange(len(loss_mean)), loss_mean-loss_std, loss_mean+loss_std, alpha=0.2)
+    
+    ax.set_xlabel("Batches")
+    ax.set_ylabel("Loss")
+    # set xticklabels to account sampling every N-th value
+    xticks = len(ax.get_xticklabels()) - spare_ticks
+    ax.set_xticklabels([0] + list(np.arange(start, len(loss_mean)*n, len(loss_mean)*n//xticks)))
+    
     return ax
