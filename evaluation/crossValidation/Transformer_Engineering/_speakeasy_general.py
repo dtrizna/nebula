@@ -25,7 +25,7 @@ SCRIPT_PATH = get_path(type="script")
 REPO_ROOT = os.path.join(SCRIPT_PATH, "..", "..", "..")
 
 # ============== REPORTING CONFIG
-LIMIT = None # 5000
+LIMIT = None # 1000
 EPOCHS = 6
 maxlen = 512
 modelClass = TransformerEncoderChunks
@@ -33,14 +33,13 @@ random_state = 1763
 
 runType = f"Transformer_Engineering"
 timestamp = int(time.time())
-runName = f"n_batches_grad_update_limit_{LIMIT}_{timestamp}"
+runName = f"learning_rates_limit_{LIMIT}_{timestamp}"
 
-# TODO 1: how to deal with scheduler and time budget?
-# TODO 2: add time budget to cross-validation class
 # time budget
-time_budget = 10 # minutes
+time_budget = None # 10 # minutes
 
 # scheduler budget
+# TODO: how to deal with scheduler and time budget?
 batch_size = 64
 trainset_size_in_3_validation_split = LIMIT if LIMIT else 50750 # 50750 is the size of the trainset in 3 validation split
 optim_step_budget = ((trainset_size_in_3_validation_split//batch_size) * EPOCHS) + 50 # 50 extra steps to stabilize schedulers
@@ -68,15 +67,16 @@ run_config = {
     "rest": 0,
     "maxlen": maxlen,
     "batchSize": batch_size,
+    "optim_scheduler": "cosine", #None,
     "optim_step_budget": optim_step_budget,
     "random_state": random_state,
     "chunk_size": 64,
     "verbosity_n_batches": 100,
     "clip_grad_norm": 1.0,
     "norm_first": True,
-    "n_batches_grad_update": [1, 8, 32, 64],
-    "optim_scheduler": None,
-    "time_budget": int(time_budget*60)
+    "n_batches_grad_update": 1, 
+    "time_budget": int(time_budget*60) if time_budget else None,
+    "learning_rate": [1e-2, 3e-3, 1e-3, 3e-4, 1e-4]
 }
 with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
     json.dump(run_config, f, indent=4)
@@ -129,10 +129,10 @@ model_trainer_config = {
     "model": None, # will be set later within CrossValidation class
     "loss_function": BCEWithLogitsLoss(),
     "optimizer_class": AdamW,
-    "optimizer_config": {"lr": 2.5e-4},
+    "optimizer_config": None,# {"lr": 2.5e-4},
     "optim_scheduler": run_config["optim_scheduler"],
     "optim_step_budget": run_config["optim_step_budget"],
-    "outputFolder": None, # will be set later
+    "outputFolder": None, # will be set later within CrossValidation class
     "batchSize": run_config["batchSize"],
     "verbosity_n_batches": run_config["verbosity_n_batches"],
     "clip_grad_norm": run_config["clip_grad_norm"],
@@ -151,29 +151,35 @@ logging.warning(f" [!] Using device: {device} | Dataset size: {len(x_train)}")
 #     logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with grad clip: {grad_clips}")
 
 # OPTIMIZER RUN
-# optim_dict = {"adamw": AdamW, "adam": Adam}
+#optim_dict = {"adamw": AdamW, "adam": Adam, "sgd": SGD}
 # for optim_class in optim_dict:
 #     metricFilePrefix =f"optimizier_{optim_class}"
 #     model_trainer_config['optimizer_class'] = optim_dict[optim_class]
 #     logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with optimizer: {optim_class}")
 
 # PRE/POST LAYER NORM RUN
-# for norm in run_config["norm_first"]:
+# for norm in run_config["norm_first"]: # [True, False]
 #     metricFilePrefix = f"norm_first_{norm}"
 #     model_config["norm_first"] = norm
 #     logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with layer input normalization: {norm}")
 
 # BATCHES GRAD UPDATE RUN
-for n_batches_grad_update in run_config["n_batches_grad_update"]:
-    metricFilePrefix = f"n_batches_grad_update_{n_batches_grad_update}"
-    model_trainer_config["n_batches_grad_update"] = n_batches_grad_update
-    logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with grad. update after n. batches: {n_batches_grad_update}")
+# for n_batches_grad_update in run_config["n_batches_grad_update"]: #[1, 8, 32, 64],
+#     metricFilePrefix = f"n_batches_grad_update_{n_batches_grad_update}"
+#     model_trainer_config["n_batches_grad_update"] = n_batches_grad_update
+#     logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with grad. update after n. batches: {n_batches_grad_update}")
 
 # LEARNING RATE SCHEDULES
-# for optim_scheduler in run_config["optim_scheduler"]:
+# for optim_scheduler in run_config["optim_scheduler"]: #["step", "triangular", "onecycle", "cosine", None]
 #     metricFilePrefix = f"optim_scheduler_{optim_scheduler}"
 #     model_trainer_config["optim_scheduler"] = optim_scheduler
 #     logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with optimizer scheduler: {optim_scheduler}")
+
+# LEARNING RATES
+for lr in run_config["learning_rate"]: # [1e-2, 3e-3, 1e-3, 3e-4, 1e-4]
+    metricFilePrefix = f"lr_{lr}"
+    model_trainer_config["optimizer_config"] = {"lr": lr}
+    logging.warning(f" [!] Starting valiation of model: {modelClass.__name__} with learning rate: {lr}")
 
     set_random_seed(random_state)
     cv = CrossValidation(model_trainer_class, model_trainer_config, modelClass, model_config, outputFolder)
