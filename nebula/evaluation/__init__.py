@@ -195,7 +195,7 @@ class CrossValidation(object):
         self.metrics_train = defaultdict(lambda: defaultdict(list))
         self.aucs_train = []
 
-    def run_folds(self, X, y, folds=3, epochs=5, fprValues=[0.0001, 0.001, 0.01, 0.1], random_state=42):
+    def run_folds(self, X, y, folds=3, epochs=5, fprValues=[0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1], random_state=42):
         """
         Cross validate a model on a dataset and return the mean metrics over all folds depending on specific False Positive Rate (FPR).
         Returns: {fpr1: [mean_tpr, mean_f1], fpr2: [mean_tpr, mean_f1], ...], "avg_epoch_time": N seconds}
