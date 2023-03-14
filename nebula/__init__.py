@@ -177,19 +177,20 @@ class ModelTrainer(object):
             if target.dim() == 1:
                 target = target.reshape(-1, 1)
             loss = self.loss_function(logits, target)
+            #loss = loss / self.n_batches_grad_update
+            loss.backward() # derivatives
 
             epoch_losses.append(loss.item())
 
             # +1 to skip update at first batch since not yet accumulated gradients
             if ((batch_idx + 1) % self.n_batches_grad_update == 0) or \
                 (batch_idx + 1 == len(train_loader)): # to update at last batch
-                self.optimizer.zero_grad()
-                loss.backward() # derivatives
 
                 if self.clip_grad_norm is not None:
                     clip_grad_norm_(self.model.parameters(), self.clip_grad_norm)
 
                 self.optimizer.step()
+                self.optimizer.zero_grad()
             
             # learning rate update
             self.global_batch_idx += 1

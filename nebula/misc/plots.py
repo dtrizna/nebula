@@ -122,12 +122,20 @@ def plot_roc_curves(fpr, tpr, tpr_std=None, model_name="", axs=None, roc_auc=Non
         axs[1].plot([0, 1], [0, 1], lw=2, linestyle="--")
     return axs
 
-def plot_roc_curve(fpr, tpr, model_name, ax, xlim=[-0.0005, 0.003], ylim=[0.3, 1.0], roc_auc=None):
+def plot_roc_curve(fpr, tpr, tpr_std=None, model_name="", ax=None, xlim=[-0.0005, 0.003], ylim=[0.3, 1.0], roc_auc=None):
+    if ax is None:
+        fig, ax = plt.subplots(1, 1, figsize=(10, 6))
     if roc_auc:
         label = f"{model_name} (AUC = {roc_auc:.6f})"
     else:
         label = model_name
     ax.plot(fpr, tpr, lw=2, label=label)
+    if tpr_std is not None:
+        tprs_upper = np.minimum(tpr + tpr_std, 1)
+        tprs_lower = tpr - tpr_std
+        color = ax.lines[-1].get_color()
+        color = color[:-2] + "33"
+        ax.fill_between(fpr, tprs_lower, tprs_upper, alpha=.2)
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
     return ax
