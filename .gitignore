@@ -6,6 +6,8 @@ __pycache__/
 # data
 data/data_raw/windows_emulation*
 data/data_raw/windows_raw_pe_*
+data/data_raw/Avast*
+data/data_raw/CruParamer/*
 data/data_filtered/speakeasy_testset*/
 data/data_filtered/speakeasy_trainset*/
 data/data_filtered/ember*
