@@ -4,6 +4,12 @@ from pandas import to_datetime
 
 from nebula.constants import VARIABLE_MAP
 
+import orjson
+import time
+import logging
+import os
+from tqdm import tqdm
+
 def normalizeTablePath(df, col="path"):
     if df.empty:
         return df
@@ -115,3 +121,31 @@ def normalizeAuditdTable(df):
     # ppid preprocessing
     df['process.ppid'] = df['process.ppid'].apply(lambda x: x if x == "1" else "<pid>")
     return df
+
+def read_and_filter_json_folders(subFolders, filter_function, benign_folders, limit=None):
+    """
+    Reads and filters all json files in subFolders. Returns a list of events and a list of y values.
+    """
+    events, y, y_filepaths = [], [], []
+    for subFolder in subFolders:
+        timenowStart = time.time()
+        logging.warning(f"Filtering and normalizing {subFolder.strip()}")
+
+        files = [os.path.join(subFolder, x) for x in os.listdir(subFolder)[:limit] if x.endswith(".json")]
+        for file in tqdm(files):
+            with open(file, "r") as f:
+                jsonEventRaw = orjson.loads(f.read())
+
+            jsonEventFiltered = filter_function(jsonEventRaw)
+            if jsonEventFiltered:
+                events.append(jsonEventFiltered)
+                
+                #basename = os.path.basename(file).rstrip('.json')
+                y_filepaths.append(file)
+                if os.path.basename(subFolder) in benign_folders:
+                    y.append(0)
+                else:
+                    y.append(1)
+        timenowEnd = time.time()
+        logging.warning(f"Finished... Took: {timenowEnd - timenowStart:.2f}s")
+    return events, y, y_filepaths

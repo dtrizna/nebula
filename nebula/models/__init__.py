@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from ..constants import *
+from .attention import TransformerEncoderChunks, TransformerEncoderModel
 
 class Cnn1DLinear(nn.Module):
     def __init__(self, 

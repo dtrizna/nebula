@@ -1,8 +1,8 @@
 # https://github.com/ucsb-seclab/Neurlux/blob/main/attention_train_all.py#L129
 
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from .preprocessor import NeurLuxPreprocessor
 
 EMBEDDING_DIM = 256
 VOCAB_SIZE = 10000

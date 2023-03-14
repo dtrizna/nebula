@@ -276,7 +276,9 @@ class JSONTokenizerBPE:
             self.load_vocab()
         else:
             self.tokenizer = spm.SentencePieceTrainer
-            logging.warning(" [!] You need to train tokenizer with .train() or specify 'model_path=' during initialization!")
+            msg = " [!] Initialized tokenizer without pre-trained model.\n\t"
+            msg += "You need to train tokenizer with .train() or specify 'model_path=' during initialization!"
+            logging.warning(msg)
     
     def split_string_to_chunks(self, s, chunkSize=4192):
         """This function should split a long string into smaller chunks of size chunkSize, 
@@ -324,7 +326,12 @@ class JSONTokenizerBPE:
                 data = f.read()
                 vocab = [x.split("\t")[0] for x in data.split("\n")]
                 self.vocab = {k:i for i,k in enumerate(vocab)}
-        self.vocab.update(self.specialTokens)
+        # update vocab with special tokens, but ensure that they are unique & at correct locations
+        keys = list(self.vocab.keys())
+        values = list(self.vocab.values())
+        for k,v in self.specialTokens.items():
+            keys[v] = k
+        self.vocab = dict(zip(keys, values))
         self.reverse_vocab = {v:k for k,v in self.vocab.items()}
         logging.warning(f" [!] Loaded vocab with size {len(self.vocab)} from {vocabPath}")
         
@@ -333,7 +340,16 @@ class JSONTokenizerBPE:
         with open(vocabFileName, "w") as f:
             json.dump(self.vocab, f, indent=4)
 
-    def train(self, jsonData, model_prefix="tokenizer", vocab_size=1024, model_type="bpe", split_by_number=False, spLength=4192, removeTrainFiles=True):
+    def train(
+        self,
+        jsonData,
+        vocab_size=1024,
+        model_prefix="tokenizer",
+        model_type="bpe",
+        split_by_number=False,
+        spLength=4192,
+        removeTrainFiles=True
+    ):
         """
         Trains the tokenizer on the given json data.
         """
@@ -360,6 +376,7 @@ class JSONTokenizerBPE:
         
         self.model_path = model_prefix
         self.load_vocab()
+        self.dump_vocab()
 
         if removeTrainFiles:
             os.remove(trainFile)
