@@ -1,15 +1,13 @@
 # TODO
 
 - Build an end-to-end pipeline for:
-  - **Speakeasy + Transformer**
-  - Speakeasy + NeurLux
-  - Speakeasy + Quo.Vadis
-  - Speakeasy + CruParam Models (?)
+  - ~~Speakeasy + Transformer~~
+  - ~~Speakeasy + NeurLux~~
+  - ~~Speakeasy + Quo.Vadis~~
+  - ROC and other metrics from cv folder for all three models
   - Avast + Transformer
   - Avast + NeurLux
   - Avast + Quo.Vadis
-  - Avast + CruParam Models (?)
   - CruParam + Transformer
   - CruParam + NeurLux
   - CruParam + Quo.Vadis
-  - CruParam + CruParam Models (?)
