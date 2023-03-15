@@ -214,11 +214,11 @@ class CrossValidation(object):
         if self.model_trainer_config["time_budget"] is not None:
             self.epochs = int(1e4)
             msg = f" [!] Training time budget: {self.model_trainer_config['time_budget']}min"
-            msg += f" | Model config: {self.model_config}"
             logging.warning(msg)
         else:
             self.epochs = epochs
-            logging.warning(f" [!] Epochs per fold: {self.epochs} | Model config: {self.model_config}")
+            logging.warning(f" [!] Epochs per fold: {self.epochs}")
+        logging.warning(f" [!] Model config: {self.model_config}")
 
         kf = KFold(n_splits=self.nFolds, shuffle=True, random_state=random_state)
         kf.get_n_splits(X)
@@ -230,7 +230,7 @@ class CrossValidation(object):
             timestamp = int(time())
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
-            logging.warning(f"\n[!!!] Fold {i+1}/{self.nFolds} | Train set size: {len(X_train)}, Validation set size: {len(X_test)}")
+            logging.warning(f" [{i+1}/{self.nFolds}] Train set size: {len(X_train)}, Validation set size: {len(X_test)}")
             if self.dump_data_splits:
                 splitData = f"dataset_splits_{timestamp}.npz"
                 np.savez_compressed(
@@ -300,7 +300,7 @@ class CrossValidation(object):
         self.metrics_train["epoch_time_avg"] = np.nanmean(self.training_time)
 
     def collect_stats(self, model_trainer, X, y, name="validation"):
-        logging.warning(f"\n [!] Evaluating model on {name} set...")
+        logging.warning(f" [!] Evaluating model on {name} set...")
         probs = model_trainer.predict_proba(X)
         logging.warning(f" [!] This fold metrics on {name} set:")
         # calculate auc 

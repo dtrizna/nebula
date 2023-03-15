@@ -370,7 +370,7 @@ class ModelTrainer(object):
         self.model.eval()
         with torch.no_grad():
             logits = self.model.predict_proba(arr)
-        return (logits > threshold).astype(np.int_)
+        return (logits > threshold).astype(np.int8)
     
     def metricsToJSON(self, metrics):
         assert len(metrics) == 4, "metricsToJSON(): metrics must be a list of length 4"

@@ -98,4 +98,4 @@ class NeurLuxPreprocessor:
     def pad_sequence(self, sequence):
         """Pads a sequence of encoded text to length."""
         padded = [self.pad(encoded) for encoded in sequence]
-        return np.vstack(padded).astype(np.int16)
+        return np.vstack(padded).astype(np.int32)
