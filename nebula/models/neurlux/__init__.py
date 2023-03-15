@@ -28,7 +28,7 @@ class NeurLuxModel(nn.Module):
     def __init__(self,
                  embedding_dim=EMBEDDING_DIM,
                  vocab_size=VOCAB_SIZE,
-                 maxlen=MAX_LEN):
+                 seq_len=MAX_LEN):
         super(NeurLuxModel, self).__init__()
         self.__name__ = "NeurLux"
         self.embedding = nn.Embedding(vocab_size, embedding_dim)
@@ -37,7 +37,7 @@ class NeurLuxModel(nn.Module):
         self.lstm = nn.LSTM(100, 32, bidirectional=True,
                             batch_first=True)
         self.attention = Attention(embed_dim=64) # LSTM_out * 2
-        attention_out = 64*int((maxlen-1)/4)
+        attention_out = 64*int((seq_len-1)/4)
         self.fc1 = nn.Linear(attention_out, 10)
         self.dropout = nn.Dropout(0.25)
         self.fc2 = nn.Linear(10, 1)
