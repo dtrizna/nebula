@@ -303,14 +303,16 @@ class JSONTokenizerBPE:
         chunks.append(currentChunk)
         return chunks
 
-    def clear_json_event(self, jsonData):
+    def clear_json_event(self, jsonDataIn):
         """
         Removes all special characters from the json event.
         """
-        assert isinstance(jsonData, (str, bytes, list, dict))
-        jsonData = str(jsonData).lower()
-        for pattern in self.patternCleanup:
-            jsonData = jsonData.replace(pattern, " ")
+        assert isinstance(jsonDataIn, (str, bytes, list, dict))
+        jsonDataIn = " ".join(jsonDataIn) if isinstance(jsonDataIn, list) else jsonDataIn
+        jsonData = str(jsonDataIn).lower()
+        if self.patternCleanup:
+            for pattern in self.patternCleanup:
+                jsonData = jsonData.replace(pattern, " ")
         jsonData = [get_alphanum_chars(x) for x in jsonData.split(" ") if x not in self.stopwords]
         return ' '.join(jsonData)
 
@@ -353,10 +355,12 @@ class JSONTokenizerBPE:
         """
         Trains the tokenizer on the given json data.
         """
+        logging.warning(" [*] Data preparation for SentencePiece tokenizer...")
         jsonDataClean = self.clear_json_event(jsonData)
         # splitting a string into chunks of 4192 characters since this sentencepiece limitation
-        jsonDataChunks = self.split_string_to_chunks(jsonDataClean, chunkSize=spLength)
+        jsonDataChunks = self.split_string_to_chunks(jsonDataClean.replace("\\\\", "\\"), chunkSize=spLength)
         # dump jsonDataClean to file
+        logging.warning(" [*] Saving to disk...")
         trainFile = f"{model_prefix}_trainset_{int(time())}.txt"
         with open(trainFile, "w", encoding="utf-8") as f:
             f.write("\n".join(jsonDataChunks))
@@ -370,7 +374,7 @@ class JSONTokenizerBPE:
             f"--max_sentence_length={spLength}",
             f"--max_sentencepiece_length=64"
         ])
-        print(f"Training tokenizer with command: {trainCmd}")
+        logging.warning(f" [!] Training tokenizer with command: {trainCmd}")
         self.tokenizer.Train(trainCmd)
         self.tokenizer = spm.SentencePieceProcessor(model_file=f"{model_prefix}.model")
         

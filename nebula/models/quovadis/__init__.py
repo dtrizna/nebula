@@ -1,7 +1,8 @@
 import numpy as np
 import logging
 import json
-from os.path import join
+from tqdm import tqdm
+from os.path import join, exists
 from collections import Counter
 from .preprocessor import report_to_apiseq, flatten
 
@@ -22,7 +23,7 @@ class Core1DConvNet(nn.Module):
                 hidden_neurons = [1024, 512, 256, 128],
                 batch_norm_ffnn = True,
                 dropout = 0.5,
-                num_classes = 2):
+                num_classes = 1):
         super().__init__()
         
         # embdding
@@ -82,26 +83,34 @@ class Core1DConvNet(nn.Module):
         x_conv = [self.conv_and_max_pool(embedded, conv1d) for conv1d in self.conv1d_module]
         x_fc = self.ffnn(torch.cat(x_conv, dim=1))
         out = self.fc_output(x_fc)
-        
         return out
 
 
 class QuoVadisModel(Core1DConvNet):
     def __init__(self, vocab=None, seq_len=150):
-        super().__init__()
-        self.vocab = vocab
         self.seq_len = seq_len
-        if self.vocab is None:
-            logging.warning(" [!] Model initialized without vocabulary - use .build_vocab()!")
+        if vocab is None:
+            logging.warning(" [!] Class initialized without vocabulary as preprocessor - use .build_vocab()!")
+            super().__init__()
         else:
-            self.reverse_vocab = {v:k for k,v in self.vocab.items()}
-    
-    def build_vocab(self, reports, top_api=600):
-        api_sequences = []
-        for report in reports:
-            api_sequences.append(report_to_apiseq(report))
+            if isinstance(vocab, dict):
+                self.vocab = vocab
+            elif exists(vocab):
+                with open(vocab) as f:
+                    self.vocab = json.load(f)
+            else:
+                raise ValueError(f"vocab: should be either dict or filepath to JSON object, got: {vocab}")
+            super().__init__(vocab_size=len(self.vocab))
+
+    def build_vocab(self, reports, top_api=600, sequences=False):
+        if sequences:
+            api_sequences = reports
+        else:
+            api_sequences = []
+            for report in tqdm(reports):
+                api_sequences.append(report_to_apiseq(report))
         api_counter = Counter(flatten(api_sequences))
-        api_calls_preserved = [x[0] for x in api_counter.most_common(top_api)]
+        api_calls_preserved = [x[0] for x in api_counter.most_common(top_api-2)] # -2 to account for pad & other
         self.vocab = dict(zip(['<pad>', '<other>'] + api_calls_preserved, range(len(api_calls_preserved)+2)))
         self.reverse_vocab = {v:k for k,v in self.vocab.items()}
         return api_sequences
@@ -127,7 +136,7 @@ class QuoVadisModel(Core1DConvNet):
         return logits, preds
     
     def apisequences_to_arr(self, api_sequences):
-        return np.array([self.apiseq_to_arr(seq) for seq in api_sequences], dtype=np.int16)
+        return np.array([self.apiseq_to_arr(seq) for seq in api_sequences], dtype=np.int32)
 
     def apiseq_to_arr(self, rawseq):
         """Function that transforms raw API sequence list to encoded array of fixed length."""
