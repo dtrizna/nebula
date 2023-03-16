@@ -4,6 +4,7 @@ import string
 import json
 from os.path import join, exists
 import numpy as np
+from tqdm import tqdm
 
 class NeurLuxPreprocessor:
     """Preprocesses text for NeurLux.
@@ -38,7 +39,7 @@ class NeurLuxPreprocessor:
         """Builds the vocabulary from the corpus and preserve the
          top vocabSize tokens based on appearance counts."""
         self.vocab = Counter()
-        for text in corpus:
+        for text in tqdm(corpus):
             text = self.lowercase_and_clear_punctuation(text)
             tokens = self.tokenizer.tokenize(text)
             self.vocab.update(tokens)

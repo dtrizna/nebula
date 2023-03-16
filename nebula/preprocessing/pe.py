@@ -11,7 +11,7 @@ from nebula.constants import *
 from nebula.models.ember import PEFeatureExtractor
 from nebula.misc import get_alphanum_chars
 
-from .json import JSONParser
+from .json import JSONFilter
 from .normalization import normalizeTableIP, normalizeTablePath
 
 class PEStaticFeatureExtractor(object):
@@ -41,7 +41,7 @@ class PEDynamicFeatureExtractor(object):
                 self.speakeasyConfig = json.load(f)
         
         self.recordLimits = recordLimits
-        self.parser = JSONParser(fields=speakeasyRecordFields)
+        self.parser = JSONFilter(fields=speakeasyRecordFields)
 
         self.outputFolder = emulationOutputFolder
         if self.outputFolder:

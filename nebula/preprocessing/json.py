@@ -17,10 +17,10 @@ from nltk import WhitespaceTokenizer
 import sentencepiece as spm
 
 from nebula.constants import *
-from nebula.misc import get_alphanum_chars
+import string
 
 
-class JSONParser:
+class JSONFilter:
     def __init__(self,
                 fields,
                 normalized=False):
@@ -100,40 +100,84 @@ class JSONParser:
                 recordDict[key] = concat([recordDict[key], tableDict[key]], axis=0, ignore_index=True)
         return recordDict
 
-
 class JSONTokenizer:
-    def __init__(self, 
-                sequenceLength = 2048,
-                patternCleanup = JSON_CLEANUP_SYMBOLS,
-                stopwords = SPEAKEASY_TOKEN_STOPWORDS,
-                specialTokens = ["<unk>", "<pad>", "<mask>"]):
-        self.sequenceLength = sequenceLength
-        self.patternCleanup = patternCleanup
-        self.stopwords = stopwords
-        self.tokenizer = WhitespaceTokenizer()
+    def __init__(self,
+                 seq_len,
+                 vocab_size,
+                 cleanup_symbols=JSON_CLEANUP_SYMBOLS,
+                 special_tokens = ["<pad>", "<unk>", "<mask>"]
+        ):
+        self.seq_len = seq_len
+        self.vocab_size = vocab_size
+        self.cleanup_symbols = cleanup_symbols
         
-        self.specialTokens = dict(zip(specialTokens, range(len(specialTokens))))
-        self.pad_token = "<pad>"
-        self.unk_token = "<unk>"
-        self.mask_token = "<mask>"
-        self.pad_token_id = self.specialTokens[self.pad_token]
-        self.unk_token_id = self.specialTokens[self.unk_token]
-        self.mask_token_id = self.specialTokens[self.mask_token]
+        self.special_tokens = dict(zip(special_tokens, range(len(special_tokens))))
+        assert len(self.special_tokens) >= 3, "special_tokens must contain at least 3 tokens for pad, unk, and mask!"
+        self.pad_token = special_tokens[0]
+        self.unk_token = special_tokens[1]
+        self.mask_token = special_tokens[2]
+        self.pad_token_id = self.special_tokens[self.pad_token]
+        self.unk_token_id = self.special_tokens[self.unk_token]
+        self.mask_token_id = self.special_tokens[self.mask_token]
 
-        self.counter = None
         self.vocab = None
-        self.reverseVocab = None
-        self.vocabError = "Vocabulary not initialized! Use buildVocab() first or load it using loadVocab()!"
+        self.reverse_vocab = None
+        
+    def clear_json_event(self, text):
+        """
+        Removes all special characters from the json event.
+        """
+        assert isinstance(text, (str, bytes, list, dict))
+        if isinstance(text, bytes):
+            text = text.decode('utf-8')
+        text = ' '.join(text) if isinstance(text, list) and isinstance(text[0], str) else text
+        text = str(text).lower()
+        if self.cleanup_symbols:
+            for pattern in self.cleanup_symbols:
+                text = text.replace(pattern, "")
+        text = text.translate(str.maketrans('', '', string.punctuation))
+        return text
 
-    # methods related to tokenization
-    def clearJsonEvent(self, jsonEvent):
-        jsonEvent = str(jsonEvent).lower()
-        for x in self.patternCleanup:
-            jsonEvent = jsonEvent.replace(x, " ")
-        return jsonEvent
+    def pad_sequence(self, encoded_sequence, seq_len=None):
+        if seq_len is None:
+            seq_len = self.seq_len
+        if len(encoded_sequence) >= seq_len:
+            return encoded_sequence[:seq_len]
+        else:
+            padded = np.pad(
+                encoded_sequence, 
+                (0, seq_len - len(encoded_sequence)), 
+                mode='constant', 
+                constant_values=self.pad_token_id
+            )
+            return padded
+    
+    def pad_sequence_list(self, encoded_sequence_list, seq_len=None):
+        return np.array([self.pad_sequence(x, seq_len) for x in encoded_sequence_list], dtype=np.int32)
 
-    def tokenizeEvent(self, jsonEvent):
-        jsonEventClean = self.clearJsonEvent(jsonEvent)
+    def pad_sequences(self, encoded_sequences, seq_len=None):
+        return self.pad_sequence_list(encoded_sequences, seq_len=seq_len)
+
+
+class JSONTokenizerWhiteSpace(JSONTokenizer):
+    def __init__(self, 
+                vocab_size,
+                seq_len,
+                cleanup_symbols = JSON_CLEANUP_SYMBOLS,
+                stopwords = SPEAKEASY_TOKEN_STOPWORDS,
+                ):
+        super().__init__(
+            seq_len,
+            vocab_size,
+            cleanup_symbols,
+        )
+        self.tokenizer = WhitespaceTokenizer()
+        self.counter = None
+        self.stopwords = stopwords
+        self.vocab_error = "Vocabulary not initialized! Use build_vocab() first or load it using load_vocab()!"
+        
+    def tokenize_event(self, jsonEvent):
+        jsonEventClean = self.clear_json_event(jsonEvent)
         tokenizedJsonEvent = self.tokenizer.tokenize(jsonEventClean)
         if self.stopwords:
             tokenizedJsonEvent = [x for x in tokenizedJsonEvent if x not in self.stopwords]
@@ -141,50 +185,59 @@ class JSONTokenizer:
 
     def tokenize(self, jsonInput):
         if isinstance(jsonInput, (str, bytes)):
-            return self.tokenizeEvent(jsonInput)
+            return self.tokenize_event(jsonInput)
         elif isinstance(jsonInput, Iterable):
-            return [self.tokenizeEvent(x) for x in jsonInput]
+            return [self.tokenize_event(x) for x in jsonInput]
         else:
             raise TypeError("tokenize(): Input must be a string, bytes, or Iterable!")
     
-    # methods related to vocab
-    def buildVocab(self, tokenListSequence, vocabSize=2500):
-        counter = Counter()
-        for tokenList in tqdm(tokenListSequence):
-            counter.update(tokenList)
+    def build_vocab(self, corpus, vocab_size=None, model_prefix=""):
+        """Builds the vocabulary from the corpus and preserve the
+         top vocabSize tokens based on appearance counts."""
+        if vocab_size:
+            self.vocab_size = vocab_size
+
+        self.counter = Counter()
+        for text in tqdm(corpus):
+            text = self.clear_json_event(text)
+            tokens = self.tokenizer.tokenize(text)
+            self.counter.update(tokens)
         
-        idx = len(self.specialTokens)
-        vocab = deepcopy(self.specialTokens)
-        vocab.update({x[0]:i+idx for i,x in enumerate(counter.most_common(vocabSize-idx))})
-
-        self.vocab = vocab
-        self.counter = counter
-        self.vocabSize = len(self.vocab) if vocabSize > len(self.vocab) else vocabSize
-        self.reverseVocab = {v:k for k,v in self.vocab.items()}
-        if vocabSize > len(self.vocab):
-            msg = " Provided 'vocabSize' is larger than number of tokens in corpus:"
-            msg += f" {vocabSize} > {len(self.vocab)}. "
-            msg += f"'vocabSize' is set to {self.vocabSize} to represent tokens in corpus!"
-            logging.warning(msg)
+        self.vocab = self.counter.most_common(self.vocab_size-len(self.special_tokens))
+        self.vocab = [token for token, _ in self.vocab]
+        self.vocab = list(self.special_tokens.keys()) + self.vocab
+        self.vocab = {token: index for index, token in enumerate(self.vocab)}
+        self.reverse_vocab = {index: token for token, index in self.vocab.items()}
+        self.dump_vocab(model_prefix)
     
-    def train(self, tokenizedListSequence, vocabSize=2500):
-        self.buildVocab(tokenizedListSequence, vocabSize)
+    def train(self, tokenizedListSequence, vocab_size=None, model_prefix=""):
+        self.build_vocab(tokenizedListSequence, vocab_size, model_prefix)
 
-    def dumpVocab(self, vocabPickleFile):
-        with open(vocabPickleFile, "wb") as f:
-            pickle.dump(self.vocab, f)
+    def dump_vocab(self, vocab_prefix):
+        with open(vocab_prefix+f"_vocab.json", "w") as f:
+            json.dump(self.vocab, f)
 
-    def loadVocab(self, vocab):
+    def dump_tokenizer_files(self, out_folder):
+        file = f"{out_folder}\\whitespace_vocab_{self.vocab_size}.json"
+        self.dump_vocab(file)
+        logging.warning("Dumped vocab to {}".format(file))
+        
+        file = f"{out_folder}\\speakeasy_counter.pkl"
+        logging.warning("Dumped vocab counter to {}".format(file))
+        with open(file, "wb") as f:
+            pickle.dump(self.counter, f)
+
+    def load_vocab(self, vocab):
         if isinstance(vocab, dict):
             self.vocab = vocab
         else:
-            with open(vocab, "rb") as f:
-                self.vocab = pickle.load(f)
-        self.vocabSize = len(self.vocab)
-        self.reverseVocab = {v:k for k,v in self.vocab.items()}
+            with open(vocab) as f:
+                self.vocab = json.load(f)
+        self.vocab_size = len(self.vocab)
+        self.reverse_vocab = {v:k for k,v in self.vocab.items()}
 
     def load_from_pretrained(self, vocab):
-        self.loadVocab(vocab)
+        self.load_vocab(vocab)
 
     # methods related to encoding
     def convertTokenListToIds(self, tokenList):
@@ -200,15 +253,6 @@ class JSONTokenizer:
         else:
             raise Exception("convertTokensToIds(): " + self.vocabError)
     
-    def padSequence(self, encodedSequence):
-        if len(encodedSequence) > self.sequenceLength:
-            return encodedSequence[:self.sequenceLength]
-        else:
-            return encodedSequence + [self.pad_token_id] * (self.sequenceLength - len(encodedSequence))
-    
-    def padSequenceList(self, encodedSequenceList):
-        return np.array([self.padSequence(x) for x in encodedSequenceList], dtype=np.int32)
-
     def encode(self, jsonInput, pad=True):
         tokenized = self.tokenize(jsonInput)
         if isinstance(tokenized[0], str):
@@ -218,57 +262,41 @@ class JSONTokenizer:
             encoded = self.convertTokenListToIds(tokenized)
         # apply padding to each element in list
         if pad:
-            return self.padSequenceList(encoded)
+            return self.pad_sequence_list(encoded)
         else:
             return encoded
     
     def decode(self, encodedSequence):
-        if self.vocab and self.reverseVocab:
+        if self.vocab and self.reverse_vocab:
             decodedSequence = []
             for x in encodedSequence:
                 if x == self.pad_token_id:
                     break
-                elif x in self.reverseVocab:
-                    decodedSequence.append(self.reverseVocab[x])
+                elif x in self.reverse_vocab:
+                    decodedSequence.append(self.reverse_vocab[x])
                 else:
                     decodedSequence.append(self.unk_token)
             return decodedSequence
         else:
             raise Exception("detokenize(): " + self.vocabError)
 
-    def dumpTokenizerFiles(self, outFolder):
-        file = f"{outFolder}\\speakeasy_VocabSize_{self.vocabSize}.pkl"
-        self.dumpVocab(file)
-        logging.warning("Dumped vocab to {}".format(file))
-        
-        file = f"{outFolder}\\speakeasy_counter.pkl"
-        logging.warning("Dumped vocab counter to {}".format(file))
-        with open(file, "wb") as f:
-            pickle.dump(self.counter, f)
-
-        file = f"{outFolder}\\speakeasy_counter_plot.png"
-        logging.warning("Dumped vocab counter plot to {}".format(file))
 
 
-class JSONTokenizerBPE:
+class JSONTokenizerBPE(JSONTokenizer):
     def __init__(self,
+                vocab_size,
+                seq_len,
                 model_path=None,
-                patternCleanup=JSON_CLEANUP_SYMBOLS,
+                cleanup_symbols=JSON_CLEANUP_SYMBOLS,
                 stopwords=SPEAKEASY_TOKEN_STOPWORDS,
-                specialTokens = ["<unk>", "<pad>", "<mask>"]):
-        self.patternCleanup = patternCleanup
+        ):
+        super().__init__(
+            seq_len,
+            vocab_size,
+            cleanup_symbols,
+        )
         self.stopwords = stopwords
 
-        self.specialTokens = dict(zip(specialTokens, range(len(specialTokens))))
-        self.pad_token = "<pad>"
-        self.unk_token = "<unk>"
-        self.mask_token = "<mask>"
-        self.pad_token_id = self.specialTokens[self.pad_token]
-        self.unk_token_id = self.specialTokens[self.unk_token]
-        self.mask_token_id = self.specialTokens[self.mask_token]
-
-        self.vocab = None
-        self.reverse_vocab = None
         if model_path:
             self.tokenizer = spm.SentencePieceProcessor(model_file=model_path.rstrip(".model")+".model")
             logging.warning(" [!] Successfully loaded pre-trained tokenizer model!")
@@ -303,26 +331,13 @@ class JSONTokenizerBPE:
         chunks.append(currentChunk)
         return chunks
 
-    def clear_json_event(self, jsonDataIn):
-        """
-        Removes all special characters from the json event.
-        """
-        assert isinstance(jsonDataIn, (str, bytes, list, dict))
-        jsonDataIn = " ".join(jsonDataIn) if isinstance(jsonDataIn, list) else jsonDataIn
-        jsonData = str(jsonDataIn).lower()
-        if self.patternCleanup:
-            for pattern in self.patternCleanup:
-                jsonData = jsonData.replace(pattern, " ")
-        jsonData = [get_alphanum_chars(x) for x in jsonData.split(" ") if x not in self.stopwords]
-        return ' '.join(jsonData)
-
-    def load_vocab(self, vocabPath=None):
-        if not vocabPath:
-            vocabPath = self.model_path.rstrip(".model")+"_vocab.json"
-            if not os.path.exists(vocabPath): # default sentencepiece -- after training
-                vocabPath = self.model_path.rstrip(".model")+".vocab"
-        with open(vocabPath, encoding="utf-8") as f:
-            if vocabPath.endswith(".json"):
+    def load_vocab(self, vocab_path=None):
+        if not vocab_path:
+            vocab_path = self.model_path.rstrip(".model")+"_vocab.json"
+            if not os.path.exists(vocab_path): # default sentencepiece -- after training
+                vocab_path = self.model_path.rstrip(".model")+".vocab"
+        with open(vocab_path, encoding="utf-8") as f:
+            if vocab_path.endswith(".json"):
                 self.vocab = json.load(f)
             else:
                 data = f.read()
@@ -331,11 +346,11 @@ class JSONTokenizerBPE:
         # update vocab with special tokens, but ensure that they are unique & at correct locations
         keys = list(self.vocab.keys())
         values = list(self.vocab.values())
-        for k,v in self.specialTokens.items():
+        for k,v in self.special_tokens.items():
             keys[v] = k
         self.vocab = dict(zip(keys, values))
         self.reverse_vocab = {v:k for k,v in self.vocab.items()}
-        logging.warning(f" [!] Loaded vocab with size {len(self.vocab)} from {vocabPath}")
+        logging.warning(f" [!] Loaded vocab with size {len(self.vocab)} from {vocab_path}")
         
     def dump_vocab(self):
         vocabFileName = self.model_path.rstrip(".model") + "_vocab.json"
@@ -345,7 +360,7 @@ class JSONTokenizerBPE:
     def train(
         self,
         jsonData,
-        vocab_size=1024,
+        vocab_size=None,
         model_prefix="tokenizer",
         model_type="bpe",
         split_by_number=False,
@@ -365,10 +380,13 @@ class JSONTokenizerBPE:
         with open(trainFile, "w", encoding="utf-8") as f:
             f.write("\n".join(jsonDataChunks))
 
+        if vocab_size:
+            self.vocab_size = vocab_size
+        
         trainCmd = " ".join([
             f"--input={trainFile}",
             f"--model_prefix={model_prefix}",
-            f"--vocab_size={vocab_size}",
+            f"--vocab_size={self.vocab_size}",
             f"--model_type={model_type}",
             f"--split_by_number={split_by_number}",
             f"--max_sentence_length={spLength}",
@@ -403,17 +421,4 @@ class JSONTokenizerBPE:
             jsonData = [jsonData]
         jsonDataClean = [self.clear_json_event(x) for x in jsonData]
         return [self.tokenizer.encode_as_ids(x) for x in jsonDataClean]
-
-    def pad_sequence(self, encodedSequence):
-        if len(encodedSequence) > self.sequenceLength:
-            return encodedSequence[:self.sequenceLength]
-        else:
-            return encodedSequence + [self.pad_token_id] * (self.sequenceLength - len(encodedSequence))
-    
-    def pad_sequence_list(self, encodedSequenceList, sequenceLength=512):
-        self.sequenceLength = sequenceLength
-        return np.array([self.pad_sequence(x) for x in encodedSequenceList], dtype=np.int32)
-
-    def pad_sequences(self, encodedSequences, sequenceLength=512):
-        return self.pad_sequence_list(encodedSequences, sequenceLength=sequenceLength)
 
