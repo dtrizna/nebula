@@ -2,7 +2,7 @@ import re
 from numpy import where
 from pandas import to_datetime
 
-from nebula.constants import VARIABLE_MAP
+from nebula.constants import VARIABLE_MAP, SPEAKEASY_LABELMAP
 
 import orjson
 import time
@@ -122,7 +122,7 @@ def normalizeAuditdTable(df):
     df['process.ppid'] = df['process.ppid'].apply(lambda x: x if x == "1" else "<pid>")
     return df
 
-def read_and_filter_json_folders(subFolders, filter_function, benign_folders, limit=None):
+def read_and_filter_json_folders(subFolders, filter_function, benign_folders, limit=None, multiclass=False):
     """
     Reads and filters all json files in subFolders. Returns a list of events and a list of y values.
     """
@@ -140,12 +140,16 @@ def read_and_filter_json_folders(subFolders, filter_function, benign_folders, li
             if jsonEventFiltered:
                 events.append(jsonEventFiltered)
                 
-                #basename = os.path.basename(file).rstrip('.json')
+                #file = os.path.basename(file).rstrip('.json')
                 y_filepaths.append(file)
                 if os.path.basename(subFolder) in benign_folders:
                     y.append(0)
                 else:
-                    y.append(1)
+                    if not multiclass:
+                        y.append(1)
+                    else:
+                        malware_type = os.path.basename(subFolder).split("_")[1]
+                        y.append(SPEAKEASY_LABELMAP[malware_type])
         timenowEnd = time.time()
         logging.warning(f"Finished... Took: {timenowEnd - timenowStart:.2f}s")
     return events, y, y_filepaths

@@ -14,6 +14,7 @@ import torch
 from torch import nn
 from torch.nn import BCEWithLogitsLoss
 from torch.optim import Adam, AdamW
+from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss, Linear
 from torch.utils.data import DataLoader, TensorDataset
 from torch.nn.utils import clip_grad_norm_
 from sklearn.metrics import f1_score, roc_auc_score, roc_curve
@@ -38,7 +39,7 @@ class ModelTrainer(object):
                     optim_step_budget = 1000,
                     time_budget = None,
                     n_batches_grad_update = 1):
-        self.model = model    
+        self.model = model 
         self.optimizer = optimizer_class(self.model.parameters(), **optimizer_config)
         self.loss_function = loss_function
         self.verbosity_n_batches = verbosity_n_batches
@@ -47,6 +48,7 @@ class ModelTrainer(object):
         self.clip_grad_norm = clip_grad_norm
         self.global_batch_idx = 0
         self.n_batches_grad_update = n_batches_grad_update
+        self.n_output_classes = [x for x in self.model.children() if isinstance(x, Linear)][-1].out_features
 
         # lr scheduling setup, for visulaizations see:
         # https://towardsdatascience.com/a-visual-guide-to-learning-rate-schedulers-in-pytorch-24bbb262c863
@@ -173,9 +175,16 @@ class ModelTrainer(object):
             data, target = data.to(self.device), target.to(self.device)
 
             logits = self.model.forwardPass(data)
+
+            if target.dim() == 1 and isinstance(self.loss_function, BCEWithLogitsLoss):
             # if dimension of target is 1, reshape to (-1,1)
-            if target.dim() == 1:
                 target = target.reshape(-1, 1)
+            if isinstance(self.loss_function, CrossEntropyLoss):
+                # "nll_loss_forward_reduce_cuda_kernel_2d_index" not implemented for 'Float'
+                target = target.long()
+                if target.dim() != 1:
+                    target = target.squeeze()
+
             loss = self.loss_function(logits, target)
             #loss = loss / self.n_batches_grad_update
             loss.backward() # derivatives
@@ -203,7 +212,7 @@ class ModelTrainer(object):
             
             if batch_idx % self.verbosity_n_batches == 0:
                 metricsReportList = [f"Loss: {loss.item():.6f}", f"Elapsed: {time.time() - now:.2f}s"]
-                if target.shape[1] == 1: # report TPR & F1 only for binary classification
+                if target.dim() == 2 and target.shape[1] == 1: # report TPR & F1 only for binary classification
                     batchSetMetrics = self.getMetrics(
                         np.array(targets[-self.verbosity_n_batches:]), 
                         np.array(epochProbs[-self.verbosity_n_batches:])
@@ -233,7 +242,7 @@ class ModelTrainer(object):
                 logging.warning(" [!] Time budget exceeded, training stopped.")
                 raise KeyboardInterrupt
 
-        if target.shape[1] == 1: # calculate TRP & F1 only for binary classification
+        if target.dim() == 2 and target.shape[1] == 1: # calculate TRP & F1 only for binary classification
             epochMetrics = self.getMetrics(np.array(targets), np.array(epochProbs))
             epoch_tprs, epoch_f1s = epochMetrics[:,0], epochMetrics[:,1]
             # calculate auc 
@@ -349,7 +358,7 @@ class ModelTrainer(object):
             raise ValueError("evaluate(): Inappropriate metrics value, must be in: ['array', 'json']")
 
     def predict_proba(self, arr):
-        out = torch.empty((0,1)).to(self.device)
+        out = torch.empty((0,self.n_output_classes)).to(self.device)
         loader = DataLoader(
             TensorDataset(torch.from_numpy(arr).long()),
             batch_size=self.batchSize,
@@ -363,14 +372,16 @@ class ModelTrainer(object):
                 out = torch.vstack([out, logits])
             if batch_idx % self.verbosity_n_batches == 0:
                 print(f" [*] Predicting batch: {batch_idx}/{len(loader)}", end="\r")
-
-        return torch.sigmoid(out).clone().detach().cpu().numpy()
+        if self.n_output_classes == 1:
+            return torch.sigmoid(out).clone().detach().cpu().numpy()
+        else:
+            return torch.softmax(out, axis=1).clone().detach().cpu().numpy()
     
     def predict(self, arr, threshold=0.5):
         self.model.eval()
         with torch.no_grad():
-            logits = self.model.predict_proba(arr)
-        return (logits > threshold).astype(np.int8)
+            prob = self.model.predict_proba(arr)
+        return (prob > threshold).astype(np.int8)
     
     def metricsToJSON(self, metrics):
         assert len(metrics) == 4, "metricsToJSON(): metrics must be a list of length 4"

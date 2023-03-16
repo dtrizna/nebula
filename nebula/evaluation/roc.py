@@ -5,6 +5,7 @@ from pandas import DataFrame, concat
 from sklearn.metrics import roc_curve, auc, accuracy_score
 from sklearn.metrics import f1_score, recall_score, precision_score
 from collections import defaultdict
+from torch.nn import Linear
 
 from ..misc import read_files_from_log
 from ..misc.plots import plot_roc_curves
@@ -72,13 +73,18 @@ def get_model_rocs(run_types, model_class, model_config, data_splits, model_file
             model = model_class(**model_config).to(device)
             model.load_state_dict(torch.load(model_file))
             model.eval()
-            fpr, tpr, roc_auc = get_roc(
-                model, 
-                data_splits[i]["X_test"],
-                data_splits[i]["y_test"],
-                model_name=f"{run_type}_split_{i}"
-            )
-            metrics[run_type].append((fpr, tpr, roc_auc))
+            n_output_classes = [x for x in model.children() if isinstance(x, Linear)][-1].out_features
+            if n_output_classes == 1:
+                fpr, tpr, roc_auc = get_roc(
+                    model, 
+                    data_splits[i]["X_test"],
+                    data_splits[i]["y_test"],
+                    model_name=f"{run_type}_split_{i}"
+                )
+                metrics[run_type].append((fpr, tpr, roc_auc))
+            else: # multiclass
+                # TBD
+                pass
     return metrics
 
 def allign_metrics(metrics, base_fpr_scale=50001):
