@@ -25,16 +25,16 @@ from nebula.evaluation import CrossValidation
 from nebula.misc import set_random_seed, clear_cuda_cache
 
 from torch import cuda
-from torch.nn import BCEWithLogitsLoss
+from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss
 from torch.optim import AdamW
 
-LIMIT = None
+LIMIT = 500
 RANDOM_SEED = 1763
-TIME_BUDGET = 5 # minutes
-INFOLDER = "out_speakeasy" # r"evaluation\dynamic_sota\out_50" # if data is processed already
+TIME_BUDGET = 0.5 # minutes
+INFOLDER = "out_speakeasy_multiclass_short" # None # if data is processed already
 
-NEBULA_VOCAB = 50000
-NEURLUX_VOCAB = 10000
+NEBULA_VOCAB = 5000
+NEURLUX_VOCAB = 1000
 QUO_VADIS_TOP_API = 600
 SEQ_LEN = 512
 SPEAKEASY_TRAINSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_trainset")
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     if INFOLDER:
         out_folder_root = INFOLDER
     else:
-        out_folder_root = f"out_speakeasy_{int(time.time())}"
+        out_folder_root = f"out_speakeasy_multiclass_{int(time.time())}"
         os.makedirs(out_folder_root, exist_ok=True)
 
     # =========== set out logging to both file and stdout
@@ -69,6 +69,7 @@ if __name__ == "__main__":
         vocab_size=NEBULA_VOCAB,
         seq_len=SEQ_LEN,
         outfolder=datafolders['nebula'],
+        multiclass=True
     )
     _, y_test, y_paths_test = preprocess_nebula_speakeasy(
         folder=SPEAKEASY_TESTSET_PATH,
@@ -77,6 +78,7 @@ if __name__ == "__main__":
         seq_len=SEQ_LEN,
         outfolder=datafolders['nebula'],
         tokenizer_model=os.path.join(datafolders['nebula'], f"tokenizer_{NEBULA_VOCAB}.model"),
+        multiclass=True
     )
 
     # =========== 'neurlux' & 'speakeasy' preprocessing
@@ -120,6 +122,9 @@ if __name__ == "__main__":
 
     # ============= DEFINE MODELS =============
     models = defaultdict(dict)
+    # count unique elements in y
+    n_unique_y = len(set(y_train))
+    logging.warning(f" [!] Multiclass classification with {n_unique_y} classes")
 
     with open(neurlux_vocab_file) as f:
         neurlux_vocab = json.load(f)
@@ -128,12 +133,14 @@ if __name__ == "__main__":
         "embedding_dim": 256,
         "vocab_size": len(neurlux_vocab),
         "seq_len": SEQ_LEN,
+        "num_classes": n_unique_y
     }
 
     models['quovadis']['class'] = QuoVadisModel
     models['quovadis']['config'] = {
         "vocab": quovadis_vocab_file,
-        "seq_len": SEQ_LEN
+        "seq_len": SEQ_LEN,
+        "num_classes": n_unique_y
     }
     
     with open(os.path.join(datafolders['nebula'], f"tokenizer_{NEBULA_VOCAB}_vocab.json")) as f:
@@ -147,7 +154,7 @@ if __name__ == "__main__":
         "nHeads": 8,  # number of heads in nn.MultiheadAttention
         "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
         "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
-        "numClasses": 1, # binary classification
+        "numClasses": n_unique_y,
         "hiddenNeurons": [64],
         "layerNorm": False,
         "dropout": 0.3,
@@ -160,7 +167,7 @@ if __name__ == "__main__":
     model_trainer_config = {
         "device": device,
         "model": None, # will be set later within CrossValidation class
-        "loss_function": BCEWithLogitsLoss(),
+        "loss_function": CrossEntropyLoss(),
         "optimizer_class": AdamW,
         "optimizer_config": {"lr": 3e-4},
         "optim_scheduler": None,
@@ -173,7 +180,7 @@ if __name__ == "__main__":
         "time_budget": int(TIME_BUDGET*60) if TIME_BUDGET else None,
     }
 
-    # ============= TRAINING LOOP ============= 
+    # ============= TRAINING LOOP =============
     for run_name in models.keys():
         logging.warning(f" [!!!] Starting CV over {run_name}!")
         
@@ -203,7 +210,8 @@ if __name__ == "__main__":
             y_train, 
             epochs=None, # time budget specified
             folds=3, 
-            random_state=RANDOM_SEED
+            random_state=RANDOM_SEED,
+            false_positive_rates=[]
         )
         cv.dump_metrics(prefix=f"{run_name}")
         cv.log_avg_metrics()

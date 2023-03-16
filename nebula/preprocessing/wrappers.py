@@ -119,7 +119,8 @@ def preprocess_nebula_speakeasy(
         stopwords = ['api_name', 'args', 'ret_val', 'event', 'path', 'open_flags', 'access_flags', 'size', 'server', 'proto', 'port', 'method'],
         vocab_size = 50000,
         seq_len = 512,
-        tokenizer_type="bpe"
+        tokenizer_type="bpe",
+        multiclass=False
 ):
     suffix = "test" if tokenizer_model else "train"
     truelimit = limit if limit else None
@@ -147,7 +148,8 @@ def preprocess_nebula_speakeasy(
         subFolders=subfolders,
         filter_function=extractor.filter_and_normalize_report,
         benign_folders=["report_clean", "report_windows_syswow64"],
-        limit=truelimit
+        limit=truelimit,
+        multiclass=multiclass
     )
     y = np.array(y, dtype=np.int8)
     np.save(os.path.join(outfolder, f"y_{suffix}_{limit}.npy"), y)

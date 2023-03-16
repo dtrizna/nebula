@@ -36,6 +36,8 @@ NEBULA_VOCAB = 50000
 NEURLUX_VOCAB = 10000
 QUO_VADIS_TOP_API = 600
 
+FOLDS = 5
+
 RANDOM_SEED = 1763
 TIME_BUDGET = 5 # minutes
 INFOLDER = None # r"evaluation\dynamic_sota\out_50" # if data is processed already
@@ -52,7 +54,7 @@ if __name__ == "__main__":
     if INFOLDER:
         out_folder_root = INFOLDER
     else:
-        out_folder_root = f"out_cruparamer_{int(time.time())}"
+        out_folder_root = f"out_cruparamer_5folds_{int(time.time())}"
         os.makedirs(out_folder_root, exist_ok=True)
 
     # =========== set out logging to both file and stdout
@@ -249,7 +251,7 @@ if __name__ == "__main__":
             x_train, 
             y_train, 
             epochs=None, # time budget specified
-            folds=3, 
+            folds=FOLDS, 
             random_state=RANDOM_SEED
         )
         cv.dump_metrics(prefix=f"{run_name}")

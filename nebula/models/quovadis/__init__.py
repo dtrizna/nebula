@@ -27,9 +27,11 @@ class Core1DConvNet(nn.Module):
         super().__init__()
         
         # embdding
-        self.embedding = nn.Embedding(vocab_size, 
-                                  embedding_dim, 
-                                  padding_idx=0)
+        self.embedding = nn.Embedding(
+            vocab_size,
+            embedding_dim,
+            padding_idx=0
+        )
         
         # convolutions
         self.conv1d_module = nn.ModuleList()
@@ -57,21 +59,16 @@ class Core1DConvNet(nn.Module):
                 self.ffnn_block.append(nn.Linear(conv_out, h))
             else:
                 self.ffnn_block.append(nn.Linear(hidden_neurons[i-1], h))
-            
             # add BatchNorm to every layer except last
             if batch_norm_ffnn:# and not i+1 == len(hidden_neurons):
                 self.ffnn_block.append(nn.BatchNorm1d(h))
-            
             self.ffnn_block.append(nn.ReLU())
-
             if dropout:
                 self.ffnn_block.append(nn.Dropout(dropout))
-            
             self.ffnn.append(nn.Sequential(*self.ffnn_block))
         
         self.ffnn = nn.Sequential(*self.ffnn)
         self.fc_output = nn.Linear(hidden_neurons[-1], num_classes)
-        self.relu = nn.ReLU()
 
     @staticmethod
     def conv_and_max_pool(x, conv):
@@ -87,11 +84,11 @@ class Core1DConvNet(nn.Module):
 
 
 class QuoVadisModel(Core1DConvNet):
-    def __init__(self, vocab=None, seq_len=150):
+    def __init__(self, vocab=None, seq_len=150, num_classes=1):
         self.seq_len = seq_len
         if vocab is None:
             logging.warning(" [!] Class initialized without vocabulary as preprocessor - use .build_vocab()!")
-            super().__init__()
+            super().__init__(num_classes=num_classes)
         else:
             if isinstance(vocab, dict):
                 self.vocab = vocab
@@ -100,7 +97,7 @@ class QuoVadisModel(Core1DConvNet):
                     self.vocab = json.load(f)
             else:
                 raise ValueError(f"vocab: should be either dict or filepath to JSON object, got: {vocab}")
-            super().__init__(vocab_size=len(self.vocab))
+            super().__init__(vocab_size=len(self.vocab), num_classes=num_classes)
 
     def build_vocab(self, reports, top_api=600, sequences=False):
         if sequences:

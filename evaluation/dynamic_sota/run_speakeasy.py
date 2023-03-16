@@ -31,7 +31,7 @@ from torch.optim import AdamW
 LIMIT = None
 RANDOM_SEED = 1763
 TIME_BUDGET = 5 # minutes
-INFOLDER = "out_speakeasy" # r"evaluation\dynamic_sota\out_50" # if data is processed already
+INFOLDER = "out_speakeasy" # if data is processed already
 
 NEBULA_VOCAB = 50000
 NEURLUX_VOCAB = 10000

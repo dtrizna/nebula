@@ -6,4 +6,6 @@
   - ~~CruParam + All three models~~
     - Run with 5 folds to replicate closer with CruParamer paper.
   - Multiclass Speakeasy + All three models
+    - Evaluate: tune roc notebook for multiclass setting
+    - Run on full data
   - Avast + All three models
