@@ -1,13 +1,9 @@
 # TODO
 
 - Build an end-to-end pipeline for:
-  - ~~Speakeasy + Transformer~~
-  - ~~Speakeasy + NeurLux~~
-  - ~~Speakeasy + Quo.Vadis~~
-  - ROC and other metrics from cv folder for all three models
-  - Avast + Transformer
-  - Avast + NeurLux
-  - Avast + Quo.Vadis
-  - CruParam + Transformer
-  - CruParam + NeurLux
-  - CruParam + Quo.Vadis
+  - ~~Speakeasy + All three models~~
+  - ~~ROC and other metrics from cv folder for all three models~~
+  - ~~CruParam + All three models~~
+    - Run with 5 folds to replicate closer with CruParamer paper.
+  - Multiclass Speakeasy + All three models
+  - Avast + All three models

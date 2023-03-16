@@ -89,7 +89,7 @@ def main(limit=None):
 
     for vocabSize in VOCAB_SIZES:
         tokenizer = JSONTokenizerBPE(
-            patternCleanup=JSON_CLEANUP_SYMBOLS,
+            cleanup_symbols=JSON_CLEANUP_SYMBOLS,
             stopwords=SPEAKEASY_TOKEN_STOPWORDS
         )
 

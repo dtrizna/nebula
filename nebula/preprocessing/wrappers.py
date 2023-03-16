@@ -1,9 +1,4 @@
 import os
-REPO_ROOT = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "..")
-
-import sys
-sys.path.extend([REPO_ROOT, "."])
-
 import time
 import logging
 import numpy as np
@@ -11,11 +6,10 @@ import orjson, json
 from lxml import etree
 from tqdm import tqdm
 
-from nebula.models.neurlux import NeurLuxPreprocessor
-from nebula.models.quovadis import QuoVadisModel
-from nebula.preprocessing import JSONTokenizerBPE, PEDynamicFeatureExtractor
-from nebula.preprocessing.normalization import read_and_filter_json_folders
-from nebula.models.quovadis import report_to_apiseq
+from ..models.neurlux import NeurLuxPreprocessor
+from ..models.quovadis import QuoVadisModel, report_to_apiseq
+from . import JSONTokenizerBPE, PEDynamicFeatureExtractor, JSONTokenizerWhiteSpace
+from .normalization import read_and_filter_json_folders
 
 def parse_cruparamer_xmlsample(xml_file):
     # reading from file
@@ -125,10 +119,12 @@ def preprocess_nebula_speakeasy(
         stopwords = ['api_name', 'args', 'ret_val', 'event', 'path', 'open_flags', 'access_flags', 'size', 'server', 'proto', 'port', 'method'],
         vocab_size = 50000,
         seq_len = 512,
+        tokenizer_type="bpe"
 ):
     suffix = "test" if tokenizer_model else "train"
     truelimit = limit if limit else None
     limit = limit if limit else "full"
+    assert tokenizer_type in ["bpe", "whitespace"], "tokenizer_type must be either 'bpe' or 'whitespace'"
     if outfolder is None:
         outfolder = f"nebula_speakeasy_{int(time.time())}"
     if not os.path.exists(outfolder):
@@ -164,10 +160,21 @@ def preprocess_nebula_speakeasy(
 
     # train tokenizer
     if not tokenizer_model:
-        tokenizer = JSONTokenizerBPE(
-            patternCleanup=json_cleanup_symbols,
-            stopwords=stopwords
-        )
+        if tokenizer_type == "bpe":
+            tokenizer = JSONTokenizerBPE(
+                vocab_size=vocab_size,
+                seq_len=seq_len,
+                cleanup_symbols=json_cleanup_symbols,
+                stopwords=stopwords
+            )
+        else:
+            tokenizer = JSONTokenizerWhiteSpace(
+                vocab_size=vocab_size,
+                seq_len=seq_len,
+                cleanup_symbols=json_cleanup_symbols,
+                stopwords=stopwords
+            )
+
         logging.warning(" [*] Initializing tokenizer training...")
         tokenizer.train(
             events,
@@ -175,15 +182,26 @@ def preprocess_nebula_speakeasy(
             model_prefix=os.path.join(outfolder, f"tokenizer_{vocab_size}")
         )
     else:
-        tokenizer = JSONTokenizerBPE(
-            model_path=tokenizer_model,
-            patternCleanup=json_cleanup_symbols,
-            stopwords=stopwords
-        )
+        if tokenizer_type == "bpe":
+            tokenizer = JSONTokenizerBPE(
+                vocab_size=vocab_size,
+                seq_len=seq_len,
+                model_path=tokenizer_model,
+                cleanup_symbols=json_cleanup_symbols,
+                stopwords=stopwords
+            )
+        else:
+            tokenizer = JSONTokenizerWhiteSpace(
+                vocab_size=vocab_size,
+                seq_len=seq_len,
+                cleanup_symbols=json_cleanup_symbols,
+                stopwords=stopwords
+            )
+            tokenizer.load_vocab(tokenizer_model)
     
     logging.warning(" [*] Encoding and padding...")
     encoded = tokenizer.encode(events)
-    x = tokenizer.pad_sequences(encoded, sequenceLength=seq_len)
+    x = tokenizer.pad_sequences(encoded, seq_len=seq_len)
     np.save(os.path.join(outfolder, f"x_{suffix}_{limit}.npy"), x)
     logging.warning(f" [!] Saved X as {os.path.join(outfolder, f'x_{suffix}_{limit}.npy')}")
 
@@ -271,7 +289,7 @@ def preprocess_nebula_cruparamer(
 
     if not tokenizer_model:
         tokenizer = JSONTokenizerBPE(
-            patternCleanup=json_cleanup_symbols,
+            cleanup_symbols=json_cleanup_symbols,
             stopwords=stopwords
         )
         logging.warning(" [*] Initializing tokenizer training...")
@@ -283,7 +301,7 @@ def preprocess_nebula_cruparamer(
     else:
         tokenizer = JSONTokenizerBPE(
             model_path=tokenizer_model,
-            patternCleanup=json_cleanup_symbols,
+            cleanup_symbols=json_cleanup_symbols,
             stopwords=stopwords
         )
 

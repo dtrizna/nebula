@@ -12,7 +12,7 @@ from collections import defaultdict
 from sklearn.utils import shuffle
 from tqdm import tqdm
 
-from preprocessors import (
+from nebula.preprocessing.wrappers import (
     parse_cruparamer_xmlsample,
     preprocess_nebula_cruparamer,
     preprocess_quovadis_cruparamer,
@@ -31,14 +31,16 @@ from torch.nn import BCEWithLogitsLoss
 from torch.optim import AdamW
 
 LIMIT = None # 500
-VOCAB = 50000 # 5000
+
+NEBULA_VOCAB = 50000
+NEURLUX_VOCAB = 10000
+QUO_VADIS_TOP_API = 600
 
 RANDOM_SEED = 1763
 TIME_BUDGET = 5 # minutes
 INFOLDER = None # r"evaluation\dynamic_sota\out_50" # if data is processed already
 
 SEQ_LEN = 512
-QUO_VADIS_TOP_API = 600
 
 DATA_DIR = os.path.join(REPO_ROOT, "data", "data_raw", "CruParamer")
 
@@ -64,9 +66,9 @@ if __name__ == "__main__":
     )
 
     datafolders = {}
-    datafolders['nebula'] = os.path.join(out_folder_root, f"nebula_vocab_{VOCAB}_seqlen_{SEQ_LEN}")
-    datafolders['neurlux'] = os.path.join(out_folder_root, f"neurlux_vocab_{VOCAB}_seqlen_{SEQ_LEN}")
-    datafolders['quovadis'] = os.path.join(out_folder_root, f"quovadis_vocab_{VOCAB}_seqlen_{SEQ_LEN}")
+    datafolders['nebula'] = os.path.join(out_folder_root, f"nebula_vocab_{NEBULA_VOCAB}_seqlen_{SEQ_LEN}")
+    datafolders['neurlux'] = os.path.join(out_folder_root, f"neurlux_vocab_{NEURLUX_VOCAB}_seqlen_{SEQ_LEN}")
+    datafolders['quovadis'] = os.path.join(out_folder_root, f"quovadis_vocab_{QUO_VADIS_TOP_API}_seqlen_{SEQ_LEN}")
     
     # =========== PARSING RAW REPORTS IN MEMORY ==============
     logging.warning(" [*] Parsing malicious reports...")
@@ -110,16 +112,16 @@ if __name__ == "__main__":
         limit=LIMIT,
         outfolder=datafolders['nebula'],
         seq_len=SEQ_LEN,
-        vocab_size=VOCAB,
+        vocab_size=NEBULA_VOCAB,
     )
-    nebula_tokenizer = os.path.join(datafolders['nebula'], f"tokenizer_{VOCAB}.model")
+    nebula_tokenizer = os.path.join(datafolders['nebula'], f"tokenizer_{NEBULA_VOCAB}.model")
     _ = preprocess_nebula_cruparamer(
         events=reports_test,
         y=y_test,
         limit=LIMIT,
         outfolder=datafolders['nebula'],
         seq_len=SEQ_LEN,
-        vocab_size=VOCAB,
+        vocab_size=NEBULA_VOCAB,
         tokenizer_model=nebula_tokenizer
     )
 
@@ -128,7 +130,7 @@ if __name__ == "__main__":
         reports,
         y,
         outfolder=datafolders['neurlux'],
-        vocab_size=VOCAB,
+        vocab_size=NEURLUX_VOCAB,
         seq_len=SEQ_LEN,
         limit=LIMIT,
         in_memory=True
@@ -138,7 +140,7 @@ if __name__ == "__main__":
         y_test,
         vocab_file=neurlux_vocab_file,
         outfolder=datafolders['neurlux'],
-        vocab_size=VOCAB,
+        vocab_size=NEURLUX_VOCAB,
         seq_len=SEQ_LEN,
         limit=LIMIT,
         in_memory=True
@@ -181,7 +183,7 @@ if __name__ == "__main__":
         "seq_len": SEQ_LEN
     }
     
-    with open(os.path.join(datafolders['nebula'], f"tokenizer_{VOCAB}_vocab.json")) as f:
+    with open(os.path.join(datafolders['nebula'], f"tokenizer_{NEBULA_VOCAB}_vocab.json")) as f:
         nebula_vocab = json.load(f)
     models['nebula']['class'] = TransformerEncoderChunks
     models['nebula']['config'] = {

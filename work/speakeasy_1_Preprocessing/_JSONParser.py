@@ -3,7 +3,7 @@ import json
 import sys
 sys.path.extend(['.','../..'])
 from nebula.constants import *
-from nebula.preprocessing import JSONParser, PEDynamicFeatureExtractor
+from nebula.preprocessing import JSONFilter, PEDynamicFeatureExtractor
 
 repoRoot = r"C:\Users\dtrizna\Code\nebula"
 
@@ -30,7 +30,7 @@ jsonEntry = extractor.filter_and_normalize_report(eventData["entry"])
 # with open("./test.json", 'w') as f:
 #     json.dump(jsonEntry, f, indent=4)
 
-parser = JSONParser(
+parser = JSONFilter(
     fields=AUDITD_FIELDS,
     normalized=True
 )
