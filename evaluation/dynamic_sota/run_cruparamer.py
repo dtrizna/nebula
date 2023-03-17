@@ -54,7 +54,7 @@ if __name__ == "__main__":
     if INFOLDER:
         out_folder_root = INFOLDER
     else:
-        out_folder_root = f"out_cruparamer_5folds_{int(time.time())}"
+        out_folder_root = f"out_cruparamer_{FOLDS}_folds_{int(time.time())}"
         os.makedirs(out_folder_root, exist_ok=True)
 
     # =========== set out logging to both file and stdout
@@ -82,7 +82,7 @@ if __name__ == "__main__":
         malicious_reports.append(" ".join(report_full))
         malicious_reports_api_only.append(report_apis_only)
     
-    logging.warning(" [*] Parsing malicious reports...")
+    logging.warning(" [*] Parsing benign reports...")
     benign_reports = []
     benign_reports_api_only = []
     for sample in tqdm(os.listdir(CRUPARAMER_TRAIN_0)[:LIMIT]):

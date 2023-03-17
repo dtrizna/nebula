@@ -10,14 +10,14 @@ from torch.nn import Linear
 from ..misc import read_files_from_log
 from ..misc.plots import plot_roc_curves
 
-def get_roc(model, X_test, y_test, model_name=None, batch_size=64, metrics_full=False, threshold=0.5):
+def get_preds(model, x, y, model_name=None, batch_size=64):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    X_test = torch.from_numpy(X_test).long().to(device)
-    y_test = torch.from_numpy(y_test).float().to(device)
+    x = torch.from_numpy(x).long().to(device)
+    y = torch.from_numpy(y).float().to(device)
 
     # getting predictions
     testLoader = torch.utils.data.DataLoader(
-        torch.utils.data.TensorDataset(X_test, y_test),
+        torch.utils.data.TensorDataset(x, y),
         batch_size=batch_size,
         shuffle=True)
 
@@ -35,9 +35,13 @@ def get_roc(model, X_test, y_test, model_name=None, batch_size=64, metrics_full=
             y_hat = model(X)
             y_pred.append(y_hat.cpu().numpy())
             y_true.append(y.cpu().numpy())
-    y_pred = np.concatenate(y_pred)
     y_true = np.concatenate(y_true)
+    y_pred = np.concatenate(y_pred)
 
+    return y_true, y_pred
+
+
+def get_roc(y_true, y_pred, metrics_full=False, threshold=0.5):
     # calculating ROC curve
     fpr, tpr, _ = roc_curve(y_true, y_pred)
     roc_auc = auc(fpr, tpr)
