@@ -105,11 +105,17 @@ class JSONTokenizer:
                  seq_len,
                  vocab_size,
                  cleanup_symbols=JSON_CLEANUP_SYMBOLS,
+                 stopwords=SPEAKEASY_TOKEN_STOPWORDS,
                  special_tokens = ["<pad>", "<unk>", "<mask>"]
         ):
+        assert isinstance(seq_len, int), "seq_len must be integer!"
         self.seq_len = seq_len
+        assert isinstance(vocab_size, int), "vocab_size must be integer!"
         self.vocab_size = vocab_size
+        assert isinstance(cleanup_symbols, (list, tuple, None)), "cleanup_symbols must be list or tuple!"
         self.cleanup_symbols = cleanup_symbols
+        assert isinstance(stopwords, (list, tuple, None)), "stopwords must be list or tuple!"
+        self.stopwords = stopwords
         
         self.special_tokens = dict(zip(special_tokens, range(len(special_tokens))))
         assert len(self.special_tokens) >= 3, "special_tokens must contain at least 3 tokens for pad, unk, and mask!"
@@ -139,14 +145,15 @@ class JSONTokenizer:
         return text
 
     def pad_sequence(self, encoded_sequence, seq_len=None):
-        if seq_len is None:
-            seq_len = self.seq_len
-        if len(encoded_sequence) >= seq_len:
-            return encoded_sequence[:seq_len]
+        if seq_len:
+            assert isinstance(seq_len, int), "seq_len must be integer!"
+            self.seq_len = seq_len
+        if len(encoded_sequence) >= self.seq_len:
+            return encoded_sequence[:self.seq_len]
         else:
             padded = np.pad(
                 encoded_sequence, 
-                (0, seq_len - len(encoded_sequence)), 
+                (0, self.seq_len - len(encoded_sequence)), 
                 mode='constant', 
                 constant_values=self.pad_token_id
             )
@@ -170,10 +177,10 @@ class JSONTokenizerWhiteSpace(JSONTokenizer):
             seq_len,
             vocab_size,
             cleanup_symbols,
+            stopwords
         )
         self.tokenizer = WhitespaceTokenizer()
         self.counter = None
-        self.stopwords = stopwords
         self.vocab_error = "Vocabulary not initialized! Use build_vocab() first or load it using load_vocab()!"
         
     def tokenize_event(self, jsonEvent):
@@ -294,8 +301,8 @@ class JSONTokenizerBPE(JSONTokenizer):
             seq_len,
             vocab_size,
             cleanup_symbols,
+            stopwords
         )
-        self.stopwords = stopwords
 
         if model_path:
             self.tokenizer = spm.SentencePieceProcessor(model_file=model_path.rstrip(".model")+".model")

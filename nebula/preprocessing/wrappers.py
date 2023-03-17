@@ -203,7 +203,7 @@ def preprocess_nebula_speakeasy(
     
     logging.warning(" [*] Encoding and padding...")
     encoded = tokenizer.encode(events)
-    x = tokenizer.pad_sequences(encoded, seq_len=seq_len)
+    x = tokenizer.pad_sequences(encoded)
     np.save(os.path.join(outfolder, f"x_{suffix}_{limit}.npy"), x)
     logging.warning(f" [!] Saved X as {os.path.join(outfolder, f'x_{suffix}_{limit}.npy')}")
 
@@ -273,8 +273,9 @@ def preprocess_nebula_cruparamer(
         seq_len=512,
         vocab_size=50000,
         tokenizer_model=None,
-        json_cleanup_symbols = None, #['"', "'", ":", ",", "[", "]", "{", "}", "\\", "/"],
+        json_cleanup_symbols = [], #['"', "'", ":", ",", "[", "]", "{", "}", "\\", "/"],
         stopwords = [], #['api_name', 'args', 'ret_val', 'event', 'path', 'open_flags', 'access_flags', 'size', 'server', 'proto', 'port', 'method'],
+        tokenizer_type="bpe",
 ):
     suffix = "test" if tokenizer_model else "train"
     limit = limit if limit else "full"
@@ -289,11 +290,23 @@ def preprocess_nebula_cruparamer(
         y = np.load(os.path.join(outfolder, f"y_{suffix}_{limit}.npy"))
         return None, y
 
+    # train tokenizer
     if not tokenizer_model:
-        tokenizer = JSONTokenizerBPE(
-            cleanup_symbols=json_cleanup_symbols,
-            stopwords=stopwords
-        )
+        if tokenizer_type == "bpe":
+            tokenizer = JSONTokenizerBPE(
+                vocab_size=vocab_size,
+                seq_len=seq_len,
+                cleanup_symbols=json_cleanup_symbols,
+                stopwords=stopwords
+            )
+        else:
+            tokenizer = JSONTokenizerWhiteSpace(
+                vocab_size=vocab_size,
+                seq_len=seq_len,
+                cleanup_symbols=json_cleanup_symbols,
+                stopwords=stopwords
+            )
+
         logging.warning(" [*] Initializing tokenizer training...")
         tokenizer.train(
             events,
@@ -301,15 +314,26 @@ def preprocess_nebula_cruparamer(
             model_prefix=os.path.join(outfolder, f"tokenizer_{vocab_size}")
         )
     else:
-        tokenizer = JSONTokenizerBPE(
-            model_path=tokenizer_model,
-            cleanup_symbols=json_cleanup_symbols,
-            stopwords=stopwords
-        )
+        if tokenizer_type == "bpe":
+            tokenizer = JSONTokenizerBPE(
+                vocab_size=vocab_size,
+                seq_len=seq_len,
+                model_path=tokenizer_model,
+                cleanup_symbols=json_cleanup_symbols,
+                stopwords=stopwords
+            )
+        else:
+            tokenizer = JSONTokenizerWhiteSpace(
+                vocab_size=vocab_size,
+                seq_len=seq_len,
+                cleanup_symbols=json_cleanup_symbols,
+                stopwords=stopwords
+            )
+            tokenizer.load_vocab(tokenizer_model)
 
     logging.warning(" [*] Encoding and padding...")
     encoded = tokenizer.encode(events)
-    x = tokenizer.pad_sequences(encoded, sequenceLength=seq_len)
+    x = tokenizer.pad_sequences(encoded)
     np.save(os.path.join(outfolder, f"x_{suffix}_{limit}.npy"), x)
     logging.warning(f" [!] Saved X as {os.path.join(outfolder, f'x_{suffix}_{limit}.npy')}")
     

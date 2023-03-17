@@ -88,35 +88,36 @@ def main(limit=None):
     # ======= ENCODING REPORTS WITH DIFFERENT MAX SEQ LENGTHS & VOCAB SIZES =====
 
     for vocabSize in VOCAB_SIZES:
-        tokenizer = JSONTokenizerBPE(
-            cleanup_symbols=JSON_CLEANUP_SYMBOLS,
-            stopwords=SPEAKEASY_TOKEN_STOPWORDS
-        )
-
-        filePrefix = f"speakeasy_VocabSize_{vocabSize}"
-        if os.path.exists(os.path.join(TRAIN_OUT_FOLDER, f"{filePrefix}_x.npy")) and \
-            os.path.exists(os.path.join(TEST_OUT_FOLDER, f"{filePrefix}_x.npy")):
-            logging.warning(f" [!] Skipping {filePrefix} because files already exist")
-            continue
-
-        # training tokenizer -- building vocabulary on train set
-        logging.warning(f"Training tokenizer with vocab size: {vocabSize}...")
-        tokenizer.train(
-            eventsTrain,
-            model_prefix = os.path.join(TRAIN_OUT_FOLDER, f"{filePrefix}_tokenizer"),
-            vocab_size=vocabSize,
-            removeTrainFiles=False
-        )
-        # encoding
-        logging.warning(f"Encoding...")
-        eventsEncodedTrain = tokenizer.encode(eventsTrain)
-        eventsEncodedTest = tokenizer.encode(eventsTest)
-            
         for maxSeqLen in MAX_SEQ_LENGTHS: 
+            tokenizer = JSONTokenizerBPE(
+                cleanup_symbols=JSON_CLEANUP_SYMBOLS,
+                stopwords=SPEAKEASY_TOKEN_STOPWORDS,
+                vocab_size=vocabSize,
+                seq_len=maxSeqLen
+            )
+
+            filePrefix = f"speakeasy_VocabSize_{vocabSize}"
+            if os.path.exists(os.path.join(TRAIN_OUT_FOLDER, f"{filePrefix}_x.npy")) and \
+                os.path.exists(os.path.join(TEST_OUT_FOLDER, f"{filePrefix}_x.npy")):
+                logging.warning(f" [!] Skipping {filePrefix} because files already exist")
+                continue
+
+            # training tokenizer -- building vocabulary on train set
+            logging.warning(f"Training tokenizer with vocab size: {vocabSize}...")
+            tokenizer.train(
+                eventsTrain,
+                model_prefix = os.path.join(TRAIN_OUT_FOLDER, f"{filePrefix}_tokenizer"),
+                removeTrainFiles=False
+            )
+            # encoding
+            logging.warning(f"Encoding...")
+            eventsEncodedTrain = tokenizer.encode(eventsTrain)
+            eventsEncodedTest = tokenizer.encode(eventsTest)
+            
             # padding
             logging.warning(f"Padding with maxLen={maxSeqLen}...")
-            eventsEncodedPaddedTrain = tokenizer.pad_sequences(eventsEncodedTrain, sequenceLength=maxSeqLen)
-            eventsEncodedPaddedTest = tokenizer.pad_sequences(eventsEncodedTest, sequenceLength=maxSeqLen)
+            eventsEncodedPaddedTrain = tokenizer.pad_sequences(eventsEncodedTrain)
+            eventsEncodedPaddedTest = tokenizer.pad_sequences(eventsEncodedTest)
             
             # saving processed arrays
             logging.warning(f"Saving files with prefix: {filePrefix}_maxLen_{maxSeqLen}")
