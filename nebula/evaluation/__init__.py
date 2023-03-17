@@ -432,7 +432,7 @@ def read_cv_data_split(npz_file):
     return {"X_train": X_train, "y_train": y_train, "X_test": X_test, "y_test": y_test}
 
 
-def read_cv_data_splits(folder):
-    fold_files = [os.path.join(folder, x) for x in os.listdir(folder) if x.endswith(".npz")][0:3]
+def read_cv_data_splits(folder, splits=3):
+    fold_files = [os.path.join(folder, x) for x in os.listdir(folder) if x.endswith(".npz")][0:splits]
     fold_sets = [read_cv_data_split(f) for f in fold_files]
     return fold_sets
