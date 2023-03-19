@@ -10,8 +10,9 @@ from torch.nn import Linear
 from ..misc import read_files_from_log
 from ..misc.plots import plot_roc_curves
 
-def get_preds(model, x, y, model_name=None, batch_size=64):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+def get_preds(model, x, y, model_name=None, batch_size=64, device=None):
+    if not device:
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     x = torch.from_numpy(x).long().to(device)
     y = torch.from_numpy(y).float().to(device)
 

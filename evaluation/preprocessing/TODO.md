@@ -1,6 +1,13 @@
 # TODO
 
-- BPE vs Whitespace
+- ~~BPE vs Whitespace~~
 - Tests with different:
-  - vocabulary sizes
-  - sequence lengths
+  - ~~vocabulary sizes~~
+    - ~~run full~~
+    - ~~roc notebook~~
+  - ~~sequence lengths~~
+    - ~~run full~~
+    - ~~roc notebook~~
+  - fields:
+    - ~~run full~~
+    - ~~roc notebook~~

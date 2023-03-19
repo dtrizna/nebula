@@ -140,7 +140,7 @@ class JSONTokenizer:
         text = str(text).lower()
         if self.cleanup_symbols:
             for pattern in self.cleanup_symbols:
-                text = text.replace(pattern, "")
+                text = text.replace(pattern, '')
         text = text.translate(str.maketrans('', '', string.punctuation))
         return text
 
@@ -172,6 +172,7 @@ class JSONTokenizerWhiteSpace(JSONTokenizer):
                 seq_len,
                 cleanup_symbols = JSON_CLEANUP_SYMBOLS,
                 stopwords = SPEAKEASY_TOKEN_STOPWORDS,
+                counter_dump=False
                 ):
         super().__init__(
             seq_len,
@@ -181,6 +182,7 @@ class JSONTokenizerWhiteSpace(JSONTokenizer):
         )
         self.tokenizer = WhitespaceTokenizer()
         self.counter = None
+        self.counter_dump = counter_dump
         self.vocab_error = "Vocabulary not initialized! Use build_vocab() first or load it using load_vocab()!"
         
     def tokenize_event(self, jsonEvent):
@@ -198,7 +200,7 @@ class JSONTokenizerWhiteSpace(JSONTokenizer):
         else:
             raise TypeError("tokenize(): Input must be a string, bytes, or Iterable!")
     
-    def build_vocab(self, corpus, vocab_size=None, model_prefix=""):
+    def build_vocab(self, corpus, vocab_size=None, model_prefix="", counter_dump=False):
         """Builds the vocabulary from the corpus and preserve the
          top vocabSize tokens based on appearance counts."""
         if vocab_size:
@@ -216,23 +218,22 @@ class JSONTokenizerWhiteSpace(JSONTokenizer):
         self.vocab = {token: index for index, token in enumerate(self.vocab)}
         self.reverse_vocab = {index: token for token, index in self.vocab.items()}
         self.dump_vocab(model_prefix)
+        if counter_dump or self.counter_dump:
+            self.dump_counter(model_prefix)
     
-    def train(self, tokenizedListSequence, vocab_size=None, model_prefix=""):
-        self.build_vocab(tokenizedListSequence, vocab_size, model_prefix)
+    def train(self, tokenizedListSequence, vocab_size=None, model_prefix="", counter_dump=False):
+        self.build_vocab(tokenizedListSequence, vocab_size, model_prefix, counter_dump)
 
     def dump_vocab(self, vocab_prefix):
         with open(vocab_prefix+f"_vocab.json", "w") as f:
             json.dump(self.vocab, f)
-
-    def dump_tokenizer_files(self, out_folder):
-        file = f"{out_folder}\\whitespace_vocab_{self.vocab_size}.json"
-        self.dump_vocab(file)
-        logging.warning("Dumped vocab to {}".format(file))
-        
-        file = f"{out_folder}\\speakeasy_counter.pkl"
-        logging.warning("Dumped vocab counter to {}".format(file))
-        with open(file, "wb") as f:
-            pickle.dump(self.counter, f)
+        logging.warning("Dumped vocab to {}".format(vocab_prefix+f"_vocab.json"))
+    
+    def dump_counter(self, prefix):
+        file = f"{prefix}_counter.json"
+        with open(file, "w") as f:
+            json.dump(self.counter, f, indent=4)
+        logging.warning(f"Dumped vocab counter to {file}")
 
     def load_vocab(self, vocab):
         if isinstance(vocab, dict):

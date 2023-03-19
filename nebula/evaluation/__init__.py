@@ -409,7 +409,7 @@ def read_cv_metrics_folder(folder, key_lambda, extra_file_filter=None):
         metricFiles = [x for x in os.listdir(folder) if x.endswith(".json") and extra_file_filter(x)]
     else:
         metricFiles = [x for x in os.listdir(folder) if x.endswith(".json")]
-    key_to_file = dict(zip([key_lambda(x) for x in metricFiles], metricFiles))
+    key_to_file = dict(zip(['_'.join(key_lambda(x)) for x in metricFiles], metricFiles))
     try:
         key_to_file = {k: v for k, v in sorted(key_to_file.items(), key=lambda item: int(item[0]))}
     except ValueError:

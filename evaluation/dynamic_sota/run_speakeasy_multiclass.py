@@ -28,13 +28,13 @@ from torch import cuda
 from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss
 from torch.optim import AdamW
 
-LIMIT = 500
+LIMIT = None # 500
 RANDOM_SEED = 1763
-TIME_BUDGET = 0.5 # minutes
-INFOLDER = "out_speakeasy_multiclass_short" # None # if data is processed already
+TIME_BUDGET = 5 # minutes
+INFOLDER = None # None # if data is processed already
 
-NEBULA_VOCAB = 5000
-NEURLUX_VOCAB = 1000
+NEBULA_VOCAB = 50000
+NEURLUX_VOCAB = 10000
 QUO_VADIS_TOP_API = 600
 SEQ_LEN = 512
 SPEAKEASY_TRAINSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_trainset")
