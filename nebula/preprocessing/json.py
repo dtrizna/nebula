@@ -200,7 +200,7 @@ class JSONTokenizerWhiteSpace(JSONTokenizer):
         else:
             raise TypeError("tokenize(): Input must be a string, bytes, or Iterable!")
     
-    def build_vocab(self, corpus, vocab_size=None, model_prefix="", counter_dump=False):
+    def build_vocab(self, corpus, vocab_size=None, model_prefix="whitespace", counter_dump=False):
         """Builds the vocabulary from the corpus and preserve the
          top vocabSize tokens based on appearance counts."""
         if vocab_size:
@@ -224,9 +224,9 @@ class JSONTokenizerWhiteSpace(JSONTokenizer):
     def train(self, tokenizedListSequence, vocab_size=None, model_prefix="", counter_dump=False):
         self.build_vocab(tokenizedListSequence, vocab_size, model_prefix, counter_dump)
 
-    def dump_vocab(self, vocab_prefix):
+    def dump_vocab(self, vocab_prefix="whitespace"):
         with open(vocab_prefix+f"_vocab.json", "w") as f:
-            json.dump(self.vocab, f)
+            json.dump(self.vocab, f, indent=4)
         logging.warning("Dumped vocab to {}".format(vocab_prefix+f"_vocab.json"))
     
     def dump_counter(self, prefix):
@@ -343,7 +343,7 @@ class JSONTokenizerBPE(JSONTokenizer):
         if not vocab_path:
             vocab_path = self.model_path.rstrip(".model")+"_vocab.json"
             if not os.path.exists(vocab_path): # default sentencepiece -- after training
-                vocab_path = self.model_path.rstrip(".model")+".vocab"
+                vocab_path = self.model_path.replace(".model", "")+".vocab"
         with open(vocab_path, encoding="utf-8") as f:
             if vocab_path.endswith(".json"):
                 self.vocab = json.load(f)
@@ -369,7 +369,7 @@ class JSONTokenizerBPE(JSONTokenizer):
         self,
         jsonData,
         vocab_size=None,
-        model_prefix="tokenizer",
+        model_prefix="bpe",
         model_type="bpe",
         split_by_number=False,
         spLength=4192,
