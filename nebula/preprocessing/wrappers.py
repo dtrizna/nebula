@@ -167,14 +167,15 @@ def preprocess_nebula_speakeasy(
                 vocab_size=vocab_size,
                 seq_len=seq_len,
                 cleanup_symbols=json_cleanup_symbols,
-                stopwords=stopwords
+                stopwords=stopwords,
             )
         else:
             tokenizer = JSONTokenizerWhiteSpace(
                 vocab_size=vocab_size,
                 seq_len=seq_len,
                 cleanup_symbols=json_cleanup_symbols,
-                stopwords=stopwords
+                stopwords=stopwords,
+                counter_dump=True
             )
 
         logging.warning(" [*] Initializing tokenizer training...")
