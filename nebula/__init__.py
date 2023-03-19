@@ -212,7 +212,8 @@ class ModelTrainer(object):
             
             if batch_idx % self.verbosity_n_batches == 0:
                 metricsReportList = [f"Loss: {loss.item():.6f}", f"Elapsed: {time.time() - now:.2f}s"]
-                if target.dim() == 2 and target.shape[1] == 1: # report TPR & F1 only for binary classification
+                if self.n_output_classes == 1:
+                # report TPR & F1 only for binary classification
                     batchSetMetrics = self.getMetrics(
                         np.array(targets[-self.verbosity_n_batches:]), 
                         np.array(epochProbs[-self.verbosity_n_batches:])
@@ -242,7 +243,7 @@ class ModelTrainer(object):
                 logging.warning(" [!] Time budget exceeded, training stopped.")
                 raise KeyboardInterrupt
 
-        if target.dim() == 2 and target.shape[1] == 1: # calculate TRP & F1 only for binary classification
+        if self.n_output_classes == 1: # calculate TRP & F1 only for binary classification
             epochMetrics = self.getMetrics(np.array(targets), np.array(epochProbs))
             epoch_tprs, epoch_f1s = epochMetrics[:,0], epochMetrics[:,1]
             # calculate auc 

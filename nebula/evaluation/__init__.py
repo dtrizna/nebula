@@ -180,12 +180,14 @@ class CrossValidation(object):
                  model_class,
                  model_config,
                  output_folder_root,
+                false_positive_rates=[0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
                  dump_data_splits=True):
         self.model_trainer_class = model_trainer_class
         self.model_trainer_config = model_trainer_config
         self.model_class = model_class
         self.model_config = model_config
         self.dump_data_splits = dump_data_splits
+        self.false_positive_rates = false_positive_rates
 
         self.output_folder_root = output_folder_root
         os.makedirs(self.output_folder_root, exist_ok=True)
@@ -201,14 +203,15 @@ class CrossValidation(object):
             y,
             folds=3,
             epochs=5,
-            false_positive_rates=[0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
+            false_positive_rates=None,
             random_state=42
     ):
         """
         Cross validate a model on a dataset and return the mean metrics over all folds depending on specific False Positive Rate (FPR).
         Returns: {fpr1: [mean_tpr, mean_f1], fpr2: [mean_tpr, mean_f1], ...], "avg_epoch_time": N seconds}
         """
-        self.false_positive_rates = false_positive_rates
+        if false_positive_rates is not None:
+            self.false_positive_rates = false_positive_rates
         self.trainSize = X.shape[0]
         if folds == 1:
             # kfold requires at least 2 folds -- this is rude shortcut 

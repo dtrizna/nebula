@@ -103,8 +103,8 @@ def plot_roc_curves(fpr, tpr, tpr_std=None, model_name="", axs=None, roc_auc=Non
         color = axs[0].lines[-1].get_color()
         color = color[:-2] + "33"
         axs[0].fill_between(fpr, tprs_lower, tprs_upper, alpha=.2)
-    axs[0].set_xlim([0.0, 1.0])
-    axs[0].set_ylim([0.0, 1.05])
+    axs[0].set_xlim([-0.05, 1.0])
+    axs[0].set_ylim([-0.05, 1.05])
     
     # plot zoomed in ROC curve x-axis from 0 to 0.2
     axs[1].plot(fpr, tpr, lw=2, label=label)
