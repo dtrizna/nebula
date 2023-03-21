@@ -4,8 +4,9 @@
   - ~~Speakeasy + All three models~~
   - ~~ROC and other metrics from cv folder for all three models~~
   - ~~CruParam + All three models~~
-    - Run with 5 folds to replicate closer with CruParamer paper.
-  - Multiclass Speakeasy + All three models
-    - Evaluate: tune roc notebook for multiclass setting
-    - Run on full data
-  - Avast + All three models
+    - ~~Run with 5 folds to replicate closer with CruParamer paper.~~
+  - ~~Multiclass Speakeasy + All three models~~
+    - ~~Evaluate: tune roc notebook for multiclass setting~~
+    - ~~Run on full data~~
+  - Avast + [Speakeasy, Neurlux] # quovadis not suitable since no sequence of API calls
+  - Add to all experiments a DMDS model
