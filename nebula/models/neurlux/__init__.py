@@ -1,3 +1,4 @@
+# https://arxiv.org/pdf/1910.11376.pdf
 # https://github.com/ucsb-seclab/Neurlux/blob/main/attention_train_all.py#L129
 
 import torch.nn as nn

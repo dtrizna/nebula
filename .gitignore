@@ -2,6 +2,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 .ipynb_checkpoints
+.DS_Store
 
 # data
 data/data_raw/windows_emulation*
@@ -21,6 +22,7 @@ evaluation/MaskedLanguageModeling/*/downstreamTask*
 evaluation/MaskedLanguageModeling/*/preTraining/
 *npy
 *npz
+data\data_raw\Data_And_Code_Zhang_Dynamic\dataset\*
 
 # models
 FastText*model
