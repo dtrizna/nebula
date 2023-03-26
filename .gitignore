@@ -12,6 +12,8 @@ data/data_raw/CruParamer/*
 data/data_filtered/speakeasy_testset*/
 data/data_filtered/speakeasy_trainset*/
 data/data_filtered/ember*
+data/data_raw/DMDS/dataset/*zip
+data/data_raw/BETH-dataset/*csv
 wazuh_*
 *windows_msft_*
 *auditd_msft_*
@@ -22,7 +24,6 @@ evaluation/MaskedLanguageModeling/*/downstreamTask*
 evaluation/MaskedLanguageModeling/*/preTraining/
 *npy
 *npz
-data\data_raw\Data_And_Code_Zhang_Dynamic\dataset\*
 
 # models
 FastText*model
