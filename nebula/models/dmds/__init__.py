@@ -7,6 +7,8 @@ import torch.nn as nn
 from functools import reduce
 from operator import __add__
 
+from .preprocessor import DMDSPreprocessor
+
 class Conv2dSamePadding(nn.Conv1d):
     def __init__(self,*args,**kwargs):
         super().__init__(*args, **kwargs)
