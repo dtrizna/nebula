@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 from ..models.neurlux import NeurLuxPreprocessor
 from ..models.quovadis import QuoVadisModel, report_to_apiseq
+from ..models.dmds import DMDSPreprocessor
 from . import JSONTokenizerBPE, PEDynamicFeatureExtractor, JSONTokenizerWhiteSpace
 from .normalization import read_and_filter_json_folders
 
@@ -389,3 +390,36 @@ def preprocess_quovadis_cruparamer(
         logging.warning(f" [!] Saved Y as {os.path.join(outfolder, f'y_{suffix}_{limit}.npy')}")
 
     return x, vocab_file
+
+
+def preprocess_dmds(api_args_sequences, seq_len=500, outfolder=".", suffix="train", y=None, limit=None):
+    if os.path.exists(outfolder):
+        logging.warning(f" [!] Skipping since exists: {outfolder}")
+        return
+
+    os.makedirs(outfolder, exist_ok=True)    
+    X_dmds = []
+    parser = DMDSPreprocessor(seq_len=seq_len)
+    for api_args_sequence in api_args_sequences[:limit]:
+        for api_name, args in api_args_sequence:
+            parser.parse(api_name, args)
+        X_dmds.append(parser.pad_sequence())
+    X_dmds = np.stack(X_dmds)
+    np.save(os.path.join(outfolder, f"X_{suffix}.npy"), X_dmds)
+    if y:
+        np.save(os.path.join(outfolder, f"y_{suffix}.npy"), y)
+
+def preprocess_dmds_speakeasy(y_paths, seq_len, outfolder, suffix="train", y=None, limit=None):
+    if os.path.exists(outfolder):
+        logging.warning(f" [!] Skipping since exists: {outfolder}")
+        return
+    
+    x_dmds_input = []
+    for sample in tqdm(y_paths):
+        with open(sample, 'r') as f:
+            sample = json.load(f)[0]
+        for api in sample['apis']:
+            api_name = api['api_name'].split(".")[-1]
+            args = api['args']
+            x_dmds_input.append((api_name, args))
+    preprocess_dmds(x_dmds_input, seq_len, outfolder, suffix, y, limit)
