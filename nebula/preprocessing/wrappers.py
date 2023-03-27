@@ -11,6 +11,7 @@ from ..models.quovadis import QuoVadisModel, report_to_apiseq
 from ..models.dmds import DMDSPreprocessor
 from . import JSONTokenizerBPE, PEDynamicFeatureExtractor, JSONTokenizerWhiteSpace
 from .normalization import read_and_filter_json_folders
+from ..constants import JSON_CLEANUP_SYMBOLS
 
 def parse_cruparamer_xmlsample(xml_file):
     # reading from file
@@ -92,6 +93,87 @@ def preprocess_neurlux(
         logging.warning(f" [!] Saved Y as {os.path.join(outfolder, f'y_{suffix}_{limit}.npy')}")
 
     return x, vocab_file
+
+
+def preprocess_nebula_avast(
+        x,
+        y,
+        outfolder=None,
+        vocab_size=50000,
+        seq_len=512,
+        tokenizer_model=None,
+        tokenizer_type="bpe",
+        limit=None,
+
+):
+    suffix = "test" if tokenizer_model else "train"
+    truelimit = limit if limit else None
+    limit = limit if limit else "full"
+
+    assert tokenizer_type in ["bpe", "whitespace"], "tokenizer_type must be either 'bpe' or 'whitespace'"
+    if outfolder is None:
+        outfolder = f"nebula_speakeasy_{int(time.time())}"
+    if not os.path.exists(outfolder):
+        os.makedirs(outfolder, exist_ok=True)
+
+    if os.path.exists(os.path.join(outfolder, f"x_{suffix}_{limit}.npy")):
+        logging.warning(f" [!] Skipping since exists: {os.path.join(outfolder, f'x_{suffix}_{limit}.npy')}")
+        with open(os.path.join(outfolder, f'y_names_{suffix}_{limit}.json')) as f:
+            y_filepaths = orjson.loads(f.read())
+        y = np.load(os.path.join(outfolder, f"y_{suffix}_{limit}.npy"))
+        return None, y, y_filepaths
+
+    # train tokenizer
+    if not tokenizer_model:
+        if tokenizer_type == "bpe":
+            tokenizer = JSONTokenizerBPE(
+                vocab_size=vocab_size,
+                seq_len=seq_len,
+                cleanup_symbols=JSON_CLEANUP_SYMBOLS,
+                stopwords=[],
+            )
+        else:
+            tokenizer = JSONTokenizerWhiteSpace(
+                vocab_size=vocab_size,
+                seq_len=seq_len,
+                cleanup_symbols=JSON_CLEANUP_SYMBOLS,
+                stopwords=[],
+                counter_dump=True
+            )
+
+        logging.warning(" [*] Initializing tokenizer training...")
+        tokenizer.train(
+            x,
+            vocab_size=vocab_size,
+            model_prefix=os.path.join(outfolder, f"tokenizer_{vocab_size}")
+        )
+    else:
+        if tokenizer_type == "bpe":
+            tokenizer = JSONTokenizerBPE(
+                vocab_size=vocab_size,
+                seq_len=seq_len,
+                model_path=tokenizer_model,
+                cleanup_symbols=JSON_CLEANUP_SYMBOLS,
+                stopwords=[]
+            )
+        else:
+            tokenizer = JSONTokenizerWhiteSpace(
+                vocab_size=vocab_size,
+                seq_len=seq_len,
+                cleanup_symbols=JSON_CLEANUP_SYMBOLS,
+                stopwords=[]
+            )
+            tokenizer.load_vocab(tokenizer_model)
+
+    logging.warning(" [*] Encoding and padding...")
+    encoded = tokenizer.encode(x)
+    x = tokenizer.pad_sequences(encoded)
+    np.save(os.path.join(outfolder, f"x_{suffix}_{limit}.npy"), x)
+    logging.warning(f" [!] Saved X as {os.path.join(outfolder, f'x_{suffix}_{limit}.npy')}")
+
+    y = np.array(y, dtype=np.int8)
+    np.save(os.path.join(outfolder, f"y_{suffix}_{limit}.npy"), y)
+    logging.warning(f" [!] Saved Y as {os.path.join(outfolder, f'y_{suffix}_{limit}.npy')}")
 
 
 def preprocess_nebula_speakeasy(

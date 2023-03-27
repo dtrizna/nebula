@@ -105,16 +105,18 @@ def allign_metrics(metrics, base_fpr_scale=50001):
     tprs_std = {k: np.std([v[i] for i in v.keys()], axis=0) for k, v in trps_same.items()}
     return base_fpr, tprs_mean, tprs_std
 
-def report_alligned_metrics(base_fpr, tprs_mean, tprs_std, metrics, metrics_full=False, 
+def report_alligned_metrics(base_fpr, tprs_mean, tprs_std, metrics=None, metrics_full=False, 
                             fprs=[0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3], 
                             xlim=[-0.0005, 0.3], 
                             ylim=[0.6, 1]):
     tprsdf = DataFrame()
+    axs = None        
     for i, model_type in enumerate(tprs_mean.keys()):
-        if i == 0:
-            axs = None        
         stds = tprs_std[model_type] if tprs_std else None
-        auc_mean = np.mean([metrics[model_type][i][2] for i in range(len(metrics[model_type]))])
+        if metrics is not None:
+            auc_mean = np.mean([metrics[model_type][i][2] for i in range(len(metrics[model_type]))])
+        else:
+            auc_mean = None
         axs = plot_roc_curves(
             base_fpr, 
             tprs_mean[model_type], 
@@ -130,16 +132,21 @@ def report_alligned_metrics(base_fpr, tprs_mean, tprs_std, metrics, metrics_full
             tpr = tprs_mean[model_type][np.argmin(np.abs(base_fpr - fpr))]
             tprs[fpr].append(tpr)
         tprsdf = concat([tprsdf, DataFrame(tprs, index=[model_type])])
+    if axs is not None:
+        [ax.grid() for ax in axs]
+        [ax.legend(loc='lower right') for ax in axs]
+
     # add other metrics to dataframe
-    aucdf = DataFrame([np.mean([y[2] for y in metrics[x]]) for x in metrics], index=metrics.keys(), columns=["AUC"])
-    if metrics_full:
-        f1df = DataFrame([np.mean([y[3] for y in metrics[x]]) for x in metrics], index=metrics.keys(), columns=["F1"])
-        recall_df = DataFrame([np.mean([y[4] for y in metrics[x]]) for x in metrics], index=metrics.keys(), columns=["Recall"])
-        precision_df = DataFrame([np.mean([y[5] for y in metrics[x]]) for x in metrics], index=metrics.keys(), columns=["Precision"])
-        acc_df = DataFrame([np.mean([y[6] for y in metrics[x]]) for x in metrics], index=metrics.keys(), columns=["Accuracy"])
-        tprsdf = concat([tprsdf, aucdf, f1df, recall_df, precision_df, acc_df], axis=1)
-    else:
-        tprsdf = concat([tprsdf, aucdf], axis=1)
-    [ax.grid() for ax in axs]
-    _ = [ax.legend(loc='lower right') for ax in axs]
+    if metrics is not None:
+        aucdf = DataFrame([np.mean([y[2] for y in metrics[x]]) for x in metrics], index=metrics.keys(), columns=["AUC"])
+        if metrics_full:
+            f1df = DataFrame([np.mean([y[3] for y in metrics[x]]) for x in metrics], index=metrics.keys(), columns=["F1"])
+            recall_df = DataFrame([np.mean([y[4] for y in metrics[x]]) for x in metrics], index=metrics.keys(), columns=["Recall"])
+            precision_df = DataFrame([np.mean([y[5] for y in metrics[x]]) for x in metrics], index=metrics.keys(), columns=["Precision"])
+            acc_df = DataFrame([np.mean([y[6] for y in metrics[x]]) for x in metrics], index=metrics.keys(), columns=["Accuracy"])
+            tprsdf = concat([tprsdf, aucdf, f1df, recall_df, precision_df, acc_df], axis=1)
+        else:
+            tprsdf = concat([tprsdf, aucdf], axis=1)
+
     return tprsdf, axs
+    

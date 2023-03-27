@@ -36,7 +36,7 @@ TIME_BUDGET = 5 # minutes
 INFOLDER = "out_speakeasy" # if data is processed already
 
 NEBULA_VOCAB = 50000
-NEURLUX_VOCAB = 50000
+NEURLUX_VOCAB = 10000
 QUO_VADIS_TOP_API = 600
 
 RANDOM_SEED = 1763
