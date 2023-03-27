@@ -392,34 +392,57 @@ def preprocess_quovadis_cruparamer(
     return x, vocab_file
 
 
-def preprocess_dmds(api_args_sequences, seq_len=500, outfolder=".", suffix="train", y=None, limit=None):
-    if os.path.exists(outfolder):
-        logging.warning(f" [!] Skipping since exists: {outfolder}")
-        return
-
-    os.makedirs(outfolder, exist_ok=True)    
-    X_dmds = []
-    parser = DMDSPreprocessor(seq_len=seq_len)
-    for api_args_sequence in api_args_sequences[:limit]:
-        for api_name, args in api_args_sequence:
-            parser.parse(api_name, args)
-        X_dmds.append(parser.pad_sequence())
-    X_dmds = np.stack(X_dmds)
-    np.save(os.path.join(outfolder, f"X_{suffix}.npy"), X_dmds)
-    if y:
-        np.save(os.path.join(outfolder, f"y_{suffix}.npy"), y)
-
 def preprocess_dmds_speakeasy(y_paths, seq_len, outfolder, suffix="train", y=None, limit=None):
-    if os.path.exists(outfolder):
-        logging.warning(f" [!] Skipping since exists: {outfolder}")
+    limit = limit if limit else "full"
+    xfile = os.path.join(outfolder, f"x_{suffix}_{limit}.npy")
+    if os.path.exists(xfile):
+        logging.warning(f" [!] Skipping since exists: {xfile}")
         return
-    
-    x_dmds_input = []
-    for sample in tqdm(y_paths):
+    os.makedirs(outfolder, exist_ok=True)
+    logging.warning(f" [!] Working on dmds {suffix} preprocessing...")
+    x = []
+    for i, sample in enumerate(tqdm(y_paths)):
+        parser = DMDSPreprocessor(seq_len=seq_len)
         with open(sample, 'r') as f:
-            sample = json.load(f)[0]
-        for api in sample['apis']:
+            full_sample = json.load(f)
+        sample_apis = []
+        for entry in full_sample:
+            if entry['apis']:
+                sample_apis.extend(entry['apis'])
+        for api in sample_apis:
             api_name = api['api_name'].split(".")[-1]
             args = api['args']
-            x_dmds_input.append((api_name, args))
-    preprocess_dmds(x_dmds_input, seq_len, outfolder, suffix, y, limit)
+            parser.parse(api_name, args)
+        if parser.x is not None:
+            x.append(parser.pad_sequence())
+        else:
+            logging.warning(f" [!] Skipping empty sample: {sample}")
+            # remove the corresponding y
+            y = np.delete(y, i, axis=0)
+    x = np.stack(x)
+    np.save(xfile, x)
+    if y is not None:
+        np.save(os.path.join(outfolder, f"y_{suffix}_{limit}.npy"), y)
+
+
+def preprocess_dmds_cruparamer(cruparamer_samples, seq_len=500, outfolder=".", suffix="train", y=None, limit=None):
+    limit = limit if limit else "full"
+    xfile = os.path.join(outfolder, f"x_{suffix}_{limit}.npy")
+    if os.path.exists(xfile):
+        logging.warning(f" [!] Skipping since exists: {xfile}")
+        return
+    os.makedirs(outfolder, exist_ok=True)
+    logging.warning(f" [!] Working on dmds {suffix} preprocessing...")
+    x = []
+    parser = DMDSPreprocessor(seq_len=seq_len)
+    for sample in tqdm(cruparamer_samples):
+        for api_bundle in sample[:seq_len]:
+            api_name = api_bundle.split(" ")[0]
+            args = [x for x in api_bundle.split(" ")[1:] if x]
+            parser.parse(api_name, args)
+        padded = parser.pad_sequence()
+        x.append(padded)
+    x = np.stack(x)
+    np.save(xfile, x)
+    if y is not None:
+        np.save(os.path.join(outfolder, f"y_{suffix}_{limit}.npy"), y)

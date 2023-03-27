@@ -53,7 +53,7 @@ class DMDSGatedCNN(nn.Module):
         """
         Input: (B, L, C) where B - batch size, L - length of sequence, C - feature dim of each sequence element 
         """
-        x = self.batch_norm1(x)
+        x = self.batch_norm1(x.float())
         x = torch.permute(x, (0, 2, 1))
 
         gated_0 = self.conv1(x)
