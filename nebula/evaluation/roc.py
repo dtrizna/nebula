@@ -13,8 +13,8 @@ from ..misc.plots import plot_roc_curves
 def get_preds(model, x, y, model_name=None, batch_size=64, device=None):
     if not device:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    x = torch.from_numpy(x).long().to(device)
-    y = torch.from_numpy(y).float().to(device)
+    x = torch.from_numpy(x).long()#.to(device)
+    y = torch.from_numpy(y).float()#.to(device)
 
     # getting predictions
     testLoader = torch.utils.data.DataLoader(
@@ -33,7 +33,7 @@ def get_preds(model, x, y, model_name=None, batch_size=64, device=None):
         else:
             print(f"Evaluating model | Size: {total_params}")
         for X, y in tqdm(testLoader):
-            y_hat = model(X)
+            y_hat = model(X.to(device))
             y_pred.append(y_hat.cpu().numpy())
             y_true.append(y.cpu().numpy())
     y_true = np.concatenate(y_true)

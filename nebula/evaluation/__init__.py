@@ -265,7 +265,7 @@ class CrossValidation(object):
                 model_trainer.fit(X_train, y_train, epochs=self.epochs, reporting_timestamp=timestamp)
                 self.training_time[i,:] = np.pad(model_trainer.training_time, (0, self.epochs-len(model_trainer.training_time)), 'constant', constant_values=(0,0))
             except RuntimeError as e: # cuda outofmemory
-                logging.warning(f" [!] Exception: {e}")
+                logging.warning(f" [!] RuntimeError exception: {e}")
                 break
             
             # collect stats of this run
@@ -314,8 +314,11 @@ class CrossValidation(object):
         logging.warning(f" [!] Evaluating model on {name} set...")
         probs = model_trainer.predict_proba(X)
         logging.warning(f" [!] This fold metrics on {name} set:")
-        # calculate auc 
-        auc = roc_auc_score(y, probs, multi_class="ovr", average="macro")
+        try: # calculate auc
+            auc = roc_auc_score(y, probs, multi_class="ovr", average="macro")
+        except ValueError as e: # only one class
+            logging.warning(f" [!] AUC calculation exception: {e}")
+            auc = np.nan
         logging.warning(f"\tAUC: {auc:.4f}")
         trps, f1s = {}, {}
         for fpr in self.false_positive_rates:

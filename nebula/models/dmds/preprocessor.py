@@ -185,7 +185,7 @@ class DMDSPreprocessor(object):
 
     def add_to_output(self, sample):
         if self.x is None:
-            self.x = [sample]
+            self.x = np.array([sample])
         else:
             self.x = np.append(self.x, [sample], axis=0)
         return len(self.x)
@@ -206,8 +206,8 @@ class DMDSPreprocessor(object):
             return padded
 
     def parse(self, api_name, args):
-        if api_name[:2] == '__':
-                return None
+        # if api_name[:2] == '__':
+        #         return None
 
         api_name_hashed = self.features['api_name'].feature_vector(api_name)
 

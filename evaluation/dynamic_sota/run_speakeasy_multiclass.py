@@ -15,12 +15,14 @@ from nebula.preprocessing.wrappers import (
     preprocess_nebula_speakeasy,
     preprocess_quovadis_speakeasy,
     preprocess_neurlux,
+    preprocess_dmds_speakeasy
 )
 
 from nebula import ModelTrainer
 from nebula.models.neurlux import NeurLuxModel
 from nebula.models.quovadis import QuoVadisModel
 from nebula.models import TransformerEncoderChunks
+from nebula.models.dmds import DMDSGatedCNN
 from nebula.evaluation import CrossValidation
 from nebula.misc import set_random_seed, clear_cuda_cache
 
@@ -28,14 +30,15 @@ from torch import cuda
 from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss
 from torch.optim import AdamW
 
-LIMIT = None # 500
-RANDOM_SEED = 1763
+LIMIT = None
 TIME_BUDGET = 5 # minutes
-INFOLDER = None # None # if data is processed already
+INFOLDER = "out_speakeasy_multiclass" # if data is processed already
 
 NEBULA_VOCAB = 50000
 NEURLUX_VOCAB = 10000
 QUO_VADIS_TOP_API = 600
+
+RANDOM_SEED = 1763
 SEQ_LEN = 512
 SPEAKEASY_TRAINSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_trainset")
 SPEAKEASY_TESTSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_testset")
@@ -61,6 +64,7 @@ if __name__ == "__main__":
     datafolders['nebula'] = os.path.join(out_folder_root, f"nebula_speakeasy_vocab_{NEBULA_VOCAB}_seqlen_{SEQ_LEN}")
     datafolders['neurlux'] = os.path.join(out_folder_root, f"neurlux_speakeasy_vocab_{NEURLUX_VOCAB}_seqlen_{SEQ_LEN}")
     datafolders['quovadis'] = os.path.join(out_folder_root, f"quovadis_speakeasy_vocab_{QUO_VADIS_TOP_API}_seqlen_{SEQ_LEN}")
+    datafolders['dmds'] = os.path.join(out_folder_root, f"dmds_speakeasy_vocab_seqlen_{SEQ_LEN}")
     
     # =========== 'nebula' & 'speakeasy' preprocessing
     _, y_train, y_paths_train, = preprocess_nebula_speakeasy(
@@ -79,6 +83,24 @@ if __name__ == "__main__":
         outfolder=datafolders['nebula'],
         tokenizer_model=os.path.join(datafolders['nebula'], f"tokenizer_{NEBULA_VOCAB}.model"),
         multiclass=True
+    )
+
+    # ============= 'dmds' & 'speakeasy' preprocessing
+    preprocess_dmds_speakeasy(
+        y_paths_train,
+        y=y_train,
+        seq_len=SEQ_LEN,
+        outfolder=datafolders['dmds'],
+        suffix="train",
+        limit=LIMIT,
+    )
+    preprocess_dmds_speakeasy(
+        y_paths_test,
+        y=y_test,
+        seq_len=SEQ_LEN,
+        outfolder=datafolders['dmds'],
+        suffix="test",
+        limit=LIMIT,
     )
 
     # =========== 'neurlux' & 'speakeasy' preprocessing
@@ -162,6 +184,13 @@ if __name__ == "__main__":
         "norm_first": True
     }
 
+    models['dmds']['class'] = DMDSGatedCNN
+    models['dmds']['config'] = {
+        "ndim": 98,
+        "seq_len": SEQ_LEN,
+        "num_classes": n_unique_y,
+    }
+
     device = "cuda" if cuda.is_available() else "cpu"
     model_trainer_class = ModelTrainer
     model_trainer_config = {
@@ -182,6 +211,11 @@ if __name__ == "__main__":
 
     # ============= TRAINING LOOP =============
     for run_name in models.keys():
+        cv_outfolder = os.path.join(out_folder_root, f"cv_{run_name}_lim{LIMIT}_r{RANDOM_SEED}_t{TIME_BUDGET}")
+        if os.path.exists(cv_outfolder):
+            logging.warning(f" [!] Skipping... CV output folder for run {run_name} already exists: {cv_outfolder}")
+            continue
+        
         logging.warning(f" [!!!] Starting CV over {run_name}!")
         
         suffix = LIMIT if LIMIT else "full"
@@ -197,7 +231,6 @@ if __name__ == "__main__":
             y_train = y_train[:LIMIT]
             
         set_random_seed(RANDOM_SEED)
-        cv_outfolder = os.path.join(out_folder_root, f"cv_{run_name}_lim{LIMIT}_r{RANDOM_SEED}_t{TIME_BUDGET}")
         cv = CrossValidation(
             model_trainer_class,
             model_trainer_config,

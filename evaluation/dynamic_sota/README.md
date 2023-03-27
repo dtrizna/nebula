@@ -43,3 +43,21 @@ Therefore 1-2 are not comparable, 3 - comparable (with remarks), and good compar
 ## CruPamer (#3) data (only API calls)
 
 ![cruparamer data](img/cruparamer_data_valsets.png)
+
+-----------------
+
+Note:
+
+Preprocessing from \[2\] takes ~100 hours for CruParamer data:
+
+```text
+2023-03-27 08:10:24,196 WARNING  [*] Parsing malicious reports...
+[16:12<00:00, 10.28it/s] 
+2023-03-27 08:26:37,438 WARNING  [*] Parsing benign reports...
+[09:02<00:00, 36.88it/s] 
+2023-03-27 08:35:40,731 WARNING  [*] Parsing test reports...
+[18:23<00:00, 13.60it/s]
+
+2023-03-27 08:54:04,809 WARNING  [!] Working on dmds train preprocessing...
+... 224/30000 [22:41<100:53:14, 12.20s/it] 
+```

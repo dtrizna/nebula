@@ -32,13 +32,14 @@ from torch.nn import BCEWithLogitsLoss
 from torch.optim import AdamW
 
 LIMIT = None
-RANDOM_SEED = 1763
 TIME_BUDGET = 5 # minutes
 INFOLDER = "out_speakeasy" # if data is processed already
 
 NEBULA_VOCAB = 50000
 NEURLUX_VOCAB = 50000
 QUO_VADIS_TOP_API = 600
+
+RANDOM_SEED = 1763
 SEQ_LEN = 512
 SPEAKEASY_TRAINSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_trainset")
 SPEAKEASY_TESTSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_testset")
@@ -83,6 +84,23 @@ if __name__ == "__main__":
         tokenizer_model=os.path.join(datafolders['nebula'], f"tokenizer_{NEBULA_VOCAB}.model"),
     )
 
+    # ============= 'dmds' & 'speakeasy' preprocessing
+    preprocess_dmds_speakeasy(
+        y_paths_train,
+        y=y_train,
+        seq_len=SEQ_LEN,
+        outfolder=datafolders['dmds'],
+        suffix="train",
+        limit=LIMIT,
+    )
+    preprocess_dmds_speakeasy(
+        y_paths_test,
+        y=y_test,
+        seq_len=SEQ_LEN,
+        outfolder=datafolders['dmds'],
+        suffix="test",
+        limit=LIMIT,
+    )
     # =========== 'neurlux' & 'speakeasy' preprocessing
     _, neurlux_vocab_file = preprocess_neurlux(
         y_paths_train, 
@@ -122,24 +140,6 @@ if __name__ == "__main__":
         limit=LIMIT,
     )
 
-    # ============= 'dmds' & 'speakeasy' preprocessing
-    logging.warning(" [!] Working on dmds preprocessing...")
-    preprocess_dmds_speakeasy(
-        y_paths_train,
-        y=y_train,
-        seq_len=SEQ_LEN,
-        outfolder=datafolders['dmds'],
-        suffix="train",
-        limit=LIMIT,
-    )
-    preprocess_dmds_speakeasy(
-        y_paths_test,
-        y=y_test,
-        seq_len=SEQ_LEN,
-        outfolder=datafolders['dmds'],
-        suffix="test",
-        limit=LIMIT,
-    )
 
     # ============= DEFINE MODELS =============
     models = defaultdict(dict)
@@ -182,7 +182,6 @@ if __name__ == "__main__":
     models['dmds']['config'] = {
         "ndim": 98,
         "seq_len": SEQ_LEN,
-        "n_classes": 1,
     }
 
     device = "cuda" if cuda.is_available() else "cpu"
@@ -212,9 +211,9 @@ if __name__ == "__main__":
         
         logging.warning(f" [!!!] Starting CV over {run_name}!")
         
-        suffix = LIMIT if LIMIT else "full"
-        x_train = np.load(os.path.join(datafolders[run_name], f"x_train_{suffix}.npy"))
-        y_train = np.load(os.path.join(datafolders[run_name], f"y_train_{suffix}.npy"))
+        limit_suffix = LIMIT if LIMIT else "full"
+        x_train = np.load(os.path.join(datafolders[run_name], f"x_train_{limit_suffix}.npy"))
+        y_train = np.load(os.path.join(datafolders[run_name], f"y_train_{limit_suffix}.npy"))
         
         model_class = models[run_name]['class']
         model_config = models[run_name]['config']
