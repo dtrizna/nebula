@@ -8,5 +8,5 @@
   - ~~Multiclass Speakeasy + All three models~~
     - ~~Evaluate: tune roc notebook for multiclass setting~~
     - ~~Run on full data~~
-  - Avast + [Speakeasy, Neurlux] # quovadis not suitable since no sequence of API calls
-  - Add to all experiments a DMDS model
+  - ~~Avast + [Speakeasy, Neurlux] # quovadis not suitable since no sequence of API calls~~
+  - ~~Add to all experiments a DMDS model~~
