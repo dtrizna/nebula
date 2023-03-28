@@ -327,6 +327,10 @@ neurlux     0.063269  0.982690  0.847869  0.982198   0.747500  0.983136
 
 ![cruparamer data](img/cruparamer_data_valsets.png)
 
+Table from CruParamer paper [5]:
+
+![cruparamer table](img/cruparamer_table.png)
+
 -----------------
 
 Note:
