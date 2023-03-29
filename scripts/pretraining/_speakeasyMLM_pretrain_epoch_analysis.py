@@ -14,7 +14,7 @@ import sys
 sys.path.extend(['../..', '.'])
 from nebula import ModelTrainer
 from nebula.models.attention import TransformerEncoderChunksLM
-from nebula.pretraining import MaskedLanguageModel
+from nebula.pretraining import MaskedLanguageModelTrainer
 from nebula.evaluation import SelfSupervisedPretraining
 from nebula.misc import get_path, set_random_seed, clear_cuda_cache
 SCRIPT_PATH = get_path(type="script")
@@ -94,7 +94,7 @@ vocab_size = len(vocab) # adjust it to exact number of tokens in the vocabulary
 logging.warning(f" [!] Loaded data and vocab. X train size: {xTrain.shape}, X test size: {xTest.shape}, vocab size: {len(vocab)}")
 
 # ============ MODEL ============
-modelConfig = {
+model_config = {
     "vocab_size": vocab_size,  # size of vocabulary
     "maxlen": maxlen,  # maximum length of the input sequence
     "dModel": 64,  # embedding & transformer dimension
@@ -107,7 +107,7 @@ modelConfig = {
 }
 
 # ======= PRETRAINING =========
-languageModelClass = MaskedLanguageModel
+languageModelClass = MaskedLanguageModelTrainer
 languageModelClassConfig = {
     "vocab": vocab, # needs vocab to mask sequences
     "mask_probability": run_config["mask_probability"],
@@ -118,7 +118,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 pretrainingConfig = {
     "modelClass": modelClass,
-    "modelConfig": modelConfig,
+    "modelConfig": model_config,
     "pretrainingTaskClass": languageModelClass,
     "pretrainingTaskConfig": languageModelClassConfig,
     "device": device,
@@ -139,7 +139,7 @@ pretrainingConfig = {
 # =========== PRETRAINING RUN ===========
 msg = f" [!] Initiating Self-Supervised Learning Pretraining\n"
 msg += f"     Language Modeling {languageModelClass.__name__}\n"
-msg += f"     Model {modelClass.__name__} with config:\n\t{modelConfig}\n"
+msg += f"     Model {modelClass.__name__} with config:\n\t{model_config}\n"
 logging.warning(msg)
 
 pretrain = SelfSupervisedPretraining(**pretrainingConfig)
@@ -185,7 +185,7 @@ for split in range(len(split_data)):
     for epoch in range(1,epochs+1):
         logging.warning(f" [!] Evaluating model from split: {split} | epoch: {epoch}")
         model_file = [x for x in pretrainModelFiles if f"epoch_{epoch}" in x][split]
-        model = modelClass(**modelConfig)
+        model = modelClass(**model_config)
         model.load_state_dict(torch.load(model_file))
         
         # finetune model

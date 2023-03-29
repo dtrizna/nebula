@@ -1,22 +1,24 @@
 from nebula import ModelTrainer
+from nebula.misc import set_random_seed
 
 import logging
 import numpy as np
 from tqdm import tqdm
 
-class MaskedLanguageModel(object):
+class MaskedLanguageModelTrainer(ModelTrainer):
     def __init__(self,
                     vocab,
+                    model_trainer_config,
                     mask_probability=0.15,
-                    random_state=None,
+                    random_state=42,
                     masked_target_type="onehot"):
-        super(MaskedLanguageModel, self).__init__()
+        super().__init__(**model_trainer_config, n_output_classes=len(vocab))
         self.__name__ = "MaskedLanguageModel"
         
         self.mask_probability = mask_probability
         self.vocab = vocab
         self.random_state = random_state
-        np.random.seed(self.random_state)
+        set_random_seed(self.random_state)
 
         assert masked_target_type in ["onehot", "count"], "masked_target_type must be either 'onehot' or 'count'"
         self.masked_target_type = masked_target_type
@@ -87,36 +89,66 @@ class MaskedLanguageModel(object):
         return seq_masked, target
 
     def pretrain(
-        self, 
-        unlabeledData, 
-        modelTrainerConfig, 
-        pretrainEpochs=5, 
+        self,
+        x_unlabeled,
+        epochs=5,
         dump_model_every_epoch=False,
         remask_epochs=False
     ):
-        assert isinstance(pretrainEpochs, int), "pretrainEpochs must be an integer"
-        model_trainer = ModelTrainer(**modelTrainerConfig)
+        assert isinstance(epochs, int), "pretrainEpochs must be an integer"
         if remask_epochs:
             assert isinstance(remask_epochs, int), "remask_epochs must be an integer"
             
             # remove output folder to avoid dumping results every remasking
-            orig_out_folder = model_trainer.output_folder
-            model_trainer.output_folder = None
+            orig_out_folder = self.output_folder
+            self.output_folder = None
 
-            for i in range(pretrainEpochs):
+            for i in range(epochs):
                 # set output folder back to original value on last iteration
-                if i == pretrainEpochs-1: 
-                    model_trainer.output_folder = orig_out_folder
+                if i == epochs-1: 
+                    self.output_folder = orig_out_folder
                 
                 if i % remask_epochs == 0:
                     logging.warning(f' [*] Re-masking sequences...')
-                    x_masked, y_masked = self.maskSequenceArr(unlabeledData)
+                    x_masked, y_masked = self.maskSequenceArr(x_unlabeled)
         
-                model_trainer.fit(x_masked, y_masked, epochs=1, dump_model_every_epoch=dump_model_every_epoch, overwrite_epoch_idx=i)
+                self.fit(x_masked, y_masked, epochs=1, dump_model_every_epoch=dump_model_every_epoch, overwrite_epoch_idx=i)
         else:
             logging.warning(' [*] Masking sequences...')
-            x_masked, y_masked = self.maskSequenceArr(unlabeledData)
+            x_masked, y_masked = self.maskSequenceArr(x_unlabeled)
             
-            model_trainer.fit(x_masked, y_masked, epochs=pretrainEpochs, dump_model_every_epoch=dump_model_every_epoch)
+            self.fit(x_masked, y_masked, epochs=epochs, dump_model_every_epoch=dump_model_every_epoch)
         
-        return model_trainer.model
+        return self.model
+
+
+class AutoRegressiveModelTrainer(ModelTrainer):
+    def __init__(
+            self,
+            vocab,
+            block_size,
+            model_trainer_config,
+            random_state=42,
+    ):
+        super().__init__(**model_trainer_config, n_output_classes=len(vocab))
+        self.__name__ = "AutoRegressiveModel"
+        self.block_size = block_size
+
+        self.random_state = random_state
+        set_random_seed(self.random_state)
+
+    
+    def pretrain(        
+        self,
+        x_unlabeled,
+        epochs=5,
+        dump_model_every_epoch=False,
+    ):
+        assert isinstance(epochs, int), "pretrainEpochs must be an integer"
+        
+        # create input and target sequences
+        x_causal = x_unlabeled[:self.block_size]
+        y_next_tokens = x_unlabeled[1:self.block_size+1]
+
+        # final action of method:
+        # model_trainer.fit(x_causal, y_next_tokens, epochs=epochs, dump_model_every_epoch=dump_model_every_epoch)

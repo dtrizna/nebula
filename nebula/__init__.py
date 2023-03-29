@@ -38,7 +38,8 @@ class ModelTrainer(object):
                     clip_grad_norm = 0.5,
                     optim_step_budget = 1000,
                     time_budget = None,
-                    n_batches_grad_update = 1):
+                    n_batches_grad_update = 1,
+                    n_output_classes = None):
         self.model = model 
         self.optimizer = optimizer_class(self.model.parameters(), **optimizer_config)
         self.loss_function = loss_function
@@ -48,7 +49,10 @@ class ModelTrainer(object):
         self.clip_grad_norm = clip_grad_norm
         self.global_batch_idx = 0
         self.n_batches_grad_update = n_batches_grad_update
-        self.n_output_classes = [x for x in self.model.children() if isinstance(x, Linear)][-1].out_features
+        if n_output_classes is not None:
+            self.n_output_classes = n_output_classes
+        else:
+            self.n_output_classes = [x for x in self.model.children() if isinstance(x, Linear)][-1].out_features
 
         # lr scheduling setup, for visulaizations see:
         # https://towardsdatascience.com/a-visual-guide-to-learning-rate-schedulers-in-pytorch-24bbb262c863
@@ -172,16 +176,16 @@ class ModelTrainer(object):
 
         for batch_idx, (data, target) in enumerate(train_loader):
             targets.extend(target)
-            data, target = data.to(self.device), target.to(self.device)
+            data, target = data.to(self.device), target.to(self.device).float()
 
-            logits = self.model.forwardPass(data)
+            logits = self.model.forwardPass(data).float()
 
             if target.dim() == 1 and isinstance(self.loss_function, BCEWithLogitsLoss):
             # if dimension of target is 1, reshape to (-1,1)
                 target = target.reshape(-1, 1)
             if isinstance(self.loss_function, CrossEntropyLoss):
                 # "nll_loss_forward_reduce_cuda_kernel_2d_index" not implemented for 'Float'
-                target = target.long()
+                #target = target.long()
                 if target.dim() != 1:
                     target = target.squeeze()
 

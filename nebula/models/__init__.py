@@ -106,7 +106,7 @@ class Cnn1DLinearLM(nn.Module):
                 batchNormFFNN = False,
                 dropout = 0.5,
                 # pretrain layers
-                pretrainLayers = [512, 1024],
+                pretrain_layers = [512, 1024],
                 numClasses = 1): # binary classification
         super().__init__()
         self.__name__ = "Cnn1DLinear"
@@ -160,19 +160,19 @@ class Cnn1DLinearLM(nn.Module):
         self.fcOutput = nn.Linear(hiddenNeurons[-1], numClasses)
 
         # pretrain layers
-        self.preTrainLayers = []
-        for i, h in enumerate(pretrainLayers):
+        self.pretrain_layers = []
+        for i, h in enumerate(pretrain_layers):
             self.preTrainBlock = []
             if i == 0:
                 self.preTrainBlock.append(nn.Linear(hiddenNeurons[-1], h))                
             else:
-                self.preTrainBlock.append(nn.Linear(pretrainLayers[i-1], h))
+                self.preTrainBlock.append(nn.Linear(pretrain_layers[i-1], h))
             self.preTrainBlock.append(nn.ReLU())
             if dropout:
                 self.preTrainBlock.append(nn.Dropout(dropout))
-            self.preTrainLayers.append(nn.Sequential(*self.preTrainBlock))
-        self.preTrainLayers.append(nn.Linear(pretrainLayers[-1], vocab_size))
-        self.preTrainLayers = nn.Sequential(*self.preTrainLayers)
+            self.pretrain_layers.append(nn.Sequential(*self.preTrainBlock))
+        self.pretrain_layers.append(nn.Linear(pretrain_layers[-1], vocab_size))
+        self.pretrain_layers = nn.Sequential(*self.pretrain_layers)
 
     @staticmethod
     def convAndMaxPool(x, conv):
@@ -197,7 +197,7 @@ class Cnn1DLinearLM(nn.Module):
 
     def pretrain(self, inputs):
         x_core = self.core(inputs)
-        return self.preTrainLayers(x_core)
+        return self.pretrain_layers(x_core)
 
     def forward(self, inputs):
         x_core = self.core(inputs)

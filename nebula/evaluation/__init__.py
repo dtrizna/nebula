@@ -36,9 +36,6 @@ class SelfSupervisedPretraining:
                     dump_data_splits=True,
                     remask_epochs=False,
                     downsample_unlabeled_data=False):
-        self.modelClass = modelClass
-        self.modelConfig = modelConfig
-        self.pretraining_task = pretrainingTaskClass(**pretrainingTaskConfig)
         self.device = device
         self.training_types = training_types
         self.false_positive_rates = false_positive_rates
@@ -56,6 +53,11 @@ class SelfSupervisedPretraining:
         self.downsample_unlabeled_data = downsample_unlabeled_data
         if self.downsample_unlabeled_data:
             assert isinstance(downsample_unlabeled_data, float) and 0 < downsample_unlabeled_data < 1
+        
+        self.model_class = modelClass
+        self.model_config = modelConfig
+        self.pretraining_task_class = pretrainingTaskClass
+        self.pretraining_task_config = pretrainingTaskConfig
 
     def run_one_split(self, x, y, x_test, y_test):
         models = {k: None for k in self.training_types}
@@ -83,8 +85,9 @@ class SelfSupervisedPretraining:
             logging.warning(f" [!] Saved dataset splits to {splitData}")
 
         logging.warning(' [!] Pre-training model...')
+
         # create a pretraining model and task
-        models['pretrained'] = self.modelClass(**self.modelConfig).to(self.device)
+        models['pretrained'] = self.model_class(**self.model_config).to(self.device)
         model_trainer_config = {
             "device": self.device,
             "model": models['pretrained'],
@@ -101,10 +104,13 @@ class SelfSupervisedPretraining:
         if self.output_folder:
             model_trainer_config["outputFolder"] = os.path.join(self.output_folder, "preTraining")
 
+        self.pretraining_task_config['model_trainer_config'] = model_trainer_config
+        self.pretraining_task = self.pretraining_task_class(
+            **self.pretraining_task_config
+        )
         self.pretraining_task.pretrain(
-            unlabeled_data, 
-            model_trainer_config, 
-            pretrainEpochs=self.pretrainingEpochs,
+            unlabeled_data,
+            epochs=self.pretrainingEpochs,
             dump_model_every_epoch=self.dump_model_every_epoch,
             remask_epochs=self.remask_epochs
         )
@@ -116,21 +122,19 @@ class SelfSupervisedPretraining:
         for model in self.training_types:
             logging.warning(f' [!] Training {model} model on downstream task...')
             if model != 'pretrained': # if not pretrained -- create a new model
-                models[model] = self.modelClass(**self.modelConfig).to(self.device)
+                models[model] = self.model_class(**self.model_config).to(self.device)
             model_trainer_config['model'] = models[model]
             
             if self.output_folder:
                 model_trainer_config["outputFolder"] = os.path.join(self.output_folder, f"downstreamTask_{model}")
             
             model_trainer[model] = ModelTrainer(**model_trainer_config)
+            # TODO: don't like how step is calculated here
+            # use size of x and self.unlabeledDataSize to calculate steps
             if model == 'full_data':
-                # TODO: don't like how step is calculated here
-                # use size of x and self.unlabeledDataSize to calculate step
                 model_trainer_config['optim_step_budget'] = self.optim_step_budget//2
                 model_trainer[model].fit(x, y, self.downstreamEpochs, reporting_timestamp=timestamp)
             else:
-                # TODO: don't like how step is calculated here
-                # use size of x and self.unlabeledDataSize to calculate step
                 model_trainer_config['optim_step_budget'] = self.optim_step_budget//10
                 model_trainer[model].fit(labeled_x, labeled_y, self.downstreamEpochs, reporting_timestamp=timestamp)
         
