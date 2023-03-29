@@ -121,7 +121,7 @@ class TransformerEncoderChunksLM(TransformerEncoderChunks):
                     dropout: float = 0.3,
                     mean_over_sequence=False,
                     # LM specific
-                    pretrainLayers: list = [1024] # pretrain layers
+                    pretrain_layers: list = [1024] # pretrain layers
                 ):
         super().__init__(
             vocab_size=vocab_size,
@@ -139,26 +139,26 @@ class TransformerEncoderChunksLM(TransformerEncoderChunks):
             mean_over_sequence=mean_over_sequence
         )
         self.__name__ = 'TransformerEncoderChunksLM'
-        self.preTrainLayers = []
-        for i, h in enumerate(pretrainLayers):
+        self.pretrain_layers = []
+        for i, h in enumerate(pretrain_layers):
             self.preTrainBlock = []
             if i == 0:
                 self.preTrainBlock.append(nn.Linear(hiddenNeurons[-1], h))                
             else:
-                self.preTrainBlock.append(nn.Linear(pretrainLayers[i-1], h))
+                self.preTrainBlock.append(nn.Linear(pretrain_layers[i-1], h))
             self.preTrainBlock.append(nn.ReLU())
             if dropout:
                 self.preTrainBlock.append(nn.Dropout(dropout))
-            self.preTrainLayers.append(nn.Sequential(*self.preTrainBlock))
-        if self.preTrainLayers:
-            self.preTrainLayers.append(nn.Linear(pretrainLayers[-1], vocab_size))
+            self.pretrain_layers.append(nn.Sequential(*self.preTrainBlock))
+        if self.pretrain_layers:
+            self.pretrain_layers.append(nn.Linear(pretrain_layers[-1], vocab_size))
         else:
-            self.preTrainLayers.append(nn.Linear(hiddenNeurons[-1], vocab_size))
-        self.preTrainLayers = nn.Sequential(*self.preTrainLayers)
+            self.pretrain_layers.append(nn.Linear(hiddenNeurons[-1], vocab_size))
+        self.pretrain_layers = nn.Sequential(*self.pretrain_layers)
     
     def pretrain(self, x: Tensor) -> Tensor:
         x = self.core(x)
-        x = self.preTrainLayers(x)
+        x = self.pretrain_layers(x)
         return x
 
 
@@ -247,7 +247,7 @@ class TransformerEncoderModelLM(TransformerEncoderModel):
                     layerNorm: bool = False, # whether to normalize decoder's FFNN layers
                     norm_first: bool = False, # whether to normalize decoder's FFNN layers
                     dropout: float = 0.3,
-                    pretrainLayers: list = [1024], # pretrain layers
+                    pretrain_layers: list = [1024], # pretrain layers
     ):
         super().__init__(
             vocab_size=vocab_size,
@@ -263,19 +263,19 @@ class TransformerEncoderModelLM(TransformerEncoderModel):
             dropout=dropout
         )
         self.__name__ = 'TransformerEncoderLM'
-        self.preTrainLayers = []
-        for i, h in enumerate(pretrainLayers):
+        self.pretrain_layers = []
+        for i, h in enumerate(pretrain_layers):
             self.preTrainBlock = []
             if i == 0:
                 self.preTrainBlock.append(nn.Linear(hiddenNeurons[-1], h))                
             else:
-                self.preTrainBlock.append(nn.Linear(pretrainLayers[i-1], h))
+                self.preTrainBlock.append(nn.Linear(pretrain_layers[i-1], h))
             self.preTrainBlock.append(nn.ReLU())
             if dropout:
                 self.preTrainBlock.append(nn.Dropout(dropout))
-            self.preTrainLayers.append(nn.Sequential(*self.preTrainBlock))
-        self.preTrainLayers.append(nn.Linear(pretrainLayers[-1], vocab_size))
-        self.preTrainLayers = nn.Sequential(*self.preTrainLayers)
+            self.pretrain_layers.append(nn.Sequential(*self.preTrainBlock))
+        self.pretrain_layers.append(nn.Linear(pretrain_layers[-1], vocab_size))
+        self.pretrain_layers = nn.Sequential(*self.pretrain_layers)
 
     def pretrain(self, x: Tensor) -> Tensor:
         x = self.core(x)
