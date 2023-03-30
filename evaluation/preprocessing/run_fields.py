@@ -27,7 +27,7 @@ from torch.optim import AdamW
 LIMIT = None
 RANDOM_SEED = 1763
 TIME_BUDGET = 5 # minutes
-INFOLDER = "out_fields_1679165454" # if data is processed already
+INFOLDER = "out_fields_whitespace_granular" # if data is processed already
 
 VOCAB = int(5e4)
 SEQ_LEN = 512
@@ -36,7 +36,7 @@ SPEAKEASY_TRAINSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_e
 SPEAKEASY_TESTSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_testset")
 
 FIELDS = {
-    'api_file_network_registry': [
+    'full': [
         'file_access.event',
         'file_access.path',
         'network_events.traffic.server',
@@ -55,11 +55,15 @@ FIELDS = {
         'apis.args',
         'apis.ret_val',
     ],
-    'file_network_registry': [
+    'file': [
         'file_access.event',
         'file_access.path',
+    ],
+    'network': [
         'network_events.traffic.server',
         'network_events.traffic.port',
+    ],
+    'registry': [
         'registry_access.event',
         'registry_access.path',
     ]
@@ -70,7 +74,7 @@ if __name__ == "__main__":
     if INFOLDER:
         out_folder_root = INFOLDER
     else:
-        out_folder_root = f"out_fields_{int(time.time())}"
+        out_folder_root = f"out_fields_{TOKENIZER_TYPE}_{int(time.time())}"
         os.makedirs(out_folder_root, exist_ok=True)
 
     # =========== set out logging to both file and stdout

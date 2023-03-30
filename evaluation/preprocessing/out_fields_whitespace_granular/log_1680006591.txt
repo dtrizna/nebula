@@ -1,0 +1,73 @@
+2023-03-28 14:29:51,007 WARNING  [!] Working on full!
+2023-03-28 14:29:51,031 WARNING Filtering and normalizing C:\Users\dtrizna\Code\nebula\evaluation\preprocessing\..\..\data\data_raw\windows_emulation_trainset\report_backdoor
+2023-03-28 14:36:52,614 WARNING Finished... Took: 421.58s
+2023-03-28 14:36:52,614 WARNING Filtering and normalizing C:\Users\dtrizna\Code\nebula\evaluation\preprocessing\..\..\data\data_raw\windows_emulation_trainset\report_clean
+2023-03-28 14:46:07,924 WARNING Finished... Took: 555.31s
+2023-03-28 14:46:07,924 WARNING Filtering and normalizing C:\Users\dtrizna\Code\nebula\evaluation\preprocessing\..\..\data\data_raw\windows_emulation_trainset\report_coinminer
+2023-03-28 14:48:55,019 WARNING Finished... Took: 167.09s
+2023-03-28 14:48:55,035 WARNING Filtering and normalizing C:\Users\dtrizna\Code\nebula\evaluation\preprocessing\..\..\data\data_raw\windows_emulation_trainset\report_dropper
+2023-03-28 14:51:32,297 WARNING Finished... Took: 157.26s
+2023-03-28 14:51:32,297 WARNING Filtering and normalizing C:\Users\dtrizna\Code\nebula\evaluation\preprocessing\..\..\data\data_raw\windows_emulation_trainset\report_keylogger
+2023-03-28 14:53:26,615 WARNING Finished... Took: 114.32s
+2023-03-28 14:53:26,615 WARNING Filtering and normalizing C:\Users\dtrizna\Code\nebula\evaluation\preprocessing\..\..\data\data_raw\windows_emulation_trainset\report_ransomware
+2023-03-28 14:57:51,673 WARNING Finished... Took: 265.06s
+2023-03-28 14:57:51,673 WARNING Filtering and normalizing C:\Users\dtrizna\Code\nebula\evaluation\preprocessing\..\..\data\data_raw\windows_emulation_trainset\report_rat
+2023-03-28 14:58:56,260 WARNING Finished... Took: 64.59s
+2023-03-28 14:58:56,260 WARNING Filtering and normalizing C:\Users\dtrizna\Code\nebula\evaluation\preprocessing\..\..\data\data_raw\windows_emulation_trainset\report_trojan
+2023-03-28 15:02:07,919 WARNING Finished... Took: 191.66s
+2023-03-28 15:02:07,920 WARNING Filtering and normalizing C:\Users\dtrizna\Code\nebula\evaluation\preprocessing\..\..\data\data_raw\windows_emulation_trainset\report_windows_syswow64
+2023-03-28 15:02:10,694 WARNING Finished... Took: 2.77s
+2023-03-28 15:02:10,698 WARNING  [!] Saved Y as out_fields_whitespace_1680006591\full_vocab_50000_seqlen_512\y_train_full.npy
+2023-03-28 15:02:11,057 WARNING  [!] Saved Y names as out_fields_whitespace_1680006591\full_vocab_50000_seqlen_512\y_names_train_full.json
+2023-03-28 15:02:11,057 WARNING  [*] Initializing tokenizer training...
+2023-03-28 15:03:42,394 WARNING Dumped vocab to out_fields_whitespace_1680006591\full_vocab_50000_seqlen_512\tokenizer_50000_vocab.json
+2023-03-28 15:03:43,216 WARNING Dumped vocab counter to out_fields_whitespace_1680006591\full_vocab_50000_seqlen_512\tokenizer_50000_counter.json
+2023-03-28 15:03:43,216 WARNING  [*] Encoding and padding...
+2023-03-28 15:05:53,722 WARNING  [!] Saved X as out_fields_whitespace_1680006591\full_vocab_50000_seqlen_512\x_train_full.npy
+2023-03-28 15:05:57,017 WARNING Filtering and normalizing C:\Users\dtrizna\Code\nebula\evaluation\preprocessing\..\..\data\data_raw\windows_emulation_testset\report_backdoor
+2023-03-28 15:06:38,542 WARNING Finished... Took: 41.53s
+2023-03-28 15:06:38,543 WARNING Filtering and normalizing C:\Users\dtrizna\Code\nebula\evaluation\preprocessing\..\..\data\data_raw\windows_emulation_testset\report_clean
+2023-03-28 15:08:35,302 WARNING Finished... Took: 116.76s
+2023-03-28 15:08:35,302 WARNING Filtering and normalizing C:\Users\dtrizna\Code\nebula\evaluation\preprocessing\..\..\data\data_raw\windows_emulation_testset\report_coinminer
+2023-03-28 15:09:08,557 WARNING Finished... Took: 33.25s
+2023-03-28 15:09:08,557 WARNING Filtering and normalizing C:\Users\dtrizna\Code\nebula\evaluation\preprocessing\..\..\data\data_raw\windows_emulation_testset\report_dropper
+2023-03-28 15:09:11,880 WARNING Finished... Took: 3.32s
+2023-03-28 15:09:11,880 WARNING Filtering and normalizing C:\Users\dtrizna\Code\nebula\evaluation\preprocessing\..\..\data\data_raw\windows_emulation_testset\report_keylogger
+2023-03-28 15:09:25,369 WARNING Finished... Took: 13.49s
+2023-03-28 15:09:25,369 WARNING Filtering and normalizing C:\Users\dtrizna\Code\nebula\evaluation\preprocessing\..\..\data\data_raw\windows_emulation_testset\report_ransomware
+2023-03-28 15:11:54,313 WARNING Finished... Took: 148.94s
+2023-03-28 15:11:54,313 WARNING Filtering and normalizing C:\Users\dtrizna\Code\nebula\evaluation\preprocessing\..\..\data\data_raw\windows_emulation_testset\report_rat
+2023-03-28 15:12:16,200 WARNING Finished... Took: 21.89s
+2023-03-28 15:12:16,200 WARNING Filtering and normalizing C:\Users\dtrizna\Code\nebula\evaluation\preprocessing\..\..\data\data_raw\windows_emulation_testset\report_trojan
+2023-03-28 15:12:31,201 WARNING Finished... Took: 15.00s
+2023-03-28 15:12:31,202 WARNING Filtering and normalizing C:\Users\dtrizna\Code\nebula\evaluation\preprocessing\..\..\data\data_raw\windows_emulation_testset\report_windows_syswow64
+2023-03-28 15:12:31,840 WARNING Finished... Took: 0.64s
+2023-03-28 15:12:31,843 WARNING  [!] Saved Y as out_fields_whitespace_1680006591\full_vocab_50000_seqlen_512\y_test_full.npy
+2023-03-28 15:12:31,925 WARNING  [!] Saved Y names as out_fields_whitespace_1680006591\full_vocab_50000_seqlen_512\y_names_test_full.json
+2023-03-28 15:12:31,958 WARNING  [*] Encoding and padding...
+2023-03-28 15:12:53,592 WARNING  [!] Saved X as out_fields_whitespace_1680006591\full_vocab_50000_seqlen_512\x_test_full.npy
+2023-03-28 15:12:54,259 WARNING  [!!!] Starting CV over full!
+2023-03-28 15:12:54,388 WARNING  [!] Training time budget: 300min
+2023-03-28 15:12:54,389 WARNING  [!] Model config: {'vocab_size': 50000, 'maxlen': 512, 'chunk_size': 64, 'dModel': 64, 'nHeads': 8, 'dHidden': 256, 'nLayers': 2, 'numClasses': 1, 'hiddenNeurons': [64], 'layerNorm': False, 'dropout': 0.3, 'mean_over_sequence': False, 'norm_first': True}
+2023-03-28 15:12:54,462 WARNING  [1/3] Train set size: 50750, Validation set size: 25376
+2023-03-28 15:12:56,483 WARNING  [!] Saved dataset splits to dataset_splits_1680009174.npz
+2023-03-28 15:12:57,674 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 5.3972e6
+2023-03-28 15:12:57,674 WARNING  [*] Training time budget set: 5.0 min
+2023-03-28 15:12:57,705 WARNING  [*] Started epoch: 1
+2023-03-28 15:12:59,984 WARNING  [*] 15:12:59: Train Epoch: 1 [  0  /50750 (0 %)] | Loss: 1.823555 | Elapsed: 2.27s | FPR 0.0003 -> TPR 0.0370 & F1 0.0714 | AUC 0.5432
+2023-03-28 15:13:22,702 WARNING  [*] 15:13:22: Train Epoch: 1 [9600 /50750 (19%)] | Loss: 0.322223 | Elapsed: 22.71s | FPR 0.0003 -> TPR 0.5195 & F1 0.6838 | AUC 0.9108
+2023-03-28 15:13:45,445 WARNING  [*] 15:13:45: Train Epoch: 1 [19200/50750 (38%)] | Loss: 0.374834 | Elapsed: 22.73s | FPR 0.0003 -> TPR 0.4035 & F1 0.5750 | AUC 0.9217
+2023-03-28 15:14:08,886 WARNING  [*] 15:14:08: Train Epoch: 1 [28800/50750 (57%)] | Loss: 0.317715 | Elapsed: 23.43s | FPR 0.0003 -> TPR 0.3492 & F1 0.5176 | AUC 0.9455
+2023-03-28 15:14:32,812 WARNING  [*] 15:14:32: Train Epoch: 1 [38400/50750 (76%)] | Loss: 0.178709 | Elapsed: 23.92s | FPR 0.0003 -> TPR 0.6857 & F1 0.8136 | AUC 0.9781
+2023-03-28 15:14:59,065 WARNING  [*] 15:14:59: Train Epoch: 1 [48000/50750 (95%)] | Loss: 0.253524 | Elapsed: 26.23s | FPR 0.0003 -> TPR 0.6765 & F1 0.8070 | AUC 0.9586
+2023-03-28 15:15:07,717 WARNING  [*] Tue Mar 28 15:15:07 2023:    1    | Tr.loss: 0.316258 | Elapsed:  130.01  s | FPR 0.0003 -> TPR: 0.10 & F1: 0.18 | AUC: 0.9275
+2023-03-28 15:15:07,718 WARNING  [*] Started epoch: 2
+2023-03-28 15:15:07,952 WARNING  [*] 15:15:07: Train Epoch: 2 [  0  /50750 (0 %)] | Loss: 0.172830 | Elapsed: 0.22s | FPR 0.0003 -> TPR 0.8571 & F1 0.9231 | AUC 0.9841
+2023-03-28 15:15:08,366 WARNING  [!] Tue Mar 28 15:15:08 2023: Dumped results:
+                model       : 1680009174-model.torch
+		train time  : 1680009174-trainTime.npy
+		train losses: 1680009174-trainLosses.npy
+		train AUC   : 1680009174-auc.npy
+		train F1s   : 1680009174-trainF1s.npy
+		train TPRs  : 1680009174-trainTPRs.npy
+2023-03-28 15:15:08,395 WARNING  [!] Evaluating model on training set...
