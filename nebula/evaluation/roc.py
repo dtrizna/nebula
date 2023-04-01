@@ -88,7 +88,7 @@ def get_model_rocs(run_types, model_class, model_config, data_splits, model_file
                 )
                 metrics[run_type].append((fpr, tpr, roc_auc))
             else: # multiclass
-                # TBD
+                # TODO: implement multiclass roc
                 pass
     return metrics
 
