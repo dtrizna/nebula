@@ -4,6 +4,8 @@ __pycache__/
 .ipynb_checkpoints
 .DS_Store
 
+PhD-notes/*
+
 # data
 data/data_raw/windows_emulation*
 data/data_raw/windows_raw_pe_*
