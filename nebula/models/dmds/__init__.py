@@ -9,7 +9,7 @@ from operator import __add__
 
 from .preprocessor import DMDSPreprocessor
 
-class Conv2dSamePadding(nn.Conv1d):
+class Conv1dSamePadding(nn.Conv1d):
     def __init__(self,*args,**kwargs):
         super().__init__(*args, **kwargs)
         self.zero_pad_2d = nn.ZeroPad2d(reduce(__add__,
@@ -30,14 +30,14 @@ class DMDSGatedCNN(nn.Module):
             num_classes=1
     ):
         super().__init__()
-        self.conv1 = Conv2dSamePadding(ndim, conv_out_dim, kernel_size=2)#, stride=1, padding=1)
+        self.conv1 = Conv1dSamePadding(ndim, conv_out_dim, kernel_size=2)#, stride=1, padding=1)
         self.sig1 = nn.Sigmoid()
-        self.conv2 = Conv2dSamePadding(ndim, conv_out_dim, kernel_size=2)#, stride=1, padding=1)
+        self.conv2 = Conv1dSamePadding(ndim, conv_out_dim, kernel_size=2)#, stride=1, padding=1)
         self.sig2 = nn.Sigmoid()
         
-        self.conv3 = Conv2dSamePadding(ndim, conv_out_dim, kernel_size=3)#, stride=1, padding=1)
+        self.conv3 = Conv1dSamePadding(ndim, conv_out_dim, kernel_size=3)#, stride=1, padding=1)
         self.sig3 = nn.Sigmoid()
-        self.conv4 = Conv2dSamePadding(ndim, conv_out_dim, kernel_size=3)#, stride=1, padding=1)
+        self.conv4 = Conv1dSamePadding(ndim, conv_out_dim, kernel_size=3)#, stride=1, padding=1)
         self.sig4 = nn.Sigmoid()
         
         self.lstm = nn.LSTM(conv_out_dim*2, lstm_hidden, bidirectional=True, batch_first=True)
