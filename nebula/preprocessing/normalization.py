@@ -140,7 +140,8 @@ def read_and_filter_json_folders(subFolders, filter_function, benign_folders, li
             if jsonEventFiltered:
                 events.append(jsonEventFiltered)
                 
-                #file = os.path.basename(file).rstrip('.json')
+                # if you want only hash of binary, uncomment this
+                # file = os.path.basename(file).rstrip('.json')
                 y_filepaths.append(file)
                 if os.path.basename(subFolder) in benign_folders:
                     y.append(0)
