@@ -9,7 +9,7 @@ from tqdm import tqdm
 from ..models.neurlux import NeurLuxPreprocessor
 from ..models.quovadis import QuoVadisModel, report_to_apiseq
 from ..models.dmds import DMDSPreprocessor
-from . import JSONTokenizerBPE, PEDynamicFeatureExtractor, JSONTokenizerWhiteSpace
+from . import JSONTokenizerBPE, PEDynamicFeatureExtractor, JSONTokenizerNaive
 from .normalization import read_and_filter_json_folders
 from ..constants import JSON_CLEANUP_SYMBOLS
 
@@ -133,7 +133,7 @@ def preprocess_nebula_avast(
                 stopwords=[],
             )
         else:
-            tokenizer = JSONTokenizerWhiteSpace(
+            tokenizer = JSONTokenizerNaive(
                 vocab_size=vocab_size,
                 seq_len=seq_len,
                 cleanup_symbols=JSON_CLEANUP_SYMBOLS,
@@ -157,7 +157,7 @@ def preprocess_nebula_avast(
                 stopwords=[]
             )
         else:
-            tokenizer = JSONTokenizerWhiteSpace(
+            tokenizer = JSONTokenizerNaive(
                 vocab_size=vocab_size,
                 seq_len=seq_len,
                 cleanup_symbols=JSON_CLEANUP_SYMBOLS,
@@ -208,7 +208,8 @@ def preprocess_nebula_speakeasy(
     suffix = "test" if tokenizer_model else "train"
     truelimit = limit if limit else None
     limit = limit if limit else "full"
-    assert tokenizer_type in ["bpe", "whitespace"], "tokenizer_type must be either 'bpe' or 'whitespace'"
+    assert tokenizer_type in ["bpe", "whitespace", "wordpunct"], \
+        "tokenizer_type must be either 'bpe', 'whitespace', or 'wordpunct'"
     if outfolder is None:
         outfolder = f"nebula_speakeasy_{int(time.time())}"
     if not os.path.exists(outfolder):
@@ -222,14 +223,18 @@ def preprocess_nebula_speakeasy(
         return None, y, y_filepaths
 
     # filter and normalize reports
-    extractor = PEDynamicFeatureExtractor(
-        speakeasyRecordFields=record_fields,
-        recordLimits=record_limits
-    )
+    if record_fields:
+        extractor = PEDynamicFeatureExtractor(
+            speakeasyRecordFields=record_fields,
+            recordLimits=record_limits
+        )
+        filter_function = extractor.filter_and_normalize_report
+    else:
+        filter_function = None
     subfolders = [os.path.join(folder, x) for x in os.listdir(folder) if x.startswith("report_")]
     events, y, y_filepaths = read_and_filter_json_folders(
         subFolders=subfolders,
-        filter_function=extractor.filter_and_normalize_report,
+        filter_function=filter_function,
         benign_folders=["report_clean", "report_windows_syswow64"],
         limit=truelimit,
         multiclass=multiclass
@@ -253,12 +258,19 @@ def preprocess_nebula_speakeasy(
                 stopwords=stopwords,
             )
         else:
-            tokenizer = JSONTokenizerWhiteSpace(
+            if tokenizer_type == "whitespace":
+                ttype = "whitespace"
+            elif tokenizer_type == "wordpunct":
+                ttype = "wordpunct"
+            else:
+                raise ValueError(f"Unknown tokenizer type: {tokenizer_type}")
+            tokenizer = JSONTokenizerNaive(
                 vocab_size=vocab_size,
                 seq_len=seq_len,
                 cleanup_symbols=json_cleanup_symbols,
                 stopwords=stopwords,
-                counter_dump=True
+                counter_dump=True,
+                type=ttype
             )
 
         logging.warning(" [*] Initializing tokenizer training...")
@@ -277,11 +289,18 @@ def preprocess_nebula_speakeasy(
                 stopwords=stopwords
             )
         else:
-            tokenizer = JSONTokenizerWhiteSpace(
+            if tokenizer_type == "whitespace":
+                ttype = "whitespace"
+            elif tokenizer_type == "wordpunct":
+                ttype = "wordpunct"
+            else:
+                raise ValueError(f"Unknown tokenizer type: {tokenizer_type}")
+            tokenizer = JSONTokenizerNaive(
                 vocab_size=vocab_size,
                 seq_len=seq_len,
                 cleanup_symbols=json_cleanup_symbols,
-                stopwords=stopwords
+                stopwords=stopwords,
+                type=ttype
             )
             tokenizer.load_vocab(tokenizer_model)
     
@@ -384,7 +403,7 @@ def preprocess_nebula_cruparamer(
                 stopwords=stopwords
             )
         else:
-            tokenizer = JSONTokenizerWhiteSpace(
+            tokenizer = JSONTokenizerNaive(
                 vocab_size=vocab_size,
                 seq_len=seq_len,
                 cleanup_symbols=json_cleanup_symbols,
@@ -407,7 +426,7 @@ def preprocess_nebula_cruparamer(
                 stopwords=stopwords
             )
         else:
-            tokenizer = JSONTokenizerWhiteSpace(
+            tokenizer = JSONTokenizerNaive(
                 vocab_size=vocab_size,
                 seq_len=seq_len,
                 cleanup_symbols=json_cleanup_symbols,
