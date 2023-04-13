@@ -27,7 +27,7 @@ from torch.optim import AdamW
 LIMIT = None
 RANDOM_SEED = 1763
 TIME_BUDGET = 5 # minutes
-INFOLDER = None #"out_speakeasy" # r"evaluation\dynamic_sota\out_50" # if data is processed already
+INFOLDER = "out_tokenizer" # r"evaluation\dynamic_sota\out_50" # if data is processed already
 
 VOCAB = 50000
 SEQ_LEN = 512
@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
     datafolders = {}
     models = defaultdict(dict)
-    for run_name in ['whitespace', 'bpe']:
+    for run_name in ['whitespace', 'bpe', 'wordpunct']:
         datafolders[run_name] = os.path.join(out_folder_root, f"nebula_{run_name}_vocab_{VOCAB}_seqlen_{SEQ_LEN}")
         # =========== 'nebula' & 'speakeasy' preprocessing
         _, y_train, y_paths_train, = preprocess_nebula_speakeasy(
@@ -117,6 +117,11 @@ if __name__ == "__main__":
         }
 
         # ============= TRAINING LOOP ============= 
+        cv_outfolder = os.path.join(out_folder_root, f"cv_{run_name}_lim{LIMIT}_r{RANDOM_SEED}_t{TIME_BUDGET}")
+        if os.path.exists(cv_outfolder):
+            logging.warning(f" [!] CV output folder {cv_outfolder} already exists, skipping!")
+            continue
+
         logging.warning(f" [!!!] Starting CV over {run_name}!")
         
         suffix = LIMIT if LIMIT else "full"
@@ -132,7 +137,6 @@ if __name__ == "__main__":
             y_train = y_train[:LIMIT]
             
         set_random_seed(RANDOM_SEED)
-        cv_outfolder = os.path.join(out_folder_root, f"cv_{run_name}_lim{LIMIT}_r{RANDOM_SEED}_t{TIME_BUDGET}")
         cv = CrossValidation(
             model_trainer_class,
             model_trainer_config,

@@ -27,16 +27,16 @@ from torch.optim import AdamW
 LIMIT = None
 RANDOM_SEED = 1763
 TIME_BUDGET = 5 # minutes
-INFOLDER = "out_fields_whitespace_granular" # if data is processed already
+INFOLDER = "out_fields" # if data is processed already
 
 VOCAB = int(5e4)
 SEQ_LEN = 512
-TOKENIZER_TYPE = "whitespace"
+TOKENIZER_TYPE = "bpe"
 SPEAKEASY_TRAINSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_trainset")
 SPEAKEASY_TESTSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_testset")
 
 FIELDS = {
-    'full': [
+    'api_file_network_registry': [
         'file_access.event',
         'file_access.path',
         'network_events.traffic.server',
@@ -55,18 +55,27 @@ FIELDS = {
         'apis.args',
         'apis.ret_val',
     ],
-    'file': [
+    # 'file': [
+    #     'file_access.event',
+    #     'file_access.path',
+    # ],
+    # 'network': [
+    #     'network_events.traffic.server',
+    #     'network_events.traffic.port',
+    # ],
+    # 'registry': [
+    #     'registry_access.event',
+    #     'registry_access.path',
+    # ],
+    'file_network_registry': [
         'file_access.event',
         'file_access.path',
-    ],
-    'network': [
         'network_events.traffic.server',
         'network_events.traffic.port',
-    ],
-    'registry': [
         'registry_access.event',
         'registry_access.path',
-    ]
+    ],
+    'all': [],
 }
 
 

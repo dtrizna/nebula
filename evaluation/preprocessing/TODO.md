@@ -11,3 +11,6 @@
   - fields:
     - ~~run full~~
     - ~~roc notebook~~
+    - run new BPE run with 'all' setup (no filters) | code ready in `run_fields.py`
+  - ~~tokenizer:~~
+    - ~~evaluate results with new run of WordPunct tokenizer~~

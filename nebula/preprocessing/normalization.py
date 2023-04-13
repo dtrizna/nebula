@@ -122,7 +122,7 @@ def normalizeAuditdTable(df):
     df['process.ppid'] = df['process.ppid'].apply(lambda x: x if x == "1" else "<pid>")
     return df
 
-def read_and_filter_json_folders(subFolders, filter_function, benign_folders, limit=None, multiclass=False):
+def read_and_filter_json_folders(subFolders, benign_folders, filter_function=None, limit=None, multiclass=False):
     """
     Reads and filters all json files in subFolders. Returns a list of events and a list of y values.
     """
@@ -136,7 +136,10 @@ def read_and_filter_json_folders(subFolders, filter_function, benign_folders, li
             with open(file, "r") as f:
                 jsonEventRaw = orjson.loads(f.read())
 
-            jsonEventFiltered = filter_function(jsonEventRaw)
+            if filter_function is not None:
+                jsonEventFiltered = filter_function(jsonEventRaw)
+            else:
+                jsonEventFiltered = jsonEventRaw
             if jsonEventFiltered:
                 events.append(jsonEventFiltered)
                 

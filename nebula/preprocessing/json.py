@@ -13,7 +13,7 @@ from typing import Iterable
 from collections import Counter, defaultdict
 from pandas import json_normalize, concat, DataFrame, merge
 
-from nltk import WhitespaceTokenizer
+from nltk import WhitespaceTokenizer, WordPunctTokenizer
 import sentencepiece as spm
 
 from nebula.constants import *
@@ -166,12 +166,13 @@ class JSONTokenizer:
         return self.pad_sequence_list(encoded_sequences, seq_len=seq_len)
 
 
-class JSONTokenizerWhiteSpace(JSONTokenizer):
+class JSONTokenizerNaive(JSONTokenizer):
     def __init__(self, 
                 vocab_size,
                 seq_len,
                 cleanup_symbols = JSON_CLEANUP_SYMBOLS,
                 stopwords = SPEAKEASY_TOKEN_STOPWORDS,
+                type = "whitespace",
                 counter_dump=False
                 ):
         super().__init__(
@@ -180,7 +181,11 @@ class JSONTokenizerWhiteSpace(JSONTokenizer):
             cleanup_symbols,
             stopwords
         )
-        self.tokenizer = WhitespaceTokenizer()
+        assert type in ["whitespace", "wordpunct"], "type must be either 'whitespace' or 'wordpiece'!"
+        if type == "whitespace":
+            self.tokenizer = WhitespaceTokenizer()
+        elif type == "wordpunct":
+            self.tokenizer = WordPunctTokenizer()
         self.counter = None
         self.counter_dump = counter_dump
         self.vocab_error = "Vocabulary not initialized! Use build_vocab() first or load it using load_vocab()!"

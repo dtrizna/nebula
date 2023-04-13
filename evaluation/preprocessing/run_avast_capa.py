@@ -19,7 +19,7 @@ from nebula import ModelTrainer
 from nebula.models import TransformerEncoderChunks
 from nebula.evaluation import CrossValidation
 from nebula.misc import set_random_seed, clear_cuda_cache
-from nebula.preprocessing.json import JSONTokenizerBPE, JSONTokenizerWhiteSpace
+from nebula.preprocessing.json import JSONTokenizerBPE, JSONTokenizerNaive
 from nebula.constants import JSON_CLEANUP_SYMBOLS
 from nebula.preprocessing.normalization import (
     normalizeStringPath
@@ -148,7 +148,7 @@ if __name__ == "__main__":
                 stopwords=[],
             )
         else:
-            tokenizer = JSONTokenizerWhiteSpace(
+            tokenizer = JSONTokenizerNaive(
                 vocab_size=VOCAB,
                 seq_len=SEQ_LEN,
                 cleanup_symbols=JSON_CLEANUP_SYMBOLS,
@@ -176,7 +176,7 @@ if __name__ == "__main__":
                 stopwords=[]
             )
         else:
-            tokenizer = JSONTokenizerWhiteSpace(
+            tokenizer = JSONTokenizerNaive(
                 vocab_size=VOCAB,
                 seq_len=SEQ_LEN,
                 cleanup_symbols=JSON_CLEANUP_SYMBOLS,
