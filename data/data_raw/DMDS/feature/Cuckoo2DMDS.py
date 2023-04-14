@@ -3,7 +3,7 @@
 
 import logging
 import os
-from Cuckoo2DMDS.DMDS import DMDS
+from .DMDS import DMDS
 from multiprocessing import Pool
 
 
