@@ -1,3 +1,4 @@
+# TRAIN START -- BPE
 2023-03-27 17:15:39,230 WARNING  [!] Initialized tokenizer without pre-trained model.
 	You need to train tokenizer with .train() or specify 'model_path=' during initialization!
 2023-03-27 17:15:39,230 WARNING  [*] Initializing tokenizer training...
@@ -5,27 +6,41 @@
 2023-03-27 17:15:46,430 WARNING  [*] Saving to disk...
 2023-03-27 17:15:46,901 WARNING  [!] Training tokenizer with command: --input=out_avast_multiclass_1679929442\nebula_bpe_speakeasy_vocab_50000_seqlen_512\tokenizer_50000_trainset_1679930146.txt --model_prefix=out_avast_multiclass_1679929442\nebula_bpe_speakeasy_vocab_50000_seqlen_512\tokenizer_50000 --vocab_size=50000 --model_type=bpe --split_by_number=False --max_sentence_length=4192 --max_sentencepiece_length=64
 2023-03-27 17:16:22,477 WARNING  [!] Loaded vocab with size 50001 from out_avast_multiclass_1679929442\nebula_bpe_speakeasy_vocab_50000_seqlen_512\tokenizer_50000.vocab
+
 2023-03-27 17:16:22,631 WARNING  [*] Encoding and padding...
 2023-03-27 17:17:31,640 WARNING  [!] Saved X as out_avast_multiclass_1679929442\nebula_bpe_speakeasy_vocab_50000_seqlen_512\x_train_full.npy
 2023-03-27 17:17:31,655 WARNING  [!] Saved Y as out_avast_multiclass_1679929442\nebula_bpe_speakeasy_vocab_50000_seqlen_512\y_train_full.npy
+# TRAIN END
+
+# TEST START -- BPE
 2023-03-27 17:17:31,776 WARNING  [!] Successfully loaded pre-trained tokenizer model!
 2023-03-27 17:17:31,821 WARNING  [!] Loaded vocab with size 50001 from out_avast_multiclass_1679929442\nebula_bpe_speakeasy_vocab_50000_seqlen_512\tokenizer_50000_vocab.json
 2023-03-27 17:17:31,821 WARNING  [*] Encoding and padding...
 2023-03-27 17:17:48,880 WARNING  [!] Saved X as out_avast_multiclass_1679929442\nebula_bpe_speakeasy_vocab_50000_seqlen_512\x_test_full.npy
 2023-03-27 17:17:48,891 WARNING  [!] Saved Y as out_avast_multiclass_1679929442\nebula_bpe_speakeasy_vocab_50000_seqlen_512\y_test_full.npy
+# TEST END
+
+# TRAIN START -- WHITESPACE
 2023-03-27 17:17:48,929 WARNING  [*] Initializing tokenizer training...
 2023-03-27 17:17:56,837 WARNING Dumped vocab to out_avast_multiclass_1679929442\nebula_wht_speakeasy_vocab_50000_seqlen_512\tokenizer_50000_vocab.json
 2023-03-27 17:17:56,947 WARNING Dumped vocab counter to out_avast_multiclass_1679929442\nebula_wht_speakeasy_vocab_50000_seqlen_512\tokenizer_50000_counter.json
+
 2023-03-27 17:17:56,947 WARNING  [*] Encoding and padding...
 2023-03-27 17:18:07,224 WARNING  [!] Saved X as out_avast_multiclass_1679929442\nebula_wht_speakeasy_vocab_50000_seqlen_512\x_train_full.npy
 2023-03-27 17:18:07,235 WARNING  [!] Saved Y as out_avast_multiclass_1679929442\nebula_wht_speakeasy_vocab_50000_seqlen_512\y_train_full.npy
+# TRAIN END -- WHITESPACE
+
 2023-03-27 17:18:07,270 WARNING  [*] Encoding and padding...
 2023-03-27 17:18:10,177 WARNING  [!] Saved X as out_avast_multiclass_1679929442\nebula_wht_speakeasy_vocab_50000_seqlen_512\x_test_full.npy
 2023-03-27 17:18:10,192 WARNING  [!] Saved Y as out_avast_multiclass_1679929442\nebula_wht_speakeasy_vocab_50000_seqlen_512\y_test_full.npy
+
+# TRAIN START -- NEURLUX
 2023-03-27 17:18:10,205 WARNING  [*] Training NeurLux preprocessor on 37512 reports...
 2023-03-27 17:18:19,161 WARNING  [*] Encoding and padding reports...
 2023-03-27 17:18:27,529 WARNING  [!] Saved X as out_avast_multiclass_1679929442\neurlux_speakeasy_vocab_10000_seqlen_512\x_train_full.npy
 2023-03-27 17:18:27,531 WARNING  [!] Saved Y as out_avast_multiclass_1679929442\neurlux_speakeasy_vocab_10000_seqlen_512\y_train_full.npy
+# TRAIN END -- NEURLUX
+
 2023-03-27 17:18:27,533 WARNING  [*] Loading NeurLux preprocessor from out_avast_multiclass_1679929442\neurlux_speakeasy_vocab_10000_seqlen_512\vocab_10000.json...
 2023-03-27 17:18:27,539 WARNING  [*] Encoding and padding reports...
 2023-03-27 17:18:30,173 WARNING  [!] Saved X as out_avast_multiclass_1679929442\neurlux_speakeasy_vocab_10000_seqlen_512\x_test_full.npy
