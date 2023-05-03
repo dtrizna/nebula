@@ -32,19 +32,20 @@ from torch import cuda
 from torch.nn import BCEWithLogitsLoss
 from torch.optim import AdamW
 
-LIMIT = 1000
+LIMIT = 1250
 
 NEBULA_VOCAB = 50000
 NEURLUX_VOCAB = 10000
 QUO_VADIS_TOP_API = 600
 
-TIME_BUDGET = 5 # minutes
+TIME_BUDGET = None # minutes
+EPOCHS = 30
 FOLDS = 5
 
 RANDOM_SEED = 1763
-INFOLDER = None # if data is processed already
+INFOLDER = "out_cruparamer_limit_no_test_5_folds_1682679343" # if data is processed already
 
-SEQ_LEN = 512
+SEQ_LEN = 64
 
 DATA_DIR = os.path.join(REPO_ROOT, "data", "data_raw", "CruParamer")
 
@@ -76,32 +77,40 @@ if __name__ == "__main__":
     datafolders['dmds'] = os.path.join(out_folder_root, f"dmds_vocab_seqlen_{SEQ_LEN}")
     
     # =========== PARSING RAW REPORTS IN MEMORY ==============
-    logging.warning(" [*] Parsing malicious reports...")
-    malicious_reports = []
-    malicious_reports_api_only = []
-    dmds_reports_malicious = []
-    for sample in tqdm(os.listdir(CRUPARAMER_TRAIN_1)[:LIMIT]):
-        sample_fullpath = os.path.join(CRUPARAMER_TRAIN_1, sample)
-        report_full, report_apis_only = parse_cruparamer_xmlsample(sample_fullpath)
-        malicious_reports.append(" ".join(report_full))
-        dmds_reports_malicious.append(report_full)
-        malicious_reports_api_only.append(report_apis_only)
-    
-    logging.warning(" [*] Parsing benign reports...")
-    benign_reports = []
-    benign_reports_api_only = []
-    dmds_reports_benign = []
-    for sample in tqdm(os.listdir(CRUPARAMER_TRAIN_0)[:LIMIT]):
-        sample_fullpath = os.path.join(CRUPARAMER_TRAIN_0, sample)
-        report_full, report_apis_only = parse_cruparamer_xmlsample(sample_fullpath)
-        benign_reports.append(" ".join(report_full))
-        dmds_reports_benign.append(report_full)
-        benign_reports_api_only.append(report_apis_only)
-    
-    y = np.array([1] * len(malicious_reports) + [0] * len(benign_reports), dtype=np.int8)
-    reports = malicious_reports + benign_reports
-    reports_apis_only = malicious_reports_api_only + benign_reports_api_only
-    dmds_reports = dmds_reports_malicious + dmds_reports_benign
+    if not INFOLDER:
+        logging.warning(" [*] Parsing malicious reports...")
+        malicious_reports = []
+        malicious_reports_api_only = []
+        dmds_reports_malicious = []
+        sampled_malicious = os.listdir(CRUPARAMER_TRAIN_1)
+        if LIMIT:
+            # take random subset of LIMIT samples from os.listdir(CRUPARAMER_TRAIN_1)
+            sampled_malicious = np.random.choice(sampled_malicious, size=LIMIT, replace=False)
+        for sample in tqdm(sampled_malicious):
+            sample_fullpath = os.path.join(CRUPARAMER_TRAIN_1, sample)
+            report_full, report_apis_only = parse_cruparamer_xmlsample(sample_fullpath)
+            malicious_reports.append(" ".join(report_full))
+            dmds_reports_malicious.append(report_full)
+            malicious_reports_api_only.append(report_apis_only)
+        
+        logging.warning(" [*] Parsing benign reports...")
+        benign_reports = []
+        benign_reports_api_only = []
+        dmds_reports_benign = []
+        sampled_benign = os.listdir(CRUPARAMER_TRAIN_0)
+        if LIMIT:
+            sampled_benign = np.random.choice(sampled_benign, size=LIMIT, replace=False)
+        for sample in tqdm(sampled_benign):
+            sample_fullpath = os.path.join(CRUPARAMER_TRAIN_0, sample)
+            report_full, report_apis_only = parse_cruparamer_xmlsample(sample_fullpath)
+            benign_reports.append(" ".join(report_full))
+            dmds_reports_benign.append(report_full)
+            benign_reports_api_only.append(report_apis_only)
+        
+        y = np.array([1] * len(malicious_reports) + [0] * len(benign_reports), dtype=np.int8)
+        reports = malicious_reports + benign_reports
+        reports_apis_only = malicious_reports_api_only + benign_reports_api_only
+        dmds_reports = dmds_reports_malicious + dmds_reports_benign
 
     # logging.warning(" [*] Parsing test reports...")
     # reports_test = []
@@ -117,13 +126,14 @@ if __name__ == "__main__":
     # y_test = np.array([1] * len(reports_test), dtype=np.int8)
 
     # =========== 'dmds' & 'cruparamer' preprocessing
-    preprocess_dmds_cruparamer(
-        dmds_reports,
-        y=y,
-        limit=LIMIT,
-        outfolder=datafolders['dmds'],
-        seq_len=64,
-    )
+    if not INFOLDER:
+        preprocess_dmds_cruparamer(
+            dmds_reports,
+            y=y,
+            limit=LIMIT,
+            outfolder=datafolders['dmds'],
+            seq_len=64,
+        )
     # preprocess_dmds_cruparamer(
     #     dmds_reports_test,
     #     y=y_test,
@@ -234,7 +244,7 @@ if __name__ == "__main__":
     models['dmds']['class'] = DMDSGatedCNN
     models['dmds']['config'] = {
         "ndim": 98,
-        "seq_len": SEQ_LEN,
+        "seq_len": 64,
     }
 
     device = "cuda" if cuda.is_available() else "cpu"
@@ -244,12 +254,12 @@ if __name__ == "__main__":
         "model": None, # will be set later within CrossValidation class
         "loss_function": BCEWithLogitsLoss(),
         "optimizer_class": AdamW,
-        "optimizer_config": {"lr": 3e-4},
+        "optimizer_config": {"lr": 3e-3},
         "optim_scheduler": None,
         "optim_step_budget": None,
         "outputFolder": None, # will be set later within CrossValidation class
         "batchSize": 96,
-        "verbosity_n_batches": 100,
+        "verbosity_n_batches": 10,
         "clip_grad_norm": 1.0,
         "n_batches_grad_update": 1,
         "time_budget": int(TIME_BUDGET*60) if TIME_BUDGET else None,
@@ -287,7 +297,7 @@ if __name__ == "__main__":
         cv.run_folds(
             x_train, 
             y_train, 
-            epochs=None, # time budget specified
+            epochs=EPOCHS, # time budget specified
             folds=FOLDS, 
             random_state=RANDOM_SEED
         )
