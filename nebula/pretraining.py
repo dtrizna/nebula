@@ -5,6 +5,8 @@ import logging
 import numpy as np
 from tqdm import tqdm
 
+import torch
+
 class MaskedLanguageModelTrainer(ModelTrainer):
     def __init__(self,
                     vocab,
@@ -92,9 +94,12 @@ class MaskedLanguageModelTrainer(ModelTrainer):
         self,
         x_unlabeled,
         epochs=5,
+        time_budget=None,
         dump_model_every_epoch=False,
         remask_epochs=False
     ):
+        assert (epochs is not None) ^ (time_budget is not None), \
+            "Either 'epochs' or 'time_budget' should be specified"
         assert isinstance(epochs, int), "pretrainEpochs must be an integer"
         if remask_epochs:
             assert isinstance(remask_epochs, int), "remask_epochs must be an integer"
@@ -112,12 +117,25 @@ class MaskedLanguageModelTrainer(ModelTrainer):
                     logging.warning(f' [*] Re-masking sequences...')
                     x_masked, y_masked = self.maskSequenceArr(x_unlabeled)
         
-                self.fit(x_masked, y_masked, epochs=1, dump_model_every_epoch=dump_model_every_epoch, overwrite_epoch_idx=i)
+                self.fit(
+                    x_masked,
+                    y_masked,
+                    epochs=1,
+                    time_budget=time_budget,
+                    dump_model_every_epoch=dump_model_every_epoch,
+                    overwrite_epoch_idx=i
+                )
         else:
             logging.warning(' [*] Masking sequences...')
             x_masked, y_masked = self.maskSequenceArr(x_unlabeled)
             
-            self.fit(x_masked, y_masked, epochs=epochs, dump_model_every_epoch=dump_model_every_epoch)
+            self.fit(
+                x_masked,
+                y_masked,
+                epochs=epochs,
+                time_budget=time_budget,
+                dump_model_every_epoch=dump_model_every_epoch
+            )
         
         return self.model
 
@@ -137,18 +155,32 @@ class AutoRegressiveModelTrainer(ModelTrainer):
         self.random_state = random_state
         set_random_seed(self.random_state)
 
-    
     def pretrain(        
         self,
         x_unlabeled,
         epochs=5,
+        time_budget=None,
+        random_offsets=False,
         dump_model_every_epoch=False,
     ):
-        assert isinstance(epochs, int), "pretrainEpochs must be an integer"
+        assert (epochs is not None) ^ (time_budget is not None), \
+            "Either 'epochs' or 'time_budget' should be specified"
         
-        # create input and target sequences
-        x_causal = x_unlabeled[:self.block_size]
-        y_next_tokens = x_unlabeled[1:self.block_size+1]
+        assert isinstance(epochs, int), "epochs must be an integer"
+        
+        if random_offsets:
+            assert isinstance(random_offsets, int), "random_sampling must be an integer"
+            ix = np.random.randint(x_unlabeled.shape[0]-self.block_size, size=(random_offsets,))
+            x = np.stack([x_unlabeled[i:i+self.block_size] for i in ix])
+            y = np.stack([x_unlabeled[i+1:i+self.block_size+1] for i in ix])
+        else: # sequential
+            x = np.stack([x_unlabeled[i:i+self.block_size] for i in range(x_unlabeled.shape[0]-self.block_size)])
+            y = np.stack([x_unlabeled[i+1:i+self.block_size+1] for i in range(x_unlabeled.shape[0]-self.block_size)])
 
-        # final action of method:
-        # model_trainer.fit(x_causal, y_next_tokens, epochs=epochs, dump_model_every_epoch=dump_model_every_epoch)
+        self.fit(
+                x,
+                y,
+                epochs=epochs,
+                time_budget=time_budget,
+                dump_model_every_epoch=dump_model_every_epoch
+        )

@@ -100,6 +100,7 @@ class JSONFilter:
                 recordDict[key] = concat([recordDict[key], tableDict[key]], axis=0, ignore_index=True)
         return recordDict
 
+
 class JSONTokenizer:
     def __init__(self,
                  seq_len,
@@ -294,7 +295,6 @@ class JSONTokenizerNaive(JSONTokenizer):
             raise Exception("detokenize(): " + self.vocabError)
 
 
-
 class JSONTokenizerBPE(JSONTokenizer):
     def __init__(self,
                 vocab_size,
@@ -434,4 +434,3 @@ class JSONTokenizerBPE(JSONTokenizer):
             jsonData = [jsonData]
         jsonDataClean = [self.clear_json_event(x) for x in jsonData]
         return [self.tokenizer.encode_as_ids(x) for x in jsonDataClean]
-
