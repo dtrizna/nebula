@@ -12,7 +12,7 @@ import torch
 from torch.nn import CrossEntropyLoss
 from torch.optim import AdamW
 
-from nebula.pretraining import AutoRegressiveModel
+from nebula.pretraining import AutoRegressiveModelTrainer
 from nebula.models.attention import TransformerEncoderChunksLM
 
 # ============ DATA ============
@@ -40,6 +40,7 @@ model_config = {
 model = TransformerEncoderChunksLM(**model_config)
 
 # ============ PRE-TRAINING ============
+BATCH_SIZE = 8
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model_trainer_config = {
     "device": device,
@@ -51,10 +52,16 @@ model_trainer_config = {
     "optim_scheduler": None,
     "optim_step_budget": None,
     "verbosity_n_batches": 10,
-    "batchSize": 8,
+    "batchSize": BATCH_SIZE,
 }
 
-pretraining_task = AutoRegressiveModel(
-    block_size=256
+pretraining_task = AutoRegressiveModelTrainer(
+    vocab=vocab,
+    block_size=16,
+    model_trainer_config=model_trainer_config,
 )
-pretraining_task.pretrain(x, model_trainer_config, epochs=1)
+pretraining_task.pretrain(
+    x,
+    epochs=1,
+    random_offsets=32
+)

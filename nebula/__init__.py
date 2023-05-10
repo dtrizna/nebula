@@ -285,7 +285,16 @@ class ModelTrainer(object):
         else:
             return epoch_losses, None, None, None
 
-    def fit(self, X, y, epochs=10, time_budget=None, dump_model_every_epoch=False, overwrite_epoch_idx=False, reporting_timestamp=None):
+    def fit(
+            self,
+            X,
+            y,
+            epochs=10,
+            time_budget=None,
+            dump_model_every_epoch=False,
+            overwrite_epoch_idx=False,
+            reporting_timestamp=None
+    ):
         assert (epochs is not None) ^ (time_budget is not None), \
             "Either epochs or time_budget should be specified"
         if time_budget or self.time_budget:

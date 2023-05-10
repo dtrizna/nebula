@@ -43,7 +43,7 @@ run_config = {
     "unlabeledDataSize": 0.8,
     "nSplits": 3,
     "downStreamEpochs": 3,
-    "preTrainEpochs": 10, # 10
+    "preTrainEpochs": 3, # 10
     "falsePositiveRates": [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
     "modelType": model_class.__name__,
     "train_limit": LIMIT,
