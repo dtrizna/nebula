@@ -7,6 +7,7 @@ __pycache__/
 PhD-notes/*
 
 # data
+aks_raw*
 data/data_raw/windows_emulation*
 data/data_raw/windows_raw_pe_*
 data/data_raw/Avast*
@@ -22,6 +23,7 @@ wazuh_*
 *kubeaudit_msft_*
 data/data_raw/windows_emulation*7z
 data/data_filtered/speakeasy_data_filtered.7z
+data/data_raw/BETH-dataset.7z
 evaluation/MaskedLanguageModeling/*/downstreamTask*
 evaluation/MaskedLanguageModeling/*/preTraining/
 *npy
