@@ -272,13 +272,16 @@ class JSONTokenizerNaive(JSONTokenizer):
         else:
             raise Exception("convertTokensToIds(): " + self.vocab_error)
     
-    def encode(self, jsonInput, pad=True):
-        tokenized = self.tokenize(jsonInput)
-        if isinstance(tokenized[0], str):
+    def encode(self, inputs, pad=True, tokenize=True):
+        if isinstance(inputs[0], str):
+            inputs = [inputs]
+        if not tokenize:
+            inputs = self.tokenize(inputs)
+        if isinstance(inputs[0], str):
             # means we got a single example for encoding
-            encoded = [self.convertTokensToIds(tokenized)]
+            encoded = [self.convertTokensToIds(inputs)]
         else:
-            encoded = self.convertTokenListToIds(tokenized)
+            encoded = self.convertTokenListToIds(inputs)
         # apply padding to each element in list
         if pad:
             return self.pad_sequence_list(encoded)
@@ -316,7 +319,7 @@ class JSONTokenizerBPE(JSONTokenizer):
         )
 
         if model_path:
-            self.tokenizer = spm.SentencePieceProcessor(model_file=model_path.rstrip(".model")+".model")
+            self.tokenizer = spm.SentencePieceProcessor(model_file=model_path.replace(".model","")+".model")
             logging.warning(" [!] Successfully loaded pre-trained tokenizer model!")
             self.model_path = model_path
             self.load_vocab()
@@ -351,7 +354,7 @@ class JSONTokenizerBPE(JSONTokenizer):
 
     def load_vocab(self, vocab_path=None):
         if not vocab_path:
-            vocab_path = self.model_path.rstrip(".model")+"_vocab.json"
+            vocab_path = self.model_path.replace(".model","")+"_vocab.json"
             if not os.path.exists(vocab_path): # default sentencepiece -- after training
                 vocab_path = self.model_path.replace(".model", "")+".vocab"
         with open(vocab_path, encoding="utf-8") as f:
@@ -371,7 +374,7 @@ class JSONTokenizerBPE(JSONTokenizer):
         logging.warning(f" [!] Loaded vocab with size {len(self.vocab)} from {vocab_path}")
         
     def dump_vocab(self):
-        vocabFileName = self.model_path.rstrip(".model") + "_vocab.json"
+        vocabFileName = self.model_path.replace(".model","") + "_vocab.json"
         with open(vocabFileName, "w") as f:
             json.dump(self.vocab, f, indent=4)
 
@@ -431,11 +434,9 @@ class JSONTokenizerBPE(JSONTokenizer):
         jsonDataClean = [self.clear_json_event(x) for x in jsonData]
         return [self.tokenizer.encode_as_pieces(x) for x in jsonDataClean]
 
-    def encode(self, jsonData):
-        """
-        Encodes the given json data.
-        """
-        if isinstance(jsonData, (str, bytes, dict)):
-            jsonData = [jsonData]
-        jsonDataClean = [self.clear_json_event(x) for x in jsonData]
-        return [self.tokenizer.encode_as_ids(x) for x in jsonDataClean]
+    def encode(self, inputs):
+        if isinstance(inputs, (str, bytes, dict)) or \
+            (isinstance(inputs, list) and isinstance(inputs[0], (str, bytes, dict))):
+            inputs = [inputs]
+        data_clean = [self.clear_json_event(x) for x in inputs]
+        return [self.tokenizer.encode_as_ids(x) for x in data_clean]

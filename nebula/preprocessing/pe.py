@@ -88,6 +88,9 @@ class PEDynamicFeatureExtractor(object):
         return None if api_seq_len == 0 else self.filter_and_normalize_report(report["entry_points"])
     
     def filter_and_normalize_report(self, entryPoints):
+        if isinstance(entryPoints, str) and os.path.exists(entryPoints):
+            with open(entryPoints, "r") as f:
+                entryPoints = json.load(f)
         # clean up report
         recordDict = self.parser.filter_and_concat(entryPoints)
         
