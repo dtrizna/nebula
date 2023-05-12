@@ -171,6 +171,7 @@ class JSONTokenizerNaive(JSONTokenizer):
     def __init__(self, 
                 vocab_size,
                 seq_len,
+                vocab=None,
                 cleanup_symbols = JSON_CLEANUP_SYMBOLS,
                 stopwords = SPEAKEASY_TOKEN_STOPWORDS,
                 type = "whitespace",
@@ -190,6 +191,8 @@ class JSONTokenizerNaive(JSONTokenizer):
         self.counter = None
         self.counter_dump = counter_dump
         self.vocab_error = "Vocabulary not initialized! Use build_vocab() first or load it using load_vocab()!"
+        if vocab:
+            self.load_vocab(vocab)
         
     def tokenize_event(self, jsonEvent):
         jsonEventClean = self.clear_json_event(jsonEvent)
@@ -198,11 +201,13 @@ class JSONTokenizerNaive(JSONTokenizer):
             tokenizedJsonEvent = [x for x in tokenizedJsonEvent if x not in self.stopwords]
         return tokenizedJsonEvent
 
-    def tokenize(self, jsonInput):
-        if isinstance(jsonInput, (str, bytes)):
-            return self.tokenize_event(jsonInput)
-        elif isinstance(jsonInput, Iterable):
-            return [self.tokenize_event(x) for x in jsonInput]
+    def tokenize(self, sample):
+        if isinstance(sample, dict):
+            return self.tokenize_event(str(sample))
+        elif isinstance(sample, (str, bytes)):
+            return self.tokenize_event(sample)
+        elif isinstance(sample, Iterable):
+            return [self.tokenize_event(str(x)) for x in sample]
         else:
             raise TypeError("tokenize(): Input must be a string, bytes, or Iterable!")
     
@@ -265,7 +270,7 @@ class JSONTokenizerNaive(JSONTokenizer):
         if self.vocab:
             return [self.vocab[x] if x in self.vocab else self.vocab["<unk>"] for x in tokenList]
         else:
-            raise Exception("convertTokensToIds(): " + self.vocabError)
+            raise Exception("convertTokensToIds(): " + self.vocab_error)
     
     def encode(self, jsonInput, pad=True):
         tokenized = self.tokenize(jsonInput)
@@ -292,7 +297,7 @@ class JSONTokenizerNaive(JSONTokenizer):
                     decodedSequence.append(self.unk_token)
             return decodedSequence
         else:
-            raise Exception("detokenize(): " + self.vocabError)
+            raise Exception("detokenize(): " + self.vocab_error)
 
 
 class JSONTokenizerBPE(JSONTokenizer):
