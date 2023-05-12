@@ -2,12 +2,17 @@ import os
 import sys
 import json
 import numpy as np
-REPOSITORY_ROOT = ".."
-sys.path.extend([REPOSITORY_ROOT, "."])
+
+# correct path to repository root
+if os.path.basename(os.getcwd()) == "scripts":
+    REPOSITORY_ROOT = os.path.join(os.getcwd(), "..")
+else:
+    REPOSITORY_ROOT = os.getcwd()
+sys.path.append(REPOSITORY_ROOT)
 
 # TAKE A PE SAMPLE
 PE = "path_to_exe"
-
+tokenization_type = "bpe" # support: ["bpe", "whitespace", "wordpunct"]
 
 # ===================
 # PREPROCESSING
@@ -25,8 +30,6 @@ filtered_report = extractor.filter_and_normalize_report(emulation_report)
 
 # 2. TOKENIZE IT
 from nebula.preprocessing import JSONTokenizerBPE, JSONTokenizerNaive
-
-tokenization_type = "whitespace" # support: ["bpe", "whitespace", "wordpunct"]
 
 if tokenization_type in ["whitespace", "wordpunct"]:
     with open(os.path.join(REPOSITORY_ROOT, "nebula", "objects", "speakeasy_whitespace_50000_vocab.json")) as f:
@@ -125,4 +128,4 @@ if TRAIN_SAMPLE:
 
     # 3. TRAIN
     model_trainer = ModelTrainer(**model_trainer_config)
-    # model_trainer.train(X, y)
+    # model_trainer.train(x, y)
