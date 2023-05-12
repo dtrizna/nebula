@@ -3,7 +3,7 @@ import sys
 import json
 import numpy as np
 REPOSITORY_ROOT = ".."
-sys.path.append(REPOSITORY_ROOT)
+sys.path.extend([REPOSITORY_ROOT, "."])
 
 # TAKE A PE SAMPLE
 PE = "path_to_exe"
