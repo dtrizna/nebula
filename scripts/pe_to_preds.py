@@ -3,12 +3,18 @@ import sys
 import json
 import numpy as np
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
 # correct path to repository root
 if os.path.basename(os.getcwd()) == "scripts":
     REPOSITORY_ROOT = os.path.join(os.getcwd(), "..")
 else:
     REPOSITORY_ROOT = os.getcwd()
 sys.path.append(REPOSITORY_ROOT)
+
+from nebula.misc import fix_random_seed
+fix_random_seed(0)
 
 # TAKE A PE SAMPLE
 PE = "path_to_exe"
@@ -26,11 +32,14 @@ extractor = PEDynamicFeatureExtractor()
 
 # 1. FILTER AND NORMALIZE IT
 emulation_report = os.path.join(REPOSITORY_ROOT, r"emulation\reportSample_EntryPoint_ransomware.json")
+logging.info(f" [*] Filtering and normalizing report...")
 filtered_report = extractor.filter_and_normalize_report(emulation_report)
+
 
 # 2. TOKENIZE IT
 from nebula.preprocessing import JSONTokenizerBPE, JSONTokenizerNaive
 
+logging.info(f" [*] Initializing tokenizer...")
 if tokenization_type in ["whitespace", "wordpunct"]:
     with open(os.path.join(REPOSITORY_ROOT, "nebula", "objects", "speakeasy_whitespace_50000_vocab.json")) as f:
         vocab = json.load(f)
@@ -51,9 +60,11 @@ if tokenization_type == "bpe":
         seq_len=512,
         model_path=pretrained_bpe_model
     )
+logging.info(f" [!] Tokenizer ready.")
 
 
 # 3. ENCODE IT
+logging.info(f" [*] Tokenizing and encoding report..."	)
 if tokenization_type in ["whitespace", "wordpunct"]:
     tokenized_report = tokenizer.tokenize(filtered_report)
     encoded_report = tokenizer.encode(
@@ -63,14 +74,15 @@ if tokenization_type in ["whitespace", "wordpunct"]:
     )
 if tokenization_type == "bpe":
     tokenized_report = tokenizer.tokenize(filtered_report)
-    encoded_report = tokenizer.encode(filtered_report)
-    # pad, since sentencepiece tokenizer does not pad
-    encoded_report = np.pad(encoded_report, (0, 512-len(encoded_report)), "constant", constant_values=0)
+    encoded_report = tokenizer.encode(filtered_report, pad=True)
+
+logging.info(f" [!] Report encoded with shapes: {encoded_report.shape}")
 
 # ===================
 # MODELING
 # ===================
 
+logging.info(f" [*] Loading model...")
 from torch import Tensor, sigmoid
 x = Tensor(encoded_report).long()
 
@@ -91,10 +103,11 @@ model_config = {
     "norm_first": True
 }
 model = TransformerEncoderChunks(**model_config)
+logging.info(f" [!] Model ready.")
 
 logit = model(x)
 prob = sigmoid(logit)
-print(f"Probability of being malicious: {prob.item():.3f}")
+print(f"\n[!!!] Probability of being malicious: {prob.item():.3f} | Logit: {logit.item():.3f}")
 
 TRAIN_SAMPLE = False
 if TRAIN_SAMPLE:
@@ -112,13 +125,13 @@ if TRAIN_SAMPLE:
     device = "cuda" if cuda.is_available() else "cpu"
     model_trainer_config = {
         "device": device,
-        "model": None, # will be set later within CrossValidation class
+        "model": model,
         "loss_function": BCEWithLogitsLoss(),
         "optimizer_class": AdamW,
         "optimizer_config": {"lr": 3e-4},
         "optim_scheduler": None,
         "optim_step_budget": None,
-        "outputFolder": None, # will be set later within CrossValidation class
+        "outputFolder": "./out",
         "batchSize": 96,
         "verbosity_n_batches": 100,
         "clip_grad_norm": 1.0,

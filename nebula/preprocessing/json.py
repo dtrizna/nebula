@@ -275,7 +275,7 @@ class JSONTokenizerNaive(JSONTokenizer):
     def encode(self, inputs, pad=True, tokenize=True):
         if isinstance(inputs[0], str):
             inputs = [inputs]
-        if not tokenize:
+        if tokenize:
             inputs = self.tokenize(inputs)
         if isinstance(inputs[0], str):
             # means we got a single example for encoding
@@ -425,18 +425,23 @@ class JSONTokenizerBPE(JSONTokenizer):
             os.remove(trainFile)
             os.remove(f"{model_prefix}.vocab")
     
-    def tokenize(self, jsonData):
+    def tokenize(self, inputs):
         """
         Tokenizes the given json data.
         """
-        if isinstance(jsonData, (str, bytes, dict)):
-            jsonData = [jsonData]
-        jsonDataClean = [self.clear_json_event(x) for x in jsonData]
-        return [self.tokenizer.encode_as_pieces(x) for x in jsonDataClean]
-
-    def encode(self, inputs):
         if isinstance(inputs, (str, bytes, dict)) or \
             (isinstance(inputs, list) and isinstance(inputs[0], (str, bytes, dict))):
             inputs = [inputs]
         data_clean = [self.clear_json_event(x) for x in inputs]
-        return [self.tokenizer.encode_as_ids(x) for x in data_clean]
+        return [self.tokenizer.encode_as_pieces(x) for x in data_clean]
+
+    def encode(self, inputs, pad=True):
+        if isinstance(inputs, (str, bytes, dict)) or \
+            (isinstance(inputs, list) and isinstance(inputs[0], (str, bytes, dict))):
+            inputs = [inputs]
+        data_clean = [self.clear_json_event(x) for x in inputs]
+        encoded = [self.tokenizer.encode_as_ids(x) for x in data_clean]
+        if pad:
+            return self.pad_sequence_list(encoded)
+        else:
+            return encoded
