@@ -1,7 +1,6 @@
 import os
 import sys
 import json
-import numpy as np
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -18,17 +17,18 @@ fix_random_seed(0)
 
 # TAKE A PE SAMPLE
 PE = "path_to_exe"
-tokenization_type = "bpe" # support: ["bpe", "whitespace", "wordpunct"]
+tokenization_type = "whitespace" # support: ["bpe", "whitespace", "wordpunct"]
 
 # ===================
 # PREPROCESSING
 # ===================
-
 from nebula import PEDynamicFeatureExtractor
 extractor = PEDynamicFeatureExtractor()
 
+
 # 0. EMULATE IT -- SKIP IF YOU HAVE JSON REPORT ALREADY !!!
 # emulation_report = extractor.emulate(path=PE)
+
 
 # 1. FILTER AND NORMALIZE IT
 emulation_report = os.path.join(REPOSITORY_ROOT, r"emulation\reportSample_EntryPoint_ransomware.json")
