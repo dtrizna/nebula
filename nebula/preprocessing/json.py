@@ -273,7 +273,8 @@ class JSONTokenizerNaive(JSONTokenizer):
             raise Exception("convertTokensToIds(): " + self.vocab_error)
     
     def encode(self, inputs, pad=True, tokenize=True):
-        if isinstance(inputs[0], str):
+        if isinstance(inputs, (str, bytes, dict)) or \
+            (isinstance(inputs, list) and isinstance(inputs[0], (str, bytes, dict))):
             inputs = [inputs]
         if tokenize:
             inputs = self.tokenize(inputs)
