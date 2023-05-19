@@ -124,21 +124,25 @@ class TransformerEncoderChunksOptionalEmbedding(TransformerEncoderChunks):
                          layerNorm, norm_first, dropout, mean_over_sequence)
         self.skip_embedding = skip_embedding
 
+    def embed(self, src: Tensor, src_mask: Optional[Tensor] = None):
+        chunks = []
+        for chunk in torch.split(src, split_size_or_sections=self.chunk_size, dim=1):
+            if chunk.shape[1] < self.chunk_size:
+                pad_mask = (0, self.chunk_size - chunk.shape[1])
+                chunk = F.pad(chunk, pad=pad_mask)
+            chunk = self.encoder(chunk) * math.sqrt(self.d_model)
+            chunk = self.pos_encoder(chunk)
+            chunk = self.transformer_encoder(chunk, src_mask)
+            # at this stage each chunk is: (batch_size, chunk_size, d_model)
+            chunks.append(chunk)
+        # after cat it'd be: (batch_size, chunk_size * nr_of_chunks * d_model, d_model)
+        # where nr_of_chunks = int(maxLen/self.chunk_size) + 1
+        x = torch.cat(chunks, dim=1)
+        return x
+
     def core(self, src: Tensor, src_mask: Optional[Tensor] = None) -> Tensor:
         if not self.skip_embedding:
-            chunks = []
-            for chunk in torch.split(src, split_size_or_sections=self.chunk_size, dim=1):
-                if chunk.shape[1] < self.chunk_size:
-                    pad_mask = (0, self.chunk_size - chunk.shape[1])
-                    chunk = F.pad(chunk, pad=pad_mask)
-                chunk = self.encoder(chunk) * math.sqrt(self.d_model)
-                chunk = self.pos_encoder(chunk)
-                chunk = self.transformer_encoder(chunk, src_mask)
-                # at this stage each chunk is: (batch_size, chunk_size, d_model)
-                chunks.append(chunk)
-            # after cat it'd be: (batch_size, chunk_size * nr_of_chunks * d_model, d_model)
-            # where nr_of_chunks = int(maxLen/self.chunk_size) + 1
-            x = torch.cat(chunks, dim=1)
+            x = self.embed(src, src_mask)
         else:
             x = src
         if self.meanOverSeq:
