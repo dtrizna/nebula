@@ -1,0 +1,541 @@
+[
+    {
+        "ep_type": "module_entry",
+        "start_addr": "0x4034c5",
+        "ep_args": [
+            "0x4000",
+            "0x4010",
+            "0x4020",
+            "0x4030"
+        ],
+        "apihash": "7a9a56b02c0cc96167befb19083d27a313310540bbbd977bb3d6d9f0a8bb9e29",
+        "apis": [
+            {
+                "pc": "0x4034ee",
+                "api_name": "KERNEL32.SetErrorMode",
+                "args": [
+                    "0x8001"
+                ],
+                "ret_val": "0x0"
+            },
+            {
+                "pc": "0x4034f4",
+                "api_name": "KERNEL32.GetVersion",
+                "args": [],
+                "ret_val": "0x1db10106"
+            },
+            {
+                "pc": "0x40681e",
+                "api_name": "KERNEL32.GetModuleHandleA",
+                "args": [
+                    "KERNEL32"
+                ],
+                "ret_val": "0x77000000"
+            },
+            {
+                "pc": "0x406839",
+                "api_name": "KERNEL32.GetProcAddress",
+                "args": [
+                    "0x77000000",
+                    "SetDefaultDllDirectories"
+                ],
+                "ret_val": "0xfeee0000"
+            },
+            {
+                "pc": "0x403515",
+                "api_name": "kernel32.SetDefaultDllDirectories",
+                "args": [
+                    "0xc00"
+                ],
+                "ret_val": "0x1"
+            },
+            {
+                "pc": "0x4067b3",
+                "api_name": "KERNEL32.GetSystemDirectoryW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x104"
+                ],
+                "ret_val": "0x14"
+            },
+            {
+                "pc": "0x4067ee",
+                "api_name": "USER32.wsprintfW",
+                "args": [
+                    "\\\u5855\u4854\u4d45E\u5355\u5245\u4e45V\u4553\u5554\u4150\u4950\u4100\u5050\u4548\u504c\u5000\u4f52\u5350\u5359\u4400\u4d57\u5041I\u5243\u5059\u4254\u5341E\u4c4f\u4145\u4343\u4300\u424c\u4143\u5154\u4e00\u4d54\u5241\u4154.dll",
+                    "%s%S.dll"
+                ],
+                "ret_val": "0x2d"
+            },
+            {
+                "pc": "0x406802",
+                "api_name": "KERNEL32.LoadLibraryExW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x0",
+                    "LOAD_WITH_ALTERED_SEARCH_PATH"
+                ],
+                "ret_val": "0x0"
+            },
+            {
+                "pc": "0x403527",
+                "api_name": "KERNEL32.lstrlenA",
+                "args": [
+                    "UXTHEME"
+                ],
+                "ret_val": "0x7"
+            },
+            {
+                "pc": "0x4067b3",
+                "api_name": "KERNEL32.GetSystemDirectoryW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x104"
+                ],
+                "ret_val": "0x14"
+            },
+            {
+                "pc": "0x4067ee",
+                "api_name": "USER32.wsprintfW",
+                "args": [
+                    "\\\u5355\u5245\u4e45V\u4553\u5554\u4150\u4950\u4100\u5050\u4548\u504c\u5000\u4f52\u5350\u5359\u4400\u4d57\u5041I\u5243\u5059\u4254\u5341E\u4c4f\u4145\u4343\u4300\u424c\u4143\u5154\u4e00\u4d54\u5241\u4154.dll",
+                    "%s%S.dll"
+                ],
+                "ret_val": "0x29"
+            },
+            {
+                "pc": "0x406802",
+                "api_name": "KERNEL32.LoadLibraryExW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x0",
+                    "LOAD_WITH_ALTERED_SEARCH_PATH"
+                ],
+                "ret_val": "0x0"
+            },
+            {
+                "pc": "0x403527",
+                "api_name": "KERNEL32.lstrlenA",
+                "args": [
+                    "USERENV"
+                ],
+                "ret_val": "0x7"
+            },
+            {
+                "pc": "0x4067b3",
+                "api_name": "KERNEL32.GetSystemDirectoryW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x104"
+                ],
+                "ret_val": "0x14"
+            },
+            {
+                "pc": "0x4067ee",
+                "api_name": "USER32.wsprintfW",
+                "args": [
+                    "\\\u4553\u5554\u4150\u4950\u4100\u5050\u4548\u504c\u5000\u4f52\u5350\u5359\u4400\u4d57\u5041I\u5243\u5059\u4254\u5341E\u4c4f\u4145\u4343\u4300\u424c\u4143\u5154\u4e00\u4d54\u5241\u4154.dll",
+                    "%s%S.dll"
+                ],
+                "ret_val": "0x25"
+            },
+            {
+                "pc": "0x406802",
+                "api_name": "KERNEL32.LoadLibraryExW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x0",
+                    "LOAD_WITH_ALTERED_SEARCH_PATH"
+                ],
+                "ret_val": "0x0"
+            },
+            {
+                "pc": "0x403527",
+                "api_name": "KERNEL32.lstrlenA",
+                "args": [
+                    "SETUPAPI"
+                ],
+                "ret_val": "0x8"
+            },
+            {
+                "pc": "0x4067b3",
+                "api_name": "KERNEL32.GetSystemDirectoryW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x104"
+                ],
+                "ret_val": "0x14"
+            },
+            {
+                "pc": "0x4067ee",
+                "api_name": "USER32.wsprintfW",
+                "args": [
+                    "\\\u5041\u4850\u4c45P\u5250\u504f\u5953S\u5744\u414d\u4950\u4300\u5952\u5450\u4142\u4553\u4f00\u454c\u4341C\u4c43\u4342\u5441Q\u544e\u414d\u5452A.dll",
+                    "%s%S.dll"
+                ],
+                "ret_val": "0x21"
+            },
+            {
+                "pc": "0x406802",
+                "api_name": "KERNEL32.LoadLibraryExW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x0",
+                    "LOAD_WITH_ALTERED_SEARCH_PATH"
+                ],
+                "ret_val": "0x0"
+            },
+            {
+                "pc": "0x403527",
+                "api_name": "KERNEL32.lstrlenA",
+                "args": [
+                    "APPHELP"
+                ],
+                "ret_val": "0x7"
+            },
+            {
+                "pc": "0x4067b3",
+                "api_name": "KERNEL32.GetSystemDirectoryW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x104"
+                ],
+                "ret_val": "0x14"
+            },
+            {
+                "pc": "0x4067ee",
+                "api_name": "USER32.wsprintfW",
+                "args": [
+                    "\\\u5250\u504f\u5953S\u5744\u414d\u4950\u4300\u5952\u5450\u4142\u4553\u4f00\u454c\u4341C\u4c43\u4342\u5441Q\u544e\u414d\u5452A.dll",
+                    "%s%S.dll"
+                ],
+                "ret_val": "0x1d"
+            },
+            {
+                "pc": "0x406802",
+                "api_name": "KERNEL32.LoadLibraryExW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x0",
+                    "LOAD_WITH_ALTERED_SEARCH_PATH"
+                ],
+                "ret_val": "0x0"
+            },
+            {
+                "pc": "0x403527",
+                "api_name": "KERNEL32.lstrlenA",
+                "args": [
+                    "PROPSYS"
+                ],
+                "ret_val": "0x7"
+            },
+            {
+                "pc": "0x4067b3",
+                "api_name": "KERNEL32.GetSystemDirectoryW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x104"
+                ],
+                "ret_val": "0x14"
+            },
+            {
+                "pc": "0x4067ee",
+                "api_name": "USER32.wsprintfW",
+                "args": [
+                    "\\\u5744\u414d\u4950\u4300\u5952\u5450\u4142\u4553\u4f00\u454c\u4341C\u4c43\u4342\u5441Q\u544e\u414d\u5452A.dll",
+                    "%s%S.dll"
+                ],
+                "ret_val": "0x19"
+            },
+            {
+                "pc": "0x406802",
+                "api_name": "KERNEL32.LoadLibraryExW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x0",
+                    "LOAD_WITH_ALTERED_SEARCH_PATH"
+                ],
+                "ret_val": "0x0"
+            },
+            {
+                "pc": "0x403527",
+                "api_name": "KERNEL32.lstrlenA",
+                "args": [
+                    "DWMAPI"
+                ],
+                "ret_val": "0x6"
+            },
+            {
+                "pc": "0x4067b3",
+                "api_name": "KERNEL32.GetSystemDirectoryW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x104"
+                ],
+                "ret_val": "0x14"
+            },
+            {
+                "pc": "0x4067ee",
+                "api_name": "USER32.wsprintfW",
+                "args": [
+                    "\\\u5243\u5059\u4254\u5341E\u4c4f\u4145\u4343\u4300\u424c\u4143\u5154\u4e00\u4d54\u5241\u4154.dll",
+                    "%s%S.dll"
+                ],
+                "ret_val": "0x15"
+            },
+            {
+                "pc": "0x406802",
+                "api_name": "KERNEL32.LoadLibraryExW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x0",
+                    "LOAD_WITH_ALTERED_SEARCH_PATH"
+                ],
+                "ret_val": "0x0"
+            },
+            {
+                "pc": "0x403527",
+                "api_name": "KERNEL32.lstrlenA",
+                "args": [
+                    "CRYPTBASE"
+                ],
+                "ret_val": "0x9"
+            },
+            {
+                "pc": "0x4067b3",
+                "api_name": "KERNEL32.GetSystemDirectoryW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x104"
+                ],
+                "ret_val": "0x14"
+            },
+            {
+                "pc": "0x4067ee",
+                "api_name": "USER32.wsprintfW",
+                "args": [
+                    "\\\u4c4f\u4145\u4343\u4300\u424c\u4143\u5154\u4e00\u4d54\u5241\u4154.dll",
+                    "%s%S.dll"
+                ],
+                "ret_val": "0x10"
+            },
+            {
+                "pc": "0x406802",
+                "api_name": "KERNEL32.LoadLibraryExW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x0",
+                    "LOAD_WITH_ALTERED_SEARCH_PATH"
+                ],
+                "ret_val": "0x0"
+            },
+            {
+                "pc": "0x403527",
+                "api_name": "KERNEL32.lstrlenA",
+                "args": [
+                    "OLEACC"
+                ],
+                "ret_val": "0x6"
+            },
+            {
+                "pc": "0x4067b3",
+                "api_name": "KERNEL32.GetSystemDirectoryW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x104"
+                ],
+                "ret_val": "0x14"
+            },
+            {
+                "pc": "0x4067ee",
+                "api_name": "USER32.wsprintfW",
+                "args": [
+                    "\\\u4c43\u4342\u5441Q\u544e\u414d\u5452A.dll",
+                    "%s%S.dll"
+                ],
+                "ret_val": "0xd"
+            },
+            {
+                "pc": "0x406802",
+                "api_name": "KERNEL32.LoadLibraryExW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x0",
+                    "LOAD_WITH_ALTERED_SEARCH_PATH"
+                ],
+                "ret_val": "0x0"
+            },
+            {
+                "pc": "0x403527",
+                "api_name": "KERNEL32.lstrlenA",
+                "args": [
+                    "CLBCATQ"
+                ],
+                "ret_val": "0x7"
+            },
+            {
+                "pc": "0x4067b3",
+                "api_name": "KERNEL32.GetSystemDirectoryW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x104"
+                ],
+                "ret_val": "0x14"
+            },
+            {
+                "pc": "0x4067ee",
+                "api_name": "USER32.wsprintfW",
+                "args": [
+                    "\\\u544e\u414d\u5452A.dll",
+                    "%s%S.dll"
+                ],
+                "ret_val": "0x9"
+            },
+            {
+                "pc": "0x406802",
+                "api_name": "KERNEL32.LoadLibraryExW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x0",
+                    "LOAD_WITH_ALTERED_SEARCH_PATH"
+                ],
+                "ret_val": "0x0"
+            },
+            {
+                "pc": "0x403527",
+                "api_name": "KERNEL32.lstrlenA",
+                "args": [
+                    "NTMARTA"
+                ],
+                "ret_val": "0x7"
+            },
+            {
+                "pc": "0x40681e",
+                "api_name": "KERNEL32.GetModuleHandleA",
+                "args": [
+                    "VERSION"
+                ],
+                "ret_val": "0x0"
+            },
+            {
+                "pc": "0x4067b3",
+                "api_name": "KERNEL32.GetSystemDirectoryW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x104"
+                ],
+                "ret_val": "0x14"
+            },
+            {
+                "pc": "0x4067ee",
+                "api_name": "USER32.wsprintfW",
+                "args": [
+                    "\\\u4556\u5352\u4f49N\u4853\u6547\u4674\u6c6f\u6564\u5072\u7461\u5768.dll",
+                    "%s%S.dll"
+                ],
+                "ret_val": "0x11"
+            },
+            {
+                "pc": "0x406802",
+                "api_name": "KERNEL32.LoadLibraryExW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x0",
+                    "LOAD_WITH_ALTERED_SEARCH_PATH"
+                ],
+                "ret_val": "0x0"
+            },
+            {
+                "pc": "0x40681e",
+                "api_name": "KERNEL32.GetModuleHandleA",
+                "args": [
+                    "SHFOLDER"
+                ],
+                "ret_val": "0x0"
+            },
+            {
+                "pc": "0x4067b3",
+                "api_name": "KERNEL32.GetSystemDirectoryW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x104"
+                ],
+                "ret_val": "0x14"
+            },
+            {
+                "pc": "0x4067ee",
+                "api_name": "USER32.wsprintfW",
+                "args": [
+                    "\\\u4853\u4f46\u444c\u5245.dll",
+                    "%s%S.dll"
+                ],
+                "ret_val": "0x9"
+            },
+            {
+                "pc": "0x406802",
+                "api_name": "KERNEL32.LoadLibraryExW",
+                "args": [
+                    "C:\\Windows\\system32",
+                    "0x0",
+                    "LOAD_WITH_ALTERED_SEARCH_PATH"
+                ],
+                "ret_val": "0x0"
+            },
+            {
+                "pc": "0x40681e",
+                "api_name": "KERNEL32.GetModuleHandleA",
+                "args": [
+                    "SHLWAPI"
+                ],
+                "ret_val": "0x67000000"
+            },
+            {
+                "pc": "0x406839",
+                "api_name": "KERNEL32.GetProcAddress",
+                "args": [
+                    "0x67000000",
+                    "0x1b5"
+                ],
+                "ret_val": "0xfeee0001"
+            }
+        ],
+        "ret_val": "0xfeee0001",
+        "error": {
+            "type": "unsupported_api",
+            "pc": "0xfeee0001",
+            "address": "0xfeee0001",
+            "instr": "disasm_failed",
+            "regs": {
+                "esp": "0x01211d00",
+                "ebp": "0x01212000",
+                "eip": "0xfeee0001",
+                "esi": "0x00408301",
+                "edi": "0x00000020",
+                "eax": "0xfeee0001",
+                "ebx": "0x00000000",
+                "ecx": "0x0040a014",
+                "edx": "0x00000000"
+            },
+            "stack": [
+                "sp+0x00: 0x00403552 -> emu.module.0a0ba23720d5afda91ccb93bda9e560473cce055bf2f516d36cc23a9c3a42e60.0x400000",
+                "sp+0x04: 0x0000001e",
+                "sp+0x08: 0x00000000",
+                "sp+0x0c: 0x00000000",
+                "sp+0x10: 0x00000000",
+                "sp+0x14: 0x0040a2e0 -> emu.module.0a0ba23720d5afda91ccb93bda9e560473cce055bf2f516d36cc23a9c3a42e60.0x400000",
+                "sp+0x18: 0x00000000",
+                "sp+0x1c: 0x00000000",
+                "sp+0x20: 0x00000000",
+                "sp+0x24: 0x00000000",
+                "sp+0x28: 0x00000000",
+                "sp+0x2c: 0x00000000",
+                "sp+0x30: 0x00000000",
+                "sp+0x34: 0x00000000",
+                "sp+0x38: 0x00000000",
+                "sp+0x3c: 0x00000000"
+            ],
+            "api_name": "shlwapi.ordinal_437"
+        },
+        "dynamic_code_segments": []
+    }
+]

@@ -1,41 +1,41 @@
 import math
+from typing import Optional
+
 import torch
+import torch.nn.functional as F
 from torch import nn, Tensor
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
-import torch.nn.functional as F
-from typing import Optional
 
 
 class TransformerEncoderChunks(nn.Module):
     def __init__(self,
-                    vocab_size: int, # size of vocabulary
-                    maxlen: int, # maximum length of input sequence
-                    chunk_size: int = 64, # what lengths input sequence should be chunked to
-                    dModel: int = 32, # embedding & transformer dimension
-                    nHeads: int = 8, # number of heads in nn.MultiheadAttention
-                    dHidden: int = 200, # dimension of the feedforward network model in nn.TransformerEncoder
-                    nLayers: int = 2, # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
-                    numClasses: int = 1, # 1 ==> binary classification 
-                    hiddenNeurons: list = [64], # decoder's classifier FFNN complexity
-                    layerNorm: bool = False, # whether to normalize decoder's FFNN layers
-                    norm_first: bool = True, # whether to normalize before or after FFNN layers
-                    dropout: float = 0.3,
-                    mean_over_sequence=False):
-        super().__init__()        
+                 vocab_size: int,  # size of vocabulary
+                 maxlen: int,  # maximum length of input sequence
+                 chunk_size: int = 64,  # what lengths input sequence should be chunked to
+                 dModel: int = 32,  # embedding & transformer dimension
+                 nHeads: int = 8,  # number of heads in nn.MultiheadAttention
+                 dHidden: int = 200,  # dimension of the feedforward network model in nn.TransformerEncoder
+                 nLayers: int = 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+                 numClasses: int = 1,  # 1 ==> binary classification
+                 hiddenNeurons: list = [64],  # decoder's classifier FFNN complexity
+                 layerNorm: bool = False,  # whether to normalize decoder's FFNN layers
+                 norm_first: bool = True,  # whether to normalize before or after FFNN layers
+                 dropout: float = 0.3,
+                 mean_over_sequence=False):
+        super().__init__()
         assert dModel % nHeads == 0, "nheads must divide evenly into d_model"
         self.__name__ = 'TransformerEncoderChunks'
-        
         self.encoder = nn.Embedding(vocab_size, dModel)
         self.pos_encoder = PositionalEncoding(dModel, dropout)
         encoder_layers = TransformerEncoderLayer(
-            dModel, nHeads, dHidden, dropout, 
+            dModel, nHeads, dHidden, dropout,
             batch_first=True, norm_first=norm_first
         )
         self.transformer_encoder = TransformerEncoder(encoder_layers, nLayers)
         self.d_model = dModel
-        
+
         self.chunk_size = chunk_size
-        self.nr_of_chunks = maxlen/self.chunk_size
+        self.nr_of_chunks = maxlen / self.chunk_size
         # add 1 if nr_of_chunks is not scalar --> account for the padding
         if self.nr_of_chunks != int(self.nr_of_chunks):
             self.nr_of_chunks = int(self.nr_of_chunks) + 1
@@ -47,22 +47,22 @@ class TransformerEncoderChunks(nn.Module):
             input_neurons = int(self.chunk_size * self.nr_of_chunks * dModel)
 
         self.ffnn = []
-        for i,h in enumerate(hiddenNeurons):
+        for i, h in enumerate(hiddenNeurons):
             self.ffnnBlock = []
             if i == 0:
                 self.ffnnBlock.append(nn.Linear(input_neurons, h))
             else:
-                self.ffnnBlock.append(nn.Linear(hiddenNeurons[i-1], h))
+                self.ffnnBlock.append(nn.Linear(hiddenNeurons[i - 1], h))
 
             # add BatchNorm to every layer except last
-            if layerNorm and i < len(hiddenNeurons)-1:
+            if layerNorm and i < len(hiddenNeurons) - 1:
                 self.ffnnBlock.append(nn.LayerNorm(h))
 
             self.ffnnBlock.append(nn.ReLU())
 
             if dropout:
                 self.ffnnBlock.append(nn.Dropout(dropout))
-            
+
             self.ffnn.append(nn.Sequential(*self.ffnnBlock))
         self.ffnn = nn.Sequential(*self.ffnn)
         self.fcOutput = nn.Linear(hiddenNeurons[-1], numClasses)
@@ -81,11 +81,10 @@ class TransformerEncoderChunks(nn.Module):
         chunks = []
         for chunk in torch.split(src, split_size_or_sections=self.chunk_size, dim=1):
             if chunk.shape[1] < self.chunk_size:
-                pad_mask = (0, self.chunk_size-chunk.shape[1])
+                pad_mask = (0, self.chunk_size - chunk.shape[1])
                 chunk = F.pad(chunk, pad=pad_mask)
-    
             chunk = self.encoder(chunk) * math.sqrt(self.d_model)
-            chunk = self.pos_encoder(chunk)        
+            chunk = self.pos_encoder(chunk)
             chunk = self.transformer_encoder(chunk, src_mask)
             # at this stage each chunk is: (batch_size, chunk_size, d_model)
             chunks.append(chunk)
@@ -98,31 +97,76 @@ class TransformerEncoderChunks(nn.Module):
             x = x.view(x.size(0), -1)
         x = self.ffnn(x)
         return x
-    
+
     def forward(self, x: Tensor) -> Tensor:
         x = self.core(x)
         out = self.fcOutput(x)
         return out
 
 
+class TransformerEncoderChunksOptionalEmbedding(TransformerEncoderChunks):
+    def __init__(self,
+                 vocab_size: int,  # size of vocabulary
+                 maxlen: int,  # maximum length of input sequence
+                 chunk_size: int = 64,  # what lengths input sequence should be chunked to
+                 dModel: int = 32,  # embedding & transformer dimension
+                 nHeads: int = 8,  # number of heads in nn.MultiheadAttention
+                 dHidden: int = 200,  # dimension of the feedforward network model in nn.TransformerEncoder
+                 nLayers: int = 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+                 numClasses: int = 1,  # 1 ==> binary classification
+                 hiddenNeurons: list = [64],  # decoder's classifier FFNN complexity
+                 layerNorm: bool = False,  # whether to normalize decoder's FFNN layers
+                 norm_first: bool = True,  # whether to normalize before or after FFNN layers
+                 dropout: float = 0.3,
+                 mean_over_sequence=False,
+                 skip_embedding=False):
+        super().__init__(vocab_size, maxlen, chunk_size, dModel, nHeads, dHidden, nLayers, numClasses, hiddenNeurons,
+                         layerNorm, norm_first, dropout, mean_over_sequence)
+        self.skip_embedding = skip_embedding
+
+    def core(self, src: Tensor, src_mask: Optional[Tensor] = None) -> Tensor:
+        if not self.skip_embedding:
+            chunks = []
+            for chunk in torch.split(src, split_size_or_sections=self.chunk_size, dim=1):
+                if chunk.shape[1] < self.chunk_size:
+                    pad_mask = (0, self.chunk_size - chunk.shape[1])
+                    chunk = F.pad(chunk, pad=pad_mask)
+                chunk = self.encoder(chunk) * math.sqrt(self.d_model)
+                chunk = self.pos_encoder(chunk)
+                chunk = self.transformer_encoder(chunk, src_mask)
+                # at this stage each chunk is: (batch_size, chunk_size, d_model)
+                chunks.append(chunk)
+            # after cat it'd be: (batch_size, chunk_size * nr_of_chunks * d_model, d_model)
+            # where nr_of_chunks = int(maxLen/self.chunk_size) + 1
+            x = torch.cat(chunks, dim=1)
+        else:
+            x = src
+        if self.meanOverSeq:
+            x = torch.mean(x, dim=1)
+        else:
+            x = x.view(x.size(0), -1)
+        x = self.ffnn(x)
+        return x
+
+
 class TransformerEncoderChunksLM(TransformerEncoderChunks):
     def __init__(self,
-                    vocab_size: int, # size of vocabulary
-                    maxlen: int, # maximum length of input sequence
-                    chunk_size: int = 64, # what lengths input sequence should be chunked to
-                    dModel: int = 32, # embedding & transformer dimension
-                    nHeads: int = 8, # number of heads in nn.MultiheadAttention
-                    dHidden: int = 200, # dimension of the feedforward network model in nn.TransformerEncoder
-                    nLayers: int = 2, # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
-                    numClasses: int = 1, # 1 ==> binary classification 
-                    hiddenNeurons: list = [64], # decoder's classifier FFNN complexity
-                    layerNorm: bool = False, # whether to normalize decoder's FFNN layers
-                    norm_first: bool = True, # whether to normalize before or after FFNN layers
-                    dropout: float = 0.3,
-                    mean_over_sequence=False,
-                    # LM specific
-                    pretrain_layers: list = [1024] # pretrain layers
-                ):
+                 vocab_size: int,  # size of vocabulary
+                 maxlen: int,  # maximum length of input sequence
+                 chunk_size: int = 64,  # what lengths input sequence should be chunked to
+                 dModel: int = 32,  # embedding & transformer dimension
+                 nHeads: int = 8,  # number of heads in nn.MultiheadAttention
+                 dHidden: int = 200,  # dimension of the feedforward network model in nn.TransformerEncoder
+                 nLayers: int = 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+                 numClasses: int = 1,  # 1 ==> binary classification
+                 hiddenNeurons: list = [64],  # decoder's classifier FFNN complexity
+                 layerNorm: bool = False,  # whether to normalize decoder's FFNN layers
+                 norm_first: bool = True,  # whether to normalize before or after FFNN layers
+                 dropout: float = 0.3,
+                 mean_over_sequence=False,
+                 # LM specific
+                 pretrain_layers: list = [1024]  # pretrain layers
+                 ):
         super().__init__(
             vocab_size=vocab_size,
             maxlen=maxlen,
@@ -143,9 +187,9 @@ class TransformerEncoderChunksLM(TransformerEncoderChunks):
         for i, h in enumerate(pretrain_layers):
             self.preTrainBlock = []
             if i == 0:
-                self.preTrainBlock.append(nn.Linear(hiddenNeurons[-1], h))                
+                self.preTrainBlock.append(nn.Linear(hiddenNeurons[-1], h))
             else:
-                self.preTrainBlock.append(nn.Linear(pretrain_layers[i-1], h))
+                self.preTrainBlock.append(nn.Linear(pretrain_layers[i - 1], h))
             self.preTrainBlock.append(nn.ReLU())
             if dropout:
                 self.preTrainBlock.append(nn.Dropout(dropout))
@@ -155,7 +199,7 @@ class TransformerEncoderChunksLM(TransformerEncoderChunks):
         else:
             self.pretrain_layers.append(nn.Linear(hiddenNeurons[-1], vocab_size))
         self.pretrain_layers = nn.Sequential(*self.pretrain_layers)
-    
+
     def pretrain(self, x: Tensor) -> Tensor:
         x = self.core(x)
         x = self.pretrain_layers(x)
@@ -164,49 +208,49 @@ class TransformerEncoderChunksLM(TransformerEncoderChunks):
 
 class TransformerEncoderModel(nn.Module):
     def __init__(self,
-                    vocab_size: int, # size of vocabulary
-                    maxlen: int, # maximum length of input sequence
-                    dModel: int = 32, # embedding & transformer dimension
-                    nHeads: int = 8, # number of heads in nn.MultiheadAttention
-                    dHidden: int = 200, # dimension of the feedforward network model in nn.TransformerEncoder
-                    nLayers: int = 2, # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
-                    numClasses: int = 1, # 1 ==> binary classification 
-                    hiddenNeurons: list = [64], # decoder's classifier FFNN complexity
-                    layerNorm: bool = False, # whether to normalize decoder's FFNN layers
-                    norm_first: bool = True, # whether to normalize before or after FFNN layers
-                    dropout: float = 0.3):
+                 vocab_size: int,  # size of vocabulary
+                 maxlen: int,  # maximum length of input sequence
+                 dModel: int = 32,  # embedding & transformer dimension
+                 nHeads: int = 8,  # number of heads in nn.MultiheadAttention
+                 dHidden: int = 200,  # dimension of the feedforward network model in nn.TransformerEncoder
+                 nLayers: int = 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+                 numClasses: int = 1,  # 1 ==> binary classification
+                 hiddenNeurons: list = [64],  # decoder's classifier FFNN complexity
+                 layerNorm: bool = False,  # whether to normalize decoder's FFNN layers
+                 norm_first: bool = True,  # whether to normalize before or after FFNN layers
+                 dropout: float = 0.3):
         super().__init__()
         assert dModel % nHeads == 0, "nheads must divide evenly into d_model"
         self.__name__ = 'TransformerEncoder'
         self.encoder = nn.Embedding(vocab_size, dModel)
         self.pos_encoder = PositionalEncoding(dModel, dropout)
         encoder_layers = TransformerEncoderLayer(
-            dModel, nHeads, dHidden, dropout, 
+            dModel, nHeads, dHidden, dropout,
             batch_first=True, norm_first=norm_first
         )
         self.transformer_encoder = TransformerEncoder(encoder_layers, nLayers)
         self.d_model = dModel
-        
+
         self.ffnn = []
-        for i,h in enumerate(hiddenNeurons):
+        for i, h in enumerate(hiddenNeurons):
             self.ffnnBlock = []
             if i == 0:
                 self.ffnnBlock.append(nn.Linear(self.d_model * maxlen, h))
             else:
-                self.ffnnBlock.append(nn.Linear(hiddenNeurons[i-1], h))
+                self.ffnnBlock.append(nn.Linear(hiddenNeurons[i - 1], h))
 
             # add BatchNorm to every layer except last
-            if layerNorm and i < len(hiddenNeurons)-1:
+            if layerNorm and i < len(hiddenNeurons) - 1:
                 self.ffnnBlock.append(nn.LayerNorm(h))
 
             self.ffnnBlock.append(nn.ReLU())
 
             if dropout:
                 self.ffnnBlock.append(nn.Dropout(dropout))
-            
+
             self.ffnn.append(nn.Sequential(*self.ffnnBlock))
         self.ffnn = nn.Sequential(*self.ffnn)
-        
+
         self.fcOutput = nn.Linear(hiddenNeurons[-1], numClasses)
 
         self.init_weights()
@@ -227,7 +271,7 @@ class TransformerEncoderModel(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.ffnn(x)
         return x
-    
+
     def forward(self, x: Tensor) -> Tensor:
         x = self.core(x)
         out = self.fcOutput(x)
@@ -236,19 +280,19 @@ class TransformerEncoderModel(nn.Module):
 
 class TransformerEncoderModelLM(TransformerEncoderModel):
     def __init__(self,
-                    vocab_size: int, # size of vocabulary
-                    maxlen: int, # maximum length of input sequence
-                    dModel: int = 32, # embedding & transformer dimension
-                    nHeads: int = 8, # number of heads in nn.MultiheadAttention
-                    dHidden: int = 200, # dimension of the feedforward network model in nn.TransformerEncoder
-                    nLayers: int = 2, # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
-                    numClasses: int = 1, # 1 ==> binary classification 
-                    hiddenNeurons: list = [64], # decoder's classifier FFNN complexity
-                    layerNorm: bool = False, # whether to normalize decoder's FFNN layers
-                    norm_first: bool = False, # whether to normalize decoder's FFNN layers
-                    dropout: float = 0.3,
-                    pretrain_layers: list = [1024], # pretrain layers
-    ):
+                 vocab_size: int,  # size of vocabulary
+                 maxlen: int,  # maximum length of input sequence
+                 dModel: int = 32,  # embedding & transformer dimension
+                 nHeads: int = 8,  # number of heads in nn.MultiheadAttention
+                 dHidden: int = 200,  # dimension of the feedforward network model in nn.TransformerEncoder
+                 nLayers: int = 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+                 numClasses: int = 1,  # 1 ==> binary classification
+                 hiddenNeurons: list = [64],  # decoder's classifier FFNN complexity
+                 layerNorm: bool = False,  # whether to normalize decoder's FFNN layers
+                 norm_first: bool = False,  # whether to normalize decoder's FFNN layers
+                 dropout: float = 0.3,
+                 pretrain_layers: list = [1024],  # pretrain layers
+                 ):
         super().__init__(
             vocab_size=vocab_size,
             maxlen=maxlen,
@@ -267,9 +311,9 @@ class TransformerEncoderModelLM(TransformerEncoderModel):
         for i, h in enumerate(pretrain_layers):
             self.preTrainBlock = []
             if i == 0:
-                self.preTrainBlock.append(nn.Linear(hiddenNeurons[-1], h))                
+                self.preTrainBlock.append(nn.Linear(hiddenNeurons[-1], h))
             else:
-                self.preTrainBlock.append(nn.Linear(pretrain_layers[i-1], h))
+                self.preTrainBlock.append(nn.Linear(pretrain_layers[i - 1], h))
             self.preTrainBlock.append(nn.ReLU())
             if dropout:
                 self.preTrainBlock.append(nn.Dropout(dropout))
@@ -290,6 +334,7 @@ def generate_square_subsequent_mask(sz: int) -> Tensor:
 
 class PositionalEncoding(nn.Module):
     """ From: https://pytorch.org/tutorials/beginner/transformer_tutorial.html """
+
     def __init__(self, d_model: int, dropout: float = 0.1, max_len: int = 5000):
         super().__init__()
         self.dropout = nn.Dropout(p=dropout)
