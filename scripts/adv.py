@@ -140,8 +140,8 @@ baseline_report = os.path.join(REPOSITORY_ROOT, r"emulation", "report_baseline.j
 x_baseline = tokenize_sample(baseline_report)
 x_embed_baseline = embed(model, baseline_report)
 
-# print(f"\n[!!!] MALWARE FOLDER")
-# analyse_folder(malware_folder, model_no_embed, x_embed_baseline)
+print(f"\n[!!!] MALWARE FOLDER")
+analyse_folder(malware_folder, model_no_embed, x_embed_baseline, "malware")
 
 print(f"\n[!!!] GOODWARE FOLDER")
 analyse_folder(goodware_folder, model_no_embed, x_embed_baseline, "goodware")
