@@ -17,7 +17,7 @@ fix_random_seed(0)
 
 # TAKE A PE SAMPLE
 PE = "path_to_exe"
-tokenization_type = "whitespace" # support: ["bpe", "whitespace", "wordpunct"]
+TOKENIZER = "whitespace" # supports: ["bpe", "whitespace", "wordpunct"]
 
 # ===================
 # PREPROCESSING
@@ -40,17 +40,18 @@ filtered_report = extractor.filter_and_normalize_report(emulation_report)
 from nebula.preprocessing import JSONTokenizerBPE, JSONTokenizerNaive
 
 logging.info(f" [*] Initializing tokenizer...")
-if tokenization_type in ["whitespace", "wordpunct"]:
+if TOKENIZER in ["whitespace", "wordpunct"]:
     with open(os.path.join(REPOSITORY_ROOT, "nebula", "objects", "speakeasy_whitespace_50000_vocab.json")) as f:
         vocab = json.load(f)
 
     tokenizer = JSONTokenizerNaive(
         vocab_size=len(vocab),
         seq_len=512,
-        vocab=vocab
+        vocab=vocab,
+        type=TOKENIZER
     )
 
-if tokenization_type == "bpe":
+if TOKENIZER == "bpe":
     pretrained_bpe_model = os.path.join(REPOSITORY_ROOT, "nebula", "objects", "speakeasy_BPE_50000_sentencepiece.model")
     with open(os.path.join(REPOSITORY_ROOT, "nebula", "objects", "speakeasy_BPE_50000_sentencepiece_vocab.json")) as f:
         vocab = json.load(f)
@@ -65,27 +66,26 @@ logging.info(f" [!] Tokenizer ready.")
 
 # 3. ENCODE IT
 logging.info(f" [*] Tokenizing and encoding report..."	)
-if tokenization_type in ["whitespace", "wordpunct"]:
+if TOKENIZER in ["whitespace", "wordpunct"]:
     tokenized_report = tokenizer.tokenize(filtered_report)
     encoded_report = tokenizer.encode(
         tokenized_report,
         tokenize=False,
         pad=True
     )
-if tokenization_type == "bpe":
+if TOKENIZER == "bpe":
     tokenized_report = tokenizer.tokenize(filtered_report)
     encoded_report = tokenizer.encode(filtered_report, pad=True)
 
-logging.info(f" [!] Report encoded with shapes: {encoded_report.shape}")
+from torch import Tensor
+x = Tensor(encoded_report).long()
+logging.info(f" [!] Report encoded with shapes: {x.shape}")
 
 # ===================
 # MODELING
 # ===================
 
 logging.info(f" [*] Loading model...")
-from torch import Tensor, sigmoid
-x = Tensor(encoded_report).long()
-
 from nebula.models import TransformerEncoderChunks
 model_config = {
     "vocab_size": len(vocab),
@@ -103,9 +103,16 @@ model_config = {
     "norm_first": True
 }
 model = TransformerEncoderChunks(**model_config)
+if TOKENIZER == "bpe":
+    model_path = os.path.join(REPOSITORY_ROOT, r"nebula\objects\speakeasy_BPE_50000_torch.model")
+if TOKENIZER in ["whitespace", "wordpunct"]:
+    model_path = os.path.join(REPOSITORY_ROOT, r"nebula\objects\speakeasy_whitespace_50000_torch.model")
+from torch import load
+model.load_state_dict(load(model_path))
 logging.info(f" [!] Model ready.")
 
 logit = model(x)
+from torch import sigmoid
 prob = sigmoid(logit)
 print(f"\n[!!!] Probability of being malicious: {prob.item():.3f} | Logit: {logit.item():.3f}")
 
