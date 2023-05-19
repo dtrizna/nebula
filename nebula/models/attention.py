@@ -123,6 +123,7 @@ class TransformerEncoderChunksOptionalEmbedding(TransformerEncoderChunks):
         super().__init__(vocab_size, maxlen, chunk_size, dModel, nHeads, dHidden, nLayers, numClasses, hiddenNeurons,
                          layerNorm, norm_first, dropout, mean_over_sequence)
         self.skip_embedding = skip_embedding
+        self.max_input_length = maxlen
 
     def embed(self, src: Tensor, src_mask: Optional[Tensor] = None):
         chunks = []

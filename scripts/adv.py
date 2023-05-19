@@ -54,7 +54,7 @@ def tokenize_sample(report_path):
     filtered_report = extractor.filter_and_normalize_report(report_path)
     tokenizer = load_tokenizer()
     tokenized_report = tokenizer.tokenize(filtered_report)
-    encoded_report = tokenizer.encode(tokenized_report, pad=True)
+    encoded_report = tokenizer.encode(tokenized_report, pad=True, tokenize=False)
     x = Tensor(encoded_report).long()
     return x
 
