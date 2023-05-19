@@ -1,6 +1,5 @@
 import copy
 import json
-import math
 import os
 import pathlib
 import sys
@@ -10,7 +9,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import shap
 import torch
-import torch.nn.functional as F
 from torch import Tensor, sigmoid
 
 from nebula import PEDynamicFeatureExtractor
@@ -35,6 +33,7 @@ def compute_score(llm, x):
     logit = llm(x)
     prob = sigmoid(logit)
     print(f"\n[!!!] Probability of being malicious: {prob.item():.3f} | Logit: {logit.item():.3f}")
+    return prob.item()
 
 
 def load_tokenizer():
@@ -62,20 +61,7 @@ def tokenize_sample(report_path):
 
 def embed(llm_model, report, src_mask: Optional[Tensor] = None):
     src = tokenize_sample(report)
-    chunks = []
-    for chunk in torch.split(src, split_size_or_sections=llm_model.chunk_size, dim=1):
-        if chunk.shape[1] < llm_model.chunk_size:
-            pad_mask = (0, llm_model.chunk_size - chunk.shape[1])
-            chunk = F.pad(chunk, pad=pad_mask)
-        chunk = llm_model.encoder(chunk) * math.sqrt(llm_model.d_model)
-        chunk = llm_model.pos_encoder(chunk)
-        chunk = llm_model.transformer_encoder(chunk, src_mask)
-        # at this stage each chunk is: (batch_size, chunk_size, d_model)
-        chunks.append(chunk)
-    # after cat it'd be: (batch_size, chunk_size * nr_of_chunks * d_model, d_model)
-    # where nr_of_chunks = int(maxLen/self.chunk_size) + 1
-    x = torch.cat(chunks, dim=1)
-    return x
+    return llm_model.embed(src, src_mask)
 
 
 def plot_shap_values(shap_values: np.ndarray, name: str):
@@ -124,10 +110,10 @@ def analyse_folder(folder: pathlib.Path, llm_model, embed_baseline, name):
     for i, report in enumerate(folder.glob("*.json")):
         print(report.name)
         x_embed = embed(llm_model, str(report))
-        compute_score(llm_model, x_embed)
+        prob = compute_score(llm_model, x_embed)
         explainer = shap.GradientExplainer(model_no_embed, data=embed_baseline)
         explanations = explainer.shap_values(x_embed, nsamples=50)
-        plot_shap_values(explanations, f"{name}_{i}")
+        plot_shap_values(explanations, f"{name}_{i} : {prob:.3f}")
 
 
 model = load_model()
