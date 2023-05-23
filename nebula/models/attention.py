@@ -85,7 +85,7 @@ class TransformerEncoderChunks(nn.Module):
                 chunk = F.pad(chunk, pad=pad_mask)
             chunks.append(chunk)
         return chunks
-    
+
     def embed(self, chunks: List[Tensor]) -> List[Tensor]:
         encoded_chunks = []
         for chunk in chunks:
@@ -93,7 +93,7 @@ class TransformerEncoderChunks(nn.Module):
             encoded_chunk = self.pos_encoder(encoded_chunk)
             encoded_chunks.append(encoded_chunk)
         return encoded_chunks
-    
+
     def transform(self, chunks: List[Tensor], src_mask: Optional[Tensor] = None) -> List[Tensor]:
         transformed_chunks = []
         for chunk in chunks:
@@ -103,8 +103,8 @@ class TransformerEncoderChunks(nn.Module):
 
     def core(self, src: Tensor, src_mask: Optional[Tensor] = None) -> Tensor:
         chunks = self.split(src)
-        chunks = self.embed(chunks) # [(batch_size, chunk_size, d_model), ..]
-        chunks = self.transform(chunks, src_mask) # [(batch_size, chunk_size, d_model), ..]
+        chunks = self.embed(chunks)  # [(batch_size, chunk_size, d_model), ..]
+        chunks = self.transform(chunks, src_mask)  # [(batch_size, chunk_size, d_model), ..]
         x = torch.cat(chunks, dim=1)
         # after .cat(): (batch_size, nr_of_chunks * chunk_size, d_model)
         # where nr_of_chunks = int(maxlen / self.chunk_size) + 1
@@ -140,15 +140,26 @@ class TransformerEncoderChunksOptionalEmbedding(TransformerEncoderChunks):
         self.max_input_length = maxlen
 
     def core(self, src: Tensor, src_mask: Optional[Tensor] = None) -> Tensor:
-        if self.skip_embedding: # assumes 'src' is already embedded
-            chunks = self.split(src)
+        if self.skip_embedding:  # assumes 'src' is already embedded
+            x = src
         else:
-            chunks = self.embed(self.split(src))
-        chunks = self.transform(chunks, src_mask)
-        x = torch.cat(chunks, dim=1)
+            x = self.embed(src)
+        x = self.transform(x, src_mask)
         x = torch.mean(x, dim=1) if self.meanOverSeq else x.view(x.size(0), -1)
         x = self.ffnn(x)
         return x
+
+    def embed(self, x: Tensor) -> Tensor:
+        encoded_chunk = self.encoder(x) * math.sqrt(self.d_model)
+        encoded = self.pos_encoder(encoded_chunk)
+        return encoded
+
+    def split(self, src: Tensor) -> Tensor:
+        return src
+
+    def transform(self, x: Tensor, src_mask: Optional[Tensor] = None) -> Tensor:
+        transformed_chunk = self.transformer_encoder(x, src_mask)
+        return transformed_chunk
 
 
 class TransformerEncoderChunksLM(TransformerEncoderChunks):

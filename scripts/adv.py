@@ -3,36 +3,47 @@ import json
 import os
 import pathlib
 import sys
-from typing import Optional
+# shap displays NumbaDeprecationWarning when importing -- supress them
+import warnings
 
 import matplotlib.pyplot as plt
 import numpy as np
+from numba.core.errors import NumbaDeprecationWarning
+
+from scripts.attack.tgd import TokenGradientDescent
+
+warnings.filterwarnings("ignore", category=NumbaDeprecationWarning)
+
 import shap
 import torch
 from torch import Tensor, sigmoid
+import logging
 
-from nebula import PEDynamicFeatureExtractor
-from nebula.models.attention import TransformerEncoderChunksOptionalEmbedding
-from nebula.preprocessing import JSONTokenizerNaive
-
-# logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
 
 # correct path to repository root
 if os.path.basename(os.getcwd()) == "scripts":
     REPOSITORY_ROOT = os.path.join(os.getcwd(), "..")
+elif os.path.basename(os.getcwd()) == "adversarial":
+    REPOSITORY_ROOT = os.path.join(os.getcwd(), "..", "..")
 else:
     REPOSITORY_ROOT = os.getcwd()
 sys.path.append(REPOSITORY_ROOT)
+
+from nebula import PEDynamicFeatureExtractor
+from nebula.models.attention import TransformerEncoderChunksOptionalEmbedding
+from nebula.preprocessing import JSONTokenizerNaive
 
 from nebula.misc import fix_random_seed
 
 fix_random_seed(0)
 
 
-def compute_score(llm, x):
+def compute_score(llm, x, verbose=True):
     logit = llm(x)
     prob = sigmoid(logit)
-    print(f"\n[!!!] Probability of being malicious: {prob.item():.3f} | Logit: {logit.item():.3f}")
+    if verbose:
+        print(f"\n[!!!] Probability of being malicious: {prob.item():.3f} | Logit: {logit.item():.3f}")
     return prob.item()
 
 
@@ -49,19 +60,23 @@ def load_tokenizer():
     return tokenizer
 
 
-def tokenize_sample(report_path):
+def tokenize_sample(report_path, encode=True):
     extractor = PEDynamicFeatureExtractor()
     filtered_report = extractor.filter_and_normalize_report(report_path)
     tokenizer = load_tokenizer()
     tokenized_report = tokenizer.tokenize(filtered_report)
-    encoded_report = tokenizer.encode(tokenized_report, pad=True, tokenize=False)
-    x = Tensor(encoded_report).long()
-    return x
+    if encode:
+        encoded_report = tokenizer.encode(tokenized_report, pad=True, tokenize=False)
+        x = Tensor(encoded_report).long()
+        return x
+    return tokenized_report
 
 
-def embed(llm_model, report, src_mask: Optional[Tensor] = None):
+def embed(llm_model, report):
     src = tokenize_sample(report)
-    return llm_model.embed(src, src_mask)
+    s = llm_model.split(src)
+    e = llm_model.embed(s)
+    return e
 
 
 def plot_shap_values(shap_values: np.ndarray, name: str):
@@ -106,19 +121,38 @@ def load_model(skip_embedding=False):
     return llm
 
 
-def analyse_folder(folder: pathlib.Path, llm_model, embed_baseline, name):
+def analyse_folder(folder: pathlib.Path, llm_model, embed_baseline, name, plot=True, verbose=True):
+    filepaths = []
+    explanations_arr = []
     for i, report in enumerate(folder.glob("*.json")):
         print(report.name)
         x_embed = embed(llm_model, str(report))
-        prob = compute_score(llm_model, x_embed)
+        prob = compute_score(llm_model, x_embed, verbose=verbose)
         explainer = shap.GradientExplainer(model_no_embed, data=embed_baseline)
         explanations = explainer.shap_values(x_embed, nsamples=50)
-        plot_shap_values(explanations, f"{name}_{i} : {prob:.3f}")
+        if plot:
+            plot_shap_values(explanations, f"{name}_{i} : {prob:.3f}")
+        explanations_arr.append(explanations)
+        filepaths.append(report.name)
+    return filepaths, explanations_arr
+
+
+def compute_adv_exe_from_folder(folder: pathlib.Path, llm_model, verbose: bool = False):
+    token_to_use = list(range(10, 512))
+    tgd_attack = TokenGradientDescent(model=llm_model, tokenizer=load_tokenizer(), step_size=100, steps=10,
+                                      index_token_to_use=token_to_use, token_index_to_avoid=[0, 2], verbose=verbose)
+    for i, report in enumerate(folder.glob("*.json")):
+        print(report.name)
+        x_embed = embed(llm_model, str(report))
+        y = torch.sign(llm_model(x_embed))
+        y = y.item()
+        final_x_adv, loss_seq, confidence_seq, x_path = tgd_attack(str(report), y, return_additional_info=True)
+        plt.plot(confidence_seq)
+        plt.show()
 
 
 model = load_model()
 model_no_embed = load_model(skip_embedding=True)
-
 malware_folder = pathlib.Path(os.path.join(REPOSITORY_ROOT, "evaluation", "explanation", "malware"))
 goodware_folder = pathlib.Path(os.path.join(REPOSITORY_ROOT, "evaluation", "explanation", "goodware"))
 
@@ -126,8 +160,10 @@ baseline_report = os.path.join(REPOSITORY_ROOT, r"emulation", "report_baseline.j
 x_baseline = tokenize_sample(baseline_report)
 x_embed_baseline = embed(model, baseline_report)
 
-print(f"\n[!!!] MALWARE FOLDER")
-analyse_folder(malware_folder, model_no_embed, x_embed_baseline, "malware")
+compute_adv_exe_from_folder(malware_folder, model_no_embed, verbose=True)
 
-print(f"\n[!!!] GOODWARE FOLDER")
-analyse_folder(goodware_folder, model_no_embed, x_embed_baseline, "goodware")
+# print(f"\n[!!!] MALWARE FOLDER")
+# filepaths, explanations = analyse_folder(malware_folder, model_no_embed, x_embed_baseline, "malware")
+#
+# print(f"\n[!!!] GOODWARE FOLDER")
+# _ = analyse_folder(goodware_folder, model_no_embed, x_embed_baseline, "goodware")
