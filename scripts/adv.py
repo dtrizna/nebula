@@ -144,7 +144,9 @@ def compute_adv_exe_from_folder(folder: pathlib.Path, llm_model, verbose: bool =
         tokenizer=load_tokenizer(),
         step_size=32,
         steps=10,
-        index_token_to_use=token_to_use, token_index_to_avoid=[0, 2], verbose=verbose,
+        index_token_to_use=token_to_use,
+        token_index_to_avoid=[0, 2],
+        verbose=verbose,
         device=DEVICE
     )
     for i, report in enumerate(folder.glob("*.json")):
