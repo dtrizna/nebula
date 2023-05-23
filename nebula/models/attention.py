@@ -1,5 +1,5 @@
 import math
-from typing import Optional
+from typing import Optional, List
 
 import torch
 import torch.nn.functional as F
@@ -77,24 +77,38 @@ class TransformerEncoderChunks(nn.Module):
                     layer.bias.data.zero_()
                     layer.weight.data.uniform_(-initrange, initrange)
 
-    def core(self, src: Tensor, src_mask: Optional[Tensor] = None) -> Tensor:
+    def split(self, src: Tensor) -> List[Tensor]:
         chunks = []
         for chunk in torch.split(src, split_size_or_sections=self.chunk_size, dim=1):
             if chunk.shape[1] < self.chunk_size:
                 pad_mask = (0, self.chunk_size - chunk.shape[1])
                 chunk = F.pad(chunk, pad=pad_mask)
-            chunk = self.encoder(chunk) * math.sqrt(self.d_model)
-            chunk = self.pos_encoder(chunk)
-            chunk = self.transformer_encoder(chunk, src_mask)
-            # at this stage each chunk is: (batch_size, chunk_size, d_model)
             chunks.append(chunk)
-        # after cat it'd be: (batch_size, chunk_size * nr_of_chunks * d_model, d_model)
-        # where nr_of_chunks = int(maxLen/self.chunk_size) + 1
+        return chunks
+    
+    def embed(self, chunks: List[Tensor]) -> List[Tensor]:
+        encoded_chunks = []
+        for chunk in chunks:
+            encoded_chunk = self.encoder(chunk) * math.sqrt(self.d_model)
+            encoded_chunk = self.pos_encoder(encoded_chunk)
+            encoded_chunks.append(encoded_chunk)
+        return encoded_chunks
+    
+    def transform(self, chunks: List[Tensor], src_mask: Optional[Tensor] = None) -> List[Tensor]:
+        transformed_chunks = []
+        for chunk in chunks:
+            transformed_chunk = self.transformer_encoder(chunk, src_mask)
+            transformed_chunks.append(transformed_chunk)
+        return transformed_chunks
+
+    def core(self, src: Tensor, src_mask: Optional[Tensor] = None) -> Tensor:
+        chunks = self.split(src)
+        chunks = self.embed(chunks) # [(batch_size, chunk_size, d_model), ..]
+        chunks = self.transform(chunks, src_mask) # [(batch_size, chunk_size, d_model), ..]
         x = torch.cat(chunks, dim=1)
-        if self.meanOverSeq:
-            x = torch.mean(x, dim=1)
-        else:
-            x = x.view(x.size(0), -1)
+        # after .cat(): (batch_size, nr_of_chunks * chunk_size, d_model)
+        # where nr_of_chunks = int(maxlen / self.chunk_size) + 1
+        x = torch.mean(x, dim=1) if self.meanOverSeq else x.view(x.size(0), -1)
         x = self.ffnn(x)
         return x
 
@@ -125,31 +139,14 @@ class TransformerEncoderChunksOptionalEmbedding(TransformerEncoderChunks):
         self.skip_embedding = skip_embedding
         self.max_input_length = maxlen
 
-    def embed(self, src: Tensor, src_mask: Optional[Tensor] = None):
-        chunks = []
-        for chunk in torch.split(src, split_size_or_sections=self.chunk_size, dim=1):
-            if chunk.shape[1] < self.chunk_size:
-                pad_mask = (0, self.chunk_size - chunk.shape[1])
-                chunk = F.pad(chunk, pad=pad_mask)
-            chunk = self.encoder(chunk) * math.sqrt(self.d_model)
-            chunk = self.pos_encoder(chunk)
-            chunk = self.transformer_encoder(chunk, src_mask)
-            # at this stage each chunk is: (batch_size, chunk_size, d_model)
-            chunks.append(chunk)
-        # after cat it'd be: (batch_size, chunk_size * nr_of_chunks * d_model, d_model)
-        # where nr_of_chunks = int(maxLen/self.chunk_size) + 1
-        x = torch.cat(chunks, dim=1)
-        return x
-
     def core(self, src: Tensor, src_mask: Optional[Tensor] = None) -> Tensor:
-        if not self.skip_embedding:
-            x = self.embed(src, src_mask)
+        if self.skip_embedding: # assumes 'src' is already embedded
+            chunks = self.split(src)
         else:
-            x = src
-        if self.meanOverSeq:
-            x = torch.mean(x, dim=1)
-        else:
-            x = x.view(x.size(0), -1)
+            chunks = self.embed(self.split(src))
+        chunks = self.transform(chunks, src_mask)
+        x = torch.cat(chunks, dim=1)
+        x = torch.mean(x, dim=1) if self.meanOverSeq else x.view(x.size(0), -1)
         x = self.ffnn(x)
         return x
 
