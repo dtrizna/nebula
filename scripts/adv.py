@@ -157,9 +157,18 @@ def compute_adv_exe_from_folder(folder: pathlib.Path, llm_model, verbose: bool =
         to_avoid = list(range(0, 250)) # faking impossible locations to manipulate
         final_x_adv, loss_seq, confidence_seq, x_path = tgd_attack(str(report), y, return_additional_info=True,
                                                                    input_index_locations_to_avoid=to_avoid)
-        plt.plot(confidence_seq, label="conf")
-        plt.plot(loss_seq, label="loss")
-        plt.legend()
+        fig, ax = plt.subplots()
+
+        ax.plot(confidence_seq, label="confidence")
+        ax.scatter(range(len(confidence_seq)), confidence_seq)
+        ax.set_ylabel("confidence")
+
+        ax.plot(loss_seq, label="loss")
+        ax.scatter(range(len(loss_seq)), loss_seq)
+        ax.twinx().set_ylabel('loss')
+
+        ax.set_xlabel("steps")
+        ax.legend()
         plt.show()
 
 
