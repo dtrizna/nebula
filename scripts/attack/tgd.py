@@ -6,7 +6,7 @@ from typing import Callable, Union
 import torch
 from torch import autograd
 from torch.nn import Softmax
-from torch.nn.functional import sigmoid
+from torch import sigmoid
 
 from nebula import PEDynamicFeatureExtractor
 from nebula.models.attention import TransformerEncoderChunksOptionalEmbedding
@@ -167,7 +167,7 @@ class TokenGradientDescent:
             )
 
         to_edit = indexes_to_perturb[results != INVALID]
-        x[0, to_edit] = embedding_tokens[results[results != INVALID].int()]
+        x[0, to_edit] = embedding_tokens[results[results != INVALID].long()]
         return x
 
     def embed_all_tokens(self):
