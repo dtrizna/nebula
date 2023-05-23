@@ -21,10 +21,10 @@ def token_gradient_descent(embedding_tokens: torch.Tensor, gradient_f: torch.Ten
     gradient_f_i = gradient_f[0, i]
     x_i = x[0, i]
     token_to_chose = single_token_gradient_update(
-        start_token=x_i,
-        gradient=gradient_f_i,
-        embedded_tokens=embedding_tokens,
-        admitted_tokens=admitted_tokens,
+        start_token=x_i.cpu(),
+        gradient=gradient_f_i.cpu(),
+        embedded_tokens=embedding_tokens.cpu(),
+        admitted_tokens=admitted_tokens.cpu(),
         unavailable_tokens=unavailable_tokens
     )
     return token_to_chose
@@ -64,7 +64,7 @@ def single_token_gradient_update(
         return invalid_distances
     distance = torch.zeros(len(admitted_tokens))
     gs = gradient / torch.norm(gradient)  # MAXIMISING the error of the real class
-    for i, b in enumerate(embedded_tokens[admitted_tokens, :]):
+    for i, b in enumerate(embedded_tokens[admitted_tokens, :].cpu()):
         if torch.all(start_token == b):
             distance[i] = invalid_val
             continue
@@ -139,6 +139,7 @@ class TokenGradientDescent:
             the adversarial malware
         """
         grad_norms = gradient_f.norm(dim=-1).squeeze()
+        grad_norms = grad_norms.cpu()
         indexes_to_perturb = [i for i in range(self.model.max_input_length)]
         if to_avoid is not None:
             grad_norms[to_avoid] = 0
@@ -157,7 +158,9 @@ class TokenGradientDescent:
     def embed_all_tokens(self):
         windows = int(self.n_tokens // self.model.max_input_length)
         tokens = torch.LongTensor(list(range(self.n_tokens)))
+        tokens = tokens.to(self.device)
         embedded_tokens = torch.zeros((self.n_tokens, self.model.d_model))
+        embedded_tokens = embedded_tokens.to(self.device)
         for i in range(windows + 1):
             start = self.model.max_input_length * i
             stop = self.model.max_input_length * (i + 1)
@@ -182,8 +185,8 @@ class TokenGradientDescent:
         if isinstance(x, str) or isinstance(x, Path):
             x = self.tokenize_sample(x)
         x_adv: torch.Tensor = copy.deepcopy(x.detach())
-        x_adv = self.model.embed(x_adv)
         x_adv = x_adv.to(self.device)
+        x_adv = self.model.embed(x_adv)
         x_adv.requires_grad_()
         embedded_tokens = self.embed_all_tokens()
         loss_seq = torch.zeros((self.steps, 1))
@@ -198,8 +201,8 @@ class TokenGradientDescent:
             if self.verbose:
                 logging.log(logging.INFO, f"Iteration {i} - Loss : {loss.item()}")
             grad_adv_x = autograd.grad(loss, x_adv)[0]
-            x_adv = self.optimization_solver(embedding_tokens=embedded_tokens, gradient_f=grad_adv_x.cpu(),
-                                             x=x_adv.cpu(),
+            x_adv = self.optimization_solver(embedding_tokens=embedded_tokens, gradient_f=grad_adv_x,
+                                             x=x_adv,
                                              admitted_tokens=torch.LongTensor(self.index_token_to_use),
                                              to_avoid=input_index_locations_to_avoid,
                                              unavailable_tokens=self.token_index_to_avoid)

@@ -38,6 +38,7 @@ from nebula.misc import fix_random_seed
 
 fix_random_seed(0)
 
+DEVICE = "cpu"
 
 def compute_score(llm, x, verbose=True):
     logit = llm(x)
@@ -72,9 +73,10 @@ def tokenize_sample(report_path, encode=True):
     return tokenized_report
 
 
-def embed(llm_model, report):
+def embed(llm_model, report, device="cpu"):
     src = tokenize_sample(report)
     s = llm_model.split(src)
+    s = s.to(device)
     e = llm_model.embed(s)
     return e
 
@@ -140,20 +142,23 @@ def analyse_folder(folder: pathlib.Path, llm_model, embed_baseline, name, plot=T
 def compute_adv_exe_from_folder(folder: pathlib.Path, llm_model, verbose: bool = False):
     token_to_use = list(range(200, 1000))
     tgd_attack = TokenGradientDescent(model=llm_model, tokenizer=load_tokenizer(), step_size=100, steps=10,
-                                      index_token_to_use=token_to_use, token_index_to_avoid=[0, 2], verbose=verbose, )
+                                      index_token_to_use=token_to_use, token_index_to_avoid=[0, 2], verbose=verbose,
+                                      device=DEVICE)
     for i, report in enumerate(folder.glob("*.json")):
         print(report.name)
-        x_embed = embed(llm_model, str(report))
+        x_embed = embed(llm_model, str(report), device=DEVICE)
         y = torch.sign(llm_model(x_embed))
         y = y.item()
         final_x_adv, loss_seq, confidence_seq, x_path = tgd_attack(str(report), y, return_additional_info=True,
                                                                    input_index_locations_to_avoid=[0, 1, 2, 100, 500])
         plt.plot(confidence_seq)
+        plt.plot(loss_seq)
         plt.show()
 
 
 model = load_model()
 model_no_embed = load_model(skip_embedding=True)
+model_no_embed = model_no_embed.to(device=DEVICE)
 malware_folder = pathlib.Path(os.path.join(REPOSITORY_ROOT, "evaluation", "explanation", "malware"))
 goodware_folder = pathlib.Path(os.path.join(REPOSITORY_ROOT, "evaluation", "explanation", "goodware"))
 
