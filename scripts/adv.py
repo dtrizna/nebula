@@ -141,7 +141,7 @@ def analyse_folder(folder: pathlib.Path, llm_model, embed_baseline, name, plot=T
 
 def compute_adv_exe_from_folder(folder: pathlib.Path, llm_model, verbose: bool = False):
     token_to_use = list(range(200, 1000))
-    tgd_attack = TokenGradientDescent(model=llm_model, tokenizer=load_tokenizer(), step_size=100, steps=10,
+    tgd_attack = TokenGradientDescent(model=llm_model, tokenizer=load_tokenizer(), step_size=32, steps=10,
                                       index_token_to_use=token_to_use, token_index_to_avoid=[0, 2], verbose=verbose,
                                       device=DEVICE)
     for i, report in enumerate(folder.glob("*.json")):
@@ -149,10 +149,12 @@ def compute_adv_exe_from_folder(folder: pathlib.Path, llm_model, verbose: bool =
         x_embed = embed(llm_model, str(report), device=DEVICE)
         y = torch.sign(llm_model(x_embed))
         y = y.item()
+        to_avoid = list(range(0, 250)) # faking impossible locations to manipulate
         final_x_adv, loss_seq, confidence_seq, x_path = tgd_attack(str(report), y, return_additional_info=True,
-                                                                   input_index_locations_to_avoid=[0, 1, 2, 100, 500])
-        plt.plot(confidence_seq)
-        plt.plot(loss_seq)
+                                                                   input_index_locations_to_avoid=to_avoid)
+        plt.plot(confidence_seq, label="conf")
+        plt.plot(loss_seq, label="loss")
+        plt.legend()
         plt.show()
 
 
