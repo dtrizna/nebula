@@ -15,9 +15,13 @@ from nebula.preprocessing.json import JSONTokenizerNaive
 INVALID = torch.inf
 
 
-def token_gradient_descent(embedding_tokens: torch.Tensor, gradient_f: torch.Tensor, i: int, x: torch.Tensor,
-                           admitted_tokens: torch.LongTensor,
-                           unavailable_tokens: Union[torch.Tensor, None] = None) -> int:
+def token_gradient_descent(
+        embedding_tokens: torch.Tensor,
+        gradient_f: torch.Tensor,
+        i: int, x: torch.Tensor,
+        admitted_tokens: torch.LongTensor,
+        unavailable_tokens: Union[torch.Tensor, None] = None
+) -> int:
     gradient_f_i = gradient_f[0, i]
     x_i = x[0, i]
     token_to_chose = single_token_gradient_update(
@@ -96,8 +100,7 @@ class TokenGradientDescent:
                  n_tokens=50000,
                  loss=Softmax(),
                  device="cpu",
-                 verbose=False
-                 ):
+                 verbose=False):
         if token_index_to_avoid is None:
             token_index_to_avoid = [0, 1, 2]
         self.model = model
@@ -113,9 +116,15 @@ class TokenGradientDescent:
         self.device = device
         self.verbose = verbose
 
-    def optimization_solver(self, embedding_tokens: torch.Tensor, gradient_f: torch.Tensor, x: torch.Tensor,
-                            admitted_tokens: torch.LongTensor, to_avoid: Union[torch.Tensor, None] = None,
-                            unavailable_tokens: Union[torch.Tensor, None] = None) -> torch.Tensor:
+    def optimization_solver(
+            self,
+            embedding_tokens: torch.Tensor,
+            gradient_f: torch.Tensor,
+            x: torch.Tensor,
+            admitted_tokens: torch.LongTensor,
+            to_avoid: Union[torch.Tensor, None] = None,
+            unavailable_tokens: Union[torch.Tensor, None] = None
+    ) -> torch.Tensor:
         """
         Optimizes the end-to-end evasion
 
@@ -148,8 +157,14 @@ class TokenGradientDescent:
         indexes_to_perturb = indexes_to_perturb[best_indexes]
         results = torch.zeros((len(best_indexes))) + INVALID
         for i, index in enumerate(best_indexes[:self.step_size]):
-            results[i] = token_gradient_descent(embedding_tokens, gradient_f, index, x, admitted_tokens,
-                                                unavailable_tokens)
+            results[i] = token_gradient_descent(
+                embedding_tokens,
+                gradient_f,
+                index,
+                x,
+                admitted_tokens,
+                unavailable_tokens
+            )
 
         to_edit = indexes_to_perturb[results != INVALID]
         x[0, to_edit] = embedding_tokens[results[results != INVALID].int()]
@@ -180,8 +195,12 @@ class TokenGradientDescent:
             return x
         return tokenized_report
 
-    def __call__(self, x: Union[torch.Tensor, str], y: float, return_additional_info=False,
-                 input_index_locations_to_avoid=None):
+    def __call__(
+            self,
+            x: Union[torch.Tensor, str],
+            y: float, return_additional_info=False,
+            input_index_locations_to_avoid=None
+    ):
         if isinstance(x, str) or isinstance(x, Path):
             x = self.tokenize_sample(x)
         x_adv: torch.Tensor = copy.deepcopy(x.detach())
@@ -201,11 +220,14 @@ class TokenGradientDescent:
             if self.verbose:
                 logging.log(logging.INFO, f"Iteration {i} - Loss : {loss.item()}")
             grad_adv_x = autograd.grad(loss, x_adv)[0]
-            x_adv = self.optimization_solver(embedding_tokens=embedded_tokens, gradient_f=grad_adv_x,
-                                             x=x_adv,
-                                             admitted_tokens=torch.LongTensor(self.index_token_to_use),
-                                             to_avoid=input_index_locations_to_avoid,
-                                             unavailable_tokens=self.token_index_to_avoid)
+            x_adv = self.optimization_solver(
+                embedding_tokens=embedded_tokens,
+                gradient_f=grad_adv_x,
+                x=x_adv,
+                admitted_tokens=torch.LongTensor(self.index_token_to_use),
+                to_avoid=input_index_locations_to_avoid,
+                unavailable_tokens=self.token_index_to_avoid
+            )
             loss_seq[i] = loss.item()
             confidence_seq[i] = sigmoid(output).cpu()
             x_path[i] = copy.deepcopy(x_adv.cpu().detach())

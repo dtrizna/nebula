@@ -1,17 +1,14 @@
 import copy
 import json
 import os
-import pathlib
 import sys
-# shap displays NumbaDeprecationWarning when importing -- supress them
+import pathlib
 import warnings
 
 import matplotlib.pyplot as plt
 import numpy as np
+
 from numba.core.errors import NumbaDeprecationWarning
-
-from scripts.attack.tgd import TokenGradientDescent
-
 warnings.filterwarnings("ignore", category=NumbaDeprecationWarning)
 
 import shap
@@ -34,8 +31,9 @@ from nebula import PEDynamicFeatureExtractor
 from nebula.models.attention import TransformerEncoderChunksOptionalEmbedding
 from nebula.preprocessing import JSONTokenizerNaive
 
-from nebula.misc import fix_random_seed
+from scripts.attack.tgd import TokenGradientDescent
 
+from nebula.misc import fix_random_seed
 fix_random_seed(0)
 
 DEVICE = "cpu"
@@ -141,9 +139,14 @@ def analyse_folder(folder: pathlib.Path, llm_model, embed_baseline, name, plot=T
 
 def compute_adv_exe_from_folder(folder: pathlib.Path, llm_model, verbose: bool = False):
     token_to_use = list(range(200, 1000))
-    tgd_attack = TokenGradientDescent(model=llm_model, tokenizer=load_tokenizer(), step_size=32, steps=10,
-                                      index_token_to_use=token_to_use, token_index_to_avoid=[0, 2], verbose=verbose,
-                                      device=DEVICE)
+    tgd_attack = TokenGradientDescent(
+        model=llm_model,
+        tokenizer=load_tokenizer(),
+        step_size=32,
+        steps=10,
+        index_token_to_use=token_to_use, token_index_to_avoid=[0, 2], verbose=verbose,
+        device=DEVICE
+    )
     for i, report in enumerate(folder.glob("*.json")):
         print(report.name)
         x_embed = embed(llm_model, str(report), device=DEVICE)
