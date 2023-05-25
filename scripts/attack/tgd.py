@@ -5,8 +5,8 @@ from typing import Callable, Union
 
 import torch
 from torch import autograd
-from torch.nn import Softmax
 from torch import sigmoid
+from torch.nn import Softmax
 
 from nebula import PEDynamicFeatureExtractor
 from nebula.models.attention import TransformerEncoderChunksOptionalEmbedding
@@ -233,6 +233,26 @@ class TokenGradientDescent:
             x_path[i] = copy.deepcopy(x_adv.cpu().detach())
         adv_index = torch.argmax(loss_seq.flatten())
         final_x_adv = x_path[adv_index]
+        final_x_adv = final_x_adv.unsqueeze(dim=0)
         if return_additional_info:
             return final_x_adv.detach().cpu(), loss_seq.detach().cpu(), confidence_seq.detach().cpu(), x_path.detach().cpu()
         return final_x_adv
+
+    def reconstruct_tokens(self, original, x_adv, index_to_avoid: list):
+        embedded_tokens = self.embed_all_tokens() if self.embedded_tokens is None else self.embedded_tokens
+        to_reconstruct = set(list(range(self.model.max_input_length))) - set(index_to_avoid)
+        to_reconstruct = list(to_reconstruct)
+        to_reconstruct.sort()
+        reconstructed = copy.deepcopy(original)
+        for j in to_reconstruct:
+            e = x_adv[0, j]
+            distances = torch.Tensor([(e - embedded_tokens[i]).norm() for i in self.index_token_to_use])
+            index = distances.argmin()
+            reconstructed[0, j] = self.index_token_to_use[index]
+        return reconstructed
+
+    def invert_tokenization(self, x):
+        vocabolary = self.tokenizer.vocab
+        inverted_vocabulary = {v: k for (k, v) in vocabolary.items()}
+        normalized_report = [inverted_vocabulary[i] for i in x.flatten().tolist()]
+        return normalized_report
