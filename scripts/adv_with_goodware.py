@@ -3,6 +3,7 @@ import sys
 import json
 import pathlib
 from typing import List
+from collections import Counter
 
 # shap related imports
 import warnings
@@ -130,35 +131,63 @@ def compute_adv_exe_from_folder(
         ax.legend()
         plt.show()
 
+def load_goodware_reports(folder, nr=200):
+    reports = []
+    for i, report in enumerate(folder.glob("*.json")):
+        if i > nr:
+            break
+        with open(report) as f:
+            report = json.load(f)
+        reports.append(report)
+    return reports
+
+def report_token_counter(reports):
+    token_counter = Counter()
+    for report in reports:
+        tokens = tokenize_sample(report)
+        token_counter.update(*tokens.tolist())
+    return token_counter
 
 if __name__ == "__main__":
+    
     # MODELS
-
+    logging.info(" [*] Loading models...")
     model = load_model()
     model.to(DEVICE)
     model_no_embed = load_model(skip_embedding=True)
     model_no_embed.to(DEVICE)
+    logging.info(" [!] Models loaded.")
 
     # REPORTS
-
+    logging.info(" [*] Loading reports...")
     malware_folder = pathlib.Path(os.path.join(REPOSITORY_ROOT, "evaluation", "explanation", "malware"))
     goodware_folder = pathlib.Path(os.path.join(REPOSITORY_ROOT, "evaluation", "explanation", "goodware"))
     baseline_report = os.path.join(REPOSITORY_ROOT, r"emulation", "report_baseline.json")
-
     x_baseline = tokenize_sample(baseline_report)
     x_embed_baseline = embed(model, baseline_report)
+    logging.info(" [!] Reports loaded.")
 
     # ATTACK
-
-    tokens_to_use = list(range(200, 1000))
-    tokens_to_avoid = list(range(0, 3))
-
+    logging.info(" [*] Initializing an attack...")
+    goodware_reports = load_goodware_reports(goodware_folder, nr=100)
+    goodware_token_counter = report_token_counter(goodware_reports)
+    
+    TOP_N_TOKENS = 300
+    SKIP_N_TOKENS = 100
+    #tokens_to_use = list(range(200, 1000))
+    #tokens_to_avoid = 
+    n_frequent_tokens = [token for token, _ in goodware_token_counter.most_common(TOP_N_TOKENS)]
+    tokens_to_use = n_frequent_tokens[SKIP_N_TOKENS:]
+    tokens_to_avoid = n_frequent_tokens[:SKIP_N_TOKENS]
+    # [0,1,2] are <pad>, <unk>, <mask> -- join with tokens_to_avoid
+    tokens_to_avoid = list(set(list(range(0, 3)) + tokens_to_avoid))
+    
     compute_adv_exe_from_folder(
             malware_folder,
             model_no_embed,
             verbose = True,
             token_to_use = tokens_to_use,
             token_to_avoid = tokens_to_avoid,
-            steps = 10,
+            steps = 20,
             step_size = 32
     )
