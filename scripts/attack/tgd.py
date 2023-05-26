@@ -10,7 +10,7 @@ from torch import sigmoid
 
 from nebula import PEDynamicFeatureExtractor
 from nebula.models.attention import TransformerEncoderChunksOptionalEmbedding
-from nebula.preprocessing.json import JSONTokenizerNaive
+from nebula.preprocessing.json import JSONTokenizerNaive, JSONTokenizerBPE
 
 INVALID = torch.inf
 
@@ -91,7 +91,7 @@ def single_token_gradient_update(
 
 class TokenGradientDescent:
     def __init__(self, model: TransformerEncoderChunksOptionalEmbedding,
-                 tokenizer: JSONTokenizerNaive,
+                 tokenizer: Union[JSONTokenizerNaive, JSONTokenizerBPE],
                  step_size: int,
                  steps: int,
                  index_token_to_use: list,
@@ -115,6 +115,10 @@ class TokenGradientDescent:
         self.loss_function = loss
         self.device = device
         self.verbose = verbose
+
+        assert isinstance(self.tokenizer, JSONTokenizerNaive) or \
+            isinstance(self.tokenizer, JSONTokenizerBPE), \
+            "Tokenizer must be a JSONTokenizerNaive or JSONTokenizerBPE"
 
     def optimization_solver(
             self,
@@ -190,7 +194,10 @@ class TokenGradientDescent:
         filtered_report = extractor.filter_and_normalize_report(report)
         tokenized_report = self.tokenizer.tokenize(filtered_report)
         if encode:
-            encoded_report = self.tokenizer.encode(tokenized_report, pad=True, tokenize=False)
+            if isinstance(self.tokenizer, JSONTokenizerBPE):
+                encoded_report = self.tokenizer.encode(filtered_report, pad=True, tokenize=True)
+            if isinstance(self.tokenizer, JSONTokenizerNaive):
+                encoded_report = self.tokenizer.encode(tokenized_report, pad=True, tokenize=False)
             x = torch.Tensor(encoded_report).long()
             return x
         return tokenized_report
