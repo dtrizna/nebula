@@ -1,14 +1,14 @@
 import copy
 import json
 import os
-import sys
 import pathlib
+import sys
 import warnings
 
 import matplotlib.pyplot as plt
 import numpy as np
-
 from numba.core.errors import NumbaDeprecationWarning
+
 warnings.filterwarnings("ignore", category=NumbaDeprecationWarning)
 
 import shap
@@ -34,9 +34,11 @@ from nebula.preprocessing import JSONTokenizerNaive
 from scripts.attack.tgd import TokenGradientDescent
 
 from nebula.misc import fix_random_seed
+
 fix_random_seed(0)
 
 DEVICE = "cpu"
+
 
 def compute_score(llm, x, verbose=True):
     logit = llm(x)
@@ -151,12 +153,15 @@ def compute_adv_exe_from_folder(folder: pathlib.Path, llm_model, verbose: bool =
     )
     for i, report in enumerate(folder.glob("*.json")):
         print(report.name)
+        original = tokenize_sample(str(report)).to(DEVICE)
         x_embed = embed(llm_model, str(report), device=DEVICE)
         y = torch.sign(llm_model(x_embed))
         y = y.item()
-        to_avoid = list(range(0, 250)) # faking impossible locations to manipulate
+        to_avoid = list(range(0, 250))  # faking impossible locations to manipulate
         final_x_adv, loss_seq, confidence_seq, x_path = tgd_attack(str(report), y, return_additional_info=True,
                                                                    input_index_locations_to_avoid=to_avoid)
+        reconstructed = tgd_attack.reconstruct_tokens(original, final_x_adv, to_avoid)
+        normalized_report = tgd_attack.invert_tokenization(reconstructed)
         fig, ax = plt.subplots()
 
         ax.plot(confidence_seq, label="confidence")
