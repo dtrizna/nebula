@@ -11,7 +11,7 @@ from nebula.constants import *
 from nebula.models.ember import PEFeatureExtractor
 from nebula.misc import get_alphanum_chars
 
-from .json import JSONFilter
+from .tokenization import JSONFilter
 from .normalization import normalizeTableIP, normalizeTablePath
 
 class PEStaticFeatureExtractor(object):

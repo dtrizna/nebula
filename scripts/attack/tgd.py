@@ -9,8 +9,8 @@ from torch import sigmoid
 from torch.nn import Softmax
 
 from nebula import PEDynamicFeatureExtractor
-from nebula.models.attention import TransformerEncoderChunksOptionalEmbedding
-from nebula.preprocessing.json import JSONTokenizerNaive, JSONTokenizerBPE
+from nebula.models.attention import TransformerEncoderOptionalEmbedding
+from nebula.preprocessing.tokenization import JSONTokenizerNaive, JSONTokenizerBPE
 
 INVALID = torch.inf
 
@@ -90,7 +90,7 @@ def single_token_gradient_update(
 
 
 class TokenGradientDescent:
-    def __init__(self, model: TransformerEncoderChunksOptionalEmbedding,
+    def __init__(self, model: TransformerEncoderOptionalEmbedding,
                  tokenizer: Union[JSONTokenizerNaive, JSONTokenizerBPE],
                  step_size: int,
                  steps: int,

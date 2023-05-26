@@ -118,7 +118,7 @@ class TransformerEncoderChunks(nn.Module):
         return out
 
 
-class TransformerEncoderChunksOptionalEmbedding(TransformerEncoderChunks):
+class TransformerEncoderOptionalEmbedding(TransformerEncoderChunks):
     def __init__(self,
                  vocab_size: int,  # size of vocabulary
                  maxlen: int,  # maximum length of input sequence
@@ -160,6 +160,10 @@ class TransformerEncoderChunksOptionalEmbedding(TransformerEncoderChunks):
     def transform(self, x: Tensor, src_mask: Optional[Tensor] = None) -> Tensor:
         transformed_chunk = self.transformer_encoder(x, src_mask)
         return transformed_chunk
+    
+    def embed_sample(self, src):
+        ssrc = self.split(src)
+        return self.embed(ssrc)
 
 
 class TransformerEncoderChunksLM(TransformerEncoderChunks):
