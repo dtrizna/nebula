@@ -33,10 +33,16 @@ from nebula.misc import fix_random_seed, compute_score
 fix_random_seed(0)
 
 DEVICE = "cpu"
+TOKENIZER = "whitespace" # "bpe"
 
+TOP_N_TOKENS = 300
+SKIP_N_TOKENS = 100
+
+ATTACK_STEPS = 20
+ATTACK_STEP_SIZE = 32
 
 def embed(llm_model, report, device="cpu"):
-    src = tokenize_sample(report)
+    src = tokenize_sample(report, type=TOKENIZER)
     return llm_model.embed_sample(src).to(device)
 
 
@@ -172,10 +178,6 @@ if __name__ == "__main__":
     goodware_reports = load_goodware_reports(goodware_folder, nr=100)
     goodware_token_counter = report_token_counter(goodware_reports)
     
-    TOP_N_TOKENS = 300
-    SKIP_N_TOKENS = 100
-    #tokens_to_use = list(range(200, 1000))
-    #tokens_to_avoid = 
     n_frequent_tokens = [token for token, _ in goodware_token_counter.most_common(TOP_N_TOKENS)]
     tokens_to_use = n_frequent_tokens[SKIP_N_TOKENS:]
     tokens_to_avoid = n_frequent_tokens[:SKIP_N_TOKENS]
@@ -188,6 +190,6 @@ if __name__ == "__main__":
             verbose = True,
             token_to_use = tokens_to_use,
             token_to_avoid = tokens_to_avoid,
-            steps = 20,
-            step_size = 32
+            steps = ATTACK_STEPS,
+            step_size = ATTACK_STEP_SIZE
     )
