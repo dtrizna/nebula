@@ -35,10 +35,10 @@ def load_tokenizer(type="whitespace"):
     return tokenizer
 
 
-def tokenize_sample(report_path, encode=True):
+def tokenize_sample(report_path, type="whitespace", encode=True):
     extractor = PEDynamicFeatureExtractor()
     filtered_report = extractor.filter_and_normalize_report(report_path)
-    tokenizer = load_tokenizer()
+    tokenizer = load_tokenizer(type=type)
     tokenized_report = tokenizer.tokenize(filtered_report)
     if encode:
         encoded_report = tokenizer.encode(tokenized_report, pad=True, tokenize=False)
