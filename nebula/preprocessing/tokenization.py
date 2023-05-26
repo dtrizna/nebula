@@ -1,13 +1,10 @@
 import os
-# TODO: think about more secure alternative to pickle
-import pickle
 import logging
 import json
 import operator
 import numpy as np
 from tqdm import tqdm
 from time import time
-from copy import deepcopy
 from functools import reduce
 from typing import Iterable
 from collections import Counter, defaultdict

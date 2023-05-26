@@ -1,19 +1,15 @@
-import copy
-import json
 import os
-import pathlib
 import sys
+import json
+import pathlib
 import warnings
 
 import matplotlib.pyplot as plt
-import numpy as np
 from numba.core.errors import NumbaDeprecationWarning
-
 warnings.filterwarnings("ignore", category=NumbaDeprecationWarning)
 
 import shap
 import torch
-from torch import Tensor, sigmoid
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -27,73 +23,19 @@ else:
     REPOSITORY_ROOT = os.getcwd()
 sys.path.append(REPOSITORY_ROOT)
 
-from nebula import PEDynamicFeatureExtractor
-from nebula.models.attention import TransformerEncoderChunksOptionalEmbedding
-from nebula.preprocessing import JSONTokenizerNaive
-
+from nebula.models.attention import TransformerEncoderOptionalEmbedding
+from nebula.preprocessing import load_tokenizer, tokenize_sample
+from nebula.misc.plots import plot_shap_values
 from scripts.attack.tgd import TokenGradientDescent
-
-from nebula.misc import fix_random_seed
-
+from nebula.misc import fix_random_seed, compute_score
 fix_random_seed(0)
 
 DEVICE = "cpu"
 
 
-def compute_score(llm, x, verbose=True):
-    logit = llm(x)
-    prob = sigmoid(logit)
-    if verbose:
-        print(f"\n[!!!] Probability of being malicious: {prob.item():.3f} | Logit: {logit.item():.3f}")
-    return prob.item()
-
-
-def load_tokenizer():
-    with open(os.path.join(REPOSITORY_ROOT, "nebula", "objects",
-                           "speakeasy_whitespace_50000_vocab.json")) as f:
-        vocab = json.load(f)
-
-    tokenizer = JSONTokenizerNaive(
-        vocab_size=len(vocab),
-        seq_len=512,
-        vocab=vocab
-    )
-    return tokenizer
-
-
-def tokenize_sample(report_path, encode=True):
-    extractor = PEDynamicFeatureExtractor()
-    filtered_report = extractor.filter_and_normalize_report(report_path)
-    tokenizer = load_tokenizer()
-    tokenized_report = tokenizer.tokenize(filtered_report)
-    if encode:
-        encoded_report = tokenizer.encode(tokenized_report, pad=True, tokenize=False)
-        x = Tensor(encoded_report).long()
-        return x
-    return tokenized_report
-
-
 def embed(llm_model, report, device="cpu"):
     src = tokenize_sample(report)
-    s = llm_model.split(src)
-    s = s.to(device)
-    e = llm_model.embed(s)
-    return e
-
-
-def plot_shap_values(shap_values: np.ndarray, name: str):
-    shap_values = shap_values.mean(axis=2)
-    pos_idx = shap_values[0] >= 0
-    neg_index = shap_values[0] < 0
-    pos_shap = copy.deepcopy(shap_values)[0]
-    pos_shap[neg_index] = 0
-    neg_shap = copy.deepcopy(shap_values)[0]
-    neg_shap[pos_idx] = 0
-    x = range(512)
-    plt.bar(x, pos_shap)
-    plt.bar(x, neg_shap)
-    plt.title(name)
-    plt.show()
+    return llm_model.embed_sample(src)
 
 
 def load_model(skip_embedding=False):
@@ -117,7 +59,7 @@ def load_model(skip_embedding=False):
         "skip_embedding": skip_embedding
     }
     state_dict = torch.load(pretrained_model, map_location='cpu')
-    llm = TransformerEncoderChunksOptionalEmbedding(**model_config)
+    llm = TransformerEncoderOptionalEmbedding(**model_config)
     llm.load_state_dict(state_dict)
     llm.eval()
     return llm
@@ -158,8 +100,12 @@ def compute_adv_exe_from_folder(folder: pathlib.Path, llm_model, verbose: bool =
         y = torch.sign(llm_model(x_embed))
         y = y.item()
         to_avoid = list(range(0, 250))  # faking impossible locations to manipulate
-        final_x_adv, loss_seq, confidence_seq, x_path = tgd_attack(str(report), y, return_additional_info=True,
-                                                                   input_index_locations_to_avoid=to_avoid)
+        final_x_adv, loss_seq, confidence_seq, x_path = tgd_attack(
+            str(report),
+            y,
+            return_additional_info=True,
+            input_index_locations_to_avoid=to_avoid
+        )
         reconstructed = tgd_attack.reconstruct_tokens(original, final_x_adv, to_avoid)
         normalized_report = tgd_attack.invert_tokenization(reconstructed)
         fig, ax = plt.subplots()

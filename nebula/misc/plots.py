@@ -1,6 +1,22 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from copy import deepcopy
 from . import read_files_from_log
+
+def plot_shap_values(shap_values: np.ndarray, name: str):
+    shap_values = shap_values.mean(axis=2)
+    pos_idx = shap_values[0] >= 0
+    neg_index = shap_values[0] < 0
+    pos_shap = deepcopy(shap_values)[0]
+    pos_shap[neg_index] = 0
+    neg_shap = deepcopy(shap_values)[0]
+    neg_shap[pos_idx] = 0
+    x = range(512)
+    plt.bar(x, pos_shap)
+    plt.bar(x, neg_shap)
+    plt.title(name)
+    plt.show()
+
 
 def set_size(width=505.89, fraction=1):
     """Set figure dimensions to avoid scaling in LaTeX.

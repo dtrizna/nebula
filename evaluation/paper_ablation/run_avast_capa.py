@@ -19,7 +19,7 @@ from nebula import ModelTrainer
 from nebula.models import TransformerEncoderChunks
 from nebula.evaluation import CrossValidation
 from nebula.misc import set_random_seed, clear_cuda_cache
-from nebula.preprocessing.json import JSONTokenizerBPE, JSONTokenizerNaive
+from nebula.preprocessing.tokenization import JSONTokenizerBPE, JSONTokenizerNaive
 from nebula.constants import JSON_CLEANUP_SYMBOLS
 from nebula.preprocessing.normalization import (
     normalizeStringPath
