@@ -1,17 +1,20 @@
-import os
-import sys
 import json
+import os
 import pathlib
-from typing import List
-
+import sys
 # shap related imports
 import warnings
+from collections import Counter
+
+import numpy as np
 from numba.core.errors import NumbaDeprecationWarning
+
 warnings.filterwarnings("ignore", category=NumbaDeprecationWarning)
 import shap
 
 import torch
 import logging
+
 logging.basicConfig(level=logging.INFO)
 import matplotlib.pyplot as plt
 
@@ -29,6 +32,7 @@ from nebula.preprocessing import load_tokenizer, tokenize_sample
 from nebula.misc.plots import plot_shap_values
 from scripts.attack.tgd import TokenGradientDescent
 from nebula.misc import fix_random_seed, compute_score
+
 fix_random_seed(0)
 
 DEVICE = "cpu"
@@ -86,11 +90,15 @@ def compute_adv_exe_from_folder(
         folder: pathlib.Path,
         llm_model,
         verbose: bool = False,
-        token_to_use: List = list(range(200, 1000)),
-        token_to_avoid = list(range(0, 3)),
+        token_to_use=None,
+        token_to_avoid=None,
         steps: int = 10,
         step_size: int = 32
 ):
+    if token_to_use is None:
+        token_to_use = list(range(200, 1000))
+    if token_to_avoid is None:
+        token_to_avoid = list(range(0, 3))
     tgd_attack = TokenGradientDescent(
         model=llm_model,
         tokenizer=load_tokenizer(),
@@ -114,8 +122,8 @@ def compute_adv_exe_from_folder(
             return_additional_info=True,
             input_index_locations_to_avoid=to_avoid
         )
-        reconstructed = tgd_attack.reconstruct_tokens(original, final_x_adv, to_avoid)
-        normalized_report = tgd_attack.invert_tokenization(reconstructed)
+        # reconstructed = tgd_attack.reconstruct_tokens(original, final_x_adv, to_avoid)
+        # normalized_report = tgd_attack.invert_tokenization(reconstructed)
         fig, ax = plt.subplots()
 
         ax.plot(confidence_seq, label="confidence")
@@ -154,11 +162,11 @@ if __name__ == "__main__":
     tokens_to_avoid = list(range(0, 3))
 
     compute_adv_exe_from_folder(
-            malware_folder,
-            model_no_embed,
-            verbose = True,
-            token_to_use = tokens_to_use,
-            token_to_avoid = tokens_to_avoid,
-            steps = 10,
-            step_size = 32
+        malware_folder,
+        model_no_embed,
+        verbose=True,
+        token_to_use=tokens_to_use,
+        token_to_avoid=tokens_to_avoid,
+        steps=20,
+        step_size=32
     )

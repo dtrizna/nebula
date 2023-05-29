@@ -1,18 +1,21 @@
-import os
-import sys
 import json
+import os
 import pathlib
-from typing import List
-from collections import Counter
-
+import sys
 # shap related imports
 import warnings
+from collections import Counter
+from typing import List
+
+import numpy as np
 from numba.core.errors import NumbaDeprecationWarning
+
 warnings.filterwarnings("ignore", category=NumbaDeprecationWarning)
 import shap
 
 import torch
 import logging
+
 logging.basicConfig(level=logging.INFO)
 import matplotlib.pyplot as plt
 
@@ -30,16 +33,18 @@ from nebula.preprocessing import load_tokenizer, tokenize_sample
 from nebula.misc.plots import plot_shap_values
 from scripts.attack.tgd import TokenGradientDescent
 from nebula.misc import fix_random_seed, compute_score
+
 fix_random_seed(0)
 
 DEVICE = "cpu"
-TOKENIZER = "whitespace" # "bpe"
+TOKENIZER = "whitespace"  # "bpe"
 
 TOP_N_TOKENS = 300
 SKIP_N_TOKENS = 100
 
 ATTACK_STEPS = 20
 ATTACK_STEP_SIZE = 32
+
 
 def embed(llm_model, report, device="cpu"):
     src = tokenize_sample(report, type=TOKENIZER)
@@ -85,7 +90,7 @@ def analyse_folder(folder: pathlib.Path, llm_model, embed_baseline, name, plot=T
         if plot:
             plot_shap_values(explanations, f"{name}_{i} : {prob:.3f}")
         explanations_arr.append(explanations)
-        filepaths.append(report.name)
+        filepaths.append(report)
     return filepaths, explanations_arr
 
 
@@ -94,7 +99,7 @@ def compute_adv_exe_from_folder(
         llm_model,
         verbose: bool = False,
         token_to_use: List = list(range(200, 1000)),
-        token_to_avoid = list(range(0, 3)),
+        token_to_avoid=list(range(0, 3)),
         steps: int = 10,
         step_size: int = 32
 ):
@@ -137,6 +142,7 @@ def compute_adv_exe_from_folder(
         ax.legend()
         plt.show()
 
+
 def load_goodware_reports(folder, nr=200):
     reports = []
     for i, report in enumerate(folder.glob("*.json")):
@@ -147,6 +153,7 @@ def load_goodware_reports(folder, nr=200):
         reports.append(report)
     return reports
 
+
 def report_token_counter(reports):
     token_counter = Counter()
     for report in reports:
@@ -154,8 +161,32 @@ def report_token_counter(reports):
         token_counter.update(*tokens.tolist())
     return token_counter
 
+
+def analyze_goodware_tokens(reports):
+    counter: Counter = report_token_counter(reports)
+    tokenizer = load_tokenizer()
+    inverse_vocab = {v: k for k, v in tokenizer.vocab.items()}
+    for k, v in sorted(counter.items(), key=lambda x: x[1])[::-1]:
+        print(f"{inverse_vocab[k]} : {v}")
+
+
+def extract_most_relevant_tokens(reports, explanations, window_token_to_consider=10, positive_contributions=False):
+    tokens = Counter(range(len(load_tokenizer().vocab)))
+    # tokens.update({k: 0 for k in tokens.keys()})
+    for r, e in zip(reports, explanations):
+        x = tokenize_sample(str(r))
+        mean_explanations = e.mean(axis=2).flatten()
+        if positive_contributions:
+            indexes = np.argsort(mean_explanations)
+        else:
+            indexes = np.argsort(mean_explanations)[::-1]
+        tokens_to_count = set(x[0, indexes[:window_token_to_consider].tolist()].tolist())
+        tokens.update(list(tokens_to_count))
+    final_tokens = [t[0] for t in tokens.most_common()]
+    return final_tokens
+
+
 if __name__ == "__main__":
-    
     # MODELS
     logging.info(" [*] Loading models...")
     model = load_model()
@@ -176,20 +207,22 @@ if __name__ == "__main__":
     # ATTACK
     logging.info(" [*] Initializing an attack...")
     goodware_reports = load_goodware_reports(goodware_folder, nr=100)
-    goodware_token_counter = report_token_counter(goodware_reports)
-    
-    n_frequent_tokens = [token for token, _ in goodware_token_counter.most_common(TOP_N_TOKENS)]
-    tokens_to_use = n_frequent_tokens[SKIP_N_TOKENS:]
-    tokens_to_avoid = n_frequent_tokens[:SKIP_N_TOKENS]
+    reports, explanations = analyse_folder(goodware_folder, model_no_embed, x_embed_baseline, None, plot=False)
+    tokens_to_use = extract_most_relevant_tokens(reports, explanations)[:500]
+    print(tokens_to_use)
+    # goodware_token_counter = report_token_counter(goodware_reports)
+    # n_frequent_tokens = [token for token, _ in goodware_token_counter.most_common(TOP_N_TOKENS)]
+    # tokens_to_use = n_frequent_tokens[SKIP_N_TOKENS:]
+    # tokens_to_avoid = n_frequent_tokens[:SKIP_N_TOKENS]
     # [0,1,2] are <pad>, <unk>, <mask> -- join with tokens_to_avoid
-    tokens_to_avoid = list(set(list(range(0, 3)) + tokens_to_avoid))
-    
+    tokens_to_avoid = list(range(0, 3))
+
     compute_adv_exe_from_folder(
-            malware_folder,
-            model_no_embed,
-            verbose = True,
-            token_to_use = tokens_to_use,
-            token_to_avoid = tokens_to_avoid,
-            steps = ATTACK_STEPS,
-            step_size = ATTACK_STEP_SIZE
+        malware_folder,
+        model_no_embed,
+        verbose=True,
+        token_to_use=tokens_to_use,
+        token_to_avoid=tokens_to_avoid,
+        steps=ATTACK_STEPS,
+        step_size=ATTACK_STEP_SIZE
     )
