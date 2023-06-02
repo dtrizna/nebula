@@ -21,7 +21,7 @@ timestamp = int(time.time())
 
 LIMIT = 1000
 PREFIX = "TEST_"
-outputFolder = os.path.join(REPO_ROOT, "evaluation", f"{PREFIX}MaskedLanguageModeling", 
+outputFolder = os.path.join(REPO_ROOT, "evaluation", f"{PREFIX}language_modeling", 
     f"{run_name}_{timestamp}")
 os.makedirs(outputFolder, exist_ok=True)
 
@@ -41,16 +41,17 @@ set_random_seed(random_state)
 
 run_config = {
     "unlabeledDataSize": 0.8,
-    "nSplits": 3,
-    "downStreamEpochs": 3,
-    "preTrainEpochs": 3, # 10
+    "nSplits": 1,
+    "downStreamEpochs": 5,
+    "preTrainEpochs": 10,
     "falsePositiveRates": [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
     "modelType": model_class.__name__,
     "train_limit": LIMIT,
     "random_state": random_state,
     "batchSize": 64,
-    "optim_step_budget": 50, # 5000
-    'verbosity_n_batches': 100,
+    "optim_scheduler": None,
+    "optim_step_budget": 5000,
+    "verbosity_n_batches": 100,
     "dump_model_every_epoch": True,
     "dump_data_splits": True,
     "remask_epochs": 2,
@@ -64,13 +65,13 @@ logging.warning(f" [!] Starting Masked Language Model evaluation over {run_confi
 # ===== LOADING DATA ==============
 vocab_size = 50000
 maxlen = 512
-xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k", f"speakeasy_vocab_size_50000_maxlen_{maxlen}_x.npy")
+xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k_new", f"speakeasy_vocab_size_50000_maxlen_{maxlen}_x.npy")
 xTrain = np.load(xTrainFile)
-yTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k", "speakeasy_y.npy")
+yTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k_new", "speakeasy_y.npy")
 yTrain = np.load(yTrainFile)
-xTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset_BPE_50k", f"speakeasy_vocab_size_50000_maxlen_{maxlen}_x.npy")
+xTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset_BPE_50k_new", f"speakeasy_vocab_size_50000_maxlen_{maxlen}_x.npy")
 xTest = np.load(xTestFile)
-yTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset_BPE_50k", "speakeasy_y.npy")
+yTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset_BPE_50k_new", "speakeasy_y.npy")
 yTest = np.load(yTestFile)
 
 if run_config['train_limit']:
@@ -81,7 +82,8 @@ if run_config['train_limit']:
     xTest = xTest[:run_config['train_limit']]
     yTest = yTest[:run_config['train_limit']]
 
-vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", "speakeasy_BPE_50000_vocab.json")
+#vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", "speakeasy_BPE_50000_sentencepiece_vocab.json")
+vocabFile = os.path.join(REPO_ROOT, r"data\data_filtered\speakeasy_trainset_BPE_50k_new\speakeasy_vocab_size_50000_tokenizer_vocab.json")
 with open(vocabFile, 'r') as f:
     vocab = json.load(f)
 vocab_size = len(vocab) # adjust it to exact number of tokens in the vocabulary
@@ -125,6 +127,7 @@ pretrainingConfig = {
     "batchSize": run_config["batchSize"],
     "randomState": random_state,
     "false_positive_rates": run_config["falsePositiveRates"],
+    "optim_scheduler": run_config["optim_scheduler"],
     "optim_step_budget": run_config["optim_step_budget"],
     "outputFolder": outputFolder,
     "dump_model_every_epoch": run_config["dump_model_every_epoch"],

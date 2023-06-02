@@ -30,6 +30,7 @@ class SelfSupervisedPretraining:
                     downstreamEpochs=5,
                     batchSize=256,
                     verbosity_n_batches=100,
+                    optim_scheduler=None,
                     optim_step_budget=5000,
                     outputFolder=None,
                     dump_model_every_epoch=False,
@@ -46,6 +47,7 @@ class SelfSupervisedPretraining:
         self.batchSize = batchSize
         self.verbosity_n_batches = verbosity_n_batches
         self.optim_step_budget = optim_step_budget
+        self.optim_scheduler = optim_scheduler
         self.output_folder = outputFolder
         self.dump_model_every_epoch = dump_model_every_epoch
         self.dump_data_splits = dump_data_splits
@@ -95,7 +97,7 @@ class SelfSupervisedPretraining:
             "loss_function": CrossEntropyLoss(),
             "optimizer_class": AdamW,
             "optimizer_config": {"lr": 2.5e-4},
-            "optim_scheduler": "step",
+            "optim_scheduler": self.optim_scheduler,
             "optim_step_budget": self.optim_step_budget,
             "verbosity_n_batches": self.verbosity_n_batches,
             "batchSize": self.batchSize,
