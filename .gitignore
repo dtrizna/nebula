@@ -3,6 +3,7 @@ __pycache__/
 *$py.class
 .ipynb_checkpoints
 .DS_Store
+.vscode
 
 PhD-notes/*
 

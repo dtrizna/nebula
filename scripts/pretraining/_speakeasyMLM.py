@@ -19,8 +19,8 @@ model_class = TransformerEncoderChunksLM
 run_name = f"{model_class.__name__}"
 timestamp = int(time.time())
 
-LIMIT = 1000
-PREFIX = "TEST_"
+LIMIT = None
+PREFIX = ""
 outputFolder = os.path.join(REPO_ROOT, "evaluation", f"{PREFIX}language_modeling", 
     f"{run_name}_{timestamp}")
 os.makedirs(outputFolder, exist_ok=True)
@@ -63,7 +63,6 @@ with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
 logging.warning(f" [!] Starting Masked Language Model evaluation over {run_config['nSplits']} splits!")
 
 # ===== LOADING DATA ==============
-vocab_size = 50000
 maxlen = 512
 xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k_new", f"speakeasy_vocab_size_50000_maxlen_{maxlen}_x.npy")
 xTrain = np.load(xTrainFile)
@@ -120,6 +119,7 @@ pretrainingConfig = {
     "pretrainingTaskClass": languageModelClass,
     "pretrainingTaskConfig": languageModelClassConfig,
     "device": device,
+    "training_types": ['pretrained', 'non_pretrained', 'full_data'],
     "unlabeledDataSize": run_config["unlabeledDataSize"],
     "pretraingEpochs": run_config["preTrainEpochs"],
     "downstreamEpochs": run_config["downStreamEpochs"],

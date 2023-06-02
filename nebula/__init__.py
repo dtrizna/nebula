@@ -213,7 +213,7 @@ class ModelTrainer(object):
         msg = " [*] {}: Train Epoch: {} [{:^5}/{:^5} ({:^2.0f}%)] | ".format(
             time.ctime().split()[3],
             self.epoch_idx,
-            self.batch_idx * self.batch_size,
+            self.batch_idx,
             self.trainset_size,
             100. * self.batch_idx / self.trainset_size
         )

@@ -138,11 +138,17 @@ class JSONTokenizer:
         text = str(text).lower()
         if self.cleanup_symbols:
             for pattern in self.cleanup_symbols:
-                text = text.replace(pattern, '')
+                text = text.replace(pattern, ' ')
         if self.stopwords:
             for pattern in self.stopwords:
                 text = text.replace(pattern, '')
-        text = text.translate(str.maketrans('', '', string.punctuation))
+        # all other punctuation -- replace with space
+        text = text.translate(
+                str.maketrans(
+                    string.punctuation,
+                    " " * len(string.punctuation)
+                )
+            )
         return text
 
     def pad_sequence(self, encoded_sequence, seq_len=None):
