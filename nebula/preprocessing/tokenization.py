@@ -439,9 +439,12 @@ class JSONTokenizerBPE(JSONTokenizer):
     def encode(self, inputs, pad=True, tokenize=True):
         if not tokenize:
             raise NotImplementedError("SentencePiece tokenizer does not support encode without tokenize!")
+
+        # if single sample, wrap in list
         if isinstance(inputs, (str, bytes, dict)) or \
-            (isinstance(inputs, list) and isinstance(inputs[0], (str, bytes, dict))):
+            (isinstance(inputs, list) and isinstance(inputs[0], (str, bytes))):
             inputs = [inputs]
+
         data_clean = [self.clear_json_event(x) for x in inputs]
         encoded = [self.tokenizer.encode_as_ids(x) for x in data_clean]
         if pad:
