@@ -138,7 +138,7 @@ if TRAIN_SAMPLE:
         "optimizer_config": {"lr": 3e-4},
         "optim_scheduler": None,
         "optim_step_budget": None,
-        "outputFolder": "./out",
+        "outputFolder": "out",
         "batchSize": 96,
         "verbosity_n_batches": 100,
         "clip_grad_norm": 1.0,

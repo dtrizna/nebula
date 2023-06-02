@@ -16,7 +16,7 @@ from nebula import PEDynamicFeatureExtractor, JSONTokenizerBPE
 LIMIT = None
 VOCAB_SIZES = [50000]
 VOCABS = {10000: "10k", 50000: "50k"}
-OUTFOLDER_SUFFIX = f"_BPE_{VOCABS[VOCAB_SIZES[0]]}_new"
+OUTFOLDER_SUFFIX = f"_BPE_{VOCABS[VOCAB_SIZES[0]]}_new_v2"
 LOGFILE = f"PreProcessing{OUTFOLDER_SUFFIX}_{int(time.time())}.log"
 MAX_SEQ_LENGTHS = [512]#, 2048]
 
