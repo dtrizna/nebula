@@ -139,6 +139,9 @@ class JSONTokenizer:
         if self.cleanup_symbols:
             for pattern in self.cleanup_symbols:
                 text = text.replace(pattern, '')
+        if self.stopwords:
+            for pattern in self.stopwords:
+                text = text.replace(pattern, '')
         text = text.translate(str.maketrans('', '', string.punctuation))
         return text
 
@@ -194,8 +197,8 @@ class JSONTokenizerNaive(JSONTokenizer):
     def tokenize_event(self, jsonEvent):
         jsonEventClean = self.clear_json_event(jsonEvent)
         tokenizedJsonEvent = self.tokenizer.tokenize(jsonEventClean)
-        if self.stopwords:
-            tokenizedJsonEvent = [x for x in tokenizedJsonEvent if x not in self.stopwords]
+        # if self.stopwords:
+        #     tokenizedJsonEvent = [x for x in tokenizedJsonEvent if x not in self.stopwords]
         return tokenizedJsonEvent
 
     def tokenize(self, sample):
