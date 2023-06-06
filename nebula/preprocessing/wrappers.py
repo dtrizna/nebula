@@ -438,11 +438,11 @@ def preprocess_nebula_cruparamer(
     encoded = tokenizer.encode(events)
     x = tokenizer.pad_sequences(encoded)
     np.save(os.path.join(outfolder, f"x_{suffix}_{limit}.npy"), x)
-    logging.warning(f" [!] Saved X as {os.path.join(outfolder, f'x_{suffix}_{limit}.npy')}")
+    logging.warning(f" [!] Saved X as {os.path.join(outfolder, f'x_{suffix}_{limit}.npy')} | Shape: {x.shape}")
     
     y = np.array(y, dtype=np.int8)
     np.save(os.path.join(outfolder, f"y_{suffix}_{limit}.npy"), y)
-    logging.warning(f" [!] Saved Y as {os.path.join(outfolder, f'y_{suffix}_{limit}.npy')}")
+    logging.warning(f" [!] Saved Y as {os.path.join(outfolder, f'y_{suffix}_{limit}.npy')} | Shape: {y.shape}")
     
     return x, y
 

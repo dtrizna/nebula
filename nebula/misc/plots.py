@@ -3,6 +3,19 @@ import matplotlib.pyplot as plt
 from copy import deepcopy
 from . import read_files_from_log
 
+T10_COLORS = [
+    'tab:blue',
+    'tab:orange',
+    'tab:green',
+    'tab:red',
+    'tab:purple',
+    'tab:brown',
+    'tab:pink',
+    'tab:gray',
+    'tab:olive',
+    'tab:cyan'
+]
+
 def plot_shap_values(shap_values: np.ndarray, name: str):
     shap_values = shap_values.mean(axis=2)
     pos_idx = shap_values[0] >= 0
@@ -172,14 +185,17 @@ def plot_roc_curves(fpr, tpr, tpr_std=None, model_name="", axs=None, roc_auc=Non
         axs[1].plot([0, 1], [0, 1], lw=2, linestyle="--")
     return axs
 
-def plot_roc_curve(fpr, tpr, tpr_std=None, model_name="", ax=None, xlim=[-0.0005, 0.003], ylim=[0.3, 1.0], roc_auc=None, linestyle="-", color=None):
+def plot_roc_curve(fpr, tpr, tpr_std=None, model_name="", ax=None, xlim=[-0.0005, 0.003], ylim=[0.3, 1.0], roc_auc=None, linestyle="-", color=None, semilogx=False):
     if ax is None:
         fig, ax = plt.subplots(1, 1, figsize=(10, 6))
     if roc_auc:
         label = f"{model_name} (AUC = {roc_auc:.6f})"
     else:
         label = model_name
-    ax.plot(fpr, tpr, lw=2, label=label, linestyle=linestyle, color=color)
+    if semilogx:
+        ax.semilogx(fpr, tpr, lw=2, label=label, linestyle=linestyle, color=color)
+    else:
+        ax.plot(fpr, tpr, lw=2, label=label, linestyle=linestyle, color=color)
     if tpr_std is not None:
         tprs_upper = np.minimum(tpr + tpr_std, 1)
         tprs_lower = tpr - tpr_std
