@@ -246,7 +246,7 @@ def preprocess_nebula_speakeasy(
     if dump_paths:
         with open(os.path.join(outfolder, f"y_names_{suffix}_{limit}.json"), "w") as f:
             json.dump(y_filepaths, f, indent=4)
-        logging.warning(f" [!] Saved Y names as {os.path.join(outfolder, f'y_names_{suffix}_{limit}.json')}")
+        logging.warning(f" [!] Saved Y names as {os.path.join(outfolder, f'y_names_{suffix}_{limit}.json')} | Shape: {y.shape}")
 
     # train tokenizer
     if not tokenizer_model:
@@ -305,10 +305,10 @@ def preprocess_nebula_speakeasy(
             tokenizer.load_vocab(tokenizer_model)
     
     logging.warning(" [*] Encoding and padding...")
-    encoded = tokenizer.encode(events)
-    x = tokenizer.pad_sequences(encoded)
+    x = tokenizer.encode(events)
+    #x = tokenizer.pad_sequences(encoded)
     np.save(os.path.join(outfolder, f"x_{suffix}_{limit}.npy"), x)
-    logging.warning(f" [!] Saved X as {os.path.join(outfolder, f'x_{suffix}_{limit}.npy')}")
+    logging.warning(f" [!] Saved X as {os.path.join(outfolder, f'x_{suffix}_{limit}.npy')} | Shape: {x.shape}")
 
     return x, y, y_filepaths
 

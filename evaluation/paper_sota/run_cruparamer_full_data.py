@@ -32,21 +32,20 @@ from torch import cuda
 from torch.nn import BCEWithLogitsLoss
 from torch.optim import AdamW
 
-LIMIT = 50
+LIMIT = None
+TIME_BUDGET = 5 # minutes
+FOLDS = 5
 
-NEBULA_VOCAB = 5000
-NEURLUX_VOCAB = 1000
+NEBULA_VOCAB = 50000
+NEURLUX_VOCAB = 10000
 QUO_VADIS_TOP_API = 600
 
-TIME_BUDGET = 0.05 # minutes
-FOLDS = 3
-
 RANDOM_SEED = 1763
-INFOLDER = None # if data is processed already
+INFOLDER = r"out_cruparamer_5_folds" # None # if data is processed already
 
 SEQ_LEN = 512
 
-DATA_DIR = os.path.join(REPO_ROOT, "data", "data_raw", "CruParamer")
+DATA_DIR = os.path.join(REPO_ROOT, "data", "data_raw", "Malware_Code_Dataset")
 
 CRUPARAMER_TRAIN_1 = os.path.join(DATA_DIR, "Datacon2019-Malicious-Code-DataSet-Stage1", "train", "black")
 CRUPARAMER_TRAIN_0 = os.path.join(DATA_DIR, "Datacon2019-Malicious-Code-DataSet-Stage1", "train", "white")
@@ -71,6 +70,7 @@ if __name__ == "__main__":
 
     datafolders = {}
     datafolders['nebula'] = os.path.join(out_folder_root, f"nebula_vocab_{NEBULA_VOCAB}_seqlen_{SEQ_LEN}")
+    datafolders['nebula_wht'] = os.path.join(out_folder_root, f"nebula_wht_vocab_{NEBULA_VOCAB}_seqlen_{SEQ_LEN}")
     datafolders['neurlux'] = os.path.join(out_folder_root, f"neurlux_vocab_{NEURLUX_VOCAB}_seqlen_{SEQ_LEN}")
     datafolders['quovadis'] = os.path.join(out_folder_root, f"quovadis_vocab_{QUO_VADIS_TOP_API}_seqlen_{SEQ_LEN}")
     #datafolders['dmds'] = os.path.join(out_folder_root, f"dmds_vocab_seqlen_{SEQ_LEN}")
@@ -99,27 +99,25 @@ if __name__ == "__main__":
         benign_reports_api_only.append(report_apis_only)
     
 
-    logging.warning(" [*] Parsing test reports...")
-    reports_test = []
-    reports_apis_only_test = []
-    dmds_reports_test = []
-    for sample in tqdm(os.listdir(CRUPARAMER_TEST)[:LIMIT]):
-        sample_fullpath = os.path.join(CRUPARAMER_TEST, sample)
-        report_full, report_apis_only = parse_cruparamer_xmlsample(sample_fullpath)
-        reports_test.append(" ".join(report_full))
-        dmds_reports_test.append(report_full)
-        reports_apis_only_test.append(report_apis_only)
+    # logging.warning(" [*] Parsing test reports...")
+    # reports_test = []
+    # reports_apis_only_test = []
+    # dmds_reports_test = []
+    # for sample in tqdm(os.listdir(CRUPARAMER_TEST)[:LIMIT]):
+    #     sample_fullpath = os.path.join(CRUPARAMER_TEST, sample)
+    #     report_full, report_apis_only = parse_cruparamer_xmlsample(sample_fullpath)
+    #     reports_test.append(" ".join(report_full))
+    #     dmds_reports_test.append(report_full)
+    #     reports_apis_only_test.append(report_apis_only)
     
-    
-
     # NOTE: test reports consist only of malicious samples, therefore,
     # not suitable for analysis using ROC curves
     # we add them to the training set and use N-fold cross-validation
 
-    reports = malicious_reports + benign_reports + reports_test
-    reports_apis_only = malicious_reports_api_only + benign_reports_api_only + reports_apis_only_test
-    dmds_reports = dmds_reports_malicious + dmds_reports_benign + dmds_reports_test
-    y = np.array([1] * len(malicious_reports) + [0] * len(benign_reports) + [1] * len(reports_test), dtype=np.int8)
+    reports = malicious_reports + benign_reports #+ reports_test
+    reports_apis_only = malicious_reports_api_only + benign_reports_api_only  #+ reports_apis_only_test
+    dmds_reports = dmds_reports_malicious + dmds_reports_benign #+ dmds_reports_test
+    y = np.array([1] * len(malicious_reports) + [0] * len(benign_reports), dtype=np.int8) #+ [1] * len(reports_test), dtype=np.int8)
 
     # =========== 'dmds' & 'cruparamer' preprocessing
     # NOTE: DMDS preprocessing is highly computationally expensive, and requires ~120 h on this dataset
@@ -134,12 +132,23 @@ if __name__ == "__main__":
     # =========== 'nebula' & 'cruparamer' preprocessing
     logging.warning(" [*] Preprocessing reports Nebula style...")
     _ = preprocess_nebula_cruparamer(
-        events=reports,
+        events=[x.split() for x in reports],
         y=y,
         limit=LIMIT,
         outfolder=datafolders['nebula'],
         seq_len=SEQ_LEN,
         vocab_size=NEBULA_VOCAB,
+    )
+
+    logging.warning(" [*] Preprocessing reports Nebula Whitespace style...")
+    _ = preprocess_nebula_cruparamer(
+        events=[x.split() for x in reports],
+        y=y,
+        limit=LIMIT,
+        outfolder=datafolders['nebula_wht'],
+        seq_len=SEQ_LEN,
+        vocab_size=NEBULA_VOCAB,
+        tokenizer_type='whitespace'
     )
 
     # =========== 'neurlux' & 'cruparamer' preprocessing
@@ -185,6 +194,25 @@ if __name__ == "__main__":
         nebula_vocab = json.load(f)
     models['nebula']['class'] = TransformerEncoderChunks
     models['nebula']['config'] = {
+        "vocab_size": len(nebula_vocab),
+        "maxlen": SEQ_LEN,
+        "chunk_size": 64,
+        "dModel": 64,  # embedding & transformer dimension
+        "nHeads": 8,  # number of heads in nn.MultiheadAttention
+        "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
+        "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+        "numClasses": 1, # binary classification
+        "hiddenNeurons": [64],
+        "layerNorm": False,
+        "dropout": 0.3,
+        "mean_over_sequence": False,
+        "norm_first": True
+    }
+
+    with open(os.path.join(datafolders['nebula_wht'], f"tokenizer_{NEBULA_VOCAB}_vocab.json")) as f:
+        nebula_vocab = json.load(f)
+    models['nebula_wht']['class'] = TransformerEncoderChunks
+    models['nebula_wht']['config'] = {
         "vocab_size": len(nebula_vocab),
         "maxlen": SEQ_LEN,
         "chunk_size": 64,

@@ -62,11 +62,13 @@ if __name__ == "__main__":
 
     datafolders = {}
     datafolders['nebula'] = os.path.join(out_folder_root, f"nebula_speakeasy_vocab_{NEBULA_VOCAB}_seqlen_{SEQ_LEN}")
+    datafolders['nebulawht'] = os.path.join(out_folder_root, f"nebulawht_speakeasy_vocab_{NEBULA_VOCAB}_seqlen_{SEQ_LEN}")
     datafolders['neurlux'] = os.path.join(out_folder_root, f"neurlux_speakeasy_vocab_{NEURLUX_VOCAB}_seqlen_{SEQ_LEN}")
     datafolders['quovadis'] = os.path.join(out_folder_root, f"quovadis_speakeasy_vocab_{QUO_VADIS_TOP_API}_seqlen_{SEQ_LEN}")
     datafolders['dmds'] = os.path.join(out_folder_root, f"dmds_speakeasy_vocab_seqlen_{SEQ_LEN}")
     
     # =========== 'nebula' & 'speakeasy' preprocessing
+    logging.warning("Preprocessing 'nebula' & 'speakeasy'...")
     _, y_train, y_paths_train, = preprocess_nebula_speakeasy(
         folder=SPEAKEASY_TRAINSET_PATH,
         limit=LIMIT,
@@ -83,6 +85,28 @@ if __name__ == "__main__":
         outfolder=datafolders['nebula'],
         tokenizer_model=os.path.join(datafolders['nebula'], f"tokenizer_{NEBULA_VOCAB}.model"),
         multiclass=True
+    )
+    
+    # =========== 'nebula' & 'speakeasy' preprocessing
+    logging.warning("Preprocessing 'nebula wht' & 'speakeasy'...")
+    _, y_train, y_paths_train, = preprocess_nebula_speakeasy(
+        folder=SPEAKEASY_TRAINSET_PATH,
+        limit=LIMIT,
+        vocab_size=NEBULA_VOCAB,
+        seq_len=SEQ_LEN,
+        outfolder=datafolders['nebulawht'],
+        multiclass=True,
+        tokenizer_type="whitespace"
+    )
+    _, y_test, y_paths_test = preprocess_nebula_speakeasy(
+        folder=SPEAKEASY_TESTSET_PATH,
+        limit=LIMIT,
+        vocab_size=NEBULA_VOCAB,
+        seq_len=SEQ_LEN,
+        outfolder=datafolders['nebulawht'],
+        tokenizer_model=os.path.join(datafolders['nebulawht'], f"tokenizer_{NEBULA_VOCAB}_vocab.json"),
+        multiclass=True,
+        tokenizer_type="whitespace"
     )
 
     # ============= 'dmds' & 'speakeasy' preprocessing
@@ -105,7 +129,7 @@ if __name__ == "__main__":
 
     # =========== 'neurlux' & 'speakeasy' preprocessing
     _, neurlux_vocab_file = preprocess_neurlux(
-        y_paths_train, 
+        y_paths_train,
         y=y_train,
         outfolder=datafolders['neurlux'],
         limit=LIMIT,
@@ -169,6 +193,24 @@ if __name__ == "__main__":
         nebula_vocab = json.load(f)
     models['nebula']['class'] = TransformerEncoderChunks
     models['nebula']['config'] = {
+        "vocab_size": len(nebula_vocab),
+        "maxlen": SEQ_LEN,
+        "chunk_size": 64,
+        "dModel": 64,  # embedding & transformer dimension
+        "nHeads": 8,  # number of heads in nn.MultiheadAttention
+        "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
+        "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+        "numClasses": n_unique_y,
+        "hiddenNeurons": [64],
+        "layerNorm": False,
+        "dropout": 0.3,
+        "mean_over_sequence": False,
+        "norm_first": True
+    }
+    with open(os.path.join(datafolders['nebulawht'], f"tokenizer_{NEBULA_VOCAB}_vocab.json")) as f:
+        nebula_vocab = json.load(f)
+    models['nebulawht']['class'] = TransformerEncoderChunks
+    models['nebulawht']['config'] = {
         "vocab_size": len(nebula_vocab),
         "maxlen": SEQ_LEN,
         "chunk_size": 64,
