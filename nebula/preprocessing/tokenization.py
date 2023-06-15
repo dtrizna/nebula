@@ -280,7 +280,7 @@ class JSONTokenizerNaive(JSONTokenizer):
     
     def encode(self, inputs, pad=True, tokenize=True):
         if isinstance(inputs, (str, bytes, dict)) or \
-            (isinstance(inputs, list) and isinstance(inputs[0], (str, bytes, dict))):
+            (isinstance(inputs, list) and isinstance(inputs[0], (str, bytes))):
             inputs = [inputs]
         if tokenize:
             inputs = self.tokenize(inputs)
@@ -437,7 +437,7 @@ class JSONTokenizerBPE(JSONTokenizer):
         Tokenizes the given json data.
         """
         if isinstance(inputs, (str, bytes, dict)) or \
-            (isinstance(inputs, list) and isinstance(inputs[0], (str, bytes, dict))):
+            (isinstance(inputs, list) and isinstance(inputs[0], (str, bytes))):
             inputs = [inputs]
         data_clean = [self.clear_json_event(x) for x in inputs]
         return [self.tokenizer.encode_as_pieces(x) for x in data_clean]
