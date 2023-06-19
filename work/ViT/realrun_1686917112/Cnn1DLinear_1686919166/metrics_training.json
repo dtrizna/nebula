@@ -1,0 +1,62 @@
+{
+    "auc": [],
+    "auc_avg": NaN,
+    "auc_std": NaN,
+    "0.0001": {
+        "tpr": [],
+        "tpr_avg": NaN,
+        "tpr_std": NaN,
+        "f1": [],
+        "f1_avg": NaN,
+        "f1_std": NaN
+    },
+    "0.0003": {
+        "tpr": [],
+        "tpr_avg": NaN,
+        "tpr_std": NaN,
+        "f1": [],
+        "f1_avg": NaN,
+        "f1_std": NaN
+    },
+    "0.001": {
+        "tpr": [],
+        "tpr_avg": NaN,
+        "tpr_std": NaN,
+        "f1": [],
+        "f1_avg": NaN,
+        "f1_std": NaN
+    },
+    "0.003": {
+        "tpr": [],
+        "tpr_avg": NaN,
+        "tpr_std": NaN,
+        "f1": [],
+        "f1_avg": NaN,
+        "f1_std": NaN
+    },
+    "0.01": {
+        "tpr": [],
+        "tpr_avg": NaN,
+        "tpr_std": NaN,
+        "f1": [],
+        "f1_avg": NaN,
+        "f1_std": NaN
+    },
+    "0.03": {
+        "tpr": [],
+        "tpr_avg": NaN,
+        "tpr_std": NaN,
+        "f1": [],
+        "f1_avg": NaN,
+        "f1_std": NaN
+    },
+    "0.1": {
+        "tpr": [],
+        "tpr_avg": NaN,
+        "tpr_std": NaN,
+        "f1": [],
+        "f1_avg": NaN,
+        "f1_std": NaN
+    },
+    "epoch_time_avg": 0.02886335374514262
+}

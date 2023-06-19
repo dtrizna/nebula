@@ -230,7 +230,7 @@ class CrossValidation(object):
 
         if self.model_trainer_config["time_budget"] is not None:
             self.epochs = int(1e4)
-            msg = f" [!] Training time budget: {self.model_trainer_config['time_budget']}min"
+            msg = f" [!] Training time budget: {self.model_trainer_config['time_budget']}s"
             logging.warning(msg)
         else:
             self.epochs = epochs
