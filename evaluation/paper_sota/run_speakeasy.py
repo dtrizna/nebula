@@ -23,7 +23,8 @@ from nebula import ModelTrainer
 from nebula.models.neurlux import NeurLuxModel
 from nebula.models.quovadis import QuoVadisModel
 from nebula.models.dmds import DMDSGatedCNN
-from nebula.models import TransformerEncoderChunks
+from nebula.models import TransformerEncoderChunks, Cnn1DLinear
+from nebula.models.attention_v2 import TransformerEncoderModelCls, CharTransformer
 from nebula.evaluation import CrossValidation
 from nebula.misc import set_random_seed, clear_cuda_cache
 
@@ -32,7 +33,7 @@ from torch.nn import BCEWithLogitsLoss
 from torch.optim import AdamW
 
 LIMIT = None
-TIME_BUDGET = 20 # minutes
+TIME_BUDGET = 5 # 20 # minutes
 INFOLDER = "out_speakeasy" # if data is processed already
 
 NEBULA_VOCAB = 50000
@@ -178,6 +179,44 @@ if __name__ == "__main__":
         "norm_first": True
     }
 
+    models['nebulacls']['class'] = TransformerEncoderModelCls
+    models['nebulacls']['config'] = {
+        "vocab_size": len(nebula_vocab),
+        "maxlen": SEQ_LEN,
+        "dModel": 64,  # embedding & transformer dimension
+        "nHeads": 8,  # number of heads in nn.MultiheadAttention
+        "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
+        "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+        "numClasses": 1, # binary classification
+        "hiddenNeurons": [64],
+        "layerNorm": False,
+        "dropout": 0.3,
+        "norm_first": True
+    }
+
+    models['nebulacnn1dlinear']['class'] = Cnn1DLinear
+    models['nebulacnn1dlinear']['config'] = {
+        "vocab_size": len(nebula_vocab),
+        "maxlen": SEQ_LEN,
+        "embeddingDim": 96,
+        "hiddenNeurons": [512, 256, 128],
+        "batchNormConv": False,
+        "batchNormFFNN": False,
+        "filterSizes": [2, 3, 4, 5],
+        "dropout": 0.3
+    }
+
+    models['nebulachartransformer']['class'] = CharTransformer
+    models['nebulachartransformer']['config'] = {
+        "patch_size": 16,
+        "in_chans": 1,
+        "embed_dim": 128,
+        "nHeads": 8,  # number of heads in nn.MultiheadAttention
+        "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
+        "hiddenNeurons": [512, 256, 128],
+        "transformer_layers": 4,
+    }
+
     models['dmds']['class'] = DMDSGatedCNN
     models['dmds']['config'] = {
         "ndim": 98,
@@ -201,6 +240,9 @@ if __name__ == "__main__":
         "n_batches_grad_update": 1,
         "time_budget": int(TIME_BUDGET*60) if TIME_BUDGET else None,
     }
+    for model in models.keys():
+        if model not in datafolders and model.startswith('nebula'):
+            datafolders[model] = datafolders['nebula']
 
     # ============= TRAINING LOOP ============= 
     for run_name in models.keys():
@@ -224,7 +266,11 @@ if __name__ == "__main__":
             y_train = y_train[:LIMIT]
             
         set_random_seed(RANDOM_SEED)
-
+        if run_name == 'nebulacls':
+            model_trainer_config["batchSize"] = 32
+        else:
+            model_trainer_config["batchSize"] = 96
+        logging.warning(f" [!] Using batch size {model_trainer_config['batchSize']} for {run_name}")
         cv = CrossValidation(
             model_trainer_class,
             model_trainer_config,

@@ -299,7 +299,10 @@ class ModelTrainer(object):
             "Either epochs or time_budget should be specified"
         if time_budget or self.time_budget:
             self.time_budget = time_budget if time_budget else self.time_budget
-            assert isinstance(self.time_budget, int), "time_budget must be an integer"
+            if isinstance(self.time_budget, float):
+                self.time_budget = int(self.time_budget)
+            assert isinstance(self.time_budget, int),\
+                f"time_budget must be an integer, instead got {self.time_budget}:{type(self.time_budget)}"
             self.training_start_time = time.time()
             logging.warning(f" [*] Training time budget set: {self.time_budget/60} min")
         self.epochs = int(1e4) if self.time_budget else epochs
