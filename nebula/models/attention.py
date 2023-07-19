@@ -65,7 +65,10 @@ class TransformerEncoderChunks(nn.Module):
 
             self.ffnn.append(nn.Sequential(*self.ffnnBlock))
         self.ffnn = nn.Sequential(*self.ffnn)
-        self.fcOutput = nn.Linear(hiddenNeurons[-1], numClasses)
+        if numClasses == 2: # binary classification
+            self.fcOutput = nn.Linear(hiddenNeurons[-1], 1)
+        else:
+            self.fcOutput = nn.Linear(hiddenNeurons[-1], numClasses)
         self.init_weights()
 
     def init_weights(self) -> None:
