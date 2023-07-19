@@ -186,7 +186,7 @@ class CrossValidation(object):
                  model_class,
                  model_config,
                  output_folder_root,
-                false_positive_rates=[0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
+                 false_positive_rates=[0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
                  dump_data_splits=True):
         self.model_trainer_class = model_trainer_class
         self.model_trainer_config = model_trainer_config
@@ -219,14 +219,10 @@ class CrossValidation(object):
         if false_positive_rates is not None:
             self.false_positive_rates = false_positive_rates
         self.trainSize = X.shape[0]
-        if folds == 1:
-            # kfold requires at least 2 folds -- this is rude shortcut 
-            # to get a single run with training on 80%, and validating on 20% of the data
-            self.nFolds = 5
-            singleFold = True
-        else:
-            self.nFolds = folds
-            singleFold = False
+        
+        # kfold requires at least 2 folds -- this is rude shortcut 
+        # to get a single run with training on 80%, and validating on 20% of the data
+        singleFold, self.nFolds = (True, 5) if folds == 1 else (False, folds)
 
         if self.model_trainer_config["time_budget"] is not None:
             self.epochs = int(1e4)
