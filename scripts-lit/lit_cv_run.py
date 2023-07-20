@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     SCRIPT_PATH = get_path(type="script")
     REPO_ROOT = os.path.join(SCRIPT_PATH, "..")
-    out_folder = os.path.join(REPO_ROOT, "scripts-lit", f"lit_cv_run_out")
+    out_folder = os.path.join(REPO_ROOT, "scripts-lit", f"lit_cv_run_out_{int(time.time())}")
     os.makedirs(out_folder, exist_ok=True)
 
     # DATA
@@ -64,11 +64,11 @@ if __name__ == "__main__":
         dump_data_splits=True,
         batch_size=64,
         dataloader_workers=8,
-        log_folder=out_folder
+        out_folder=out_folder
     )
     litcv.run(
         x_train,
         y_train,
-        #max_epochs=3
-        max_time={"minutes": 5}
+        max_epochs=3
+        #max_time={"minutes": 5}
     )
