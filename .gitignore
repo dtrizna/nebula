@@ -32,6 +32,7 @@ evaluation/MaskedLanguageModeling/*/downstreamTask*
 evaluation/MaskedLanguageModeling/*/preTraining/
 *npy
 *npz
+*pickle
 
 # models
 FastText*model
