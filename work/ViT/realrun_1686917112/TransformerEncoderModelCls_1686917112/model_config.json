@@ -1,0 +1,15 @@
+{
+    "vocab_size": 50001,
+    "maxlen": 512,
+    "dModel": 64,
+    "nHeads": 8,
+    "dHidden": 256,
+    "nLayers": 2,
+    "numClasses": 1,
+    "hiddenNeurons": [
+        64
+    ],
+    "layerNorm": false,
+    "dropout": 0.3,
+    "norm_first": true
+}

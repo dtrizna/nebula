@@ -2,9 +2,14 @@ __pycache__/
 *.py[cod]
 *$py.class
 .ipynb_checkpoints
+.DS_Store
+.vscode
+*.ckpt
 
 # data
+aks_raw*
 data/data_raw/windows_emulation*
+data/windows_emulation*
 data/windows_emulation*
 data/data_raw/windows_raw_pe_*
 data/data_raw/aks_raw*
@@ -14,6 +19,9 @@ wazuh_*
 *windows_msft_*
 *auditd_msft_*
 *kubeaudit_msft_*
+data/data_raw/windows_emulation*7z
+data/data_filtered/speakeasy_data_filtered.7z
+data/data_raw/BETH-dataset.7z
 evaluation/MaskedLanguageModeling/*/downstreamTask*
 evaluation/MaskedLanguageModeling/*/preTraining/
 

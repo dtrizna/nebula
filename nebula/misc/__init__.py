@@ -8,6 +8,7 @@ import torch
 import random
 import gc
 import numpy as np
+from torch import sigmoid
 
 # supress UndefinedMetricWarning, which appears when a batch has only one class
 import warnings
@@ -110,3 +111,10 @@ def read_files_from_log(logfile=None, folder=".", pattern=".torch"):
     with open(logfile) as f:
         log = f.read()
     return [os.path.join(folder, "training_files", x.split(": ")[1]) for x in log.split("\n") if pattern in x]
+
+def compute_score(model, x, verbose=True):
+    logit = model(x)
+    prob = sigmoid(logit)
+    if verbose:
+        print(f"\n[!!!] Probability of being malicious: {prob.item():.3f} | Logit: {logit.item():.3f}")
+    return prob.item()

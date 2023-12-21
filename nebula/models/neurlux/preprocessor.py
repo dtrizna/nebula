@@ -1,7 +1,10 @@
 from nltk import WhitespaceTokenizer
 from collections import Counter
 import string
+import json
+from os.path import join, exists
 import numpy as np
+from tqdm import tqdm
 
 class NeurLuxPreprocessor:
     """Preprocesses text for NeurLux.
@@ -36,7 +39,7 @@ class NeurLuxPreprocessor:
         """Builds the vocabulary from the corpus and preserve the
          top vocabSize tokens based on appearance counts."""
         self.vocab = Counter()
-        for text in corpus:
+        for text in tqdm(corpus):
             text = self.lowercase_and_clear_punctuation(text)
             tokens = self.tokenizer.tokenize(text)
             self.vocab.update(tokens)
@@ -46,6 +49,21 @@ class NeurLuxPreprocessor:
         self.vocab = ['<unk>', '<pad>'] + self.vocab
         self.vocab = {token: index for index, token in enumerate(self.vocab)}
         self.reverse_vocab = {index: token for token, index in self.vocab.items()}
+    
+    def dump_vocab(self, outfolder):
+        vocab_file = join(outfolder, f"vocab_{self.vocab_size}.json")
+        with open(vocab_file, "w") as f:
+            json.dump(self.vocab, f, indent=4)
+        return vocab_file
+    
+    def load_vocab(self, vocab):
+        if isinstance(vocab, dict):
+            self.vocab = vocab
+        elif exists(vocab):
+            with open(vocab) as f:
+                self.vocab = json.load(f)
+        else:
+            raise ValueError("Vocabulary must be a dictionary or a path to a JSON file.")
 
     def tokenize(self, text):
         """Preprocesses text for NeurLux."""
@@ -81,4 +99,4 @@ class NeurLuxPreprocessor:
     def pad_sequence(self, sequence):
         """Pads a sequence of encoded text to length."""
         padded = [self.pad(encoded) for encoded in sequence]
-        return np.vstack(padded).astype(np.int16)
+        return np.vstack(padded).astype(np.int32)

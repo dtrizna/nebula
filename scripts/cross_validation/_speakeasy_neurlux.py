@@ -177,7 +177,7 @@ for maxLen in maxLens:
         y_train, 
         epochs=run_config["epochs"], 
         folds=run_config["nFolds"], 
-        fprValues=run_config["fprValues"], 
+        false_positive_rates=run_config["fprValues"], 
         random_state=random_state
     )
     cv.dump_metrics(prefix=metricFilePrefix)
