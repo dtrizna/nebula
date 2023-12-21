@@ -91,7 +91,7 @@ class ReformerLM(nn.Module):
             self.out = Identity()
             return
 
-        self.preTrainLayers = nn.Sequential(
+        self.pretrain_layers = nn.Sequential(
             nn.Linear(dim, emb_dim) if emb_dim != dim else Identity(),
             nn.Linear(emb_dim, vocab_size) if not weight_tie_embedding else MatrixMultiply(self.token_emb.weight, transpose=True, normalize=True)
         )
@@ -128,7 +128,7 @@ class ReformerLM(nn.Module):
     
     def pretrain(self, x):
         x_core = self.core(x)
-        return self.preTrainLayers(x_core).mean(dim=1)
+        return self.pretrain_layers(x_core).mean(dim=1)
     
     def forward(self, x):
         x = self.core(x)

@@ -8,20 +8,20 @@ from torch import cuda
 from sklearn.utils import shuffle
 sys.path.extend([r"..\..", '.'])
 from nebula.models.attention import TransformerEncoderChunksLM
-from nebula.pretraining import MaskedLanguageModel
+from nebula.pretraining import MaskedLanguageModelTrainer
 from nebula.evaluation import SelfSupervisedPretraining
 from nebula.misc import get_path, set_random_seed, clear_cuda_cache
 SCRIPT_PATH = get_path(type="script")
 REPO_ROOT = os.path.join(SCRIPT_PATH, "..", "..")
 
 # ===== LOGGING SETUP =====
-modelClass = TransformerEncoderChunksLM
-run_name = f"{modelClass.__name__}"
+model_class = TransformerEncoderChunksLM
+run_name = f"{model_class.__name__}"
 timestamp = int(time.time())
 
-LIMIT = 1000
-PREFIX = "TEST_"
-outputFolder = os.path.join(REPO_ROOT, "evaluation", f"{PREFIX}MaskedLanguageModeling", 
+LIMIT = None
+PREFIX = ""
+outputFolder = os.path.join(REPO_ROOT, "evaluation", f"{PREFIX}language_modeling", 
     f"{run_name}_{timestamp}")
 os.makedirs(outputFolder, exist_ok=True)
 
@@ -41,16 +41,17 @@ set_random_seed(random_state)
 
 run_config = {
     "unlabeledDataSize": 0.8,
-    "nSplits": 3,
-    "downStreamEpochs": 3,
-    "preTrainEpochs": 10, # 10
+    "nSplits": 1,
+    "downStreamEpochs": 5,
+    "preTrainEpochs": 10,
     "falsePositiveRates": [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
-    "modelType": modelClass.__name__,
+    "modelType": model_class.__name__,
     "train_limit": LIMIT,
     "random_state": random_state,
     "batchSize": 64,
-    "optim_step_budget": 50, # 5000
-    'verbosity_n_batches': 100,
+    "optim_scheduler": None,
+    "optim_step_budget": 5000,
+    "verbosity_n_batches": 100,
     "dump_model_every_epoch": True,
     "dump_data_splits": True,
     "remask_epochs": 2,
@@ -62,15 +63,14 @@ with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
 logging.warning(f" [!] Starting Masked Language Model evaluation over {run_config['nSplits']} splits!")
 
 # ===== LOADING DATA ==============
-vocab_size = 50000
 maxlen = 512
-xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k", f"speakeasy_vocab_size_50000_maxlen_{maxlen}_x.npy")
+xTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k_new", f"speakeasy_vocab_size_50000_maxlen_{maxlen}_x.npy")
 xTrain = np.load(xTrainFile)
-yTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k", "speakeasy_y.npy")
+yTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k_new", "speakeasy_y.npy")
 yTrain = np.load(yTrainFile)
-xTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset_BPE_50k", f"speakeasy_vocab_size_50000_maxlen_{maxlen}_x.npy")
+xTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset_BPE_50k_new", f"speakeasy_vocab_size_50000_maxlen_{maxlen}_x.npy")
 xTest = np.load(xTestFile)
-yTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset_BPE_50k", "speakeasy_y.npy")
+yTestFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_testset_BPE_50k_new", "speakeasy_y.npy")
 yTest = np.load(yTestFile)
 
 if run_config['train_limit']:
@@ -81,7 +81,8 @@ if run_config['train_limit']:
     xTest = xTest[:run_config['train_limit']]
     yTest = yTest[:run_config['train_limit']]
 
-vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", "speakeasy_BPE_50000_vocab.json")
+#vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", "speakeasy_BPE_50000_sentencepiece_vocab.json")
+vocabFile = os.path.join(REPO_ROOT, r"data\data_filtered\speakeasy_trainset_BPE_50k_new\speakeasy_vocab_size_50000_tokenizer_vocab.json")
 with open(vocabFile, 'r') as f:
     vocab = json.load(f)
 vocab_size = len(vocab) # adjust it to exact number of tokens in the vocabulary
@@ -89,7 +90,7 @@ vocab_size = len(vocab) # adjust it to exact number of tokens in the vocabulary
 logging.warning(f" [!] Loaded data and vocab. X train size: {xTrain.shape}, X test size: {xTest.shape}, vocab size: {len(vocab)}")
 
 # =========== PRETRAINING CONFIG ===========
-modelConfig = {
+model_config = {
     "vocab_size": vocab_size,  # size of vocabulary
     "maxlen": maxlen,  # maximum length of the input sequence
     "dModel": 64,  # embedding & transformer dimension
@@ -102,9 +103,9 @@ modelConfig = {
 }
 # dump model config as json
 with open(os.path.join(outputFolder, f"model_config.json"), "w") as f:
-    json.dump(modelConfig, f, indent=4)
+    json.dump(model_config, f, indent=4)
 
-languageModelClass = MaskedLanguageModel
+languageModelClass = MaskedLanguageModelTrainer
 languageModelClassConfig = {
     "vocab": vocab, # needs vocab to mask sequences
     "mask_probability": 0.15,
@@ -113,18 +114,20 @@ languageModelClassConfig = {
 
 device = "cuda" if cuda.is_available() else "cpu"
 pretrainingConfig = {
-    "modelClass": modelClass,
-    "modelConfig": modelConfig,
+    "modelClass": model_class,
+    "modelConfig": model_config,
     "pretrainingTaskClass": languageModelClass,
     "pretrainingTaskConfig": languageModelClassConfig,
     "device": device,
+    "training_types": ['pretrained', 'non_pretrained', 'full_data'],
     "unlabeledDataSize": run_config["unlabeledDataSize"],
     "pretraingEpochs": run_config["preTrainEpochs"],
     "downstreamEpochs": run_config["downStreamEpochs"],
     "verbosity_n_batches": run_config["verbosity_n_batches"],
     "batchSize": run_config["batchSize"],
     "randomState": random_state,
-    "falsePositiveRates": run_config["falsePositiveRates"],
+    "false_positive_rates": run_config["falsePositiveRates"],
+    "optim_scheduler": run_config["optim_scheduler"],
     "optim_step_budget": run_config["optim_step_budget"],
     "outputFolder": outputFolder,
     "dump_model_every_epoch": run_config["dump_model_every_epoch"],
@@ -135,7 +138,7 @@ pretrainingConfig = {
 # =========== PRETRAINING RUN ===========
 msg = f" [!] Initiating Self-Supervised Learning Pretraining\n"
 msg += f"     Language Modeling {languageModelClass.__name__}\n"
-msg += f"     Model {modelClass.__name__} with config:\n\t{modelConfig}\n"
+msg += f"     Model {model_class.__name__} with config:\n\t{model_config}\n"
 logging.warning(msg)
 
 pretrain = SelfSupervisedPretraining(**pretrainingConfig)

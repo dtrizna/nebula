@@ -1,0 +1,21 @@
+{
+    "train_limit": null,
+    "nFolds": 3,
+    "epochs": null,
+    "fprValues": [
+        0.0001,
+        0.0003,
+        0.001,
+        0.003,
+        0.01,
+        0.03,
+        0.1
+    ],
+    "rest": 0,
+    "maxlen": 512,
+    "batchSize": 32,
+    "optim_step_budget": 3000,
+    "random_state": 1763,
+    "verbosity_n_batches": 100,
+    "time_budget": 5
+}

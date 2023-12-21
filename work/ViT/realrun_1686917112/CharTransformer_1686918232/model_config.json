@@ -1,0 +1,13 @@
+{
+    "patch_size": 16,
+    "in_chans": 1,
+    "embed_dim": 128,
+    "nHeads": 8,
+    "dHidden": 256,
+    "hiddenNeurons": [
+        512,
+        256,
+        128
+    ],
+    "transformer_layers": 4
+}

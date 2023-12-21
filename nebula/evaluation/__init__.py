@@ -23,25 +23,23 @@ class SelfSupervisedPretraining:
                     pretrainingTaskConfig,
                     device = 'auto',
                     training_types=['pretrained', 'non_pretrained', 'full_data'],
-                    falsePositiveRates=[0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
+                    false_positive_rates=[0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
                     unlabeledDataSize=0.8,
                     randomState=None,
                     pretraingEpochs=5,
                     downstreamEpochs=5,
                     batchSize=256,
                     verbosity_n_batches=100,
+                    optim_scheduler=None,
                     optim_step_budget=5000,
                     outputFolder=None,
                     dump_model_every_epoch=False,
                     dump_data_splits=True,
                     remask_epochs=False,
                     downsample_unlabeled_data=False):
-        self.modelClass = modelClass
-        self.modelConfig = modelConfig
-        self.pretraining_task = pretrainingTaskClass(**pretrainingTaskConfig)
         self.device = device
         self.training_types = training_types
-        self.falsePositiveRates = falsePositiveRates
+        self.false_positive_rates = false_positive_rates
         self.unlabeledDataSize = unlabeledDataSize
         self.randomState = randomState
         self.pretrainingEpochs = pretraingEpochs
@@ -49,6 +47,7 @@ class SelfSupervisedPretraining:
         self.batchSize = batchSize
         self.verbosity_n_batches = verbosity_n_batches
         self.optim_step_budget = optim_step_budget
+        self.optim_scheduler = optim_scheduler
         self.output_folder = outputFolder
         self.dump_model_every_epoch = dump_model_every_epoch
         self.dump_data_splits = dump_data_splits
@@ -56,6 +55,11 @@ class SelfSupervisedPretraining:
         self.downsample_unlabeled_data = downsample_unlabeled_data
         if self.downsample_unlabeled_data:
             assert isinstance(downsample_unlabeled_data, float) and 0 < downsample_unlabeled_data < 1
+        
+        self.model_class = modelClass
+        self.model_config = modelConfig
+        self.pretraining_task_class = pretrainingTaskClass
+        self.pretraining_task_config = pretrainingTaskConfig
 
     def run_one_split(self, x, y, x_test, y_test):
         models = {k: None for k in self.training_types}
@@ -83,8 +87,9 @@ class SelfSupervisedPretraining:
             logging.warning(f" [!] Saved dataset splits to {splitData}")
 
         logging.warning(' [!] Pre-training model...')
+
         # create a pretraining model and task
-        models['pretrained'] = self.modelClass(**self.modelConfig).to(self.device)
+        models['pretrained'] = self.model_class(**self.model_config).to(self.device)
         model_trainer_config = {
             "device": self.device,
             "model": models['pretrained'],
@@ -92,19 +97,22 @@ class SelfSupervisedPretraining:
             "loss_function": CrossEntropyLoss(),
             "optimizer_class": AdamW,
             "optimizer_config": {"lr": 2.5e-4},
-            "optim_scheduler": "step",
+            "optim_scheduler": self.optim_scheduler,
             "optim_step_budget": self.optim_step_budget,
             "verbosity_n_batches": self.verbosity_n_batches,
             "batchSize": self.batchSize,
-            "falsePositiveRates": self.falsePositiveRates,
+            "falsePositiveRates": self.false_positive_rates,
         }
         if self.output_folder:
             model_trainer_config["outputFolder"] = os.path.join(self.output_folder, "preTraining")
 
+        self.pretraining_task_config['model_trainer_config'] = model_trainer_config
+        self.pretraining_task = self.pretraining_task_class(
+            **self.pretraining_task_config
+        )
         self.pretraining_task.pretrain(
-            unlabeled_data, 
-            model_trainer_config, 
-            pretrainEpochs=self.pretrainingEpochs,
+            unlabeled_data,
+            epochs=self.pretrainingEpochs,
             dump_model_every_epoch=self.dump_model_every_epoch,
             remask_epochs=self.remask_epochs
         )
@@ -116,21 +124,19 @@ class SelfSupervisedPretraining:
         for model in self.training_types:
             logging.warning(f' [!] Training {model} model on downstream task...')
             if model != 'pretrained': # if not pretrained -- create a new model
-                models[model] = self.modelClass(**self.modelConfig).to(self.device)
+                models[model] = self.model_class(**self.model_config).to(self.device)
             model_trainer_config['model'] = models[model]
             
             if self.output_folder:
                 model_trainer_config["outputFolder"] = os.path.join(self.output_folder, f"downstreamTask_{model}")
             
             model_trainer[model] = ModelTrainer(**model_trainer_config)
+            # TODO: don't like how step is calculated here
+            # use size of x and self.unlabeledDataSize to calculate steps
             if model == 'full_data':
-                # TODO: don't like how step is calculated here
-                # use size of x and self.unlabeledDataSize to calculate step
                 model_trainer_config['optim_step_budget'] = self.optim_step_budget//2
                 model_trainer[model].fit(x, y, self.downstreamEpochs, reporting_timestamp=timestamp)
             else:
-                # TODO: don't like how step is calculated here
-                # use size of x and self.unlabeledDataSize to calculate step
                 model_trainer_config['optim_step_budget'] = self.optim_step_budget//10
                 model_trainer[model].fit(labeled_x, labeled_y, self.downstreamEpochs, reporting_timestamp=timestamp)
         
@@ -138,7 +144,7 @@ class SelfSupervisedPretraining:
             logging.warning(f' [*] Evaluating {model} model on test set...')
             metrics[model] = model_trainer[model].evaluate(x_test, y_test, metrics="json")
             logging.warning(f"\t[!] Test set AUC: {metrics[model]['auc']:.4f}")
-            for reportingFPR in self.falsePositiveRates:
+            for reportingFPR in self.false_positive_rates:
                 f1 = metrics[model]["fpr_"+str(reportingFPR)]["f1"]
                 tpr = metrics[model]["fpr_"+str(reportingFPR)]["tpr"]
                 logging.warning(f'\t[!] Test set scores at FPR: {reportingFPR:>6} --> TPR: {tpr:.4f} | F1: {f1:.4f}')
@@ -147,7 +153,7 @@ class SelfSupervisedPretraining:
         return metrics
 
     def run_splits(self, x, y, x_test, y_test, nSplits=5, rest=None):
-        metrics = {k: {"fpr_"+str(fpr): {"f1": [], "tpr": []} for fpr in self.falsePositiveRates} for k in self.training_types}
+        metrics = {k: {"fpr_"+str(fpr): {"f1": [], "tpr": []} for fpr in self.false_positive_rates} for k in self.training_types}
         for trainingType in self.training_types:
             metrics[trainingType]['auc'] = []
         # collect metrics for number of iterations
@@ -157,7 +163,7 @@ class SelfSupervisedPretraining:
             splitMetrics = self.run_one_split(x, y, x_test, y_test)
             for trainingType in self.training_types:
                 metrics[trainingType]['auc'].append(splitMetrics[trainingType]['auc'])
-                for fpr in self.falsePositiveRates:
+                for fpr in self.false_positive_rates:
                     metrics[trainingType]["fpr_"+str(fpr)]["f1"].append(splitMetrics[trainingType]["fpr_"+str(fpr)]["f1"])
                     metrics[trainingType]["fpr_"+str(fpr)]["tpr"].append(splitMetrics[trainingType]["fpr_"+str(fpr)]["tpr"])
             if rest:
@@ -165,7 +171,7 @@ class SelfSupervisedPretraining:
 
         # compute mean and std for each metric
         for trainingType in self.training_types:
-            for fpr in self.falsePositiveRates:
+            for fpr in self.false_positive_rates:
                 metrics[trainingType]["fpr_"+str(fpr)]["f1_mean"] = np.nanmean(metrics[trainingType]["fpr_"+str(fpr)]["f1"])
                 metrics[trainingType]["fpr_"+str(fpr)]["f1_std"] = np.nanstd(metrics[trainingType]["fpr_"+str(fpr)]["f1"])
                 metrics[trainingType]["fpr_"+str(fpr)]["tpr_mean"] = np.nanmean(metrics[trainingType]["fpr_"+str(fpr)]["tpr"])
@@ -180,12 +186,14 @@ class CrossValidation(object):
                  model_class,
                  model_config,
                  output_folder_root,
+                 false_positive_rates=[0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
                  dump_data_splits=True):
         self.model_trainer_class = model_trainer_class
         self.model_trainer_config = model_trainer_config
         self.model_class = model_class
         self.model_config = model_config
         self.dump_data_splits = dump_data_splits
+        self.false_positive_rates = false_positive_rates
 
         self.output_folder_root = output_folder_root
         os.makedirs(self.output_folder_root, exist_ok=True)
@@ -195,30 +203,35 @@ class CrossValidation(object):
         self.metrics_train = defaultdict(lambda: defaultdict(list))
         self.aucs_train = []
 
-    def run_folds(self, X, y, folds=3, epochs=5, fprValues=[0.0001, 0.001, 0.01, 0.1], random_state=42):
+    def run_folds(
+            self, 
+            X,
+            y,
+            folds=3,
+            epochs=5,
+            false_positive_rates=None,
+            random_state=42
+    ):
         """
         Cross validate a model on a dataset and return the mean metrics over all folds depending on specific False Positive Rate (FPR).
         Returns: {fpr1: [mean_tpr, mean_f1], fpr2: [mean_tpr, mean_f1], ...], "avg_epoch_time": N seconds}
         """
-        self.fprValues = fprValues
+        if false_positive_rates is not None:
+            self.false_positive_rates = false_positive_rates
         self.trainSize = X.shape[0]
-        if folds == 1:
-            # kfold requires at least 2 folds -- this is rude shortcut 
-            # to get a single run with training on 80%, and validating on 20% of the data
-            self.nFolds = 5
-            singleFold = True
-        else:
-            self.nFolds = folds
-            singleFold = False
+        
+        # kfold requires at least 2 folds -- this is rude shortcut 
+        # to get a single run with training on 80%, and validating on 20% of the data
+        singleFold, self.nFolds = (True, 5) if folds == 1 else (False, folds)
 
         if self.model_trainer_config["time_budget"] is not None:
             self.epochs = int(1e4)
-            msg = f" [!] Training time budget: {self.model_trainer_config['time_budget']}min"
-            msg += f" | Model config: {self.model_config}"
+            msg = f" [!] Training time budget: {self.model_trainer_config['time_budget']}s"
             logging.warning(msg)
         else:
             self.epochs = epochs
-            logging.warning(f" [!] Epochs per fold: {self.epochs} | Model config: {self.model_config}")
+            logging.warning(f" [!] Epochs per fold: {self.epochs}")
+        logging.warning(f" [!] Model config: {self.model_config}")
 
         kf = KFold(n_splits=self.nFolds, shuffle=True, random_state=random_state)
         kf.get_n_splits(X)
@@ -230,7 +243,7 @@ class CrossValidation(object):
             timestamp = int(time())
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
-            logging.warning(f"\n[!!!] Fold {i+1}/{self.nFolds} | Train set size: {len(X_train)}, Validation set size: {len(X_test)}")
+            logging.warning(f" [{i+1}/{self.nFolds}] Train set size: {len(X_train)}, Validation set size: {len(X_test)}")
             if self.dump_data_splits:
                 splitData = f"dataset_splits_{timestamp}.npz"
                 np.savez_compressed(
@@ -254,7 +267,7 @@ class CrossValidation(object):
                 model_trainer.fit(X_train, y_train, epochs=self.epochs, reporting_timestamp=timestamp)
                 self.training_time[i,:] = np.pad(model_trainer.training_time, (0, self.epochs-len(model_trainer.training_time)), 'constant', constant_values=(0,0))
             except RuntimeError as e: # cuda outofmemory
-                logging.warning(f" [!] Exception: {e}")
+                logging.warning(f" [!] RuntimeError exception: {e}")
                 break
             
             # collect stats of this run
@@ -262,7 +275,7 @@ class CrossValidation(object):
             aucs_val, tprs_val, f1_val = self.collect_stats(model_trainer, X_test, y_test, name="validation")
             self.aucs_train.append(aucs_train)
             self.aucs_val.append(aucs_val)
-            for fpr in self.fprValues:
+            for fpr in self.false_positive_rates:
                 self.metrics_train[fpr]["tpr"].append(tprs_train[fpr])
                 self.metrics_train[fpr]["f1"].append(f1_train[fpr])
                 self.metrics_val[fpr]["tpr"].append(tprs_val[fpr])
@@ -286,7 +299,7 @@ class CrossValidation(object):
         self.metrics_train["auc_std"] = np.nanstd(self.aucs_train)
 
         # take means over all folds        
-        for fpr in self.fprValues:
+        for fpr in self.false_positive_rates:
             self.metrics_val[fpr]["tpr_avg"] = np.nanmean(self.metrics_val[fpr]["tpr"])
             self.metrics_val[fpr]["tpr_std"] = np.nanstd(self.metrics_val[fpr]["tpr"])
             self.metrics_val[fpr]["f1_avg"] = np.nanmean(self.metrics_val[fpr]["f1"])
@@ -300,18 +313,24 @@ class CrossValidation(object):
         self.metrics_train["epoch_time_avg"] = np.nanmean(self.training_time)
 
     def collect_stats(self, model_trainer, X, y, name="validation"):
-        logging.warning(f"\n [!] Evaluating model on {name} set...")
+        logging.warning(f" [!] Evaluating model on {name} set...")
         probs = model_trainer.predict_proba(X)
         logging.warning(f" [!] This fold metrics on {name} set:")
-        # calculate auc 
-        auc = roc_auc_score(y, probs)
+        try: # calculate auc
+            auc = roc_auc_score(y, probs, multi_class="ovr", average="macro")
+        except ValueError as e: # only one class
+            logging.warning(f" [!] AUC calculation exception: {e}")
+            auc = np.nan
         logging.warning(f"\tAUC: {auc:.4f}")
         trps, f1s = {}, {}
-        for fpr in self.fprValues:
+        for fpr in self.false_positive_rates:
             tpr, threshold = get_tpr_at_fpr(y, probs, fpr)
             f1 = f1_score(y, probs >= threshold)
             trps[fpr], f1s[fpr] = tpr, f1
             logging.warning(f"\tFPR: {fpr} | TPR: {tpr:.4f} | F1: {f1:.4f}")
+        if not self.false_positive_rates:
+            f1 = f1_score(y, np.argmax(probs, axis=1), average='macro')
+            logging.warning(f"\tF1: {f1:.4f}")
         return auc, trps, f1s
 
     def dump_metrics(self, prefix="", suffix=""):
@@ -333,7 +352,7 @@ class CrossValidation(object):
     def log_avg_metrics(self):
         msg = f" [!] Average epoch time: {self.metrics_train['epoch_time_avg']:.2f}s | Mean values over {self.nFolds} folds:\n"
         msg += f"\tAUC: {self.metrics_val['auc_avg']:.4f}\n"
-        for fpr in self.fprValues:
+        for fpr in self.false_positive_rates:
             msg += f"\tFPR: {fpr:>6} -- TPR: {self.metrics_val[fpr]['tpr_avg']:.4f} -- F1: {self.metrics_val[fpr]['f1_avg']:.4f}\n"
         logging.warning(msg)
 
@@ -398,7 +417,7 @@ def read_cv_metrics_folder(folder, key_lambda, extra_file_filter=None):
         metricFiles = [x for x in os.listdir(folder) if x.endswith(".json") and extra_file_filter(x)]
     else:
         metricFiles = [x for x in os.listdir(folder) if x.endswith(".json")]
-    key_to_file = dict(zip([key_lambda(x) for x in metricFiles], metricFiles))
+    key_to_file = dict(zip(['_'.join(key_lambda(x)) for x in metricFiles], metricFiles))
     try:
         key_to_file = {k: v for k, v in sorted(key_to_file.items(), key=lambda item: int(item[0]))}
     except ValueError:
@@ -421,7 +440,7 @@ def read_cv_data_split(npz_file):
     return {"X_train": X_train, "y_train": y_train, "X_test": X_test, "y_test": y_test}
 
 
-def read_cv_data_splits(folder):
-    fold_files = [os.path.join(folder, x) for x in os.listdir(folder) if x.endswith(".npz")][0:3]
+def read_cv_data_splits(folder, splits=3):
+    fold_files = [os.path.join(folder, x) for x in os.listdir(folder) if x.endswith(".npz")][0:splits]
     fold_sets = [read_cv_data_split(f) for f in fold_files]
     return fold_sets

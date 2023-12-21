@@ -14,6 +14,7 @@ import torch
 from torch import nn
 from torch.nn import BCEWithLogitsLoss
 from torch.optim import Adam, AdamW
+from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss, Linear
 from torch.utils.data import DataLoader, TensorDataset
 from torch.nn.utils import clip_grad_norm_
 from sklearn.metrics import f1_score, roc_auc_score, roc_curve
@@ -37,16 +38,21 @@ class ModelTrainer(object):
                     clip_grad_norm = 0.5,
                     optim_step_budget = 1000,
                     time_budget = None,
-                    n_batches_grad_update = 1):
-        self.model = model    
+                    n_batches_grad_update = 1,
+                    n_output_classes = None):
+        self.model = model 
         self.optimizer = optimizer_class(self.model.parameters(), **optimizer_config)
         self.loss_function = loss_function
         self.verbosity_n_batches = verbosity_n_batches
-        self.batchSize = batchSize
+        self.batch_size = batchSize
         self.reporting_timestamp = timestamp
         self.clip_grad_norm = clip_grad_norm
         self.global_batch_idx = 0
         self.n_batches_grad_update = n_batches_grad_update
+        if n_output_classes is not None:
+            self.n_output_classes = n_output_classes
+        else:
+            self.n_output_classes = [x for x in self.model.children() if isinstance(x, Linear)][-1].out_features
 
         # lr scheduling setup, for visulaizations see:
         # https://towardsdatascience.com/a-visual-guide-to-learning-rate-schedulers-in-pytorch-24bbb262c863
@@ -162,34 +168,97 @@ class ModelTrainer(object):
             metrics.append([tpr, f1_at_fpr])
         return np.array(metrics)
 
-    def trainOneEpoch(self, train_loader, epochId):
+    def updateMetricsReportList(self, metricsReportList, tprs=None, f1s=None, batch_metrics=None, auc=None):
+        if tprs is not None and f1s is not None:
+            tpr = tprs[self.fp_reporting_idx]
+            f1 = f1s[self.fp_reporting_idx]
+            metricsReport = f"FPR {self.fp_rates[self.fp_reporting_idx]} -> "
+            metricsReport += f"TPR: {tpr:.2f} & F1: {f1:.2f}"
+            metricsReportList.append(metricsReport)
+        if auc is not None:
+            metricsReportList.append(f"AUC: {auc:.4f}")
+        return metricsReportList
+
+    def logBatchMetrics(self, loss, targets, probs,):
+        metricsReportList = [f"Loss: {loss.item():.6f}", f"Elapsed: {time.time() - self.tick:.2f}s"]
+
+        # report TPR | F1 | AUC only for binary classification
+        if self.n_output_classes == 1:
+
+            # metrics for set of batches since last reporting
+            batchMetrics = self.getMetrics(
+                np.array(targets[-self.verbosity_n_batches:]), 
+                np.array(probs[-self.verbosity_n_batches:])
+            )
+            batch_tprs, batch_f1s = batchMetrics[:,0], batchMetrics[:,1]
+
+            try: # calculate auc for last set of batches
+                batch_auc = roc_auc_score(
+                    targets[-self.verbosity_n_batches:], 
+                    probs[-self.verbosity_n_batches:]
+                )
+            # batch might contain only one class, then auc fails
+            except ValueError:
+                batch_auc = np.nan
+
+            metricsReportList = self.updateMetricsReportList(
+                metricsReportList,
+                tprs=batch_tprs,
+                f1s=batch_f1s,
+                auc=batch_auc
+            )
+        else: # multiclass
+            # TODO: implement multiclass roc
+            pass
+        msg = " [*] {}: Train Epoch: {} [{:^5}/{:^5} ({:^2.0f}%)] | ".format(
+            time.ctime().split()[3],
+            self.epoch_idx,
+            self.batch_idx,
+            self.trainset_size,
+            100. * self.batch_idx / self.trainset_size
+        )
+        msg += " | ".join(metricsReportList)
+        logging.warning(msg)
+        self.tick = time.time()
+
+    def train_one_epoch(self, train_loader):
         epoch_losses = []
         epochProbs = []
         targets = []
-        now = time.time()
+        self.tick = time.time()
 
         for batch_idx, (data, target) in enumerate(train_loader):
+            self.batch_idx = batch_idx
             targets.extend(target)
-            data, target = data.to(self.device), target.to(self.device)
+            data, target = data.to(self.device), target.to(self.device).float()
 
-            logits = self.model.forwardPass(data)
-            # if dimension of target is 1, reshape to (-1,1)
-            if target.dim() == 1:
+            logits = self.model.forwardPass(data).float()
+
+            if isinstance(self.loss_function, BCEWithLogitsLoss) and target.dim() == 1:
                 target = target.reshape(-1, 1)
-            loss = self.loss_function(logits, target)
+            elif isinstance(self.loss_function, CrossEntropyLoss) and target.dim() != 1:
+                target = target.squeeze()
+            
+            try:
+                loss = self.loss_function(logits, target)
+            except RuntimeError:
+                # NOTE: might need to transform to .long() for CrossEntropyLoss if this error occurs:
+                # "nll_loss_forward_reduce_cuda_kernel_2d_index" not implemented for 'Float'
+                target = target.long()
+                loss = self.loss_function(logits, target)
 
+            loss.backward() # derivatives
             epoch_losses.append(loss.item())
 
             # +1 to skip update at first batch since not yet accumulated gradients
             if ((batch_idx + 1) % self.n_batches_grad_update == 0) or \
                 (batch_idx + 1 == len(train_loader)): # to update at last batch
-                self.optimizer.zero_grad()
-                loss.backward() # derivatives
 
                 if self.clip_grad_norm is not None:
                     clip_grad_norm_(self.model.parameters(), self.clip_grad_norm)
 
                 self.optimizer.step()
+                self.optimizer.zero_grad()
             
             # learning rate update
             self.global_batch_idx += 1
@@ -201,38 +270,13 @@ class ModelTrainer(object):
             epochProbs.extend(predProbs)
             
             if batch_idx % self.verbosity_n_batches == 0:
-                metricsReportList = [f"Loss: {loss.item():.6f}", f"Elapsed: {time.time() - now:.2f}s"]
-                if target.shape[1] == 1: # report TPR & F1 only for binary classification
-                    batchSetMetrics = self.getMetrics(
-                        np.array(targets[-self.verbosity_n_batches:]), 
-                        np.array(epochProbs[-self.verbosity_n_batches:])
-                    )
-                    # TODO: check if this is correct
-                    # TODO: unify code with reporting at .fit()
-                    currentTPR = batchSetMetrics[self.fp_reporting_idx, 0]
-                    currentF1 = batchSetMetrics[self.fp_reporting_idx, 1]
-                    metricsReport = f"FPR {self.fp_rates[self.fp_reporting_idx]} -> "
-                    metricsReport += f"TPR {currentTPR:.4f} & F1 {currentF1:.4f}"
-                    metricsReportList.append(metricsReport)
-                    try: # calculate auc for last set of batches
-                        batch_auc = roc_auc_score(
-                            targets[-self.verbosity_n_batches:], 
-                            epochProbs[-self.verbosity_n_batches:]
-                        )
-                    # Only one class present in y_true. ROC AUC score is not defined in that case.
-                    except ValueError:
-                        batch_auc = np.nan
-                    metricsReportList.append(f"AUC {batch_auc:.4f}")
-                logging.warning(" [*] {}: Train Epoch: {} [{:^5}/{:^5} ({:^2.0f}%)] | ".format(
-                    time.ctime().split()[3], epochId, batch_idx * len(data), len(train_loader.dataset),
-                100. * batch_idx / len(train_loader)) + " | ".join(metricsReportList))
-                now = time.time()
+                self.logBatchMetrics(loss, targets, epochProbs)
             
             if self.time_budget is not None and (time.time() - self.training_start_time) > self.time_budget:
                 logging.warning(" [!] Time budget exceeded, training stopped.")
                 raise KeyboardInterrupt
 
-        if target.shape[1] == 1: # calculate TRP & F1 only for binary classification
+        if self.n_output_classes == 1: # calculate TRP & F1 only for binary classification
             epochMetrics = self.getMetrics(np.array(targets), np.array(epochProbs))
             epoch_tprs, epoch_f1s = epochMetrics[:,0], epochMetrics[:,1]
             # calculate auc 
@@ -241,12 +285,24 @@ class ModelTrainer(object):
         else:
             return epoch_losses, None, None, None
 
-    def fit(self, X, y, epochs=10, time_budget=None, dump_model_every_epoch=False, overwrite_epoch_idx=False, reporting_timestamp=None):
+    def fit(
+            self,
+            X,
+            y,
+            epochs=10,
+            time_budget=None,
+            dump_model_every_epoch=False,
+            overwrite_epoch_idx=False,
+            reporting_timestamp=None
+    ):
         assert (epochs is not None) ^ (time_budget is not None), \
             "Either epochs or time_budget should be specified"
         if time_budget or self.time_budget:
             self.time_budget = time_budget if time_budget else self.time_budget
-            assert isinstance(self.time_budget, int), "time_budget must be an integer"
+            if isinstance(self.time_budget, float):
+                self.time_budget = int(self.time_budget)
+            assert isinstance(self.time_budget, int),\
+                f"time_budget must be an integer, instead got {self.time_budget}:{type(self.time_budget)}"
             self.training_start_time = time.time()
             logging.warning(f" [*] Training time budget set: {self.time_budget/60} min")
         self.epochs = int(1e4) if self.time_budget else epochs
@@ -256,9 +312,11 @@ class ModelTrainer(object):
 
         trainLoader = DataLoader(
             TensorDataset(torch.from_numpy(X).long(), torch.from_numpy(y).float()),
-            batch_size=self.batchSize,
+            batch_size=self.batch_size,
             shuffle=True
         )
+        self.trainset_size = len(trainLoader)
+
         self.model.train()
         self.train_tprs = np.empty(shape=(self.epochs, len(self.fp_rates)))
         self.train_f1s = np.empty(shape=(self.epochs, len(self.fp_rates)))
@@ -266,37 +324,38 @@ class ModelTrainer(object):
         self.training_time = []
         self.auc = []
         try:
-            for epochIdx in range(1, epochs + 1):
+            for epoch_idx in range(1, epochs + 1):
                 if overwrite_epoch_idx:
                     assert isinstance(overwrite_epoch_idx, int), "overwrite_epoch_idx must be an integer"
-                    epochIdx = overwrite_epoch_idx + epochIdx
+                    epoch_idx = overwrite_epoch_idx + epoch_idx
+                self.epoch_idx = epoch_idx
 
                 epochStartTime = time.time()
-                logging.warning(f" [*] Started epoch: {epochIdx}")
-                epoch_train_loss, epoch_tprs, epoch_f1s, epoch_auc = self.trainOneEpoch(trainLoader, epochIdx)
+                logging.warning(f" [*] Started epoch: {epoch_idx}")
+                epoch_train_loss, epoch_tprs, epoch_f1s, epoch_auc = self.train_one_epoch(trainLoader)
 
                 if overwrite_epoch_idx:
-                    self.train_tprs[epochIdx-1-overwrite_epoch_idx] = epoch_tprs
-                    self.train_f1s[epochIdx-1-overwrite_epoch_idx] = epoch_f1s
+                    self.train_tprs[epoch_idx-1-overwrite_epoch_idx] = epoch_tprs
+                    self.train_f1s[epoch_idx-1-overwrite_epoch_idx] = epoch_f1s
                 else:
-                    self.train_tprs[epochIdx-1] = epoch_tprs
-                    self.train_f1s[epochIdx-1] = epoch_f1s
+                    self.train_tprs[epoch_idx-1] = epoch_tprs
+                    self.train_f1s[epoch_idx-1] = epoch_f1s
 
                 self.train_losses.extend(epoch_train_loss)
                 self.auc.append(epoch_auc)
                 timeElapsed = time.time() - epochStartTime
                 self.training_time.append(timeElapsed)
                 
-                # TODO: unify code with reporting at .trainOneEpoch()
-                metricsReportList = [f"{epochIdx:^7}", f"Tr.loss: {np.nanmean(epoch_train_loss):.6f}", f"Elapsed: {timeElapsed:^9.2f}s"]
-                if epoch_tprs is not None and epoch_f1s is not None and epoch_auc is not None:
-                    metricsReport = f"FPR {self.fp_rates[self.fp_reporting_idx]} -> "
-                    metricsReport += f"TPR: {epoch_tprs[self.fp_reporting_idx]:.2f} & F1: {epoch_f1s[self.fp_reporting_idx]:.2f}"
-                    metricsReportList.append(metricsReport)
-                    metricsReportList.append(f"AUC: {epoch_auc:.4f}")
+                metricsReportList = [f"{epoch_idx:^7}", f"Tr.loss: {np.nanmean(epoch_train_loss):.6f}", f"Elapsed: {timeElapsed:^9.2f}s"]
+                metricsReportList = self.updateMetricsReportList(
+                    metricsReportList,
+                    tprs=epoch_tprs,
+                    f1s=epoch_f1s,
+                    auc=epoch_auc
+                )
                 logging.warning(f" [*] {time.ctime()}: " + " | ".join(metricsReportList))
                 if dump_model_every_epoch:
-                    self.dumpResults(prefix=f"epoch_{epochIdx}_", model_only=True)
+                    self.dumpResults(prefix=f"epoch_{epoch_idx}_", model_only=True)
             if self.output_folder:
                 self.dumpResults()
         except KeyboardInterrupt:
@@ -316,7 +375,7 @@ class ModelTrainer(object):
     def evaluate(self, X, y, metrics="array"):
         testLoader = DataLoader(
             TensorDataset(torch.from_numpy(X).long(), torch.from_numpy(y).float()),
-            batch_size=self.batchSize,
+            batch_size=self.batch_size,
             shuffle=True
         )
         self.model.eval()
@@ -348,10 +407,10 @@ class ModelTrainer(object):
             raise ValueError("evaluate(): Inappropriate metrics value, must be in: ['array', 'json']")
 
     def predict_proba(self, arr):
-        out = torch.empty((0,1)).to(self.device)
+        out = torch.empty((0,self.n_output_classes)).to(self.device)
         loader = DataLoader(
             TensorDataset(torch.from_numpy(arr).long()),
-            batch_size=self.batchSize,
+            batch_size=self.batch_size,
             shuffle=False
         )
 
@@ -362,14 +421,16 @@ class ModelTrainer(object):
                 out = torch.vstack([out, logits])
             if batch_idx % self.verbosity_n_batches == 0:
                 print(f" [*] Predicting batch: {batch_idx}/{len(loader)}", end="\r")
-
-        return torch.sigmoid(out).clone().detach().cpu().numpy()
+        if self.n_output_classes == 1:
+            return torch.sigmoid(out).clone().detach().cpu().numpy()
+        else:
+            return torch.softmax(out, axis=1).clone().detach().cpu().numpy()
     
     def predict(self, arr, threshold=0.5):
         self.model.eval()
         with torch.no_grad():
-            logits = self.model.predict_proba(arr)
-        return (logits > threshold).astype(np.int_)
+            prob = self.model.predict_proba(arr)
+        return (prob > threshold).astype(np.int8)
     
     def metricsToJSON(self, metrics):
         assert len(metrics) == 4, "metricsToJSON(): metrics must be a list of length 4"

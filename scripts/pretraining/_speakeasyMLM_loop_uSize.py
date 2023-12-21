@@ -8,7 +8,7 @@ import sys
 from sklearn.utils import shuffle
 sys.path.extend(['../..', '.'])
 from nebula.models.attention import TransformerEncoderChunksLM
-from nebula.pretraining import MaskedLanguageModel
+from nebula.pretraining import MaskedLanguageModelTrainer
 from nebula.evaluation import SelfSupervisedPretraining
 from nebula.misc import get_path, set_random_seed, clear_cuda_cache
 SCRIPT_PATH = get_path(type="script")
@@ -88,7 +88,7 @@ for uSize in [0.7, 0,75, 0.8, 0.85, 0.9, 0.95, 0.97]:
     logging.warning(f" [!] Loaded data and vocab. X train size: {xTrain.shape}, X test size: {xTest.shape}, vocab size: {len(vocab)}")
 
     # =========== PRETRAINING CONFIG ===========
-    modelConfig = {
+    model_config = {
         "vocab_size": vocab_size,  # size of vocabulary
         "maxlen": maxlen,  # maximum length of the input sequence
         "dModel": 64,  # embedding & transformer dimension
@@ -101,9 +101,9 @@ for uSize in [0.7, 0,75, 0.8, 0.85, 0.9, 0.95, 0.97]:
     }
     # dump model config as json
     with open(os.path.join(outputFolder, f"model_config.json"), "w") as f:
-        json.dump(modelConfig, f, indent=4)
+        json.dump(model_config, f, indent=4)
 
-    languageModelClass = MaskedLanguageModel
+    languageModelClass = MaskedLanguageModelTrainer
     languageModelClassConfig = {
         "vocab": vocab, # needs vocab to mask sequences
         "mask_probability": 0.15,
@@ -113,7 +113,7 @@ for uSize in [0.7, 0,75, 0.8, 0.85, 0.9, 0.95, 0.97]:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     pretrainingConfig = {
         "modelClass": modelClass,
-        "modelConfig": modelConfig,
+        "modelConfig": model_config,
         "pretrainingTaskClass": languageModelClass,
         "pretrainingTaskConfig": languageModelClassConfig,
         "device": device,
@@ -133,7 +133,7 @@ for uSize in [0.7, 0,75, 0.8, 0.85, 0.9, 0.95, 0.97]:
     # =========== PRETRAINING RUN ===========
     msg = f" [!] Initiating Self-Supervised Learning Pretraining\n"
     msg += f"     Language Modeling {languageModelClass.__name__}\n"
-    msg += f"     Model {modelClass.__name__} with config:\n\t{modelConfig}\n"
+    msg += f"     Model {modelClass.__name__} with config:\n\t{model_config}\n"
     logging.warning(msg)
 
     pretrain = SelfSupervisedPretraining(**pretrainingConfig)

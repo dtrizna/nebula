@@ -1,6 +1,69 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from copy import deepcopy
 from . import read_files_from_log
+
+T10_COLORS = [
+    'tab:blue',
+    'tab:orange',
+    'tab:green',
+    'tab:red',
+    'tab:purple',
+    'tab:brown',
+    'tab:pink',
+    'tab:gray',
+    'tab:olive',
+    'tab:cyan'
+]
+
+def plot_shap_values(shap_values: np.ndarray, name: str):
+    shap_values = shap_values.mean(axis=2)
+    pos_idx = shap_values[0] >= 0
+    neg_index = shap_values[0] < 0
+    pos_shap = deepcopy(shap_values)[0]
+    pos_shap[neg_index] = 0
+    neg_shap = deepcopy(shap_values)[0]
+    neg_shap[pos_idx] = 0
+    x = range(512)
+    plt.bar(x, pos_shap)
+    plt.bar(x, neg_shap)
+    plt.title(name)
+    plt.show()
+
+
+def set_size(width=505.89, fraction=1):
+    """Set figure dimensions to avoid scaling in LaTeX.
+
+    Parameters
+    ----------
+    width: float
+            Document textwidth or columnwidth in pts
+    fraction: float, optional
+            Fraction of the width which you wish the figure to occupy
+
+    Returns
+    -------
+    fig_dim: tuple
+            Dimensions of figure in inches
+    """
+    # Width of figure (in pts)
+    fig_width_pt = width * fraction
+
+    # Convert from pt to inches
+    inches_per_pt = 1 / 72.27
+
+    # Golden ratio to set aesthetic figure height
+    # https://disq.us/p/2940ij3
+    golden_ratio = (5**.5 - 1) / 2
+
+    # Figure width in inches
+    fig_width_in = fig_width_pt * inches_per_pt
+    # Figure height in inches
+    fig_height_in = fig_width_in * golden_ratio
+
+    fig_dim = (fig_width_in, fig_height_in)
+
+    return fig_dim
 
 def plot3D(arr, labels, title):
     #from mpl_toolkits.mplot3d import Axes3D
@@ -103,8 +166,8 @@ def plot_roc_curves(fpr, tpr, tpr_std=None, model_name="", axs=None, roc_auc=Non
         color = axs[0].lines[-1].get_color()
         color = color[:-2] + "33"
         axs[0].fill_between(fpr, tprs_lower, tprs_upper, alpha=.2)
-    axs[0].set_xlim([0.0, 1.0])
-    axs[0].set_ylim([0.0, 1.05])
+    axs[0].set_xlim([-0.05, 1.0])
+    axs[0].set_ylim([-0.05, 1.05])
     
     # plot zoomed in ROC curve x-axis from 0 to 0.2
     axs[1].plot(fpr, tpr, lw=2, label=label)
@@ -122,12 +185,23 @@ def plot_roc_curves(fpr, tpr, tpr_std=None, model_name="", axs=None, roc_auc=Non
         axs[1].plot([0, 1], [0, 1], lw=2, linestyle="--")
     return axs
 
-def plot_roc_curve(fpr, tpr, model_name, ax, xlim=[-0.0005, 0.003], ylim=[0.3, 1.0], roc_auc=None):
+def plot_roc_curve(fpr, tpr, tpr_std=None, model_name="", ax=None, xlim=[-0.0005, 0.003], ylim=[0.3, 1.0], roc_auc=None, linestyle="-", color=None, semilogx=False):
+    if ax is None:
+        fig, ax = plt.subplots(1, 1, figsize=(10, 6))
     if roc_auc:
         label = f"{model_name} (AUC = {roc_auc:.6f})"
     else:
         label = model_name
-    ax.plot(fpr, tpr, lw=2, label=label)
+    if semilogx:
+        ax.semilogx(fpr, tpr, lw=2, label=label, linestyle=linestyle, color=color)
+    else:
+        ax.plot(fpr, tpr, lw=2, label=label, linestyle=linestyle, color=color)
+    if tpr_std is not None:
+        tprs_upper = np.minimum(tpr + tpr_std, 1)
+        tprs_lower = tpr - tpr_std
+        color = ax.lines[-1].get_color()
+        color = color[:-2] + "33"
+        ax.fill_between(fpr, tprs_lower, tprs_upper, alpha=.2, color=color)
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
     return ax

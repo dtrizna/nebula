@@ -1,0 +1,7 @@
+classes: 2
+f1_threshold: 0.5
+learning_rate: 0.001
+optimizer: Adam
+scheduler: null
+scheduler_step_budget: 100
+weight_decay: 1.0e-05

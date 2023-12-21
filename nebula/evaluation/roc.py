@@ -2,21 +2,24 @@ import torch
 import numpy as np
 from tqdm import tqdm
 from pandas import DataFrame, concat
-from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_curve, auc, accuracy_score
+from sklearn.metrics import f1_score, recall_score, precision_score
 from collections import defaultdict
+from torch.nn import Linear
 
 from ..misc import read_files_from_log
 from ..misc.plots import plot_roc_curves
 
-def get_roc(model, X_test, y_test, model_name=None):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    X_test = torch.from_numpy(X_test).long().to(device)
-    y_test = torch.from_numpy(y_test).float().to(device)
+def get_preds(model, x, y, model_name=None, batch_size=64, device=None):
+    if not device:
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    x = torch.from_numpy(x).long()#.to(device)
+    y = torch.from_numpy(y).float()#.to(device)
 
     # getting predictions
     testLoader = torch.utils.data.DataLoader(
-        torch.utils.data.TensorDataset(X_test, y_test),
-        batch_size=64,
+        torch.utils.data.TensorDataset(x, y),
+        batch_size=batch_size,
         shuffle=True)
 
     # get count of trainable model parameters
@@ -30,17 +33,30 @@ def get_roc(model, X_test, y_test, model_name=None):
         else:
             print(f"Evaluating model | Size: {total_params}")
         for X, y in tqdm(testLoader):
-            y_hat = model(X)
+            y_hat = model(X.to(device))
             y_pred.append(y_hat.cpu().numpy())
             y_true.append(y.cpu().numpy())
-    y_pred = np.concatenate(y_pred)
     y_true = np.concatenate(y_true)
+    y_pred = np.concatenate(y_pred)
 
+    return y_true, y_pred
+
+
+def get_roc(y_true, y_pred, metrics_full=False, threshold=0.5):
     # calculating ROC curve
     fpr, tpr, _ = roc_curve(y_true, y_pred)
     roc_auc = auc(fpr, tpr)
 
-    return fpr, tpr, roc_auc
+    if metrics_full:
+        # compute f1, precision, recall
+        y_pred_labels = np.where(y_pred > threshold, 1, 0)
+        f1 = f1_score(y_true, y_pred_labels)
+        recall = recall_score(y_true, y_pred_labels)
+        precision = precision_score(y_true, y_pred_labels)
+        acc = accuracy_score(y_true, y_pred_labels)
+        return fpr, tpr, roc_auc, f1, recall, precision, acc
+    else:
+        return fpr, tpr, roc_auc
 
 def get_model_rocs(run_types, model_class, model_config, data_splits, model_files=None, logfile=None, splits=3, verbose=True):
     if model_files is None:
@@ -62,20 +78,25 @@ def get_model_rocs(run_types, model_class, model_config, data_splits, model_file
             model = model_class(**model_config).to(device)
             model.load_state_dict(torch.load(model_file))
             model.eval()
-            fpr, tpr, roc_auc = get_roc(
-                model, 
-                data_splits[i]["X_test"],
-                data_splits[i]["y_test"],
-                model_name=f"{run_type}_split_{i}"
-            )
-            metrics[run_type].append((fpr, tpr, roc_auc))
+            n_output_classes = [x for x in model.children() if isinstance(x, Linear)][-1].out_features
+            if n_output_classes == 1:
+                fpr, tpr, roc_auc = get_roc(
+                    model, 
+                    data_splits[i]["X_test"],
+                    data_splits[i]["y_test"],
+                    model_name=f"{run_type}_split_{i}"
+                )
+                metrics[run_type].append((fpr, tpr, roc_auc))
+            else: # multiclass
+                # TODO: implement multiclass roc
+                pass
     return metrics
 
 def allign_metrics(metrics, base_fpr_scale=50001):
     base_fpr = np.linspace(0, 1, base_fpr_scale)
     trps_same = defaultdict(dict)
     for run_type in metrics.keys():
-        for i, (fpr, tpr, auc) in enumerate(metrics[run_type]):
+        for i, (fpr, tpr, *_) in enumerate(metrics[run_type]):
             tpr = np.interp(base_fpr, fpr, tpr)
             tpr[0] = 0.0
             trps_same[run_type][i] = tpr
@@ -84,22 +105,25 @@ def allign_metrics(metrics, base_fpr_scale=50001):
     tprs_std = {k: np.std([v[i] for i in v.keys()], axis=0) for k, v in trps_same.items()}
     return base_fpr, tprs_mean, tprs_std
 
-def report_alligned_metrics(base_fpr, tprs_mean, tprs_std, metrics, 
+def report_alligned_metrics(base_fpr, tprs_mean, tprs_std, metrics=None, metrics_full=False, 
                             fprs=[0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3], 
                             xlim=[-0.0005, 0.3], 
                             ylim=[0.6, 1]):
     tprsdf = DataFrame()
+    axs = None        
     for i, model_type in enumerate(tprs_mean.keys()):
-        if i == 0:
-            axs = None        
         stds = tprs_std[model_type] if tprs_std else None
+        if metrics is not None:
+            auc_mean = np.mean([metrics[model_type][i][2] for i in range(len(metrics[model_type]))])
+        else:
+            auc_mean = None
         axs = plot_roc_curves(
             base_fpr, 
             tprs_mean[model_type], 
             tpr_std=stds,
             model_name=f"{model_type}",
             axs=axs,
-            roc_auc=metrics[model_type][0][2],
+            roc_auc=auc_mean,
             xlim=xlim,
             ylim=ylim
         )
@@ -108,6 +132,21 @@ def report_alligned_metrics(base_fpr, tprs_mean, tprs_std, metrics,
             tpr = tprs_mean[model_type][np.argmin(np.abs(base_fpr - fpr))]
             tprs[fpr].append(tpr)
         tprsdf = concat([tprsdf, DataFrame(tprs, index=[model_type])])
-    [ax.grid() for ax in axs]
-    _ = [ax.legend(loc='lower right') for ax in axs]
+    if axs is not None:
+        [ax.grid() for ax in axs]
+        [ax.legend(loc='lower right') for ax in axs]
+
+    # add other metrics to dataframe
+    if metrics is not None:
+        aucdf = DataFrame([np.mean([y[2] for y in metrics[x]]) for x in metrics], index=metrics.keys(), columns=["AUC"])
+        if metrics_full:
+            f1df = DataFrame([np.mean([y[3] for y in metrics[x]]) for x in metrics], index=metrics.keys(), columns=["F1"])
+            recall_df = DataFrame([np.mean([y[4] for y in metrics[x]]) for x in metrics], index=metrics.keys(), columns=["Recall"])
+            precision_df = DataFrame([np.mean([y[5] for y in metrics[x]]) for x in metrics], index=metrics.keys(), columns=["Precision"])
+            acc_df = DataFrame([np.mean([y[6] for y in metrics[x]]) for x in metrics], index=metrics.keys(), columns=["Accuracy"])
+            tprsdf = concat([tprsdf, aucdf, f1df, recall_df, precision_df, acc_df], axis=1)
+        else:
+            tprsdf = concat([tprsdf, aucdf], axis=1)
+
     return tprsdf, axs
+    

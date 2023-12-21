@@ -1,8 +1,9 @@
+# https://arxiv.org/pdf/1910.11376.pdf
 # https://github.com/ucsb-seclab/Neurlux/blob/main/attention_train_all.py#L129
 
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from .preprocessor import NeurLuxPreprocessor
 
 EMBEDDING_DIM = 256
 VOCAB_SIZE = 10000
@@ -28,7 +29,8 @@ class NeurLuxModel(nn.Module):
     def __init__(self,
                  embedding_dim=EMBEDDING_DIM,
                  vocab_size=VOCAB_SIZE,
-                 maxlen=MAX_LEN):
+                 seq_len=MAX_LEN,
+                 num_classes=1):
         super(NeurLuxModel, self).__init__()
         self.__name__ = "NeurLux"
         self.embedding = nn.Embedding(vocab_size, embedding_dim)
@@ -37,10 +39,10 @@ class NeurLuxModel(nn.Module):
         self.lstm = nn.LSTM(100, 32, bidirectional=True,
                             batch_first=True)
         self.attention = Attention(embed_dim=64) # LSTM_out * 2
-        attention_out = 64*int((maxlen-1)/4)
+        attention_out = 64*int((seq_len-1)/4)
         self.fc1 = nn.Linear(attention_out, 10)
         self.dropout = nn.Dropout(0.25)
-        self.fc2 = nn.Linear(10, 1)
+        self.fc2 = nn.Linear(10, num_classes)
 
     def forward(self, x):
         x = self.embedding(x)

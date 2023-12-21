@@ -57,6 +57,17 @@ SPEAKEASY_EXCEPTIONS = (PEFormatError, UcError, IndexError, errors.NotSupportedE
 
 STATIC_FEATURE_VECTOR_LENGTH = 2381
 
+SPEAKEASY_LABELMAP = {
+    "clean": 0,
+    "backdoor": 1,
+    "coinminer": 2,
+    "dropper": 3,
+    "keylogger": 4,
+    "ransomware": 5,
+    "rat": 6,
+    "trojan": 7
+}
+
 # good reference:
 # https://docs.microsoft.com/en-us/windows/deployment/usmt/usmt-recognized-environment-variables
 VARIABLE_MAP = {
