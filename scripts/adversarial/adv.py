@@ -30,7 +30,7 @@ sys.path.append(REPOSITORY_ROOT)
 from nebula.models.attention import TransformerEncoderOptionalEmbedding
 from nebula.preprocessing import load_tokenizer, tokenize_sample
 from nebula.misc.plots import plot_shap_values
-from scripts.attack.tgd import TokenGradientDescent
+from scripts.adversarial.tgd import TokenGradientDescent
 from nebula.misc import fix_random_seed, compute_score
 
 fix_random_seed(0)
