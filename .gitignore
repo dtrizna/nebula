@@ -6,8 +6,6 @@ __pycache__/
 .vscode
 *.ckpt
 
-PhD-notes/*
-
 # data
 aks_raw*
 data/data_raw/windows_emulation*
