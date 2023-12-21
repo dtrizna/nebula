@@ -5,7 +5,6 @@ import logging
 import numpy as np
 from tqdm import tqdm
 
-import torch
 
 class MaskedLanguageModelTrainer(ModelTrainer):
     def __init__(self,
