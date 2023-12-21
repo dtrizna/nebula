@@ -14,9 +14,10 @@ data/data_filtered/*
 *zip
 *npy
 *npz
-*pickle
+*explanations*
 
 # models
 *.ckpt
 FastText*model
 *torch
+*ckpt
