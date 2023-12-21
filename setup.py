@@ -14,7 +14,7 @@ with open("requirements.txt", encoding="utf-8") as f:
 
 version = "0.0.4"
 package_data = {
-    'nebula': 'objects/*'
+    'nebula': 'objects/*.*'
 }
 setup(
     name="nebula",
