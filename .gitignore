@@ -5,19 +5,15 @@ __pycache__/
 .DS_Store
 .vscode
 
-evaluation/MaskedLanguageModeling/*/downstreamTask*
-evaluation/MaskedLanguageModeling/*/preTraining/
+# research files
+evaluation/*
 
 # Data
-data/data_filtered/*
 *7z
 *zip
 *npy
 *npz
-*explanations*
 
 # models
 *.ckpt
-FastText*model
-*torch
-*ckpt
+*.torch
