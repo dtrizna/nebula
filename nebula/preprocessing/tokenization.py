@@ -197,7 +197,7 @@ class JSONTokenizerNaive(JSONTokenizer):
         self.counter = None
         self.counter_dump = counter_dump
         self.vocab_error = "Vocabulary not initialized! Use build_vocab() first or load it using load_vocab()!"
-        if vocab:
+        if vocab is not None:
             self.load_vocab(vocab)
         
     def tokenize_event(self, jsonEvent):
@@ -315,6 +315,7 @@ class JSONTokenizerBPE(JSONTokenizer):
                 vocab_size,
                 seq_len,
                 model_path=None,
+                vocab=None,
                 cleanup_symbols=JSON_CLEANUP_SYMBOLS,
                 stopwords=SPEAKEASY_TOKEN_STOPWORDS,
         ):
@@ -325,11 +326,11 @@ class JSONTokenizerBPE(JSONTokenizer):
             stopwords
         )
 
-        if model_path:
+        if model_path is not None:
             self.tokenizer = spm.SentencePieceProcessor(model_file=model_path.replace(".model","")+".model")
             logging.warning(" [!] Successfully loaded pre-trained tokenizer model!")
             self.model_path = model_path
-            self.load_vocab()
+            self.load_vocab(vocab=vocab)
         else:
             self.tokenizer = spm.SentencePieceTrainer
             msg = " [!] Initialized tokenizer without pre-trained model.\n\t"
@@ -359,13 +360,23 @@ class JSONTokenizerBPE(JSONTokenizer):
         chunks.append(currentChunk)
         return chunks
 
-    def load_vocab(self, vocab_path=None):
-        if not vocab_path:
-            vocab_path = self.model_path.replace(".model","")+"_vocab.json"
-            if not os.path.exists(vocab_path): # default sentencepiece -- after training
-                vocab_path = self.model_path.replace(".model", "")+".vocab"
-        with open(vocab_path, encoding="utf-8") as f:
-            if vocab_path.endswith(".json"):
+    def load_vocab(self, vocab=None):
+        if isinstance(vocab, dict):
+            self.vocab = vocab
+            self.reverse_vocab = {v:k for k,v in self.vocab.items()}
+            return
+
+        # parsing default sentencepiece vocab file
+        if vocab is None:
+            vocab = self.model_path.replace(".model","")+"_vocab.json"
+        if not os.path.exists(vocab): # default sentencepiece -- after training
+            vocab = self.model_path.replace(".model", "")+".vocab"
+        if not os.path.exists(vocab):
+            logging.error(f" [!] Vocab file {vocab} does not exist! .load_vocab() failed!")
+            return
+
+        with open(vocab, encoding="utf-8") as f:
+            if vocab.endswith(".json"):
                 self.vocab = json.load(f)
             else:
                 data = f.read()
@@ -376,9 +387,10 @@ class JSONTokenizerBPE(JSONTokenizer):
         values = list(self.vocab.values())
         for k,v in self.special_tokens.items():
             keys[v] = k
+        
         self.vocab = dict(zip(keys, values))
         self.reverse_vocab = {v:k for k,v in self.vocab.items()}
-        logging.warning(f" [!] Loaded vocab with size {len(self.vocab)} from {vocab_path}")
+        logging.warning(f" [!] Loaded vocab with size {len(self.vocab)} from {vocab}")
         
     def dump_vocab(self):
         vocabFileName = self.model_path.replace(".model","") + "_vocab.json"

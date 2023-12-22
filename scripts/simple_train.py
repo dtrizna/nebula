@@ -60,7 +60,7 @@ model_config = {
     "norm_first": True
 }
 model = TransformerEncoderChunks(**model_config)
-model_path = os.path.join(REPOSITORY_ROOT, r"nebula\objects\speakeasy_BPE_50000_torch.model")
+model_path = os.path.join(REPOSITORY_ROOT, r"nebula\objects\bpe_50000_torch.model")
 
 from torch import load
 state_dict = load(model_path)

@@ -81,7 +81,7 @@ for downsample_unlabeled_data in [0.9]:# [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9
         xTest = xTest[:run_config['train_limit']]
         yTest = yTest[:run_config['train_limit']]
 
-    vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", "speakeasy_BPE_50000_vocab.json")
+    vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", "bpe_50000_vocab.json")
     with open(vocabFile, 'r') as f:
         vocab = json.load(f)
     vocab_size = len(vocab) # adjust it to exact number of tokens in the vocabulary

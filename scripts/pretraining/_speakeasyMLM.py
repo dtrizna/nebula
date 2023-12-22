@@ -81,7 +81,6 @@ if run_config['train_limit']:
     xTest = xTest[:run_config['train_limit']]
     yTest = yTest[:run_config['train_limit']]
 
-#vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", "speakeasy_BPE_50000_sentencepiece_vocab.json")
 vocabFile = os.path.join(REPO_ROOT, r"data\data_filtered\speakeasy_trainset_BPE_50k_new\speakeasy_vocab_size_50000_tokenizer_vocab.json")
 with open(vocabFile, 'r') as f:
     vocab = json.load(f)

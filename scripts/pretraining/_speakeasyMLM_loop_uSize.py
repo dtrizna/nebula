@@ -80,7 +80,7 @@ for uSize in [0.7, 0,75, 0.8, 0.85, 0.9, 0.95, 0.97]:
         xTest = xTest[:config['train_limit']]
         yTest = yTest[:config['train_limit']]
 
-    vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", "speakeasy_BPE_50000_vocab.json")
+    vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", "bpe_50000_vocab.json")
     with open(vocabFile, 'r') as f:
         vocab = json.load(f)
     vocab_size = len(vocab) # adjust it to exact number of tokens in the vocabulary

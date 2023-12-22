@@ -137,7 +137,7 @@ for maxLen in maxLens:
     # with open(os.path.join(outputFolder, f"vocab.json"), "w") as f:
     #     json.dump(p.vocab, f, indent=4)
     # vocab = p.vocab
-    with open(os.path.join(SCRIPT_PATH, r"..\nebula\objects\speakeasy_BPE_50000_vocab.json")) as f:
+    with open(os.path.join(SCRIPT_PATH, r"..\nebula\objects\bpe_50000_vocab.json")) as f:
         vocab = json.load(f)
     vocabSize = len(vocab)
     logging.warning(f" [!] Loaded data and vocab. X train size: {x_train.shape}, vocab size: {vocabSize}")

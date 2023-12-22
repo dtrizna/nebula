@@ -81,7 +81,7 @@ if run_config['train_limit']:
     x_train = x_train[:run_config['train_limit']]
     y_train = y_train[:run_config['train_limit']]
 
-vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", "speakeasy_BPE_50000_sentencepiece_vocab.json")
+vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", "bpe_50000_sentencepiece_vocab.json")
 with open(vocabFile, 'r') as f:
     vocab = json.load(f)
 vocab_size = len(vocab) # adjust it to exact number of tokens in the vocabulary

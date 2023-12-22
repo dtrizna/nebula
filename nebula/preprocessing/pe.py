@@ -4,6 +4,7 @@ import logging
 from time import time
 from pathlib import Path
 
+import lief
 import speakeasy
 
 import nebula
@@ -13,6 +14,21 @@ from nebula.misc import get_alphanum_chars
 
 from .tokenization import JSONFilter
 from .normalization import normalizeTableIP, normalizeTablePath
+
+
+def is_pe_file(file_path):
+    try:
+        # Parse the file
+        binary = lief.parse(file_path)
+
+        # Check if it's PE
+        if isinstance(binary, lief.PE.Binary):
+            return True
+    except (lief.bad_format, lief.bad_file, lief.pe_error, lief.parser_error):
+        # Exceptions indicate it's likely not a PE or the file can't be parsed.
+        pass
+    return False
+
 
 class PEStaticFeatureExtractor(object):
     def __init__(self):

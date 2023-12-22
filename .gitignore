@@ -4,11 +4,15 @@ __pycache__/
 .ipynb_checkpoints
 .DS_Store
 .vscode
+*egg-info
+build/*
+.markdownlint.json
 
 # research files
 evaluation/*
 
 # Data
+data/*
 *7z
 *zip
 *npy

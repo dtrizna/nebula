@@ -13,7 +13,7 @@ def load_tokenizer(type="whitespace"):
     
     if type == "whitespace":
         with open(os.path.join(REPOSITORY_ROOT, "nebula", "objects",
-                "speakeasy_whitespace_50000_vocab.json")) as f:
+                "whitespace_50000_vocab.json")) as f:
             vocab = json.load(f)
     
         tokenizer = JSONTokenizerNaive(
@@ -23,14 +23,14 @@ def load_tokenizer(type="whitespace"):
         )
     if type == "bpe":
         with open(os.path.join(REPOSITORY_ROOT, "nebula", "objects",
-                "speakeasy_BPE_50000_sentencepiece_vocab.json")) as f:
+                "bpe_50000_sentencepiece_vocab.json")) as f:
             vocab = json.load(f)
         
         tokenizer = JSONTokenizerBPE(
             vocab_size=len(vocab),
             seq_len=512,
             model_path=os.path.join(REPOSITORY_ROOT, "nebula", "objects",
-                        "speakeasy_BPE_50000_sentencepiece.model")
+                        "bpe_50000_sentencepiece.model")
         )
     return tokenizer
 

@@ -135,7 +135,7 @@ for i, file in enumerate(trainSetsFiles):
     maxlen = int(file.split("_")[4])
     model_config["maxlen"] = maxlen
 
-    vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", f"speakeasy_BPE_{vocab_size}_vocab.json")
+    vocabFile = os.path.join(REPO_ROOT, "nebula", "objects", f"bpe_{vocab_size}_vocab.json")
     with open(vocabFile, 'r') as f:
         vocab = json.load(f)
     vocab_size = len(vocab) # adjust it to exact number of tokens in the vocabulary
