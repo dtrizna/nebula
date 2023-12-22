@@ -390,7 +390,7 @@ class JSONTokenizerBPE(JSONTokenizer):
         
         self.vocab = dict(zip(keys, values))
         self.reverse_vocab = {v:k for k,v in self.vocab.items()}
-        logging.warning(f" [!] Loaded vocab with size {len(self.vocab)} from {vocab}")
+        logging.warning(f" [!] Loaded vocab from {vocab}")
         
     def dump_vocab(self):
         vocabFileName = self.model_path.replace(".model","") + "_vocab.json"

@@ -118,37 +118,3 @@ logit = model(x)
 from torch import sigmoid
 prob = sigmoid(logit)
 print(f"\n[!!!] Probability of being malicious: {prob.item():.3f} | Logit: {logit.item():.3f}")
-
-TRAIN_SAMPLE = False
-if TRAIN_SAMPLE:
-    # ===================
-    # OPTIONAL !!!!!
-    # ===================
-    # TRAINING
-    # ===================
-    from torch import cuda
-    from torch.optim import AdamW
-    from torch.nn import BCEWithLogitsLoss
-    from nebula import ModelTrainer
-
-    TIME_BUDGET = 5 # minutes
-    device = "cuda" if cuda.is_available() else "cpu"
-    model_trainer_config = {
-        "device": device,
-        "model": model,
-        "loss_function": BCEWithLogitsLoss(),
-        "optimizer_class": AdamW,
-        "optimizer_config": {"lr": 3e-4},
-        "optim_scheduler": None,
-        "optim_step_budget": None,
-        "outputFolder": "out",
-        "batchSize": 96,
-        "verbosity_n_batches": 100,
-        "clip_grad_norm": 1.0,
-        "n_batches_grad_update": 1,
-        "time_budget": int(TIME_BUDGET*60) if TIME_BUDGET else None,
-    }
-
-    # 3. TRAIN
-    model_trainer = ModelTrainer(**model_trainer_config)
-    # model_trainer.train(x, y)
