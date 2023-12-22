@@ -100,7 +100,7 @@ class Nebula:
                 seq_len=self.seq_len,
                 vocab=vocab_file
             )
-        logging.info("[!] Tokenizer ready!")
+        logging.info(" [!] Tokenizer ready!")
         
         # PyTorch model initialization
         if torch_model_config is None:

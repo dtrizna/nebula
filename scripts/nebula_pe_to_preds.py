@@ -13,7 +13,7 @@ nebula = Nebula(
     tokenizer = TOKENIZER,
 )
 
-# 0. EMULATE IT -- SKIP IF YOU HAVE JSON REPORT ALREADY !!!
+# 0. EMULATE IT: SKIP IF YOU HAVE JSON REPORT ALREADY
 PE = r"C:\Windows\System32\calc.exe"
 report = nebula.dynamic_analysis_pe_file(PE)
 # 1. PREPROCESS EMULATED JSON REPORT AS ARRAY

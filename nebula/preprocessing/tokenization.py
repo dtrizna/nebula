@@ -328,7 +328,7 @@ class JSONTokenizerBPE(JSONTokenizer):
 
         if model_path is not None:
             self.tokenizer = spm.SentencePieceProcessor(model_file=model_path.replace(".model","")+".model")
-            logging.warning(" [!] Successfully loaded pre-trained tokenizer model!")
+            logging.info(" [!] Successfully loaded pre-trained tokenizer model!")
             self.model_path = model_path
             self.load_vocab(vocab=vocab)
         else:
@@ -390,7 +390,7 @@ class JSONTokenizerBPE(JSONTokenizer):
         
         self.vocab = dict(zip(keys, values))
         self.reverse_vocab = {v:k for k,v in self.vocab.items()}
-        logging.warning(f" [!] Loaded vocab from {vocab}")
+        logging.info(f" [!] Loaded vocab from {vocab}")
         
     def dump_vocab(self):
         vocabFileName = self.model_path.replace(".model","") + "_vocab.json"

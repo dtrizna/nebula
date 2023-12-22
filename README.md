@@ -10,21 +10,47 @@ All Nebula and alternative dynamic malware analysis models are under `nebula/mod
 
 Examples of usage are under `scripts/` directory.
 
-All experimental setup and results are under `evaluation/` directory, specifically:
-
-- `paper_ablation/` contains the code for the ablation studies;
-- `paper_sota/` contains the code for the comparison with state-of-the-art models;
-- `explanation/` contains the code for the explainability experiments of the model;
-- `adversarial/` contains the code for the adversarial robustness experiments;
-- `language_modeling/` has experiments with masked language modeling.
-
 ### Installation
 
 ```bash
 pip install git+https://github.com/dtrizna/nebula
 ```
 
+### Usage Example
 
+```python
+from nebula import Nebula
+
+# model setup
+TOKENIZER = "bpe" # supports: ["bpe", "whitespace"]
+nebula = Nebula(
+    vocab_size = 50000, # pre-trained only for 50k
+    seq_len = 512, # pre-trained only for 512
+    tokenizer = TOKENIZER,
+)
+
+# 0. EMULATE IT: SKIP IF YOU HAVE JSON REPORTS ALREADY
+PE = r"C:\Windows\System32\calc.exe"
+report = nebula.dynamic_analysis_pe_file(PE)
+# 1. PREPROCESS EMULATED JSON REPORT AS ARRAY
+x_arr = nebula.preprocess(report)
+# 2. PASS THROUGH PYTORCH MODEL
+prob = nebula.predict_proba(x_arr)
+print(f"\n[!] Probability of being malicious: {prob:.3f}")
+```
+
+Running this:
+
+```bash
+> python3 scripts\nebula_pe_to_preds.py
+
+INFO:root: [!] Successfully loaded pre-trained tokenizer model!
+INFO:root: [!] Loaded vocab from <REDACTED>\nebula\objects\bpe_50000_vocab.json
+INFO:root: [!] Tokenizer ready!
+INFO:root: [!] Model ready!
+
+[!] Probability of being malicious: 0.001
+```
 
 ## Pre-training with self-supervised techniques
 
