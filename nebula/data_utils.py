@@ -35,12 +35,22 @@ class CSRTensorDataset(Dataset):
             return x_data,
 
 
-def create_dataloader(X, y=None, batch_size=1024, shuffle=False, workers=4):
+def create_dataloader(
+        X: np.ndarray,
+        y: np.ndarray = None,
+        batch_size: int = 1024,
+        shuffle: bool = False,
+        workers: int = 4
+) -> DataLoader:
     # Convert numpy arrays to torch tensors
     if isinstance(X, np.ndarray):
         X = torch.from_numpy(X).long()
     if y is not None and isinstance(y, np.ndarray):
         y = torch.from_numpy(y).float()
+    
+    if y is not None:
+        # y = y.reshape(-1, 1) if len(y.shape) == 1 else y
+        assert X.shape[0] == y.shape[0], "X and y must have the same number of rows"
 
     # Handle csr_matrix case
     if isinstance(X, csr_matrix):
@@ -56,6 +66,7 @@ def create_dataloader(X, y=None, batch_size=1024, shuffle=False, workers=4):
         batch_size=batch_size,
         shuffle=shuffle,
         num_workers=workers,
+        # NOTE: these are important for lightning to iterate quickly
         persistent_workers=True,
         pin_memory=True
     )

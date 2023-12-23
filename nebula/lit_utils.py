@@ -11,10 +11,12 @@ from lightning.pytorch.callbacks import TQDMProgressBar, ModelCheckpoint, EarlyS
 from lightning.pytorch.loggers import CSVLogger, TensorBoardLogger
 
 from torch import nn
-from torch import cat, sigmoid, optim
+from torch import cat, sigmoid, save, load, optim
 from torch.utils.data import DataLoader
 from torch.nn import BCEWithLogitsLoss
 import torchmetrics
+
+from .data_utils import create_dataloader
 
 
 class LitProgressBar(TQDMProgressBar):
@@ -28,7 +30,7 @@ class PyTorchLightningModel(L.LightningModule):
     def __init__(
             self,
             model: nn.Module,
-            learning_rate: float,
+            learning_rate: float = 1e-3,
             fpr: float = 1e-4,
             scheduler: Union[None, str] = None,
             scheduler_step_budget: Union[None, int] = None
@@ -178,14 +180,21 @@ class LitTrainerWrapper:
         early_stop_patience: Union[None, int] = 5,
         early_stop_min_delta: float = 0.0001,
         scheduler: Union[None, str] = None,
-        verbose=False
+        # data config
+        batch_size: int = 1024,
+        dataloader_workers: int = 4,
+        random_state: int = 42,
+        verbose: bool = False,
+        skip_trainer_init: bool = False
     ):
         self.pytorch_model = pytorch_model
         self.lit_model = None
+        self.model_file = model_file
 
         self.name = name
         self.log_folder = log_folder
-        self.model_file = model_file
+        os.makedirs(self.log_folder, exist_ok=True)
+        print(f"[!] Logging to {self.log_folder}")
         
         self.epochs = epochs
         self.learning_rate = learning_rate
@@ -198,9 +207,23 @@ class LitTrainerWrapper:
         self.early_stop_min_delta = early_stop_min_delta
         self.scheduler = scheduler
 
-        self.verbose = verbose
-        self.setup_trainer()
+        self.batch_size = batch_size
+        self.dataloader_workers = dataloader_workers
 
+        self.verbose = verbose
+        self.random_state = random_state
+        L.seed_everything(self.random_state)
+        if not skip_trainer_init:
+            self.setup_trainer()
+
+        # TODO: provide option to setup time
+        self.training_time = None
+        # assert (max_time is None) or (max_epochs is None), "only either 'max_time' or 'max_epochs' can be set"
+        # assert (max_time is not None) or (max_epochs is not None), "at least one of 'max_time' or 'max_epochs' should be set"
+        # assert max_time is None or isinstance(max_time, dict),\
+        #     """max_time must be None or dict, e.g. {"minutes": 2, "seconds": 30}"""
+        # NOTE: above format is what L.Trainer expects to receive as max_time parameter
+        
 
     def setup_trainer(self):
         model_checkpoint = ModelCheckpoint(
@@ -255,28 +278,29 @@ class LitTrainerWrapper:
 
     def train_lit_model(
             self,
-            X_train_loader: DataLoader,
-            X_test_loader: DataLoader,
+            train_dataloader: DataLoader,
+            val_dataloader: DataLoader = None,
     ):
-        self.scheduler_budget = self.epochs * len(X_train_loader)
+        self.train_dataloader = train_dataloader
+        self.val_dataloader = val_dataloader
+        self.scheduler_budget = self.calculate_scheduler_step_budget(
+            max_epochs=self.epochs,
+            max_time=self.training_time
+        )
         if self.lit_model is None:
             self.lit_model = PyTorchLightningModel(
                 model=self.pytorch_model,
                 learning_rate=self.learning_rate,
                 scheduler=self.scheduler,
-                scheduler_step_budget=self.scheduler_budget
+                scheduler_step_budget=self.scheduler_budget,
             )
 
         print(f"[*] Training '{self.name}' model...")
-        self.trainer.fit(self.lit_model, X_train_loader, X_test_loader)
+        self.trainer.fit(self.lit_model, self.train_dataloader, self.val_dataloader)
 
         if self.model_file is not None:
-            # copy best checkpoint to the LOGS_DIR for further tests
-            last_version_folder = [x for x in os.listdir(os.path.join(self.log_folder, self.name + "_csv")) if "version" in x][-1]
-            checkpoint_path = os.path.join(self.log_folder, self.name + "_csv", last_version_folder, "checkpoints")
-            best_checkpoint_name = [x for x in os.listdir(checkpoint_path) if x != "last.ckpt"][0]
-            copyfile(os.path.join(checkpoint_path, best_checkpoint_name), self.model_file)
-        
+            self.save_lit_model()
+
 
     def predict_lit_model(
             self,
@@ -293,4 +317,67 @@ class LitTrainerWrapper:
         if dump_logits:
             assert isinstance(dump_logits, str), "Please provide a path to dump logits: dump_logits='path/to/logits.pkl'"
             pickle.dump(y_pred_logits, open(dump_logits, "wb"))
-        return y_pred
+        return y_pred     
+
+
+    def save_lit_model(self, model_name: str = None):
+        # TODO: verify if this works properly, do not see model file
+        if model_name is None:
+            model_name = self.model_file
+        assert model_name is not None, "Please provide a model name"
+
+        # copy the best checkpoint
+        last_version_folder = [x for x in os.listdir(os.path.join(self.log_folder, self.name + "_csv")) if "version" in x][-1]
+        checkpoint_path = os.path.join(self.log_folder, self.name + "_csv", last_version_folder, "checkpoints")
+        best_checkpoint_name = [x for x in os.listdir(checkpoint_path) if x != "last.ckpt"][0]
+        copyfile(os.path.join(checkpoint_path, best_checkpoint_name), self.model_file)
+
+
+    def save_torch_model(self, model_name: str = None):
+        if model_name is None:
+            model_name = self.model_file
+        assert model_name is not None, "Please provide a model name"
+
+        save(self.pytorch_model, model_name)
+        print(f"[!] Saved model to {model_name}")
+    
+
+    def create_dataloader(
+            self,
+            X: np.ndarray,
+            y: np.ndarray,
+            batch_size: int = None,
+            dataloader_workers: int = None,
+            shuffle: bool = False
+    ):
+        if batch_size is None:
+            batch_size = self.batch_size
+        else:
+            self.batch_size = batch_size
+        if dataloader_workers is None:
+            dataloader_workers = self.dataloader_workers
+        else:
+            self.dataloader_workers = dataloader_workers
+
+        dataloader = create_dataloader(
+                X=X,
+                y=y,
+                batch_size=self.batch_size,
+                shuffle=shuffle,
+                workers=self.dataloader_workers
+        )
+        return dataloader
+    
+
+    def calculate_scheduler_step_budget(
+        self,
+        max_time: dict = None,
+        max_epochs: int = None
+    ) -> int:
+        if max_epochs is not None:
+            total_batches = max_epochs * len(self.train_dataloader)
+        if max_time is not None:
+            # TODO: does lightning provide a way to get the number of batches from time?
+            raise NotImplementedError("calculate_scheduler_step_budget for max_time is not implemented yet")
+        return total_batches
+    

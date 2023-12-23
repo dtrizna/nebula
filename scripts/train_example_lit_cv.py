@@ -17,11 +17,10 @@ else:
     REPOSITORY_ROOT = os.getcwd()
 sys.path.append(REPOSITORY_ROOT)
 
-from nebula.lit_utils import LitTrainerWrapper
+from nebula.evaluation.lit_cv import LitCrossValidation
 from nebula.misc import fix_random_seed
 
 if __name__ == "__main__":
-
     fix_random_seed(0)
 
     # ==============
@@ -82,28 +81,23 @@ if __name__ == "__main__":
     # TRAINING
     # ===================
 
-    lit_trainer = LitTrainerWrapper(
+    lit_cv = LitCrossValidation(
+        # cv config
+        folds=3,
+        dump_data_splits=True,
+        dump_models=True,
+        # trainer config
         pytorch_model=model,
         name = "test_training",
-        log_folder=f"./test_run_{int(time())}",
+        log_folder=f"./cv_test_run_{int(time())}",
         epochs = 2,
         scheduler="onecycle",
         model_file="test.ckpt",
+        # data config
         batch_size=256,
-        dataloader_workers=4
+        dataloader_workers=4,
+        # misc
+        random_state=0,
+        verbose=True
     )
-    train_loader = lit_trainer.create_dataloader(x_train, y_train)
-    test_loader = lit_trainer.create_dataloader(x_test, y_test, shuffle=False)
-    lit_trainer.train_lit_model(
-        train_dataloader=train_loader,
-        val_dataloader=test_loader,
-    )
-
-    # get f1 scores
-    y_train_pred = lit_trainer.predict_lit_model(train_loader)
-    f1_train = f1_score(y_train, y_train_pred)
-    print(f"[!] Train F1: {f1_train*100:.2f}%")
-
-    y_test_pred = lit_trainer.predict_lit_model(test_loader)
-    f1_test = f1_score(y_test, y_test_pred)
-    print(f"[!] Test F1: {f1_test*100:.2f}%")
+    lit_cv.run(x=x_train, y=y_train, print_fold_scores=True)
