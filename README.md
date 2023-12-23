@@ -21,21 +21,23 @@ pip install git+https://github.com/dtrizna/nebula
 ```python
 from nebula import Nebula
 
-# model setup
-TOKENIZER = "bpe" # supports: ["bpe", "whitespace"]
+# 0. MODEL SETUP
 nebula = Nebula(
     vocab_size = 50000, # pre-trained only for 50k
     seq_len = 512, # pre-trained only for 512
-    tokenizer = TOKENIZER,
+    tokenizer = "bpe" # supports: ["bpe", "whitespace"],
 )
 
-# 0. EMULATE IT: SKIP IF YOU HAVE JSON REPORTS ALREADY
-PE = r"C:\Windows\System32\calc.exe"
-report = nebula.dynamic_analysis_pe_file(PE)
-# 1. PREPROCESS EMULATED JSON REPORT AS ARRAY
+# 1. EMULATE IT: SKIP IF YOU HAVE JSON REPORTS ALREADY
+pe = r"C:\Windows\System32\calc.exe"
+report = nebula.dynamic_analysis_pe_file(pe)
+
+# 2. PREPROCESS EMULATED JSON REPORT AS ARRAY
 x_arr = nebula.preprocess(report)
-# 2. PASS THROUGH PYTORCH MODEL
+
+# 3. PASS THROUGH PYTORCH MODEL
 prob = nebula.predict_proba(x_arr)
+
 print(f"\n[!] Probability of being malicious: {prob:.3f}")
 ```
 
