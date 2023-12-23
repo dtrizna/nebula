@@ -24,7 +24,7 @@ class MaskedLanguageModelTrainer(ModelTrainer):
         assert masked_target_type in ["onehot", "count"], "masked_target_type must be either 'onehot' or 'count'"
         self.masked_target_type = masked_target_type
 
-    def maskSequence(self, sequence):
+    def mask_seq(self, sequence):
         """
         Mask a sequence with a given probability.
         
@@ -76,11 +76,11 @@ class MaskedLanguageModelTrainer(ModelTrainer):
 
         return masked_sequence, masked_token_idxs
 
-    def maskSequenceArr(self, sequence):
+    def mask_seq_arr(self, sequence):
         seq_masked = []
         target = []
         for seq in tqdm(sequence):
-            masked_local, target_local = self.maskSequence(seq)
+            masked_local, target_local = self.mask_seq(seq)
             seq_masked.append(masked_local)
             target.append(target_local)
         # U_masked shape: (n_sequences, max_len)
@@ -114,7 +114,7 @@ class MaskedLanguageModelTrainer(ModelTrainer):
                 
                 if i % remask_epochs == 0:
                     logging.warning(f' [*] Re-masking sequences...')
-                    x_masked, y_masked = self.maskSequenceArr(x_unlabeled)
+                    x_masked, y_masked = self.mask_seq_arr(x_unlabeled)
         
                 self.fit(
                     x_masked,
@@ -126,7 +126,7 @@ class MaskedLanguageModelTrainer(ModelTrainer):
                 )
         else:
             logging.warning(' [*] Masking sequences...')
-            x_masked, y_masked = self.maskSequenceArr(x_unlabeled)
+            x_masked, y_masked = self.mask_seq_arr(x_unlabeled)
             
             self.fit(
                 x_masked,

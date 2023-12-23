@@ -25,7 +25,7 @@ set_random_seed(random_state)
 
 uSize = 0.8
 run_name = f"uSize_{uSize}_mask_every_epoch"
-modelClass = TransformerEncoderChunksLM
+model_class = TransformerEncoderChunksLM
 
 run_config = {
     "unlabeledDataSize": uSize,
@@ -33,7 +33,7 @@ run_config = {
     "downStreamEpochs": 3,
     "preTrainEpochs": 30,
     "falsePositiveRates": [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
-    "modelType": modelClass.__name__,
+    "modelType": model_class.__name__,
     "train_limit": None,
     "random_state": random_state,
     'batchSize': 64,
@@ -46,18 +46,18 @@ run_config = {
 }
 
 timestamp = int(time.time())
-outputFolder = os.path.join(REPO_ROOT, "evaluation", "MaskedLanguageModeling", "pretrain_epoch_analysis",
+output_dir = os.path.join(REPO_ROOT, "evaluation", "MaskedLanguageModeling", "pretrain_epoch_analysis",
     f"{run_name}_{timestamp}")
-os.makedirs(outputFolder, exist_ok=True)
+os.makedirs(output_dir, exist_ok=True)
 
-with open(os.path.join(outputFolder, f"run_config.json"), "w") as f:
+with open(os.path.join(output_dir, f"run_config.json"), "w") as f:
     json.dump(run_config, f, indent=4)
 
 # ===== LOGGING SETUP =====
 logFile = f"{run_name}.log"
 
 logging.basicConfig(
-    filename=os.path.join(outputFolder, logFile),
+    filename=os.path.join(output_dir, logFile),
     level=logging.WARNING,
     format='%(asctime)s %(message)s',
     datefmt='%m/%d/%Y %I:%M:%S %p'
@@ -107,8 +107,8 @@ model_config = {
 }
 
 # ======= PRETRAINING =========
-languageModelClass = MaskedLanguageModelTrainer
-languageModelClassConfig = {
+language_modeling_class = MaskedLanguageModelTrainer
+language_modeling_config = {
     "vocab": vocab, # needs vocab to mask sequences
     "mask_probability": run_config["mask_probability"],
     "random_state": random_state,
@@ -117,35 +117,36 @@ languageModelClassConfig = {
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 pretrainingConfig = {
-    "modelClass": modelClass,
-    "modelConfig": model_config,
-    "pretrainingTaskClass": languageModelClass,
-    "pretrainingTaskConfig": languageModelClassConfig,
+    "model_class": model_class,
+    "model_config": model_config,
+    "language_modeling_class": language_modeling_class,
+    "language_modeling_config": language_modeling_config,
     "device": device,
-    "unlabeledDataSize": run_config["unlabeledDataSize"],
-    "pretraingEpochs": run_config["preTrainEpochs"],
-    "downstreamEpochs": run_config["downStreamEpochs"],
+    "unlabeled_data_ratio": run_config["unlabeledDataSize"],
+    "pretrain_epochs": run_config["preTrainEpochs"],
+    "downstream_epochs": run_config["downStreamEpochs"],
     "verbosity_n_batches": run_config["verbosity_n_batches"],
-    "batchSize": run_config["batchSize"],
-    "randomState": random_state,
-    "falsePositiveRates": run_config["falsePositiveRates"],
+    "batch_size": run_config["batchSize"],
+    "random_state": random_state,
+    "false_positive_rates": run_config["falsePositiveRates"],
     "optim_step_budget": run_config["optim_step_budget"],
-    "outputFolder": outputFolder,
+    "output_dir": output_dir,
     "dump_model_every_epoch": run_config["dump_model_every_epoch"],
     "dump_data_splits": run_config["dump_data_splits"],
     "remask_epochs": run_config["remask_epochs"],
 }
 
+
 # =========== PRETRAINING RUN ===========
 msg = f" [!] Initiating Self-Supervised Learning Pretraining\n"
-msg += f"     Language Modeling {languageModelClass.__name__}\n"
-msg += f"     Model {modelClass.__name__} with config:\n\t{model_config}\n"
+msg += f"     Language Modeling {language_modeling_class.__name__}\n"
+msg += f"     Model {model_class.__name__} with config:\n\t{model_config}\n"
 logging.warning(msg)
 
 pretrain = SelfSupervisedPretraining(**pretrainingConfig)
 metrics = pretrain.run_splits(xTrain, yTrain, xTest, yTest, nSplits=run_config['nSplits'], rest=0)
 
-metricsOutFile = f"{outputFolder}/results_full.json"
+metricsOutFile = f"{output_dir}/results_full.json"
 with open(metricsOutFile, 'w') as f:
     json.dump(metrics, f, indent=4)
 logging.warning(f" [!] Finished pre-training evaluation over {run_config['nSplits']} splits! Saved metrics to:\n\t{metricsOutFile}")
@@ -155,10 +156,10 @@ del pretrain
 clear_cuda_cache()
 
 logging.warning(f" [*] Evaluating pre-training length utility -- looping over per-epoch models...")
-split_data = [x for x in os.listdir(outputFolder) if x.endswith(".npz")]
-split_data = [os.path.join(outputFolder, x) for x in split_data]
+split_data = [x for x in os.listdir(output_dir) if x.endswith(".npz")]
+split_data = [os.path.join(output_dir, x) for x in split_data]
 
-pretrainFileFolder = os.path.join(outputFolder, "preTraining", "training_files")
+pretrainFileFolder = os.path.join(output_dir, "preTraining", "training_files")
 pretrainModelFiles = [x for x in os.listdir(pretrainFileFolder) if x.startswith("epoch_")]
 pretrainModelFiles = [os.path.join(pretrainFileFolder, x) for x in pretrainModelFiles]
 
@@ -185,7 +186,7 @@ for split in range(len(split_data)):
     for epoch in range(1,epochs+1):
         logging.warning(f" [!] Evaluating model from split: {split} | epoch: {epoch}")
         model_file = [x for x in pretrainModelFiles if f"epoch_{epoch}" in x][split]
-        model = modelClass(**model_config)
+        model = model_class(**model_config)
         model.load_state_dict(torch.load(model_file))
         
         # finetune model
@@ -219,5 +220,5 @@ for epoch in range(1, epochs+1):
     results[epoch]['auc_mean'] = np.nanmean(aucs[epoch], axis=0)
     results[epoch]['auc_std'] = np.nanstd(aucs[epoch], axis=0)
 
-with open(os.path.join(outputFolder, "results_per_epoch.json"), "w") as f:
+with open(os.path.join(output_dir, "results_per_epoch.json"), "w") as f:
     json.dump(results, f, indent=4)

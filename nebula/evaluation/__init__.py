@@ -4,51 +4,54 @@ import logging
 import numpy as np
 from collections import defaultdict
 from pandas import DataFrame
+from typing import Union, List
 
 from time import sleep, time
-from torch.optim import Adam, AdamW
-from torch.nn import BCEWithLogitsLoss, CrossEntropyLoss
+from torch.optim import AdamW
+from torch.nn import BCEWithLogitsLoss, CrossEntropyLoss, Module
 from sklearn.model_selection import train_test_split, KFold
 from sklearn.metrics import f1_score, roc_auc_score
 
 from nebula import ModelTrainer
 from nebula.misc import get_tpr_at_fpr, clear_cuda_cache
+from nebula.pretraining import MaskedLanguageModelTrainer, AutoRegressiveModelTrainer
 
 
 class SelfSupervisedPretraining:
     def __init__(self, 
-                    modelClass,
-                    modelConfig,
-                    pretrainingTaskClass,
-                    pretrainingTaskConfig,
-                    device = 'auto',
-                    training_types=['pretrained', 'non_pretrained', 'full_data'],
-                    false_positive_rates=[0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
-                    unlabeledDataSize=0.8,
-                    randomState=None,
-                    pretraingEpochs=5,
-                    downstreamEpochs=5,
-                    batchSize=256,
-                    verbosity_n_batches=100,
-                    optim_scheduler=None,
-                    optim_step_budget=5000,
-                    outputFolder=None,
-                    dump_model_every_epoch=False,
-                    dump_data_splits=True,
-                    remask_epochs=False,
-                    downsample_unlabeled_data=False):
+                    model_class: Module,
+                    model_config: dict,
+                    language_modeling_class: Union[MaskedLanguageModelTrainer, AutoRegressiveModelTrainer],
+                    language_modeling_config: dict,
+                    device: str = 'auto',
+                    training_types: List[str] = ['pretrained', 'non_pretrained', 'full_data'],
+                    false_positive_rates: List[str] =[0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
+                    unlabeled_data_ratio: float = 0.8,
+                    random_state: int = None,
+                    pretrain_epochs: int = 5,
+                    downstream_epochs: int = 5,
+                    batch_size: int = 256,
+                    verbosity_n_batches: int = 100,
+                    optim_scheduler: str = None,
+                    optim_step_budget: int = 5000,
+                    output_dir: str = None,
+                    dump_model_every_epoch: bool = False,
+                    dump_data_splits: bool = True,
+                    remask_epochs: bool = False,
+                    downsample_unlabeled_data: bool = False
+                ):
         self.device = device
         self.training_types = training_types
         self.false_positive_rates = false_positive_rates
-        self.unlabeledDataSize = unlabeledDataSize
-        self.randomState = randomState
-        self.pretrainingEpochs = pretraingEpochs
-        self.downstreamEpochs = downstreamEpochs
-        self.batchSize = batchSize
+        self.unlabeledDataSize = unlabeled_data_ratio
+        self.randomState = random_state
+        self.pretrain_pochs = pretrain_epochs
+        self.downstream_epochs = downstream_epochs
+        self.batch_size = batch_size
         self.verbosity_n_batches = verbosity_n_batches
         self.optim_step_budget = optim_step_budget
         self.optim_scheduler = optim_scheduler
-        self.output_folder = outputFolder
+        self.output_dir = output_dir
         self.dump_model_every_epoch = dump_model_every_epoch
         self.dump_data_splits = dump_data_splits
         self.remask_epochs = remask_epochs
@@ -56,10 +59,10 @@ class SelfSupervisedPretraining:
         if self.downsample_unlabeled_data:
             assert isinstance(downsample_unlabeled_data, float) and 0 < downsample_unlabeled_data < 1
         
-        self.model_class = modelClass
-        self.model_config = modelConfig
-        self.pretraining_task_class = pretrainingTaskClass
-        self.pretraining_task_config = pretrainingTaskConfig
+        self.model_class = model_class
+        self.model_config = model_config
+        self.pretraining_task_class = language_modeling_class
+        self.pretraining_task_config = language_modeling_config
 
     def run_one_split(self, x, y, x_test, y_test):
         models = {k: None for k in self.training_types}
@@ -79,7 +82,7 @@ class SelfSupervisedPretraining:
         if self.dump_data_splits:
             splitData = f"dataset_splits_{timestamp}.npz"
             np.savez_compressed(
-                os.path.join(self.output_folder, splitData),
+                os.path.join(self.output_dir, splitData),
                 unlabeled_data=unlabeled_data,
                 labeled_x=labeled_x,
                 labeled_y=labeled_y
@@ -93,18 +96,18 @@ class SelfSupervisedPretraining:
         model_trainer_config = {
             "device": self.device,
             "model": models['pretrained'],
-            "modelForwardPass": models['pretrained'].pretrain,
+            "forward_pass": models['pretrained'].pretrain,
             "loss_function": CrossEntropyLoss(),
             "optimizer_class": AdamW,
             "optimizer_config": {"lr": 2.5e-4},
             "optim_scheduler": self.optim_scheduler,
             "optim_step_budget": self.optim_step_budget,
             "verbosity_n_batches": self.verbosity_n_batches,
-            "batchSize": self.batchSize,
+            "batchSize": self.batch_size,
             "falsePositiveRates": self.false_positive_rates,
         }
-        if self.output_folder:
-            model_trainer_config["outputFolder"] = os.path.join(self.output_folder, "preTraining")
+        if self.output_dir:
+            model_trainer_config["outputFolder"] = os.path.join(self.output_dir, "pretraining")
 
         self.pretraining_task_config['model_trainer_config'] = model_trainer_config
         self.pretraining_task = self.pretraining_task_class(
@@ -112,14 +115,14 @@ class SelfSupervisedPretraining:
         )
         self.pretraining_task.pretrain(
             unlabeled_data,
-            epochs=self.pretrainingEpochs,
+            epochs=self.pretrain_pochs,
             dump_model_every_epoch=self.dump_model_every_epoch,
             remask_epochs=self.remask_epochs
         )
 
         # downstream task for pretrained model
         model_trainer_config['loss_function'] = BCEWithLogitsLoss()
-        model_trainer_config['modelForwardPass'] = None
+        model_trainer_config['forward_pass'] = None
 
         for model in self.training_types:
             logging.warning(f' [!] Training {model} model on downstream task...')
@@ -127,18 +130,18 @@ class SelfSupervisedPretraining:
                 models[model] = self.model_class(**self.model_config).to(self.device)
             model_trainer_config['model'] = models[model]
             
-            if self.output_folder:
-                model_trainer_config["outputFolder"] = os.path.join(self.output_folder, f"downstreamTask_{model}")
+            if self.output_dir:
+                model_trainer_config["outputFolder"] = os.path.join(self.output_dir, f"downstream_task_{model}")
             
             model_trainer[model] = ModelTrainer(**model_trainer_config)
             # TODO: don't like how step is calculated here
             # use size of x and self.unlabeledDataSize to calculate steps
             if model == 'full_data':
                 model_trainer_config['optim_step_budget'] = self.optim_step_budget//2
-                model_trainer[model].fit(x, y, self.downstreamEpochs, reporting_timestamp=timestamp)
+                model_trainer[model].fit(x, y, self.downstream_epochs, reporting_timestamp=timestamp)
             else:
                 model_trainer_config['optim_step_budget'] = self.optim_step_budget//10
-                model_trainer[model].fit(labeled_x, labeled_y, self.downstreamEpochs, reporting_timestamp=timestamp)
+                model_trainer[model].fit(labeled_x, labeled_y, self.downstream_epochs, reporting_timestamp=timestamp)
         
         for model in models:
             logging.warning(f' [*] Evaluating {model} model on test set...')
