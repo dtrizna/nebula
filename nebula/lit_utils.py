@@ -32,8 +32,8 @@ class PyTorchLightningModel(L.LightningModule):
             fpr: float = 1e-4,
             scheduler: Union[None, str] = None,
             scheduler_step_budget: Union[None, int] = None
+            # NOTE: scheduler_step_budget = epochs * len(train_loader)
     ):
-        # NOTE: scheduler_step_budget = epochs * len(train_loader)
         super().__init__()
 
         self.model = model
@@ -90,7 +90,6 @@ class PyTorchLightningModel(L.LightningModule):
                 "frequency": 1
             }
         }
-
 
     def get_tpr_at_fpr(self, predicted_logits, true_labels, fprNeeded=1e-4):
         predicted_probs = sigmoid(predicted_logits).cpu().detach().numpy()
@@ -161,116 +160,137 @@ class PyTorchLightningModel(L.LightningModule):
         return super().predict_step(batch[0], batch_idx, dataloader_idx)
         
 
-def configure_trainer(
-        name: str,
-        log_folder: str,
-        epochs: int,
-        device: str = "cpu",
-        # how many times to check val set within a single epoch
-        val_check_times: int = 2,
-        log_every_n_steps: int = 10,
-        monitor_metric: str = "val_tpr",
-        early_stop_patience: Union[None, int] = 5,
-        lit_sanity_steps: int = 1
-):
-    model_checkpoint = ModelCheckpoint(
-        monitor=monitor_metric,
-        save_top_k=1,
-        mode="max",
-        verbose=False,
-        save_last=True,
-        filename="{epoch}-tpr{val_tpr:.4f}-f1{val_f1:.4f}-acc{val_cc:.4f}"
-    )
-    callbacks = [LitProgressBar(), model_checkpoint]
-
-    if early_stop_patience is not None:
-        early_stop = EarlyStopping(
-            monitor=monitor_metric,
-            patience=early_stop_patience,
-            min_delta=0.0001,
-            verbose=True,
-            mode="max"
-        )
-        callbacks.append(early_stop)
-
-    trainer = L.Trainer(
-        num_sanity_val_steps=lit_sanity_steps,
-        max_epochs=epochs,
-        accelerator=device,
-        devices=1,
-        callbacks=callbacks,
-        val_check_interval=1/val_check_times,
-        log_every_n_steps=log_every_n_steps,
-        logger=[
-            CSVLogger(save_dir=log_folder, name=f"{name}_csv"),
-            TensorBoardLogger(save_dir=log_folder, name=f"{name}_tb")
-        ]
-    )
-
-    # Ensure folders for logging exist
-    os.makedirs(os.path.join(log_folder, f"{name}_tb"), exist_ok=True)
-    os.makedirs(os.path.join(log_folder, f"{name}_csv"), exist_ok=True)
-
-    return trainer
-
-
-def load_lit_model(
-        model_file: str,
+class LitTrainerWrapper:
+    def __init__(
+        self,
         pytorch_model: nn.Module,
         name: str,
         log_folder: str,
-        epochs: int,
-        device: str,
-        lit_sanity_steps: int
-):
-    lightning_model = PyTorchLightningModel.load_from_checkpoint(checkpoint_path=model_file, model=pytorch_model)
-    trainer = configure_trainer(name, log_folder, epochs, device=device, lit_sanity_steps=lit_sanity_steps)
-    return trainer, lightning_model
-
-
-def train_lit_model(
-        X_train_loader: DataLoader,
-        X_test_loader: DataLoader,
-        pytorch_model: nn.Module,
-        name: str,
-        log_folder: str,
+        model_file: str = None,
+        # training config
         epochs: int = 10,
         learning_rate: float = 1e-3,
-        scheduler: Union[None, str] = None,
-        scheduler_budget: Union[None, int] = None,
-        model_file: Union[None, str] = None,
         device: str = "cpu",
+        val_check_times: int = 2,
+        log_every_n_steps: int = 10,
         lit_sanity_steps: int = 1,
-        early_stop_patience: int = 5
-):
-    lightning_model = PyTorchLightningModel(model=pytorch_model, learning_rate=learning_rate, scheduler=scheduler, scheduler_step_budget=scheduler_budget)
-    trainer = configure_trainer(name, log_folder, epochs, device=device, lit_sanity_steps=lit_sanity_steps, early_stop_patience=early_stop_patience)
+        monitor_metric: str = "val_tpr",
+        early_stop_patience: Union[None, int] = 5,
+        early_stop_min_delta: float = 0.0001,
+        scheduler: Union[None, str] = None,
+        verbose=False
+    ):
+        self.pytorch_model = pytorch_model
+        self.lit_model = None
 
-    print(f"[*] Training '{name}' model...")
-    trainer.fit(lightning_model, X_train_loader, X_test_loader)
+        self.name = name
+        self.log_folder = log_folder
+        self.model_file = model_file
+        
+        self.epochs = epochs
+        self.learning_rate = learning_rate
+        self.device = device
+        self.val_check_times = val_check_times
+        self.log_every_n_steps = log_every_n_steps
+        self.lit_sanity_steps = lit_sanity_steps
+        self.monitor_metric = monitor_metric
+        self.early_stop_patience = early_stop_patience
+        self.early_stop_min_delta = early_stop_min_delta
+        self.scheduler = scheduler
 
-    if model_file is not None:
-        # copy best checkpoint to the LOGS_DIR for further tests
-        last_version_folder = [x for x in os.listdir(os.path.join(log_folder, name + "_csv")) if "version" in x][-1]
-        checkpoint_path = os.path.join(log_folder, name + "_csv", last_version_folder, "checkpoints")
-        best_checkpoint_name = [x for x in os.listdir(checkpoint_path) if x != "last.ckpt"][0]
-        copyfile(os.path.join(checkpoint_path, best_checkpoint_name), model_file)
-
-    return trainer, lightning_model
+        self.verbose = verbose
+        self.setup_trainer()
 
 
-def predict_lit_model(
-        loader: DataLoader, 
-        trainer: L.Trainer, 
-        lightning_model: PyTorchLightningModel, 
-        decision_threshold: int = 0.5, 
-        dump_logits: bool = False
-) -> np.ndarray:
-    """Get scores out of a loader."""
-    y_pred_logits = trainer.predict(model=lightning_model, dataloaders=loader)
-    y_pred = sigmoid(cat(y_pred_logits, dim=0)).numpy()
-    y_pred = np.array([1 if x > decision_threshold else 0 for x in y_pred])
-    if dump_logits:
-        assert isinstance(dump_logits, str), "Please provide a path to dump logits: dump_logits='path/to/logits.pkl'"
-        pickle.dump(y_pred_logits, open(dump_logits, "wb"))
-    return y_pred
+    def setup_trainer(self):
+        model_checkpoint = ModelCheckpoint(
+            monitor=self.monitor_metric,
+            save_top_k=1,
+            mode="max",
+            verbose=self.verbose,
+            save_last=True,
+            filename="{epoch}-tpr{val_tpr:.4f}-f1{val_f1:.4f}-acc{val_cc:.4f}"
+        )
+        callbacks = [LitProgressBar(), model_checkpoint]
+
+        if self.early_stop_patience is not None:
+            early_stop = EarlyStopping(
+                monitor=self.monitor_metric,
+                patience=self.early_stop_patience,
+                min_delta=self.early_stop_min_delta,
+                verbose=self.verbose,
+                mode="max"
+            )
+            callbacks.append(early_stop)
+
+        self.trainer = L.Trainer(
+            num_sanity_val_steps=self.lit_sanity_steps,
+            max_epochs=self.epochs,
+            accelerator=self.device,
+            devices=1,
+            callbacks=callbacks,
+            val_check_interval=1/self.val_check_times,
+            log_every_n_steps=self.log_every_n_steps,
+            logger=[
+                CSVLogger(save_dir=self.log_folder, name=f"{self.name}_csv"),
+                TensorBoardLogger(save_dir=self.log_folder, name=f"{self.name}_tb")
+            ]
+        )
+
+        # Ensure folders for logging exist
+        os.makedirs(os.path.join(self.log_folder, f"{self.name}_tb"), exist_ok=True)
+        os.makedirs(os.path.join(self.log_folder, f"{self.name}_csv"), exist_ok=True)
+
+
+    def load_lit_model(
+            self,
+            model_file: str,
+    ):
+        self.model_file = model_file
+        self.lit_model = PyTorchLightningModel.load_from_checkpoint(
+            checkpoint_path=self.model_file,
+            model=self.pytorch_model
+        )
+        
+
+    def train_lit_model(
+            self,
+            X_train_loader: DataLoader,
+            X_test_loader: DataLoader,
+    ):
+        self.scheduler_budget = self.epochs * len(X_train_loader)
+        if self.lit_model is None:
+            self.lit_model = PyTorchLightningModel(
+                model=self.pytorch_model,
+                learning_rate=self.learning_rate,
+                scheduler=self.scheduler,
+                scheduler_step_budget=self.scheduler_budget
+            )
+
+        print(f"[*] Training '{self.name}' model...")
+        self.trainer.fit(self.lit_model, X_train_loader, X_test_loader)
+
+        if self.model_file is not None:
+            # copy best checkpoint to the LOGS_DIR for further tests
+            last_version_folder = [x for x in os.listdir(os.path.join(self.log_folder, self.name + "_csv")) if "version" in x][-1]
+            checkpoint_path = os.path.join(self.log_folder, self.name + "_csv", last_version_folder, "checkpoints")
+            best_checkpoint_name = [x for x in os.listdir(checkpoint_path) if x != "last.ckpt"][0]
+            copyfile(os.path.join(checkpoint_path, best_checkpoint_name), self.model_file)
+        
+
+    def predict_lit_model(
+            self,
+            loader: DataLoader, 
+            decision_threshold: int = 0.5, 
+            dump_logits: Union[bool, str] = False
+    ) -> np.ndarray:
+        assert self.lit_model is not None,\
+            "[-] lightning_model isn't instantiated: either .train_lit_model() or .load_list_model()"
+        """Get scores out of a loader."""
+        y_pred_logits = self.trainer.predict(model=self.lit_model, dataloaders=loader)
+        y_pred = sigmoid(cat(y_pred_logits, dim=0)).numpy()
+        y_pred = np.array([1 if x > decision_threshold else 0 for x in y_pred])
+        if dump_logits:
+            assert isinstance(dump_logits, str), "Please provide a path to dump logits: dump_logits='path/to/logits.pkl'"
+            pickle.dump(y_pred_logits, open(dump_logits, "wb"))
+        return y_pred
