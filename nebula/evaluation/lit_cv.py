@@ -6,13 +6,14 @@ from torch import save
 from ..lit_utils import LitTrainerWrapper
 
 class LitCrossValidation(LitTrainerWrapper):
-    def __init__(self,
-                folds=3,
-                dump_data_splits=True,
-                dump_models=True,
-                *args,
-                **kwargs
-                ):
+    def __init__(
+            self,
+            folds=3,
+            dump_data_splits=True,
+            dump_models=True,
+            *args,
+            **kwargs
+        ):
         super().__init__(skip_trainer_init=True, *args, **kwargs)
         
         # cross validation config
@@ -68,7 +69,7 @@ class LitCrossValidation(LitTrainerWrapper):
 
         for fold, (train_index, val_index) in enumerate(kf.split(x)):
             self.fold = fold
-            print(f"[*] Fold {self.fold}/{self.folds}...")
+            print(f"[*] Fold {self.fold+1}/{self.folds}...")
             self.setup_trainer()
 
             X_train, y_train  = x[train_index], y[train_index]
@@ -94,11 +95,11 @@ class LitCrossValidation(LitTrainerWrapper):
             )
             if self.dump_models:
                 self.save_torch_model(model_name=os.path.join(self.log_folder, f"fold_{self.fold}_model.torch"))
-                self.save_lit_model(model_name=os.path.join(self.log_folder, f"fold_{self.fold}_model.lit"))
+                self.save_lit_model(model_name=os.path.join(self.log_folder, f"fold_{self.fold}_lit_model.ckpt"))
 
             if print_fold_scores:
                 y_train_pred = self.predict_lit_model(self.train_dataloader)
                 f1_train = f1_score(y_train, y_train_pred)
                 y_val_pred = self.predict_lit_model(self.val_dataloader)
                 f1_val = f1_score(y_val, y_val_pred)
-                print(f"[*] Fold {self.fold}/{self.folds} | train f1: {f1_train:.4f} | val f1: {f1_val:.4f}")
+                print(f"[*] Fold {self.fold+1}/{self.folds} | train f1: {f1_train:.4f} | val f1: {f1_val:.4f}")

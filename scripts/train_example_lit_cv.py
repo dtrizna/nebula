@@ -92,7 +92,6 @@ if __name__ == "__main__":
         log_folder=f"./cv_test_run_{int(time())}",
         epochs = 2,
         scheduler="onecycle",
-        model_file="test.ckpt",
         # data config
         batch_size=256,
         dataloader_workers=4,

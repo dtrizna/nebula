@@ -2,7 +2,7 @@ import os
 import pickle
 import numpy as np
 from shutil import copyfile
-from typing import Union, Any
+from typing import Union, Any, Callable
 
 from sklearn.metrics import roc_curve
 
@@ -33,15 +33,16 @@ class PyTorchLightningModel(L.LightningModule):
             learning_rate: float = 1e-3,
             fpr: float = 1e-4,
             scheduler: Union[None, str] = None,
-            scheduler_step_budget: Union[None, int] = None
+            scheduler_step_budget: Union[None, int] = None,
             # NOTE: scheduler_step_budget = epochs * len(train_loader)
+            loss: Callable = BCEWithLogitsLoss(),
     ):
         super().__init__()
 
         self.model = model
         self.learning_rate = learning_rate
         self.fpr = fpr
-        self.loss = BCEWithLogitsLoss()
+        self.loss = loss
 
         assert scheduler in [None, "onecycle", "cosine"], "Scheduler must be onecycle or cosine"
         if scheduler is not None:
@@ -330,16 +331,16 @@ class LitTrainerWrapper:
         last_version_folder = [x for x in os.listdir(os.path.join(self.log_folder, self.name + "_csv")) if "version" in x][-1]
         checkpoint_path = os.path.join(self.log_folder, self.name + "_csv", last_version_folder, "checkpoints")
         best_checkpoint_name = [x for x in os.listdir(checkpoint_path) if x != "last.ckpt"][0]
-        copyfile(os.path.join(checkpoint_path, best_checkpoint_name), self.model_file)
+        copyfile(os.path.join(checkpoint_path, best_checkpoint_name), model_name)
+        print(f"[!] Saved Ligthining model model to {model_name}")
 
 
     def save_torch_model(self, model_name: str = None):
         if model_name is None:
             model_name = self.model_file
         assert model_name is not None, "Please provide a model name"
-
         save(self.pytorch_model, model_name)
-        print(f"[!] Saved model to {model_name}")
+        print(f"[!] Saved PyTorch model to {model_name}")
     
 
     def create_dataloader(
