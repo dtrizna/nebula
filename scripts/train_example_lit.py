@@ -87,8 +87,10 @@ if __name__ == "__main__":
         name = "test_training",
         log_folder=f"./test_run_{int(time())}",
         epochs = 2,
+        log_every_n_steps=1,
         scheduler="onecycle",
-        model_file="test.ckpt",
+        lit_model_file="test.ckpt",
+        torch_model_file="test.torch",
         batch_size=256,
         dataloader_workers=4
     )

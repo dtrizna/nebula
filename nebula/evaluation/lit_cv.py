@@ -94,8 +94,8 @@ class LitCrossValidation(LitTrainerWrapper):
                 val_dataloader=self.val_dataloader
             )
             if self.dump_models:
-                self.save_torch_model(model_name=os.path.join(self.log_folder, f"fold_{self.fold}_model.torch"))
-                self.save_lit_model(model_name=os.path.join(self.log_folder, f"fold_{self.fold}_lit_model.ckpt"))
+                self.save_torch_model(model_file=os.path.join(self.log_folder, f"fold_{self.fold}_model.torch"))
+                self.save_lit_model(model_file=os.path.join(self.log_folder, f"fold_{self.fold}_lit_model.ckpt"))
 
             if print_fold_scores:
                 y_train_pred = self.predict_lit_model(self.train_dataloader)

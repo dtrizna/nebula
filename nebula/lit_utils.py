@@ -1,6 +1,7 @@
 import os
 import pickle
 import numpy as np
+from time import time
 from shutil import copyfile
 from typing import Union, Any, Callable
 
@@ -20,9 +21,9 @@ from .data_utils import create_dataloader
 
 
 class LitProgressBar(TQDMProgressBar):
-    # to preserve progress bar after each epoch
     def on_train_epoch_end(self, *args, **kwargs):
         super().on_train_epoch_end(*args, **kwargs)
+        # to preserve progress bar after each epoch
         print()
 
 
@@ -97,7 +98,11 @@ class PyTorchLightningModel(L.LightningModule):
     def get_tpr_at_fpr(self, predicted_logits, true_labels, fprNeeded=1e-4):
         predicted_probs = sigmoid(predicted_logits).cpu().detach().numpy()
         true_labels = true_labels.cpu().detach().numpy()
-        fpr, tpr, thresholds = roc_curve(true_labels, predicted_probs)
+        try :
+            fpr, tpr, thresholds = roc_curve(true_labels, predicted_probs)
+        except ValueError: 
+            # when multi-label 'ValueError: multilabel-indicator format is not supported'
+            return np.nan
         if all(np.isnan(fpr)):
             return np.nan#, np.nan
         else:
@@ -111,16 +116,16 @@ class PyTorchLightningModel(L.LightningModule):
     def _shared_step(self, batch):
         # used by training_step, validation_step and test_step
         x, y = batch
-        y = y.unsqueeze(1)
+        if len(y.shape) == 1:
+            y = y.unsqueeze(1)
         logits = self(x)
         loss = self.loss(logits, y)
-        
         return loss, y, logits
     
     def training_step(self, batch, batch_idx):
         # NOTE: keep batch_idx -- lightning needs it
         loss, y, logits = self._shared_step(batch)
-        self.log('train_loss', loss, prog_bar=True) # logging loss for this mini-batch
+        self.log('train_loss', loss, prog_bar=True)
         self.train_acc(logits, y)
         self.log('train_acc', self.train_acc, on_step=False, on_epoch=True, prog_bar=True)
         self.train_f1(logits, y)
@@ -134,6 +139,7 @@ class PyTorchLightningModel(L.LightningModule):
         return loss
     
     def validation_step(self, batch, batch_idx):
+        # NOTE: keep batch_idx -- lightning needs it
         loss, y, logits = self._shared_step(batch)
         self.log('val_loss', loss)
         self.val_acc(logits, y)
@@ -147,6 +153,7 @@ class PyTorchLightningModel(L.LightningModule):
         return loss
     
     def test_step(self, batch, batch_idx):
+        # NOTE: keep batch_idx -- lightning needs it
         loss, y, logits = self._shared_step(batch)
         self.log('test_loss', loss)
         self.test_acc(logits, y)
@@ -161,7 +168,7 @@ class PyTorchLightningModel(L.LightningModule):
 
     def predict_step(self, batch: Any, batch_idx: int, dataloader_idx: int = 0) -> Any:
         return super().predict_step(batch[0], batch_idx, dataloader_idx)
-        
+
 
 class LitTrainerWrapper:
     def __init__(
@@ -169,15 +176,17 @@ class LitTrainerWrapper:
         pytorch_model: nn.Module,
         name: str,
         log_folder: str,
-        model_file: str = None,
+        lit_model_file: str = None,
+        torch_model_file: str = None,
         # training config
-        epochs: int = 10,
+        epochs: int = None,
         learning_rate: float = 1e-3,
         device: str = "cpu",
         val_check_times: int = 2,
         log_every_n_steps: int = 10,
         lit_sanity_steps: int = 1,
         monitor_metric: str = "val_tpr",
+        monitor_mode: str = "max",
         early_stop_patience: Union[None, int] = 5,
         early_stop_min_delta: float = 0.0001,
         scheduler: Union[None, str] = None,
@@ -190,7 +199,8 @@ class LitTrainerWrapper:
     ):
         self.pytorch_model = pytorch_model
         self.lit_model = None
-        self.model_file = model_file
+        self.lit_model_file = lit_model_file
+        self.torch_model_file = torch_model_file
 
         self.name = name
         self.log_folder = log_folder
@@ -204,36 +214,39 @@ class LitTrainerWrapper:
         self.log_every_n_steps = log_every_n_steps
         self.lit_sanity_steps = lit_sanity_steps
         self.monitor_metric = monitor_metric
+        self.monitor_mode = monitor_mode
         self.early_stop_patience = early_stop_patience
         self.early_stop_min_delta = early_stop_min_delta
         self.scheduler = scheduler
+        self.scheduler_budget = None
 
         self.batch_size = batch_size
         self.dataloader_workers = dataloader_workers
 
         self.verbose = verbose
         self.random_state = random_state
-        L.seed_everything(self.random_state)
-        if not skip_trainer_init:
-            self.setup_trainer()
-
+        
         # TODO: provide option to setup time
         self.training_time = None
         # assert (max_time is None) or (max_epochs is None), "only either 'max_time' or 'max_epochs' can be set"
         # assert (max_time is not None) or (max_epochs is not None), "at least one of 'max_time' or 'max_epochs' should be set"
         # assert max_time is None or isinstance(max_time, dict),\
         #     """max_time must be None or dict, e.g. {"minutes": 2, "seconds": 30}"""
-        # NOTE: above format is what L.Trainer expects to receive as max_time parameter
-        
+        # NOTE: above format is what L.Trainer expects to receive as max_time parameter        
+       
+        L.seed_everything(self.random_state)
+        if not skip_trainer_init:
+            self.setup_trainer()
 
-    def setup_trainer(self):
+
+    def setup_callbacks(self):
         model_checkpoint = ModelCheckpoint(
             monitor=self.monitor_metric,
+            mode=self.monitor_mode,
             save_top_k=1,
-            mode="max",
-            verbose=self.verbose,
             save_last=True,
-            filename="{epoch}-tpr{val_tpr:.4f}-f1{val_f1:.4f}-acc{val_cc:.4f}"
+            filename="{epoch}-{val_tpr:.4f}-{val_f1:.4f}-{val_cc:.4f}",
+            verbose=self.verbose,
         )
         callbacks = [LitProgressBar(), model_checkpoint]
 
@@ -246,6 +259,11 @@ class LitTrainerWrapper:
                 mode="max"
             )
             callbacks.append(early_stop)
+        return callbacks
+
+
+    def setup_trainer(self):
+        callbacks = self.setup_callbacks()
 
         self.trainer = L.Trainer(
             num_sanity_val_steps=self.lit_sanity_steps,
@@ -266,28 +284,43 @@ class LitTrainerWrapper:
         os.makedirs(os.path.join(self.log_folder, f"{self.name}_csv"), exist_ok=True)
 
 
-    def load_lit_model(
-            self,
-            model_file: str,
-    ):
-        self.model_file = model_file
+    def load_lit_model(self, model_file: str = None):
+        if model_file is not None:
+            self.lit_model_file = model_file
+        assert self.lit_model_file is not None, "Please provide a model file"
         self.lit_model = PyTorchLightningModel.load_from_checkpoint(
-            checkpoint_path=self.model_file,
+            checkpoint_path=self.lit_model_file,
             model=self.pytorch_model
         )
-        
+
+
+    def load_torch_model(self, model_file: str = None):
+        if model_file is not None:
+            self.torch_model_file = model_file
+        assert self.torch_model_file is not None, "Please provide a model file"
+        self.pytorch_model = load(self.torch_model_file)
+        self.lit_model = PyTorchLightningModel(
+            model=self.pytorch_model,
+            learning_rate=self.learning_rate,
+            scheduler=self.scheduler,
+            scheduler_step_budget=self.scheduler_budget,
+        )
+
 
     def train_lit_model(
             self,
             train_dataloader: DataLoader,
             val_dataloader: DataLoader = None,
     ):
+        assert self.trainer is not None, "Please setup trainer first"
         self.train_dataloader = train_dataloader
         self.val_dataloader = val_dataloader
-        self.scheduler_budget = self.calculate_scheduler_step_budget(
-            max_epochs=self.epochs,
-            max_time=self.training_time
-        )
+
+        if self.scheduler is not None:
+            self.scheduler_budget = self.calculate_scheduler_step_budget(
+                max_epochs=self.epochs,
+                max_time=self.training_time
+            )
         if self.lit_model is None:
             self.lit_model = PyTorchLightningModel(
                 model=self.pytorch_model,
@@ -299,8 +332,10 @@ class LitTrainerWrapper:
         print(f"[*] Training '{self.name}' model...")
         self.trainer.fit(self.lit_model, self.train_dataloader, self.val_dataloader)
 
-        if self.model_file is not None:
+        if self.lit_model_file is not None:
             self.save_lit_model()
+        if self.torch_model_file is not None:
+            self.save_torch_model()
 
 
     def predict_lit_model(
@@ -321,26 +356,47 @@ class LitTrainerWrapper:
         return y_pred     
 
 
-    def save_lit_model(self, model_name: str = None):
-        # TODO: verify if this works properly, do not see model file
-        if model_name is None:
-            model_name = self.model_file
-        assert model_name is not None, "Please provide a model name"
+    def save_lit_model(self, model_file: str = None, how="best"):
+        if model_file is not None:
+            self.lit_model_file = model_file
+        assert how in ["best", "last"], "how must be either 'best' or 'last'"
+        if how == "best":
+          checkpoint_path = self.trainer.checkpoint_callback.best_model_path
+        if how == "last":
+          checkpoint_path = self.trainer.checkpoint_callback.last_model_path
+        basename = os.path.basename(checkpoint_path)
+        
+        if self.lit_model_file is None: # case when no model file is specified
+            basename = f"{int(time())}_epoch_{self.trainer.current_epoch}_{basename}.ckpt"
+            self.lit_model_file = os.path.join(self.log_folder, basename)
+        if os.path.exists(self.lit_model_file): # be sure not to override existing models
+            basename = f"{int(time())}_epoch_{self.trainer.current_epoch}_{basename}.ckpt"
+            self.lit_model_file = os.path.join(self.log_folder, basename)
+        if self.log_folder not in self.lit_model_file:
+            self.lit_model_file = os.path.join(self.log_folder, self.lit_model_file)
+        
+        if os.path.exists(checkpoint_path): 
+            copyfile(checkpoint_path, self.lit_model_file)
+            print(f"[!] Saved Ligthining model to {self.lit_model_file}")
+        else:
+            print(f"[-] Cannot locate lit model checkpoint...")
 
-        # copy the best checkpoint
-        last_version_folder = [x for x in os.listdir(os.path.join(self.log_folder, self.name + "_csv")) if "version" in x][-1]
-        checkpoint_path = os.path.join(self.log_folder, self.name + "_csv", last_version_folder, "checkpoints")
-        best_checkpoint_name = [x for x in os.listdir(checkpoint_path) if x != "last.ckpt"][0]
-        copyfile(os.path.join(checkpoint_path, best_checkpoint_name), model_name)
-        print(f"[!] Saved Ligthining model model to {model_name}")
 
-
-    def save_torch_model(self, model_name: str = None):
-        if model_name is None:
-            model_name = self.model_file
-        assert model_name is not None, "Please provide a model name"
-        save(self.pytorch_model, model_name)
-        print(f"[!] Saved PyTorch model to {model_name}")
+    def save_torch_model(self, model_file: str = None):
+        if model_file is not None:
+            self.torch_model_file = model_file
+        
+        if self.torch_model_file is None: # case when no model file is specified
+            basename = f"{int(time())}_epoch_{self.trainer.current_epoch}.torch"
+            self.torch_model_file = os.path.join(self.log_folder, basename)
+        if os.path.exists(self.torch_model_file): # be sure not to override existing models
+            basename = f"{int(time())}_epoch_{self.trainer.current_epoch}_{os.path.basename(self.torch_model_file)}"
+            self.torch_model_file = os.path.join(self.log_folder, basename)
+        if self.log_folder not in self.torch_model_file:
+            self.torch_model_file = os.path.join(self.log_folder, self.torch_model_file)
+        
+        save(self.pytorch_model, self.torch_model_file)
+        print(f"[!] Saved PyTorch model to {self.torch_model_file}")
     
 
     def create_dataloader(
@@ -375,6 +431,8 @@ class LitTrainerWrapper:
         max_time: dict = None,
         max_epochs: int = None
     ) -> int:
+        assert (max_time is None) or (max_epochs is None), "only either 'max_time' or 'max_epochs' can be set"
+        assert (max_time is not None) or (max_epochs is not None), "at least one of 'max_time' or 'max_epochs' should be set"
         if max_epochs is not None:
             total_batches = max_epochs * len(self.train_dataloader)
         if max_time is not None:
