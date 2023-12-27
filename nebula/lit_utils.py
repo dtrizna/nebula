@@ -8,6 +8,7 @@ from typing import Union, Any, Callable
 from sklearn.metrics import roc_curve
 
 import lightning as L
+from lightning.lite.utilities.seed import seed_everything
 from lightning.pytorch.callbacks import TQDMProgressBar, ModelCheckpoint, EarlyStopping
 from lightning.pytorch.loggers import CSVLogger, TensorBoardLogger
 
@@ -56,18 +57,24 @@ class PyTorchLightningModel(L.LightningModule):
         self.train_f1 = torchmetrics.F1Score(task='binary', average='macro')
         self.train_auc = torchmetrics.AUROC(task='binary')
         self.train_tpr = self.get_tpr_at_fpr
+        self.train_recall = torchmetrics.Recall(task='binary')
+        self.train_precision = torchmetrics.Precision(task='binary')
 
         self.val_acc = torchmetrics.Accuracy(task='binary')
         self.val_f1 = torchmetrics.F1Score(task='binary', average='macro')
         self.val_auc = torchmetrics.AUROC(task='binary')
         self.val_tpr = self.get_tpr_at_fpr
+        self.val_recall = torchmetrics.Recall(task='binary')
+        self.val_precision = torchmetrics.Precision(task='binary')
 
         self.test_acc = torchmetrics.Accuracy(task='binary')
         self.test_f1 = torchmetrics.F1Score(task='binary', average='macro')
         self.test_auc = torchmetrics.AUROC(task='binary')
         self.test_tpr = self.get_tpr_at_fpr
+        self.test_recall = torchmetrics.Recall(task='binary')
+        self.test_precision = torchmetrics.Precision(task='binary')
 
-        self.save_hyperparameters(ignore=["model"])
+        # self.save_hyperparameters(ignore=["model"])
     
     def configure_optimizers(self):
         optimizer = optim.AdamW(self.parameters(), lr=self.learning_rate)
@@ -125,15 +132,20 @@ class PyTorchLightningModel(L.LightningModule):
     def training_step(self, batch, batch_idx):
         # NOTE: keep batch_idx -- lightning needs it
         loss, y, logits = self._shared_step(batch)
-        self.log('train_loss', loss, prog_bar=True)
+        self.train_loss = loss
+        self.log('train_loss', self.train_loss, prog_bar=True)
         self.train_acc(logits, y)
         self.log('train_acc', self.train_acc, on_step=False, on_epoch=True, prog_bar=True)
         self.train_f1(logits, y)
         self.log('train_f1', self.train_f1, on_step=False, on_epoch=True, prog_bar=True)
         self.train_auc(logits, y)
-        self.log('train_auc', self.train_auc, on_step=False, on_epoch=True, prog_bar=True)
+        self.log('train_auc', self.train_auc, on_step=False, on_epoch=True, prog_bar=False)
         train_tpr = self.train_tpr(logits, y, fprNeeded=self.fpr)
         self.log('train_tpr', train_tpr, on_step=False, on_epoch=True, prog_bar=True)
+        self.train_recall(logits, y)
+        self.log('train_recall', self.train_recall, on_step=False, on_epoch=True, prog_bar=False)
+        self.train_precision(logits, y)
+        self.log('train_precision', self.train_precision, on_step=False, on_epoch=True, prog_bar=False)
         learning_rate = self.optimizers().param_groups[0]['lr']
         self.log('learning_rate', learning_rate, on_step=False, on_epoch=True, prog_bar=False)
         return loss
@@ -147,9 +159,13 @@ class PyTorchLightningModel(L.LightningModule):
         self.val_f1(logits, y)
         self.log('val_f1', self.val_f1, on_step=False, on_epoch=True, prog_bar=True)
         self.val_auc(logits, y)
-        self.log('val_auc', self.val_auc, on_step=False, on_epoch=True, prog_bar=True)
+        self.log('val_auc', self.val_auc, on_step=False, on_epoch=True, prog_bar=False)
         val_tpr = self.val_tpr(logits, y, fprNeeded=self.fpr)
         self.log('val_tpr', val_tpr, on_step=False, on_epoch=True, prog_bar=True)
+        self.val_recall(logits, y)
+        self.log('val_recall', self.val_recall, on_step=False, on_epoch=True, prog_bar=False)
+        self.val_precision(logits, y)
+        self.log('val_precision', self.val_precision, on_step=False, on_epoch=True, prog_bar=False)
         return loss
     
     def test_step(self, batch, batch_idx):
@@ -161,9 +177,13 @@ class PyTorchLightningModel(L.LightningModule):
         self.test_f1(logits, y)
         self.log('test_f1', self.test_f1, on_step=False, on_epoch=True, prog_bar=True)
         self.test_auc(logits, y)
-        self.log('test_auc', self.test_auc, on_step=False, on_epoch=True, prog_bar=True)
+        self.log('test_auc', self.test_auc, on_step=False, on_epoch=False, prog_bar=False)
         test_tpr = self.test_tpr(logits, y, fprNeeded=self.fpr)
         self.log('test_tpr', test_tpr, on_step=False, on_epoch=True, prog_bar=True)
+        self.test_recall(logits, y)
+        self.log('test_recall', self.test_recall, on_step=False, on_epoch=False, prog_bar=False)
+        self.test_precision(logits, y)
+        self.log('test_precision', self.test_precision, on_step=False, on_epoch=False, prog_bar=False)
         return loss
 
     def predict_step(self, batch: Any, batch_idx: int, dataloader_idx: int = 0) -> Any:
@@ -175,7 +195,7 @@ class LitTrainerWrapper:
         self,
         pytorch_model: nn.Module,
         name: str,
-        log_folder: str,
+        log_folder: str = None,
         lit_model_file: str = None,
         torch_model_file: str = None,
         # training config
@@ -195,7 +215,7 @@ class LitTrainerWrapper:
         dataloader_workers: int = 4,
         random_state: int = 42,
         verbose: bool = False,
-        skip_trainer_init: bool = False
+        skip_trainer_init: bool = True
     ):
         self.pytorch_model = pytorch_model
         self.lit_model = None
@@ -204,8 +224,6 @@ class LitTrainerWrapper:
 
         self.name = name
         self.log_folder = log_folder
-        os.makedirs(self.log_folder, exist_ok=True)
-        print(f"[!] Logging to {self.log_folder}")
         
         self.epochs = epochs
         self.learning_rate = learning_rate
@@ -234,18 +252,21 @@ class LitTrainerWrapper:
         #     """max_time must be None or dict, e.g. {"minutes": 2, "seconds": 30}"""
         # NOTE: above format is what L.Trainer expects to receive as max_time parameter        
        
-        L.seed_everything(self.random_state)
         if not skip_trainer_init:
             self.setup_trainer()
 
 
     def setup_callbacks(self):
+        if "val" in self.monitor_metric:
+            ckpt_filename = "{epoch}-{val_tpr:.4f}-{val_f1:.4f}-{val_cc:.4f}"
+        else:
+            ckpt_filename = "{epoch}-{train_loss:.4f}"
         model_checkpoint = ModelCheckpoint(
             monitor=self.monitor_metric,
             mode=self.monitor_mode,
             save_top_k=1,
             save_last=True,
-            filename="{epoch}-{val_tpr:.4f}-{val_f1:.4f}-{val_cc:.4f}",
+            filename=ckpt_filename,
             verbose=self.verbose,
         )
         callbacks = [LitProgressBar(), model_checkpoint]
@@ -263,7 +284,13 @@ class LitTrainerWrapper:
 
 
     def setup_trainer(self):
+        seed_everything(self.random_state)
         callbacks = self.setup_callbacks()
+
+        if self.log_folder is None:
+            self.log_folder = f"./out_{self.name}_{int(time())}"
+        os.makedirs(self.log_folder, exist_ok=True)
+        print(f"[!] Logging to {self.log_folder}")
 
         self.trainer = L.Trainer(
             num_sanity_val_steps=self.lit_sanity_steps,
@@ -273,6 +300,7 @@ class LitTrainerWrapper:
             callbacks=callbacks,
             val_check_interval=1/self.val_check_times,
             log_every_n_steps=self.log_every_n_steps,
+            enable_model_summary=False, # self.verbose,
             logger=[
                 CSVLogger(save_dir=self.log_folder, name=f"{self.name}_csv"),
                 TensorBoardLogger(save_dir=self.log_folder, name=f"{self.name}_tb")
@@ -299,12 +327,22 @@ class LitTrainerWrapper:
             self.torch_model_file = model_file
         assert self.torch_model_file is not None, "Please provide a model file"
         self.pytorch_model = load(self.torch_model_file)
+        # NOTE: you have to reset self.lit_model after this
+        #  if lit_model is already initialized, then load state dict directly:
+        # self.lit_model.model.load_state_dict(state_dict)
+
+
+    def setup_lit_model(self):
         self.lit_model = PyTorchLightningModel(
-            model=self.pytorch_model,
-            learning_rate=self.learning_rate,
-            scheduler=self.scheduler,
-            scheduler_step_budget=self.scheduler_budget,
-        )
+                model=self.pytorch_model,
+                learning_rate=self.learning_rate,
+                scheduler=self.scheduler,
+                scheduler_step_budget=self.scheduler_budget,
+            )
+
+    def fit(self, *args, **kwargs):
+        assert self.trainer is not None, "Please setup trainer first"
+        self.trainer.fit(*args, **kwargs)
 
 
     def train_lit_model(
@@ -322,12 +360,7 @@ class LitTrainerWrapper:
                 max_time=self.training_time
             )
         if self.lit_model is None:
-            self.lit_model = PyTorchLightningModel(
-                model=self.pytorch_model,
-                learning_rate=self.learning_rate,
-                scheduler=self.scheduler,
-                scheduler_step_budget=self.scheduler_budget,
-            )
+            self.setup_lit_model()
 
         print(f"[*] Training '{self.name}' model...")
         self.trainer.fit(self.lit_model, self.train_dataloader, self.val_dataloader)
@@ -372,8 +405,8 @@ class LitTrainerWrapper:
         if os.path.exists(self.lit_model_file): # be sure not to override existing models
             basename = f"{int(time())}_epoch_{self.trainer.current_epoch}_{basename}.ckpt"
             self.lit_model_file = os.path.join(self.log_folder, basename)
-        if self.log_folder not in self.lit_model_file:
-            self.lit_model_file = os.path.join(self.log_folder, self.lit_model_file)
+        # if self.log_folder not in self.lit_model_file: # dumb check if log_folder is in the path of lit_model_file 
+        #     self.lit_model_file = os.path.join(self.log_folder, self.lit_model_file)
         
         if os.path.exists(checkpoint_path): 
             copyfile(checkpoint_path, self.lit_model_file)
@@ -392,8 +425,8 @@ class LitTrainerWrapper:
         if os.path.exists(self.torch_model_file): # be sure not to override existing models
             basename = f"{int(time())}_epoch_{self.trainer.current_epoch}_{os.path.basename(self.torch_model_file)}"
             self.torch_model_file = os.path.join(self.log_folder, basename)
-        if self.log_folder not in self.torch_model_file:
-            self.torch_model_file = os.path.join(self.log_folder, self.torch_model_file)
+        # if self.log_folder not in self.torch_model_file: # dumb check if log_folder is in the path of lit_model_file
+        #     self.torch_model_file = os.path.join(self.log_folder, self.torch_model_file)
         
         save(self.pytorch_model, self.torch_model_file)
         print(f"[!] Saved PyTorch model to {self.torch_model_file}")

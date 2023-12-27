@@ -4,10 +4,8 @@ import numpy as np
 from tqdm import tqdm
 from time import time
 from typing import Union, List
-from sklearn.model_selection import train_test_split
-
 from torch.nn import CrossEntropyLoss
-
+from sklearn.model_selection import train_test_split
 from .lit_utils import LitTrainerWrapper, PyTorchLightningModel
 
 
@@ -25,7 +23,6 @@ class MaskedLanguageModelTrainer(LitTrainerWrapper):
             pretrain_epochs: int = 3,
             # whether to remask sequence after nr of remask_epochs
             remask_epochs: int = False,
-            # downsteam_epochs: int = 2, # TODO: do we care about it here?
             mask_probability: float = 0.15,
             # mask the token with distribution (80% mask, 10% random, 10% same)
             # same as Devlin et al (https://arxiv.org/abs/1810.04805)
@@ -37,26 +34,26 @@ class MaskedLanguageModelTrainer(LitTrainerWrapper):
             *args,
             **kwargs
     ):
-        super().__init__(skip_trainer_init=True, *args, **kwargs)
+        super().__init__(skip_trainer_init=True, monitor_metric="train_loss", monitor_mode="min", *args, **kwargs)
         self.__name__ = "MaskedLanguageModel"
         
         assert "<pad>" in vocab, "Vocabulary must contain '<pad>' token"
         assert "<mask>" in vocab, "Vocabulary must contain '<mask>' token"
         self.vocab = vocab
-
         self.pretrain_epochs = pretrain_epochs
-        # self.downsteam_epochs = downsteam_epochs
-
+        
         if remask_epochs:
             assert isinstance(remask_epochs, int), "remask_epochs must be an integer"
         self.remask_epochs = remask_epochs
 
         assert len(mask_distribution) == 2, "mask_distribution must be a list of length 2"
         self.mask_distribution = mask_distribution
-
+        
         self.mask_probability = mask_probability
+        
         assert masked_target_type in ["onehot", "count"], "masked_target_type must be either 'onehot' or 'count'"
         self.masked_target_type = masked_target_type
+        
         self.dump_model_every_epoch = dump_model_every_epoch
         
 
@@ -133,18 +130,21 @@ class MaskedLanguageModelTrainer(LitTrainerWrapper):
         return seq_masked, target
 
 
+    def setup_lit_language_model(self):
+        self.lit_model = PyTorchLightningModelLM(
+                model=self.pytorch_model,
+                learning_rate=self.learning_rate,
+                scheduler=self.scheduler,
+                scheduler_step_budget=self.scheduler_budget,
+            )
+
     def pretrain(self, x_unlabeled: np.ndarray, epochs: int = None):
         if epochs is not None:
             self.pretrain_epochs = epochs
 
         # MODEL SETUP
         if self.lit_model is None:
-            self.lit_model = PyTorchLightningModelLM(
-                model=self.pytorch_model,
-                learning_rate=self.learning_rate,
-                scheduler=self.scheduler,
-                scheduler_step_budget=self.scheduler_budget,
-            )
+            self.setup_lit_language_model()
 
         # DATA SETUP
         logging.warning(' [*] Masking of sequences...')
@@ -170,10 +170,8 @@ class MaskedLanguageModelTrainer(LitTrainerWrapper):
                 self.save_torch_model(model_file=os.path.join(self.log_folder, f"pretrained_epoch_{epoch}.torch"))
 
         # NOTE: lit weird behavior: no checkpoint files are saved if train_loss 
-        # is specified as monitor metric in ModelCheckpoint, therefore, saving torch model.
+        # is specified as monitor metric in ModelCheckpoint, therefore, saving torch model manually.
         self.save_torch_model(model_file=os.path.join(self.log_folder, "pretrained_final.torch"))
-
-        self.lit_model.forward = self.lit_model.model.forward
 
 
 class AutoRegressiveModelTrainer(LitTrainerWrapper):
@@ -217,31 +215,43 @@ class AutoRegressiveModelTrainer(LitTrainerWrapper):
         raise NotImplementedError
 
 
-class SelfSupervisedPretraining:
+class SelfSupervisedLearningEvalFramework:
     def __init__(
             self,
-            lm_pretrainer: Union[MaskedLanguageModelTrainer, AutoRegressiveModelTrainer],
+            # pretrainer: Union[MaskedLanguageModelTrainer, AutoRegressiveModelTrainer],
+            pretrainer: MaskedLanguageModelTrainer,
             downstream_trainer: LitTrainerWrapper,
             training_types: List[str] = ['pretrained', 'non_pretrained', 'full_data'],
-            # pre-train details
+            # eval details
             unlabeled_data_ratio: float = 0.8,
-            pretrain_epochs: int = 5,
-            downstream_epochs: int = 2,
+            n_splits: int = 5,
             # logging details
-            output_dir: str = None,
+            log_folder: str = None,
             dump_data_splits: bool = True,
             downsample_unlabeled_data: bool = False,
             false_positive_rates: List[float] = [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
             random_state: int = None,
     ):
-        self.pretrainer = lm_pretrainer
-        self.downstread_trainer = downstream_trainer
+        self.pretrainer = pretrainer
+        self.downstream_trainer = downstream_trainer
+
         self.training_types = training_types
         self.unlabeled_data_ratio = unlabeled_data_ratio
-        self.pretrain_pochs = pretrain_epochs
-        self.downstream_epochs = downstream_epochs
+        self.n_splits = n_splits
 
-        self.output_dir = output_dir
+        tempfolder = os.path.join(os.getcwd(), f"out_self_supervised_eval_{int(time())}")
+        self.log_folder = log_folder if log_folder is not None else tempfolder
+        os.makedirs(self.log_folder, exist_ok=True)
+
+        self.pretrainer.log_folder = os.path.join(self.log_folder, self.pretrainer.log_folder)
+        self.init_pretrain_log_folder = self.pretrainer.log_folder
+        
+        self.downstream_trainer.log_folder = os.path.join(self.log_folder, self.downstream_trainer.log_folder)
+        self.init_downstream_log_folder = self.downstream_trainer.log_folder
+        
+        self.init_pretrain_model_weights = self.pretrainer.pytorch_model.state_dict()
+        self.init_downstream_model_weights = self.downstream_trainer.pytorch_model.state_dict()        
+
         self.dump_data_splits = dump_data_splits
         self.downsample_unlabeled_data = downsample_unlabeled_data
         if self.downsample_unlabeled_data:
@@ -250,120 +260,81 @@ class SelfSupervisedPretraining:
         self.random_state = random_state
 
 
-    def run_one_split(self, x, y, x_test, y_test):
-        models = {k: None for k in self.training_types}
-        model_trainer = {k: None for k in self.training_types}
-        metrics = {k: None for k in self.training_types}
-        timestamp = int(time())
-        
-        # split x and y into train and validation sets
-        unlabeled_data, labeled_x, _, labeled_y = train_test_split(
-            x, y, train_size=self.unlabeled_data_ratio, random_state=self.random_state
+    def _dump_data_splits(self):
+        split_data_file = f"dataset_splits_{self.timestamp}.npz"
+        np.savez_compressed(
+            os.path.join(self.log_folder, split_data_file),
+            unlabeled_data=self.unlabeled_data,
+            labeled_x=self.labeled_x,
+            labeled_y=self.labeled_y
         )
+        print(f"[!] Saved dataset splits to {split_data_file}")
+
+
+    def run_one_split(
+            self,
+            x_train: np.ndarray,
+            y_train: np.ndarray,
+            x_val: np.ndarray = None,
+            y_val: np.ndarray = None,
+    ):
+        self.timestamp = int(time())
+
+        # split x and y into train and validation sets
+        self.unlabeled_data, self.labeled_x, _, self.labeled_y = train_test_split(
+            x_train, y_train, train_size=self.unlabeled_data_ratio, random_state=self.random_state
+        )
+        
         if self.downsample_unlabeled_data:
             # sample N random samples from unlabeled data which is numpy array
-            unlabeled_size = unlabeled_data.shape[0]
+            unlabeled_size = self.unlabeled_data.shape[0]
             indices = np.random.choice(unlabeled_size, int(self.downsample_unlabeled_data*unlabeled_size), replace=False)
-            unlabeled_data = unlabeled_data[indices].copy()
-        if self.dump_data_splits:
-            splitData = f"dataset_splits_{timestamp}.npz"
-            np.savez_compressed(
-                os.path.join(self.output_dir, splitData),
-                unlabeled_data=unlabeled_data,
-                labeled_x=labeled_x,
-                labeled_y=labeled_y
-            )
-            logging.warning(f" [!] Saved dataset splits to {splitData}")
-
-        logging.warning(' [!] Pre-training model...')
-
-        # create a pretraining model and task
-        models['pretrained'] = self.model_class(**self.model_config).to(self.device)
-        model_trainer_config = {
-            "device": self.device,
-            "model": models['pretrained'],
-            "forward_pass": models['pretrained'].pretrain,
-            "loss_function": CrossEntropyLoss(),
-            "optimizer_class": AdamW,
-            "optimizer_config": {"lr": 2.5e-4},
-            "optim_scheduler": self.optim_scheduler,
-            "optim_step_budget": self.optim_step_budget,
-            "verbosity_n_batches": self.verbosity_n_batches,
-            "batchSize": self.batch_size,
-            "falsePositiveRates": self.false_positive_rates,
-        }
-        if self.output_dir:
-            model_trainer_config["outputFolder"] = os.path.join(self.output_dir, "pretraining")
-
-        self.pretraining_task_config['model_trainer_config'] = model_trainer_config
-        self.pretraining_task = self.pretraining_task_class(
-            **self.pretraining_task_config
-        )
-        self.pretraining_task.pretrain(
-            unlabeled_data,
-            epochs=self.pretrain_pochs,
-            dump_model_every_epoch=self.dump_model_every_epoch,
-            remask_epochs=self.remask_epochs
-        )
-
-        # downstream task for pretrained model
-        model_trainer_config['loss_function'] = BCEWithLogitsLoss()
-        model_trainer_config['forward_pass'] = None
-
-        for model in self.training_types:
-            logging.warning(f' [!] Training {model} model on downstream task...')
-            if model != 'pretrained': # if not pretrained -- create a new model
-                models[model] = self.model_class(**self.model_config).to(self.device)
-            model_trainer_config['model'] = models[model]
-            
-            if self.output_dir:
-                model_trainer_config["outputFolder"] = os.path.join(self.output_dir, f"downstream_task_{model}")
-            
-            model_trainer[model] = ModelTrainer(**model_trainer_config)
-            # TODO: don't like how step is calculated here
-            # use size of x and self.unlabeledDataSize to calculate steps
-            if model == 'full_data':
-                model_trainer_config['optim_step_budget'] = self.optim_step_budget//2
-                model_trainer[model].fit(x, y, self.downstream_epochs, reporting_timestamp=timestamp)
-            else:
-                model_trainer_config['optim_step_budget'] = self.optim_step_budget//10
-                model_trainer[model].fit(labeled_x, labeled_y, self.downstream_epochs, reporting_timestamp=timestamp)
+            self.unlabeled_data = self.unlabeled_data[indices].copy()
         
-        for model in models:
-            logging.warning(f' [*] Evaluating {model} model on test set...')
-            metrics[model] = model_trainer[model].evaluate(x_test, y_test, metrics="json")
-            logging.warning(f"\t[!] Test set AUC: {metrics[model]['auc']:.4f}")
-            for reportingFPR in self.false_positive_rates:
-                f1 = metrics[model]["fpr_"+str(reportingFPR)]["f1"]
-                tpr = metrics[model]["fpr_"+str(reportingFPR)]["tpr"]
-                logging.warning(f'\t[!] Test set scores at FPR: {reportingFPR:>6} --> TPR: {tpr:.4f} | F1: {f1:.4f}')
-        del models, model_trainer # cleanup to not accidentaly reuse 
-        clear_cuda_cache()
-        return metrics
+        if self.dump_data_splits:
+            self._dump_data_splits()
 
-    def run_splits(self, x, y, x_test, y_test, nSplits=5, rest=None):
-        metrics = {k: {"fpr_"+str(fpr): {"f1": [], "tpr": []} for fpr in self.false_positive_rates} for k in self.training_types}
-        for trainingType in self.training_types:
-            metrics[trainingType]['auc'] = []
-        # collect metrics for number of iterations
-        for i in range(nSplits):
+        print("[!] Pre-training model...")
+        self.pretrainer.log_folder = self.init_pretrain_log_folder + "_" + str(self.timestamp)
+        
+        # reset model weights
+        self.pretrainer.pytorch_model.load_state_dict(self.init_pretrain_model_weights)
+        self.pretrainer.setup_trainer()
+        self.pretrainer.setup_lit_language_model()
+        self.pretrainer.pretrain(self.unlabeled_data)
+
+        self.train_loader = self.downstream_trainer.create_dataloader(self.labeled_x, self.labeled_y, shuffle=True)
+        if "full_data" in self.training_types:
+            self.full_train_loader = self.downstream_trainer.create_dataloader(x_train, y_train, shuffle=True)
+        
+        if x_val is not None:
+            self.val_loader = self.downstream_trainer.create_dataloader(x_val, y_val, shuffle=False)
+        else:
+            self.val_loader = None
+        
+        for training_type in self.training_types:
+            print(f"[!] Fine-tuning of '{training_type}' model on downstream task...")
+            self.downstream_trainer.name = training_type
+            self.downstream_trainer.log_folder = self.init_downstream_log_folder + "_" + training_type + "_" + str(self.timestamp)
+
+            if training_type == "pretrained":
+                self.downstream_trainer.pytorch_model.load_state_dict(self.pretrainer.pytorch_model.state_dict())
+            else:
+                self.downstream_trainer.pytorch_model.load_state_dict(self.init_downstream_model_weights)
+            
+            self.downstream_trainer.setup_trainer()
+            self.downstream_trainer.setup_lit_model()
+            
+            if training_type == "full_data":
+                self.downstream_trainer.train_lit_model(self.full_train_loader, self.val_loader)
+            else:
+                self.downstream_trainer.train_lit_model(self.train_loader, self.val_loader)
+
+
+    def run_splits(self, *args, **kwargs):
+        for i in range(self.n_splits):
             self.random_state += i # to get different splits
-            logging.warning(f' [!] Running pre-training split {i+1}/{nSplits}')
-            splitMetrics = self.run_one_split(x, y, x_test, y_test)
-            for trainingType in self.training_types:
-                metrics[trainingType]['auc'].append(splitMetrics[trainingType]['auc'])
-                for fpr in self.false_positive_rates:
-                    metrics[trainingType]["fpr_"+str(fpr)]["f1"].append(splitMetrics[trainingType]["fpr_"+str(fpr)]["f1"])
-                    metrics[trainingType]["fpr_"+str(fpr)]["tpr"].append(splitMetrics[trainingType]["fpr_"+str(fpr)]["tpr"])
-            if rest:
-                sleep(rest)
-
-        # compute mean and std for each metric
-        for trainingType in self.training_types:
-            for fpr in self.false_positive_rates:
-                metrics[trainingType]["fpr_"+str(fpr)]["f1_mean"] = np.nanmean(metrics[trainingType]["fpr_"+str(fpr)]["f1"])
-                metrics[trainingType]["fpr_"+str(fpr)]["f1_std"] = np.nanstd(metrics[trainingType]["fpr_"+str(fpr)]["f1"])
-                metrics[trainingType]["fpr_"+str(fpr)]["tpr_mean"] = np.nanmean(metrics[trainingType]["fpr_"+str(fpr)]["tpr"])
-                metrics[trainingType]["fpr_"+str(fpr)]["tpr_std"] = np.nanstd(metrics[trainingType]["fpr_"+str(fpr)]["tpr"])
-        return metrics
-
+            self.pretrainer.random_state = self.random_state
+            self.downstream_trainer.random_state = self.random_state
+            print(f'[!] Running pre-training split {i+1}/{self.n_splits}')
+            self.run_one_split(*args, **kwargs)

@@ -1,12 +1,8 @@
 import os
 import sys
 import json
-from time import time
-
-import logging
-logging.basicConfig(level=logging.INFO)
-
 import numpy as np
+from time import time
 from sklearn.utils import shuffle
 
 # correct path to repository root
@@ -16,9 +12,10 @@ else:
     REPOSITORY_ROOT = os.getcwd()
 sys.path.append(REPOSITORY_ROOT)
 
-from nebula.lit_pretraining import MaskedLanguageModelTrainer
+from nebula.lit_pretraining import MaskedLanguageModelTrainer, SelfSupervisedLearningEvalFramework
+from nebula.lit_utils import LitTrainerWrapper
 from nebula.models.attention import TransformerEncoderChunksLM
-from lightning import seed_everything
+from lightning.lite.utilities.seed import seed_everything
 
 if __name__ == "__main__":
     random_state = 0
@@ -27,7 +24,7 @@ if __name__ == "__main__":
     # ==============
     # LOAD DATA
     # ==============
-    logging.info(f" [*] Loading data...")
+    print(f"[*] Loading data...")
     train_folder = os.path.join(REPOSITORY_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k")
     xTrainFile = os.path.join(train_folder, f"speakeasy_vocab_size_50000_maxlen_512_x.npy")
     x_train = np.load(xTrainFile)
@@ -52,12 +49,12 @@ if __name__ == "__main__":
     with open(vocabFile, 'r') as f:
         vocab = json.load(f)
     vocab_size = len(vocab)
-    logging.info(f" [*] Loaded data.")
+    print(f"[!] Data ready.")
 
     # ===================
     # MODELING
     # ===================
-    logging.info(f" [*] Loading model...")
+    print(f"[*] Loading model...")
     model_config = {
         "vocab_size": vocab_size,
         "maxlen": 512,
@@ -75,30 +72,63 @@ if __name__ == "__main__":
     }
     model = TransformerEncoderChunksLM(**model_config)
 
-    logging.info(f" [!] Model ready.")
+    print(f"[!] Model ready.")
 
     # ===================
     # TRAINING
     # ===================
-
+    VERBOSE = False
+    PRETRAINING_EPOCHS = 4
+    DOWNSTREAM_EPOCHS = 3
+    REMASK_EVERY_N_EPOCHS = 2
+    BATCH_SIZE = 128
+    DATALOADER_WORKERS = 4
+    LOG_EVERY_N_STEPS = 1
+    SSL_EVAL_SPLITS = 3
+    NAME = "mlm_testrun"
     lit_mlm = MaskedLanguageModelTrainer(
         # pretrain config
         vocab=vocab,
-        pretrain_epochs = 4,
-        remask_epochs=2,
+        pretrain_epochs=PRETRAINING_EPOCHS,
+        remask_epochs=REMASK_EVERY_N_EPOCHS,
+        dump_model_every_epoch=False,
         # trainer config
         pytorch_model=model,
-        name = "test_training",
-        log_folder=f"./z_mlm_test_run_{int(time())}",
-        log_every_n_steps=1,
+        name = NAME + "_pretraining",
+        log_folder=f"z_{NAME}_pretraining",
+        log_every_n_steps=LOG_EVERY_N_STEPS,
+        device="gpu",
         # data config
-        batch_size=256,
-        dataloader_workers=4,
+        batch_size=BATCH_SIZE,
+        dataloader_workers=DATALOADER_WORKERS,
         # misc
         random_state=random_state,
-        verbose=True
+        verbose=VERBOSE
     )
-    lit_model = lit_mlm.pretrain(x_unlabeled=x_train)
-    
-    # 3. Q: ensure correct output folder structure, can use .name attribute
-    # 3. A: 
+    downstream_trainer = LitTrainerWrapper(
+        # trainer config
+        epochs=DOWNSTREAM_EPOCHS,
+        pytorch_model=model,
+        name = NAME + "_downstream",
+        log_folder=f"z_{NAME}_downstream",
+        log_every_n_steps=LOG_EVERY_N_STEPS,
+        device="gpu",
+        skip_trainer_init=True,
+        # data config
+        batch_size=BATCH_SIZE,
+        dataloader_workers=DATALOADER_WORKERS,
+        # misc
+        random_state=random_state,
+        verbose=VERBOSE
+    )
+    eval_run = SelfSupervisedLearningEvalFramework(
+        pretrainer=lit_mlm,
+        downstream_trainer=downstream_trainer,
+        unlabeled_data_ratio=0.8,
+        log_folder=f"./z_mlm_eval_{int(time())}",
+        dump_data_splits=True,
+        random_state=random_state,
+        n_splits=SSL_EVAL_SPLITS
+    )
+
+    eval_run.run_splits(x_train, y_train, x_test, y_test)
