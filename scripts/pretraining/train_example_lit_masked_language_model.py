@@ -85,8 +85,9 @@ if __name__ == "__main__":
         # pretrain config
         vocab=vocab,
         pretrain_epochs = 4,
-        remask_epochs=2,
+        remask_epochs = 2,
         # trainer config
+        device="gpu",
         pytorch_model=model,
         name = "test_training",
         log_folder=f"./z_mlm_test_run_{int(time())}",

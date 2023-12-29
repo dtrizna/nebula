@@ -40,7 +40,7 @@ if __name__ == "__main__":
     y_test = np.load(yTestFile)
 
     # shuffle and limit
-    limit = 1000
+    limit = None # 1000
     x_train, y_train = shuffle(x_train, y_train, random_state=0)
     x_train = x_train[:limit]
     y_train = y_train[:limit]
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     # MODELING
     # ===================
     logging.info(f" [*] Loading model...")
-    from nebula.models import TransformerEncoderChunks
+    from nebula.models.attention import TransformerEncoderChunksLM
     model_config = {
         "vocab_size": vocab_size,
         "maxlen": 512,
@@ -74,31 +74,32 @@ if __name__ == "__main__":
         "mean_over_sequence": False,
         "norm_first": True
     }
-    model = TransformerEncoderChunks(**model_config)
+    model = TransformerEncoderChunksLM(**model_config)
 
     logging.info(f" [!] Model ready.")
 
     # ===================
     # TRAINING
     # ===================
-
+    outfolder = f"test_run_{int(time())}"
     lit_trainer = LitTrainerWrapper(
         pytorch_model=model,
         name = "test_training",
-        log_folder=f"./test_run_{int(time())}",
+        log_folder=outfolder,
         epochs = 2,
+        device="gpu",
         log_every_n_steps=1,
         scheduler="onecycle",
-        lit_model_file="test.ckpt",
-        torch_model_file="test.torch",
+        lit_model_file=os.path.join(outfolder, "test.ckpt"),
+        torch_model_file=os.path.join(outfolder, "test.torch"),
         batch_size=256,
         dataloader_workers=4
     )
     train_loader = lit_trainer.create_dataloader(x_train, y_train)
     test_loader = lit_trainer.create_dataloader(x_test, y_test, shuffle=False)
     lit_trainer.train_lit_model(
-        train_dataloader=train_loader,
-        val_dataloader=test_loader,
+        train_loader=train_loader,
+        val_loader=test_loader,
     )
 
     # get f1 scores

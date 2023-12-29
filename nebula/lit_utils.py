@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 from time import time
 from shutil import copyfile
-from typing import Union, Any, Callable
+from typing import Union, Any, Callable, Optional
 
 from sklearn.metrics import roc_curve
 
@@ -12,10 +12,9 @@ from lightning.lite.utilities.seed import seed_everything
 from lightning.pytorch.callbacks import TQDMProgressBar, ModelCheckpoint, EarlyStopping
 from lightning.pytorch.loggers import CSVLogger, TensorBoardLogger
 
-from torch import nn
-from torch import cat, sigmoid, save, load, optim
+from torch import cat, sigmoid, save, load, optim, cuda, nn
+from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss
 from torch.utils.data import DataLoader
-from torch.nn import BCEWithLogitsLoss
 import torchmetrics
 
 from .data_utils import create_dataloader
@@ -28,7 +27,7 @@ class LitProgressBar(TQDMProgressBar):
         print()
 
 
-class PyTorchLightningModel(L.LightningModule):
+class PyTorchLightningModelBase(L.LightningModule):
     def __init__(
             self,
             model: nn.Module,
@@ -76,6 +75,10 @@ class PyTorchLightningModel(L.LightningModule):
 
         # self.save_hyperparameters(ignore=["model"])
     
+    def optimizer_zero_grad(self, epoch, batch_idx, optimizer, optimizer_idx):
+        # https://pytorch-lightning.readthedocs.io/en/1.3.8/benchmarking/performance.html#zero-grad-set-to-none-true
+        optimizer.zero_grad(set_to_none=True)
+
     def configure_optimizers(self):
         optimizer = optim.AdamW(self.parameters(), lr=self.learning_rate)
         if self.scheduler is None:
@@ -90,8 +93,11 @@ class PyTorchLightningModel(L.LightningModule):
         if self.scheduler == "cosine":
             scheduler = optim.lr_scheduler.CosineAnnealingLR(
                 optimizer,
-                T_max=self.scheduler_step_budget
+                T_max=self.scheduler_step_budget,
+                # minimum learning rate, should be ~= learning_rate/10 per Chinchilla
+                eta_min=self.learning_rate/10
             )
+        print(f"[!] Setting up {self.scheduler} scheduler with step budget {self.scheduler_step_budget}")
         return {
             "optimizer": optimizer,
             "lr_scheduler": {
@@ -132,54 +138,36 @@ class PyTorchLightningModel(L.LightningModule):
     def training_step(self, batch, batch_idx):
         # NOTE: keep batch_idx -- lightning needs it
         loss, y, logits = self._shared_step(batch)
-        self.train_loss = loss
-        self.log('train_loss', self.train_loss, prog_bar=True)
-        self.train_acc(logits, y)
-        self.log('train_acc', self.train_acc, on_step=False, on_epoch=True, prog_bar=True)
+        self.log('train_loss', loss, prog_bar=True)
+        learning_rate = self.optimizers().param_groups[0]['lr']
+        self.log('lr', learning_rate, on_step=True, prog_bar=False)
+        self.log('memory', float(cuda.memory_allocated()), on_step=True, prog_bar=True)
         self.train_f1(logits, y)
         self.log('train_f1', self.train_f1, on_step=False, on_epoch=True, prog_bar=True)
-        self.train_auc(logits, y)
-        self.log('train_auc', self.train_auc, on_step=False, on_epoch=True, prog_bar=False)
         train_tpr = self.train_tpr(logits, y, fprNeeded=self.fpr)
         self.log('train_tpr', train_tpr, on_step=False, on_epoch=True, prog_bar=True)
+        self.train_acc(logits, y)
+        self.log('train_acc', self.train_acc, on_step=False, on_epoch=True, prog_bar=True)
+        self.train_auc(logits, y)
+        self.log('train_auc', self.train_auc, on_step=False, on_epoch=True, prog_bar=False)
         self.train_recall(logits, y)
         self.log('train_recall', self.train_recall, on_step=False, on_epoch=True, prog_bar=False)
         self.train_precision(logits, y)
         self.log('train_precision', self.train_precision, on_step=False, on_epoch=True, prog_bar=False)
-        learning_rate = self.optimizers().param_groups[0]['lr']
-        self.log('learning_rate', learning_rate, on_step=False, on_epoch=True, prog_bar=False)
-        return loss
-    
-    def validation_step(self, batch, batch_idx):
-        # NOTE: keep batch_idx -- lightning needs it
-        loss, y, logits = self._shared_step(batch)
-        self.log('val_loss', loss)
-        self.val_acc(logits, y)
-        self.log('val_acc', self.val_acc, on_step=False, on_epoch=True, prog_bar=True)
-        self.val_f1(logits, y)
-        self.log('val_f1', self.val_f1, on_step=False, on_epoch=True, prog_bar=True)
-        self.val_auc(logits, y)
-        self.log('val_auc', self.val_auc, on_step=False, on_epoch=True, prog_bar=False)
-        val_tpr = self.val_tpr(logits, y, fprNeeded=self.fpr)
-        self.log('val_tpr', val_tpr, on_step=False, on_epoch=True, prog_bar=True)
-        self.val_recall(logits, y)
-        self.log('val_recall', self.val_recall, on_step=False, on_epoch=True, prog_bar=False)
-        self.val_precision(logits, y)
-        self.log('val_precision', self.val_precision, on_step=False, on_epoch=True, prog_bar=False)
         return loss
     
     def test_step(self, batch, batch_idx):
         # NOTE: keep batch_idx -- lightning needs it
         loss, y, logits = self._shared_step(batch)
         self.log('test_loss', loss)
-        self.test_acc(logits, y)
-        self.log('test_acc', self.test_acc, on_step=False, on_epoch=True, prog_bar=True)
         self.test_f1(logits, y)
         self.log('test_f1', self.test_f1, on_step=False, on_epoch=True, prog_bar=True)
-        self.test_auc(logits, y)
-        self.log('test_auc', self.test_auc, on_step=False, on_epoch=False, prog_bar=False)
         test_tpr = self.test_tpr(logits, y, fprNeeded=self.fpr)
         self.log('test_tpr', test_tpr, on_step=False, on_epoch=True, prog_bar=True)
+        self.test_acc(logits, y)
+        self.log('test_acc', self.test_acc, on_step=False, on_epoch=True, prog_bar=True)
+        self.test_auc(logits, y)
+        self.log('test_auc', self.test_auc, on_step=False, on_epoch=False, prog_bar=False)
         self.test_recall(logits, y)
         self.log('test_recall', self.test_recall, on_step=False, on_epoch=False, prog_bar=False)
         self.test_precision(logits, y)
@@ -190,14 +178,60 @@ class PyTorchLightningModel(L.LightningModule):
         return super().predict_step(batch[0], batch_idx, dataloader_idx)
 
 
+class PyTorchLightningModel(PyTorchLightningModelBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    
+    def validation_step(self, batch, batch_idx):
+        # NOTE: keep batch_idx -- lightning needs it
+        loss, y, logits = self._shared_step(batch)
+        self.log('val_loss', loss)
+        self.val_f1(logits, y)
+        self.log('val_f1', self.val_f1, on_step=False, on_epoch=True, prog_bar=True)
+        val_tpr = self.val_tpr(logits, y, fprNeeded=self.fpr)
+        self.log('val_tpr', val_tpr, on_step=False, on_epoch=True, prog_bar=True)
+        self.val_acc(logits, y)
+        self.log('val_acc', self.val_acc, on_step=False, on_epoch=True, prog_bar=True)
+        self.val_auc(logits, y)
+        self.log('val_auc', self.val_auc, on_step=False, on_epoch=True, prog_bar=False)
+        self.val_recall(logits, y)
+        self.log('val_recall', self.val_recall, on_step=False, on_epoch=True, prog_bar=False)
+        self.val_precision(logits, y)
+        self.log('val_precision', self.val_precision, on_step=False, on_epoch=True, prog_bar=False)
+        return loss    
+
+
+class PyTorchLightningModelLM(PyTorchLightningModelBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(loss = CrossEntropyLoss(), *args, **kwargs)
+        assert hasattr(self.model, "pretrain"), "This model does not have a 'pretrain' method."
+        self.forward = self.model.pretrain
+        
+    def _shared_step(self, batch):
+        # used by training_step, validation_step and test_step
+        x, y = batch
+        if len(y.shape) == 1:
+            y = y.unsqueeze(1)
+        logits = self(x)
+        loss = self.loss(logits, y)
+        return loss
+
+    def training_step(self, batch, batch_idx):
+        # NOTE: keep batch_idx -- lightning needs it
+        loss = self._shared_step(batch)
+        self.log('train_loss', loss, prog_bar=True)
+        learning_rate = self.optimizers().param_groups[0]['lr']
+        self.log('lr', learning_rate, on_step=True, prog_bar=True)
+        self.log('memory', float(cuda.memory_allocated()), on_step=True, prog_bar=True)
+        return loss
+
+
 class LitTrainerWrapper:
     def __init__(
         self,
         pytorch_model: nn.Module,
-        name: str,
-        log_folder: str = None,
-        lit_model_file: str = None,
-        torch_model_file: str = None,
+        name: Optional[str] = None,
+        log_folder: Optional[str] = None,
         # training config
         epochs: int = None,
         learning_rate: float = 1e-3,
@@ -209,20 +243,27 @@ class LitTrainerWrapper:
         monitor_mode: str = "max",
         early_stop_patience: Union[None, int] = 5,
         early_stop_min_delta: float = 0.0001,
+        # efficient training strategies
         scheduler: Union[None, str] = None,
+        accumulate_grad_batches: Optional[int] = None,
+        gradient_clip_val: Optional[float] = None,
+        # https://lightning.ai/docs/pytorch/stable/advanced/speed.html#mixed-precision-16-bit-training
+        # lit: Double precision (64), full precision (32), half precision (16) or bfloat16 precision (bf16) for TPUS
+        precision: Optional[int] = 32,
         # data config
         batch_size: int = 1024,
         dataloader_workers: int = 4,
         random_state: int = 42,
         verbose: bool = False,
-        skip_trainer_init: bool = True
+        skip_trainer_init: Optional[bool] = False
     ):
         self.pytorch_model = pytorch_model
         self.lit_model = None
-        self.lit_model_file = lit_model_file
-        self.torch_model_file = torch_model_file
 
-        self.name = name
+        if name is None:
+            self.name = f"{self.pytorch_model.__class__.__name__}_{int(time())}"
+        else:
+            self.name = name
         self.log_folder = log_folder
         
         self.epochs = epochs
@@ -237,6 +278,10 @@ class LitTrainerWrapper:
         self.early_stop_min_delta = early_stop_min_delta
         self.scheduler = scheduler
         self.scheduler_budget = None
+        self.accumulate_grad_batches = accumulate_grad_batches
+        self.gradient_clip_val = gradient_clip_val
+        assert precision in [16, 32, 64]
+        self.precision = precision
 
         self.batch_size = batch_size
         self.dataloader_workers = dataloader_workers
@@ -293,14 +338,17 @@ class LitTrainerWrapper:
         print(f"[!] Logging to {self.log_folder}")
 
         self.trainer = L.Trainer(
-            num_sanity_val_steps=self.lit_sanity_steps,
             max_epochs=self.epochs,
             accelerator=self.device,
             devices=1,
             callbacks=callbacks,
             val_check_interval=1/self.val_check_times,
             log_every_n_steps=self.log_every_n_steps,
-            enable_model_summary=False, # self.verbose,
+            num_sanity_val_steps=self.lit_sanity_steps,
+            enable_model_summary=self.verbose,
+            accumulate_grad_batches=self.accumulate_grad_batches,
+            gradient_clip_val=self.gradient_clip_val,
+            precision=self.precision,
             logger=[
                 CSVLogger(save_dir=self.log_folder, name=f"{self.name}_csv"),
                 TensorBoardLogger(save_dir=self.log_folder, name=f"{self.name}_tb")
@@ -313,32 +361,31 @@ class LitTrainerWrapper:
 
 
     def load_lit_model(self, model_file: str = None):
-        if model_file is not None:
-            self.lit_model_file = model_file
-        assert self.lit_model_file is not None, "Please provide a model file"
+        assert model_file is not None, "Please provide a model file"
         self.lit_model = PyTorchLightningModel.load_from_checkpoint(
-            checkpoint_path=self.lit_model_file,
+            checkpoint_path=model_file,
             model=self.pytorch_model
         )
 
 
     def load_torch_model(self, model_file: str = None):
-        if model_file is not None:
-            self.torch_model_file = model_file
-        assert self.torch_model_file is not None, "Please provide a model file"
-        self.pytorch_model = load(self.torch_model_file)
+        assert model_file is not None, "Please provide a model file"
+        self.pytorch_model = load(model_file)
         # NOTE: you have to reset self.lit_model after this
         #  if lit_model is already initialized, then load state dict directly:
         # self.lit_model.model.load_state_dict(state_dict)
 
 
     def setup_lit_model(self):
+        if self.scheduler is not None and self.scheduler_budget is None:
+            self.calculate_scheduler_step_budget(max_epochs=self.epochs, max_time=self.training_time)
         self.lit_model = PyTorchLightningModel(
                 model=self.pytorch_model,
                 learning_rate=self.learning_rate,
                 scheduler=self.scheduler,
                 scheduler_step_budget=self.scheduler_budget,
             )
+
 
     def fit(self, *args, **kwargs):
         assert self.trainer is not None, "Please setup trainer first"
@@ -347,28 +394,18 @@ class LitTrainerWrapper:
 
     def train_lit_model(
             self,
-            train_dataloader: DataLoader,
-            val_dataloader: DataLoader = None,
+            train_loader: DataLoader,
+            val_loader: DataLoader = None,
     ):
         assert self.trainer is not None, "Please setup trainer first"
-        self.train_dataloader = train_dataloader
-        self.val_dataloader = val_dataloader
+        self.train_loader = train_loader
+        self.val_loader = val_loader
 
-        if self.scheduler is not None:
-            self.scheduler_budget = self.calculate_scheduler_step_budget(
-                max_epochs=self.epochs,
-                max_time=self.training_time
-            )
         if self.lit_model is None:
             self.setup_lit_model()
 
         print(f"[*] Training '{self.name}' model...")
-        self.trainer.fit(self.lit_model, self.train_dataloader, self.val_dataloader)
-
-        if self.lit_model_file is not None:
-            self.save_lit_model()
-        if self.torch_model_file is not None:
-            self.save_torch_model()
+        self.trainer.fit(self.lit_model, self.train_loader, self.val_loader)
 
 
     def predict_lit_model(
@@ -390,8 +427,6 @@ class LitTrainerWrapper:
 
 
     def save_lit_model(self, model_file: str = None, how="best"):
-        if model_file is not None:
-            self.lit_model_file = model_file
         assert how in ["best", "last"], "how must be either 'best' or 'last'"
         if how == "best":
           checkpoint_path = self.trainer.checkpoint_callback.best_model_path
@@ -399,37 +434,30 @@ class LitTrainerWrapper:
           checkpoint_path = self.trainer.checkpoint_callback.last_model_path
         basename = os.path.basename(checkpoint_path)
         
-        if self.lit_model_file is None: # case when no model file is specified
+        if model_file is None: # case when no model file is specified
             basename = f"{int(time())}_epoch_{self.trainer.current_epoch}_{basename}.ckpt"
-            self.lit_model_file = os.path.join(self.log_folder, basename)
-        if os.path.exists(self.lit_model_file): # be sure not to override existing models
+            model_file = os.path.join(self.log_folder, basename)
+        if os.path.exists(model_file): # be sure not to override existing models
             basename = f"{int(time())}_epoch_{self.trainer.current_epoch}_{basename}.ckpt"
-            self.lit_model_file = os.path.join(self.log_folder, basename)
-        # if self.log_folder not in self.lit_model_file: # dumb check if log_folder is in the path of lit_model_file 
-        #     self.lit_model_file = os.path.join(self.log_folder, self.lit_model_file)
+            model_file = os.path.join(self.log_folder, basename)
         
         if os.path.exists(checkpoint_path): 
-            copyfile(checkpoint_path, self.lit_model_file)
-            print(f"[!] Saved Ligthining model to {self.lit_model_file}")
+            copyfile(checkpoint_path, model_file)
+            print(f"[!] Saved Ligthining model to {model_file}")
         else:
             print(f"[-] Cannot locate lit model checkpoint...")
 
 
     def save_torch_model(self, model_file: str = None):
-        if model_file is not None:
-            self.torch_model_file = model_file
-        
-        if self.torch_model_file is None: # case when no model file is specified
+        if model_file is None: # case when no model file is specified
             basename = f"{int(time())}_epoch_{self.trainer.current_epoch}.torch"
-            self.torch_model_file = os.path.join(self.log_folder, basename)
-        if os.path.exists(self.torch_model_file): # be sure not to override existing models
-            basename = f"{int(time())}_epoch_{self.trainer.current_epoch}_{os.path.basename(self.torch_model_file)}"
-            self.torch_model_file = os.path.join(self.log_folder, basename)
-        # if self.log_folder not in self.torch_model_file: # dumb check if log_folder is in the path of lit_model_file
-        #     self.torch_model_file = os.path.join(self.log_folder, self.torch_model_file)
+            model_file = os.path.join(self.log_folder, basename)
+        if os.path.exists(model_file): # be sure not to override existing models
+            basename = f"{int(time())}_epoch_{self.trainer.current_epoch}_{os.path.basename(model_file)}"
+            model_file = os.path.join(self.log_folder, basename)
         
-        save(self.pytorch_model, self.torch_model_file)
-        print(f"[!] Saved PyTorch model to {self.torch_model_file}")
+        save(self.pytorch_model, model_file)
+        print(f"[!] Saved PyTorch model to {model_file}")
     
 
     def create_dataloader(
@@ -466,10 +494,13 @@ class LitTrainerWrapper:
     ) -> int:
         assert (max_time is None) or (max_epochs is None), "only either 'max_time' or 'max_epochs' can be set"
         assert (max_time is not None) or (max_epochs is not None), "at least one of 'max_time' or 'max_epochs' should be set"
+
+        accumulate_grad_batches = 1 if self.accumulate_grad_batches is None else self.accumulate_grad_batches
+        total_batches = 0
         if max_epochs is not None:
-            total_batches = max_epochs * len(self.train_dataloader)
+            total_batches = int(np.ceil(max_epochs * len(self.train_loader) / accumulate_grad_batches))
         if max_time is not None:
-            # TODO: does lightning provide a way to get the number of batches from time?
+            # TODO: Implement logic for max_time if needed
             raise NotImplementedError("calculate_scheduler_step_budget for max_time is not implemented yet")
-        return total_batches
-    
+
+        self.scheduler_budget = total_batches

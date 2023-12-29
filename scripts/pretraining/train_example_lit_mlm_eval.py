@@ -37,7 +37,7 @@ if __name__ == "__main__":
     y_test = np.load(yTestFile)
 
     # shuffle and limit
-    limit = 1000
+    limit = 10000 # None
     x_train, y_train = shuffle(x_train, y_train, random_state=0)
     x_train = x_train[:limit]
     y_train = y_train[:limit]
@@ -66,69 +66,91 @@ if __name__ == "__main__":
         "numClasses": 1, # binary classification
         "hiddenNeurons": [64], # classifier ffnn dims
         "layerNorm": False,
-        "dropout": 0.1,
+        "dropout": None,
         "mean_over_sequence": False,
         "norm_first": True
     }
-    model = TransformerEncoderChunksLM(**model_config)
+    # NOTE: for pretraining 0 is good, for finetuning try 0.1+
+    model_config['dropout'] = 0.0
+    lm_model = TransformerEncoderChunksLM(**model_config)
+    model_config['dropout'] = 0.3
+    downstream_model = TransformerEncoderChunksLM(**model_config)
 
-    print(f"[!] Model ready.")
+    print(f"[!] Models ready.")
 
     # ===================
     # TRAINING
     # ===================
-    VERBOSE = False
-    PRETRAINING_EPOCHS = 4
+    VERBOSE = True
+    PRETRAINING_EPOCHS = 2
     DOWNSTREAM_EPOCHS = 3
-    REMASK_EVERY_N_EPOCHS = 2
-    BATCH_SIZE = 128
+    BATCH_SIZE = 256
     DATALOADER_WORKERS = 4
     LOG_EVERY_N_STEPS = 1
-    SSL_EVAL_SPLITS = 3
-    NAME = "mlm_testrun"
+    SSL_EVAL_SPLITS = 2
+    # efficient training methods
+    ACCUMULATE_GRAD_BATCHES = None # 4 # might leave default, batch sizes are reasonably big
+    GRAD_CLIP_VALUE = 1.0
+
+    # NOTE: scheduler is incompatible with REMASK_EVERY_N_EPOCHS 
+    # and DUMP_MODEL_EVERY_EPOCH because of lighning nuances
+    # USE:
+    SCHEDULER = "onecycle"
+    REMASK_EVERY_N_EPOCHS = False
+    DUMP_MODEL_EVERY_EPOCH = False
+    # OR
+    # SCHEDULER = None
+    # REMASK_EVERY_N_EPOCHS = 2
+    # DUMP_MODEL_EVERY_EPOCH = True
+    
+    NAME = "no_scheduler_grad_clip_1"
+
+    trainer_config = {
+        "log_every_n_steps": LOG_EVERY_N_STEPS,
+        "device": "gpu",
+        "accumulate_grad_batches": ACCUMULATE_GRAD_BATCHES,
+        "gradient_clip_val": GRAD_CLIP_VALUE,
+        "scheduler": SCHEDULER,
+        # "batch_size": BATCH_SIZE,
+        "dataloader_workers": DATALOADER_WORKERS,
+        "random_state": random_state,
+        "verbose": VERBOSE
+    }
     lit_mlm = MaskedLanguageModelTrainer(
-        # pretrain config
+        # pretrainer config
         vocab=vocab,
         pretrain_epochs=PRETRAINING_EPOCHS,
         remask_epochs=REMASK_EVERY_N_EPOCHS,
-        dump_model_every_epoch=False,
+        dump_model_every_epoch=DUMP_MODEL_EVERY_EPOCH,
         # trainer config
-        pytorch_model=model,
+        pytorch_model=lm_model,
         name = NAME + "_pretraining",
         log_folder=f"z_{NAME}_pretraining",
-        log_every_n_steps=LOG_EVERY_N_STEPS,
-        device="gpu",
-        # data config
-        batch_size=BATCH_SIZE,
-        dataloader_workers=DATALOADER_WORKERS,
-        # misc
-        random_state=random_state,
-        verbose=VERBOSE
+        batch_size=512,
+        precision=16,
+        **trainer_config
     )
     downstream_trainer = LitTrainerWrapper(
         # trainer config
         epochs=DOWNSTREAM_EPOCHS,
-        pytorch_model=model,
+        pytorch_model=downstream_model,
         name = NAME + "_downstream",
         log_folder=f"z_{NAME}_downstream",
-        log_every_n_steps=LOG_EVERY_N_STEPS,
-        device="gpu",
         skip_trainer_init=True,
-        # data config
-        batch_size=BATCH_SIZE,
-        dataloader_workers=DATALOADER_WORKERS,
-        # misc
-        random_state=random_state,
-        verbose=VERBOSE
+        batch_size=256,
+        **trainer_config
     )
     eval_run = SelfSupervisedLearningEvalFramework(
         pretrainer=lit_mlm,
         downstream_trainer=downstream_trainer,
         unlabeled_data_ratio=0.8,
-        log_folder=f"./z_mlm_eval_{int(time())}",
+        log_folder=f"./z_out_mlm_effective_training_techniques_lim_{limit}",
         dump_data_splits=True,
         random_state=random_state,
         n_splits=SSL_EVAL_SPLITS
     )
 
     eval_run.run_splits(x_train, y_train, x_test, y_test)
+
+    # TODO: 
+    # 1. remove pretrain layers from downstream trainer -- might allow to make larger batch sizes

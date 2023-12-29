@@ -3,17 +3,11 @@ import logging
 import numpy as np
 from tqdm import tqdm
 from time import time
-from typing import Union, List
-from torch.nn import CrossEntropyLoss
+from typing import List
+from copy import deepcopy
 from sklearn.model_selection import train_test_split
-from .lit_utils import LitTrainerWrapper, PyTorchLightningModel
-
-
-class PyTorchLightningModelLM(PyTorchLightningModel):
-    def __init__(self, *args, **kwargs):
-        super().__init__(loss = CrossEntropyLoss(), *args, **kwargs)
-        assert hasattr(self.model, "pretrain"), "This model does not have a 'pretrain' method."
-        self.forward = self.model.pretrain
+from .lit_utils import LitTrainerWrapper, PyTorchLightningModelLM
+from .misc import clear_cuda_cache
 
 
 class MaskedLanguageModelTrainer(LitTrainerWrapper):
@@ -23,6 +17,7 @@ class MaskedLanguageModelTrainer(LitTrainerWrapper):
             pretrain_epochs: int = 3,
             # whether to remask sequence after nr of remask_epochs
             remask_epochs: int = False,
+            dump_model_every_epoch: bool = False,
             mask_probability: float = 0.15,
             # mask the token with distribution (80% mask, 10% random, 10% same)
             # same as Devlin et al (https://arxiv.org/abs/1810.04805)
@@ -30,7 +25,6 @@ class MaskedLanguageModelTrainer(LitTrainerWrapper):
             # how to construct the target for the masked tokens
             # 1 if onehot, sum of maskings if count
             masked_target_type: str = "onehot",
-            dump_model_every_epoch: bool = False,
             *args,
             **kwargs
     ):
@@ -41,6 +35,7 @@ class MaskedLanguageModelTrainer(LitTrainerWrapper):
         assert "<mask>" in vocab, "Vocabulary must contain '<mask>' token"
         self.vocab = vocab
         self.pretrain_epochs = pretrain_epochs
+        self.dump_model_every_epoch = dump_model_every_epoch
         
         if remask_epochs:
             assert isinstance(remask_epochs, int), "remask_epochs must be an integer"
@@ -53,9 +48,7 @@ class MaskedLanguageModelTrainer(LitTrainerWrapper):
         
         assert masked_target_type in ["onehot", "count"], "masked_target_type must be either 'onehot' or 'count'"
         self.masked_target_type = masked_target_type
-        
-        self.dump_model_every_epoch = dump_model_every_epoch
-        
+
 
     def mask_seq(self, sequence: np.ndarray):
         """
@@ -131,6 +124,9 @@ class MaskedLanguageModelTrainer(LitTrainerWrapper):
 
 
     def setup_lit_language_model(self):
+        if self.scheduler is not None and self.scheduler_budget is None:
+            self.calculate_scheduler_step_budget(max_epochs=self.pretrain_epochs)
+
         self.lit_model = PyTorchLightningModelLM(
                 model=self.pytorch_model,
                 learning_rate=self.learning_rate,
@@ -142,36 +138,51 @@ class MaskedLanguageModelTrainer(LitTrainerWrapper):
         if epochs is not None:
             self.pretrain_epochs = epochs
 
-        # MODEL SETUP
-        if self.lit_model is None:
-            self.setup_lit_language_model()
-
         # DATA SETUP
         logging.warning(' [*] Masking of sequences...')
         x_masked, y_masked = self.mask_seq_arr(x_unlabeled)
-        dataloader = self.create_dataloader(x_masked, y_masked, shuffle=True)
+        self.train_loader = self.create_dataloader(x_masked, y_masked, shuffle=True)
+
+        # MODEL SETUP
+        if self.lit_model is None:
+            self.setup_lit_language_model()
         
         # TRAINER SETUP AND TRAINING
-        self.epochs = 1
-        self.setup_trainer()
-        for epoch in range(self.pretrain_epochs):
-            if self.remask_epochs and epoch % self.remask_epochs == 0 and epoch > 0:
-                logging.warning(f' [*] Re-masking sequences...')
-                x_masked, y_masked = self.mask_seq_arr(x_unlabeled)
-                dataloader = self.create_dataloader(x_masked, y_masked, shuffle=True)
-
-            self.trainer.fit(self.lit_model, dataloader)
-
-            # Modify the Trainer's fit_loop max_epochs to ensure .fit() can be called again
-            if epoch < self.pretrain_epochs - 1:
-                self.trainer.fit_loop.max_epochs = self.trainer.max_epochs + 1
-
+        if not self.remask_epochs and not self.dump_model_every_epoch:
+            self.epochs = self.pretrain_epochs
+            self.setup_trainer()
+            self.trainer.fit(self.lit_model, self.train_loader)
+        else:
+            # need to stop training in between to peform extra logic: saving or remasking
+            # TODO: this doesn't work with 'scheduler', since L.Trainer
+            # calls configure_optimizers() with every .fit()
+            # need to write custom configure_optimizers() for LM model ???
+            # for now avoiding using remask_every_n_epochs and dump_model_every_epoch w/ scheduler    
+            loop_length = self.remask_epochs
+            total_loops = self.pretrain_epochs // loop_length
             if self.dump_model_every_epoch:
-                self.save_torch_model(model_file=os.path.join(self.log_folder, f"pretrained_epoch_{epoch}.torch"))
+                loop_length = 1
+                total_loops = self.pretrain_epochs
+            self.epochs = loop_length
+            self.setup_trainer()
+            for loop in range(total_loops):
+                if loop > 0 and (not self.dump_model_every_epoch or loop % self.remask_epochs == 0):
+                    logging.warning(f' [*] Re-masking sequences... [{loop}/{total_loops-1}]')
+                    x_masked, y_masked = self.mask_seq_arr(x_unlabeled)
+                    self.train_loader = self.create_dataloader(x_masked, y_masked, shuffle=True)
 
+                self.trainer.fit(self.lit_model, self.train_loader)
+
+                # NOTE: here we modify the Trainer's fit_loop max_epochs to ensure .fit() can be called again
+                if loop < total_loops - 1:
+                    self.trainer.fit_loop.max_epochs = self.trainer.max_epochs + loop_length
+
+                if self.dump_model_every_epoch:
+                    self.save_torch_model(os.path.join(self.log_folder, f"pretrained_epoch_{loop}.torch"))
+        
         # NOTE: lit weird behavior: no checkpoint files are saved if train_loss 
         # is specified as monitor metric in ModelCheckpoint, therefore, saving torch model manually.
-        self.save_torch_model(model_file=os.path.join(self.log_folder, "pretrained_final.torch"))
+        self.save_torch_model(os.path.join(self.log_folder, "pretrained_final.torch"))
 
 
 class AutoRegressiveModelTrainer(LitTrainerWrapper):
@@ -180,8 +191,8 @@ class AutoRegressiveModelTrainer(LitTrainerWrapper):
             vocab: dict,
             pretrain_epochs: int = 3,
             block_size: int = 256,
-            dump_model_every_epoch: bool = False,
             random_offsets: int = False,
+            dump_model_every_epoch: bool = False,
             *args,
             **kwargs
     ):
@@ -191,8 +202,8 @@ class AutoRegressiveModelTrainer(LitTrainerWrapper):
         assert "<pad>" in vocab, "Vocabulary must contain '<pad>' token"
         assert "<mask>" in vocab, "Vocabulary must contain '<mask>' token"
         self.vocab = vocab
-
         self.pretrain_epochs = pretrain_epochs
+
         self.block_size = block_size
         self.dump_model_every_epoch = dump_model_every_epoch
         self.random_offsets = random_offsets
@@ -249,8 +260,9 @@ class SelfSupervisedLearningEvalFramework:
         self.downstream_trainer.log_folder = os.path.join(self.log_folder, self.downstream_trainer.log_folder)
         self.init_downstream_log_folder = self.downstream_trainer.log_folder
         
-        self.init_pretrain_model_weights = self.pretrainer.pytorch_model.state_dict()
-        self.init_downstream_model_weights = self.downstream_trainer.pytorch_model.state_dict()        
+        # NOTE: if not deepcopy, init_weights are overwritten with load_state_dict()
+        self.init_pretrain_model_weights = deepcopy(self.pretrainer.pytorch_model.state_dict())
+        self.init_downstream_model_weights = deepcopy(self.downstream_trainer.pytorch_model.state_dict())
 
         self.dump_data_splits = dump_data_splits
         self.downsample_unlabeled_data = downsample_unlabeled_data
@@ -297,12 +309,11 @@ class SelfSupervisedLearningEvalFramework:
         print("[!] Pre-training model...")
         self.pretrainer.log_folder = self.init_pretrain_log_folder + "_" + str(self.timestamp)
         
-        # reset model weights
+        # reset model weights -- needed for multiple splits
         self.pretrainer.pytorch_model.load_state_dict(self.init_pretrain_model_weights)
-        self.pretrainer.setup_trainer()
-        self.pretrainer.setup_lit_language_model()
         self.pretrainer.pretrain(self.unlabeled_data)
-
+        pretrained_weights = deepcopy(self.pretrainer.pytorch_model.state_dict())
+        
         self.train_loader = self.downstream_trainer.create_dataloader(self.labeled_x, self.labeled_y, shuffle=True)
         if "full_data" in self.training_types:
             self.full_train_loader = self.downstream_trainer.create_dataloader(x_train, y_train, shuffle=True)
@@ -316,18 +327,25 @@ class SelfSupervisedLearningEvalFramework:
             print(f"[!] Fine-tuning of '{training_type}' model on downstream task...")
             self.downstream_trainer.name = training_type
             self.downstream_trainer.log_folder = self.init_downstream_log_folder + "_" + training_type + "_" + str(self.timestamp)
+            
+            # reset params that should be re-initialized
+            self.downstream_trainer.lit_model = None
+            self.downstream_trainer.scheduler_budget = None
 
             if training_type == "pretrained":
-                self.downstream_trainer.pytorch_model.load_state_dict(self.pretrainer.pytorch_model.state_dict())
+                self.downstream_trainer.pytorch_model.load_state_dict(pretrained_weights)
             else:
                 self.downstream_trainer.pytorch_model.load_state_dict(self.init_downstream_model_weights)
             
             self.downstream_trainer.setup_trainer()
-            self.downstream_trainer.setup_lit_model()
-            
+
             if training_type == "full_data":
+                self.downstream_trainer.train_loader = self.full_train_loader
+                self.downstream_trainer.setup_lit_model()
                 self.downstream_trainer.train_lit_model(self.full_train_loader, self.val_loader)
             else:
+                self.downstream_trainer.train_loader = self.train_loader
+                self.downstream_trainer.setup_lit_model()
                 self.downstream_trainer.train_lit_model(self.train_loader, self.val_loader)
 
 

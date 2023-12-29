@@ -61,12 +61,14 @@ def create_dataloader(
     else:
         raise ValueError("Unsupported type for X. Supported types are numpy arrays, torch tensors, and scipy CSR matrices.")
     
+    persistent_workers = True if workers > 0 else False
     return DataLoader(
         dataset,
         batch_size=batch_size,
         shuffle=shuffle,
         num_workers=workers,
         # NOTE: these are important for lightning to iterate quickly
-        persistent_workers=True,
+        # see: https://lightning.ai/docs/pytorch/stable/advanced/speed.html
+        persistent_workers=persistent_workers,
         pin_memory=True
     )
