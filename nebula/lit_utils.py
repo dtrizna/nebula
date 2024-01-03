@@ -8,8 +8,9 @@ from typing import Union, Any, Callable, Optional
 from sklearn.metrics import roc_curve
 
 import lightning as L
+import lightning.pytorch as pl
 from lightning.lite.utilities.seed import seed_everything
-from lightning.pytorch.callbacks import TQDMProgressBar, ModelCheckpoint, EarlyStopping
+from lightning.pytorch.callbacks import TQDMProgressBar, ModelCheckpoint, EarlyStopping, ModelSummary
 from lightning.pytorch.loggers import CSVLogger, TensorBoardLogger
 
 from torch import cat, sigmoid, save, load, optim, cuda, nn
@@ -66,12 +67,13 @@ class PyTorchLightningModelBase(L.LightningModule):
         self.val_recall = torchmetrics.Recall(task='binary')
         self.val_precision = torchmetrics.Precision(task='binary')
 
-        self.test_acc = torchmetrics.Accuracy(task='binary')
-        self.test_f1 = torchmetrics.F1Score(task='binary', average='macro')
-        self.test_auc = torchmetrics.AUROC(task='binary')
-        self.test_tpr = self.get_tpr_at_fpr
-        self.test_recall = torchmetrics.Recall(task='binary')
-        self.test_precision = torchmetrics.Precision(task='binary')
+        # NOTE: not using .test(), don't want to have these rudimentary metrics to drag over
+        # self.test_acc = torchmetrics.Accuracy(task='binary')
+        # self.test_f1 = torchmetrics.F1Score(task='binary', average='macro')
+        # self.test_auc = torchmetrics.AUROC(task='binary')
+        # self.test_tpr = self.get_tpr_at_fpr
+        # self.test_recall = torchmetrics.Recall(task='binary')
+        # self.test_precision = torchmetrics.Precision(task='binary')
 
         # self.save_hyperparameters(ignore=["model"])
     
@@ -155,24 +157,25 @@ class PyTorchLightningModelBase(L.LightningModule):
         self.train_precision(logits, y)
         self.log('train_precision', self.train_precision, on_step=False, on_epoch=True, prog_bar=False)
         return loss
-    
-    def test_step(self, batch, batch_idx):
-        # NOTE: keep batch_idx -- lightning needs it
-        loss, y, logits = self._shared_step(batch)
-        self.log('test_loss', loss)
-        self.test_f1(logits, y)
-        self.log('test_f1', self.test_f1, on_step=False, on_epoch=True, prog_bar=True)
-        test_tpr = self.test_tpr(logits, y, fprNeeded=self.fpr)
-        self.log('test_tpr', test_tpr, on_step=False, on_epoch=True, prog_bar=True)
-        self.test_acc(logits, y)
-        self.log('test_acc', self.test_acc, on_step=False, on_epoch=True, prog_bar=True)
-        self.test_auc(logits, y)
-        self.log('test_auc', self.test_auc, on_step=False, on_epoch=False, prog_bar=False)
-        self.test_recall(logits, y)
-        self.log('test_recall', self.test_recall, on_step=False, on_epoch=False, prog_bar=False)
-        self.test_precision(logits, y)
-        self.log('test_precision', self.test_precision, on_step=False, on_epoch=False, prog_bar=False)
-        return loss
+
+    # NOTE: not using .test(), don't want to have these rudimentary metrics to drag over
+    # def test_step(self, batch, batch_idx):
+    #     # NOTE: keep batch_idx -- lightning needs it
+    #     loss, y, logits = self._shared_step(batch)
+    #     self.log('test_loss', loss)
+    #     self.test_f1(logits, y)
+    #     self.log('test_f1', self.test_f1, on_step=False, on_epoch=True, prog_bar=True)
+    #     test_tpr = self.test_tpr(logits, y, fprNeeded=self.fpr)
+    #     self.log('test_tpr', test_tpr, on_step=False, on_epoch=True, prog_bar=True)
+    #     self.test_acc(logits, y)
+    #     self.log('test_acc', self.test_acc, on_step=False, on_epoch=True, prog_bar=True)
+    #     self.test_auc(logits, y)
+    #     self.log('test_auc', self.test_auc, on_step=False, on_epoch=False, prog_bar=False)
+    #     self.test_recall(logits, y)
+    #     self.log('test_recall', self.test_recall, on_step=False, on_epoch=False, prog_bar=False)
+    #     self.test_precision(logits, y)
+    #     self.log('test_precision', self.test_precision, on_step=False, on_epoch=False, prog_bar=False)
+    #     return loss
 
     def predict_step(self, batch: Any, batch_idx: int, dataloader_idx: int = 0) -> Any:
         return super().predict_step(batch[0], batch_idx, dataloader_idx)
@@ -315,6 +318,9 @@ class LitTrainerWrapper:
             verbose=self.verbose,
         )
         callbacks = [LitProgressBar(), model_checkpoint]
+        if self.verbose:
+            summary = ModelSummary(max_depth=-1)
+            callbacks.append(summary)
 
         if self.early_stop_patience is not None:
             early_stop = EarlyStopping(
@@ -345,7 +351,7 @@ class LitTrainerWrapper:
             val_check_interval=1/self.val_check_times,
             log_every_n_steps=self.log_every_n_steps,
             num_sanity_val_steps=self.lit_sanity_steps,
-            enable_model_summary=self.verbose,
+            enable_model_summary=False, # added manually with different depth
             accumulate_grad_batches=self.accumulate_grad_batches,
             gradient_clip_val=self.gradient_clip_val,
             precision=self.precision,

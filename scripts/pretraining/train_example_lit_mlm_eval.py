@@ -14,7 +14,7 @@ sys.path.append(REPOSITORY_ROOT)
 
 from nebula.lit_pretraining import MaskedLanguageModelTrainer, SelfSupervisedLearningEvalFramework
 from nebula.lit_utils import LitTrainerWrapper
-from nebula.models.attention import TransformerEncoderChunksLM
+from nebula.models.attention import TransformerEncoderChunksLM, TransformerEncoderChunks
 from lightning.lite.utilities.seed import seed_everything
 
 if __name__ == "__main__":
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     model_config['dropout'] = 0.0
     lm_model = TransformerEncoderChunksLM(**model_config)
     model_config['dropout'] = 0.3
-    downstream_model = TransformerEncoderChunksLM(**model_config)
+    downstream_model = TransformerEncoderChunks(**model_config)
 
     print(f"[!] Models ready.")
 
@@ -89,17 +89,18 @@ if __name__ == "__main__":
     LOG_EVERY_N_STEPS = 1
     SSL_EVAL_SPLITS = 2
     # efficient training methods
-    ACCUMULATE_GRAD_BATCHES = None # 4 # might leave default, batch sizes are reasonably big
     GRAD_CLIP_VALUE = 1.0
+    # might leave here default, batch sizes are reasonably big
+    ACCUMULATE_GRAD_BATCHES = None
 
     # NOTE: scheduler is incompatible with REMASK_EVERY_N_EPOCHS 
     # and DUMP_MODEL_EVERY_EPOCH because of lighning nuances
     # USE:
-    SCHEDULER = "onecycle"
+    # SCHEDULER = "onecycle"
     REMASK_EVERY_N_EPOCHS = False
     DUMP_MODEL_EVERY_EPOCH = False
     # OR
-    # SCHEDULER = None
+    SCHEDULER = None
     # REMASK_EVERY_N_EPOCHS = 2
     # DUMP_MODEL_EVERY_EPOCH = True
     

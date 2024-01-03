@@ -90,8 +90,6 @@ if __name__ == "__main__":
         device="gpu",
         log_every_n_steps=1,
         scheduler="onecycle",
-        lit_model_file=os.path.join(outfolder, "test.ckpt"),
-        torch_model_file=os.path.join(outfolder, "test.torch"),
         batch_size=256,
         dataloader_workers=4
     )

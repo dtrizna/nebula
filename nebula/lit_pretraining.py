@@ -283,6 +283,30 @@ class SelfSupervisedLearningEvalFramework:
         print(f"[!] Saved dataset splits to {split_data_file}")
 
 
+    def _train_downstream_model(self, training_type, pretrained_weights=None):
+        # reset params that should be re-initialized
+        self.downstream_trainer.lit_model = None
+        self.downstream_trainer.scheduler_budget = None
+        self.downstream_trainer.name = training_type
+        self.downstream_trainer.log_folder = self.init_downstream_log_folder + "_" + training_type + "_" + str(self.timestamp)
+        
+        if training_type == "pretrained":
+            self.downstream_trainer.pytorch_model.load_state_dict(pretrained_weights)
+        else:
+            self.downstream_trainer.pytorch_model.load_state_dict(self.init_downstream_model_weights)
+        
+        self.downstream_trainer.setup_trainer()
+
+        if training_type == "full_data":
+            self.downstream_trainer.train_loader = self.full_train_loader
+            self.downstream_trainer.setup_lit_model()
+            self.downstream_trainer.train_lit_model(self.full_train_loader, self.val_loader)
+        else:
+            self.downstream_trainer.train_loader = self.train_loader
+            self.downstream_trainer.setup_lit_model()
+            self.downstream_trainer.train_lit_model(self.train_loader, self.val_loader)
+
+
     def run_one_split(
             self,
             x_train: np.ndarray,
@@ -313,6 +337,11 @@ class SelfSupervisedLearningEvalFramework:
         self.pretrainer.pytorch_model.load_state_dict(self.init_pretrain_model_weights)
         self.pretrainer.pretrain(self.unlabeled_data)
         pretrained_weights = deepcopy(self.pretrainer.pytorch_model.state_dict())
+
+        # remove pre-train head
+        to_remove = [k for k in pretrained_weights.keys() if k.startswith('pretrain_layers')]
+        for k in to_remove:
+            del pretrained_weights[k]
         
         self.train_loader = self.downstream_trainer.create_dataloader(self.labeled_x, self.labeled_y, shuffle=True)
         if "full_data" in self.training_types:
@@ -325,28 +354,7 @@ class SelfSupervisedLearningEvalFramework:
         
         for training_type in self.training_types:
             print(f"[!] Fine-tuning of '{training_type}' model on downstream task...")
-            self.downstream_trainer.name = training_type
-            self.downstream_trainer.log_folder = self.init_downstream_log_folder + "_" + training_type + "_" + str(self.timestamp)
-            
-            # reset params that should be re-initialized
-            self.downstream_trainer.lit_model = None
-            self.downstream_trainer.scheduler_budget = None
-
-            if training_type == "pretrained":
-                self.downstream_trainer.pytorch_model.load_state_dict(pretrained_weights)
-            else:
-                self.downstream_trainer.pytorch_model.load_state_dict(self.init_downstream_model_weights)
-            
-            self.downstream_trainer.setup_trainer()
-
-            if training_type == "full_data":
-                self.downstream_trainer.train_loader = self.full_train_loader
-                self.downstream_trainer.setup_lit_model()
-                self.downstream_trainer.train_lit_model(self.full_train_loader, self.val_loader)
-            else:
-                self.downstream_trainer.train_loader = self.train_loader
-                self.downstream_trainer.setup_lit_model()
-                self.downstream_trainer.train_lit_model(self.train_loader, self.val_loader)
+            self._train_downstream_model(training_type, pretrained_weights)
 
 
     def run_splits(self, *args, **kwargs):
