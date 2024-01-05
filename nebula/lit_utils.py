@@ -8,12 +8,11 @@ from typing import Union, Any, Callable, Optional
 from sklearn.metrics import roc_curve
 
 import lightning as L
-import lightning.pytorch as pl
 from lightning.lite.utilities.seed import seed_everything
 from lightning.pytorch.callbacks import TQDMProgressBar, ModelCheckpoint, EarlyStopping, ModelSummary
 from lightning.pytorch.loggers import CSVLogger, TensorBoardLogger
 
-from torch import cat, sigmoid, save, load, optim, cuda, nn
+import torch
 from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss
 from torch.utils.data import DataLoader
 import torchmetrics
@@ -31,7 +30,7 @@ class LitProgressBar(TQDMProgressBar):
 class PyTorchLightningModelBase(L.LightningModule):
     def __init__(
             self,
-            model: nn.Module,
+            model: torch.nn.Module,
             learning_rate: float = 1e-3,
             fpr: float = 1e-4,
             scheduler: Union[None, str] = None,
@@ -77,26 +76,26 @@ class PyTorchLightningModelBase(L.LightningModule):
 
         # self.save_hyperparameters(ignore=["model"])
     
-    def optimizer_zero_grad(self, epoch, batch_idx, optimizer, optimizer_idx):
+    def optimizer_zero_grad(self, epoch: int, batch_idx: int, optimizer: Callable, optimizer_idx: int):
         # https://pytorch-lightning.readthedocs.io/en/1.3.8/benchmarking/performance.html#zero-grad-set-to-none-true
         optimizer.zero_grad(set_to_none=True)
 
     def configure_optimizers(self):
-        optimizer = optim.AdamW(self.parameters(), lr=self.learning_rate)
+        optimizer = torch.optim.AdamW(self.parameters(), lr=self.learning_rate)
         if self.scheduler is None:
             return optimizer
 
         if self.scheduler == "onecycle":
-            scheduler = optim.lr_scheduler.OneCycleLR(
+            scheduler = torch.optim.lr_scheduler.OneCycleLR(
                 optimizer,
                 max_lr=self.learning_rate,
                 total_steps=self.scheduler_step_budget
             )
         if self.scheduler == "cosine":
-            scheduler = optim.lr_scheduler.CosineAnnealingLR(
+            scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
                 optimizer,
                 T_max=self.scheduler_step_budget,
-                # minimum learning rate, should be ~= learning_rate/10 per Chinchilla
+                # NOTE: minimum learning rate, should be ~= learning_rate/10 per Chinchilla
                 eta_min=self.learning_rate/10
             )
         print(f"[!] Setting up {self.scheduler} scheduler with step budget {self.scheduler_step_budget}")
@@ -110,53 +109,65 @@ class PyTorchLightningModelBase(L.LightningModule):
             }
         }
 
-    def get_tpr_at_fpr(self, predicted_logits, true_labels, fprNeeded=1e-4):
-        predicted_probs = sigmoid(predicted_logits).cpu().detach().numpy()
-        true_labels = true_labels.cpu().detach().numpy()
+    def get_tpr_at_fpr(
+            self,
+            predicted_logits: torch.Tensor,
+            true_labels: torch.Tensor,
+            fprNeeded: float = 1e-4,
+            return_thresholds: bool = False
+    ):
+        predicted_probs = torch.sigmoid(predicted_logits).cpu().detach()
+        true_labels = true_labels.cpu().detach()
         try :
             fpr, tpr, thresholds = roc_curve(true_labels, predicted_probs)
         except ValueError: 
             # when multi-label 'ValueError: multilabel-indicator format is not supported'
-            return np.nan
+            return (torch.nan, torch.nan) if return_thresholds else torch.nan
         if all(np.isnan(fpr)):
-            return np.nan#, np.nan
+            return (torch.nan, torch.nan) if return_thresholds else torch.nan
         else:
             tpr_at_fpr = tpr[fpr <= fprNeeded][-1]
-            #threshold_at_fpr = thresholds[fpr <= fprNeeded][-1]
-            return tpr_at_fpr#, threshold_at_fpr
+            threshold_at_fpr = thresholds[fpr <= fprNeeded][-1]
+            return (tpr_at_fpr, threshold_at_fpr) if return_thresholds else tpr_at_fpr
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.model(x)
     
-    def _shared_step(self, batch):
+    def _shared_step(self, batch: torch.Tensor):
         # used by training_step, validation_step and test_step
         x, y = batch
         if len(y.shape) == 1:
             y = y.unsqueeze(1)
-        logits = self(x)
+        logits = self.forward(x)
         loss = self.loss(logits, y)
-        return loss, y, logits
+        # NOTE: by returning only loss here we avoid memory leaks
+        self.logits = logits.detach().cpu()
+        self.y = y.detach().cpu()
+        return loss
     
-    def training_step(self, batch, batch_idx):
+    def training_step(self, batch: torch.Tensor, batch_idx):
         # NOTE: keep batch_idx -- lightning needs it
-        loss, y, logits = self._shared_step(batch)
+        loss = self._shared_step(batch)
         self.log('train_loss', loss, prog_bar=True)
         learning_rate = self.optimizers().param_groups[0]['lr']
         self.log('lr', learning_rate, on_step=True, prog_bar=False)
-        self.log('memory', float(cuda.memory_allocated()), on_step=True, prog_bar=True)
-        self.train_f1(logits, y)
+        self.log('memory', float(torch.cuda.memory_allocated()), on_step=True, prog_bar=True)
+        self.train_f1(self.logits, self.y)
         self.log('train_f1', self.train_f1, on_step=False, on_epoch=True, prog_bar=True)
-        train_tpr = self.train_tpr(logits, y, fprNeeded=self.fpr)
+        train_tpr = self.train_tpr(self.logits, self.y, fprNeeded=self.fpr)
         self.log('train_tpr', train_tpr, on_step=False, on_epoch=True, prog_bar=True)
-        self.train_acc(logits, y)
+        self.train_acc(self.logits, self.y)
         self.log('train_acc', self.train_acc, on_step=False, on_epoch=True, prog_bar=True)
-        self.train_auc(logits, y)
+        self.train_auc(self.logits, self.y)
         self.log('train_auc', self.train_auc, on_step=False, on_epoch=True, prog_bar=False)
-        self.train_recall(logits, y)
+        self.train_recall(self.logits, self.y)
         self.log('train_recall', self.train_recall, on_step=False, on_epoch=True, prog_bar=False)
-        self.train_precision(logits, y)
+        self.train_precision(self.logits, self.y)
         self.log('train_precision', self.train_precision, on_step=False, on_epoch=True, prog_bar=False)
         return loss
+
+    def predict_step(self, batch: torch.Tensor, batch_idx: int, dataloader_idx: int = 0) -> Any:
+        return super().predict_step(batch[0], batch_idx, dataloader_idx)
 
     # NOTE: not using .test(), don't want to have these rudimentary metrics to drag over
     # def test_step(self, batch, batch_idx):
@@ -177,29 +188,27 @@ class PyTorchLightningModelBase(L.LightningModule):
     #     self.log('test_precision', self.test_precision, on_step=False, on_epoch=False, prog_bar=False)
     #     return loss
 
-    def predict_step(self, batch: Any, batch_idx: int, dataloader_idx: int = 0) -> Any:
-        return super().predict_step(batch[0], batch_idx, dataloader_idx)
-
 
 class PyTorchLightningModel(PyTorchLightningModelBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
     
-    def validation_step(self, batch, batch_idx):
+    def validation_step(self, batch: (torch.Tensor, torch.Tensor), batch_idx):
         # NOTE: keep batch_idx -- lightning needs it
-        loss, y, logits = self._shared_step(batch)
+        # loss, y, logits = self._shared_step(batch)
+        loss = self._shared_step(batch)
         self.log('val_loss', loss)
-        self.val_f1(logits, y)
+        self.val_f1(self.logits, self.y)
         self.log('val_f1', self.val_f1, on_step=False, on_epoch=True, prog_bar=True)
-        val_tpr = self.val_tpr(logits, y, fprNeeded=self.fpr)
+        val_tpr = self.val_tpr(self.logits, self.y, fprNeeded=self.fpr)
         self.log('val_tpr', val_tpr, on_step=False, on_epoch=True, prog_bar=True)
-        self.val_acc(logits, y)
+        self.val_acc(self.logits, self.y)
         self.log('val_acc', self.val_acc, on_step=False, on_epoch=True, prog_bar=True)
-        self.val_auc(logits, y)
+        self.val_auc(self.logits, self.y)
         self.log('val_auc', self.val_auc, on_step=False, on_epoch=True, prog_bar=False)
-        self.val_recall(logits, y)
+        self.val_recall(self.logits, self.y)
         self.log('val_recall', self.val_recall, on_step=False, on_epoch=True, prog_bar=False)
-        self.val_precision(logits, y)
+        self.val_precision(self.logits, self.y)
         self.log('val_precision', self.val_precision, on_step=False, on_epoch=True, prog_bar=False)
         return loss    
 
@@ -209,30 +218,21 @@ class PyTorchLightningModelLM(PyTorchLightningModelBase):
         super().__init__(loss = CrossEntropyLoss(), *args, **kwargs)
         assert hasattr(self.model, "pretrain"), "This model does not have a 'pretrain' method."
         self.forward = self.model.pretrain
-        
-    def _shared_step(self, batch):
-        # used by training_step, validation_step and test_step
-        x, y = batch
-        if len(y.shape) == 1:
-            y = y.unsqueeze(1)
-        logits = self(x)
-        loss = self.loss(logits, y)
-        return loss
-
-    def training_step(self, batch, batch_idx):
+    
+    def training_step(self, batch: torch.Tensor, batch_idx):
         # NOTE: keep batch_idx -- lightning needs it
         loss = self._shared_step(batch)
         self.log('train_loss', loss, prog_bar=True)
         learning_rate = self.optimizers().param_groups[0]['lr']
         self.log('lr', learning_rate, on_step=True, prog_bar=True)
-        self.log('memory', float(cuda.memory_allocated()), on_step=True, prog_bar=True)
+        self.log('memory', float(torch.cuda.memory_allocated()), on_step=True, prog_bar=True)
         return loss
 
 
 class LitTrainerWrapper:
     def __init__(
         self,
-        pytorch_model: nn.Module,
+        pytorch_model: torch.nn.Module,
         name: Optional[str] = None,
         log_folder: Optional[str] = None,
         # training config
@@ -340,7 +340,12 @@ class LitTrainerWrapper:
 
         if self.log_folder is None:
             self.log_folder = f"./out_{self.name}_{int(time())}"
-        os.makedirs(self.log_folder, exist_ok=True)
+        try:
+            os.makedirs(self.log_folder, exist_ok=True)
+        except ValueError as ex:
+            print(self.log_folder)
+            raise ex
+            
         print(f"[!] Logging to {self.log_folder}")
 
         self.trainer = L.Trainer(
@@ -376,7 +381,7 @@ class LitTrainerWrapper:
 
     def load_torch_model(self, model_file: str = None):
         assert model_file is not None, "Please provide a model file"
-        self.pytorch_model = load(model_file)
+        self.pytorch_model = torch.load(model_file)
         # NOTE: you have to reset self.lit_model after this
         #  if lit_model is already initialized, then load state dict directly:
         # self.lit_model.model.load_state_dict(state_dict)
@@ -424,7 +429,7 @@ class LitTrainerWrapper:
             "[-] lightning_model isn't instantiated: either .train_lit_model() or .load_list_model()"
         """Get scores out of a loader."""
         y_pred_logits = self.trainer.predict(model=self.lit_model, dataloaders=loader)
-        y_pred = sigmoid(cat(y_pred_logits, dim=0)).numpy()
+        y_pred = torch.sigmoid(torch.cat(y_pred_logits, dim=0)).numpy()
         y_pred = np.array([1 if x > decision_threshold else 0 for x in y_pred])
         if dump_logits:
             assert isinstance(dump_logits, str), "Please provide a path to dump logits: dump_logits='path/to/logits.pkl'"
@@ -462,14 +467,14 @@ class LitTrainerWrapper:
             basename = f"{int(time())}_epoch_{self.trainer.current_epoch}_{os.path.basename(model_file)}"
             model_file = os.path.join(self.log_folder, basename)
         
-        save(self.pytorch_model, model_file)
+        torch.save(self.pytorch_model, model_file)
         print(f"[!] Saved PyTorch model to {model_file}")
     
 
     def create_dataloader(
             self,
-            X: np.ndarray,
-            y: np.ndarray,
+            X: Union[np.ndarray, torch.Tensor],
+            y: Union[np.ndarray, torch.Tensor],
             batch_size: int = None,
             dataloader_workers: int = None,
             shuffle: bool = False
