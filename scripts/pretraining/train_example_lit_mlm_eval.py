@@ -14,7 +14,7 @@ sys.path.append(REPOSITORY_ROOT)
 
 from nebula.lit_pretraining import MaskedLanguageModelTrainer, SelfSupervisedLearningEvalFramework
 from nebula.lit_utils import LitTrainerWrapper
-from nebula.models.attention import TransformerEncoderChunksLM, TransformerEncoderChunks
+from nebula.models.attention import TransformerEncoderChunks
 from lightning.lite.utilities.seed import seed_everything
 
 if __name__ == "__main__":
@@ -67,13 +67,14 @@ if __name__ == "__main__":
         "hiddenNeurons": [64], # classifier ffnn dims
         "layerNorm": False,
         "dropout": None,
-        "mean_over_sequence": False,
-        "norm_first": True
+        "norm_first": True,
+        "pretrain_layers": [1024]
     }
     # NOTE: for pretraining 0 is good, for finetuning try 0.1+
     model_config['dropout'] = 0.0
-    lm_model = TransformerEncoderChunksLM(**model_config)
+    lm_model = TransformerEncoderChunks(**model_config)
     model_config['dropout'] = 0.3
+    model_config['pretrain_layers'] = None
     downstream_model = TransformerEncoderChunks(**model_config)
 
     print(f"[!] Models ready.")
@@ -121,7 +122,7 @@ if __name__ == "__main__":
         # pretrainer config
         vocab=vocab,
         pretrain_epochs=PRETRAINING_EPOCHS,
-        remask_epochs=REMASK_EVERY_N_EPOCHS,
+        rebuild_dataloader_every_n_epochs=REMASK_EVERY_N_EPOCHS,
         dump_model_every_epoch=DUMP_MODEL_EVERY_EPOCH,
         # trainer config
         pytorch_model=lm_model,
@@ -151,7 +152,4 @@ if __name__ == "__main__":
         n_splits=SSL_EVAL_SPLITS
     )
 
-    eval_run.run_splits(x_train, y_train, x_test, y_test)
-
-    # TODO: 
-    # 1. remove pretrain layers from downstream trainer -- might allow to make larger batch sizes
+    eval_run.run_splits(None, x_train, y_train, x_test, y_test)

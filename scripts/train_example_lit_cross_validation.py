@@ -70,7 +70,6 @@ if __name__ == "__main__":
         "hiddenNeurons": [64], # classifier ffnn dims
         "layerNorm": False,
         "dropout": 0.3,
-        "mean_over_sequence": False,
         "norm_first": True
     }
     model = TransformerEncoderChunks(**model_config)
@@ -88,9 +87,9 @@ if __name__ == "__main__":
         dump_models=True,
         # trainer config
         pytorch_model=model,
-        name = "test_training",
+        name="test_training",
         log_folder=f"./cv_test_run_{int(time())}",
-        epochs = 2,
+        epochs=2,
         scheduler="onecycle",
         # data config
         batch_size=256,

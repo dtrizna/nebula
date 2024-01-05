@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.sparse import csr_matrix
+from typing import Union
 
 import torch
 from torch.utils.data import TensorDataset, Dataset, DataLoader
@@ -36,8 +37,8 @@ class CSRTensorDataset(Dataset):
 
 
 def create_dataloader(
-        X: np.ndarray,
-        y: np.ndarray = None,
+        X: Union[np.ndarray, torch.Tensor],
+        y: Union[np.ndarray, torch.Tensor] = None,
         batch_size: int = 1024,
         shuffle: bool = False,
         workers: int = 4

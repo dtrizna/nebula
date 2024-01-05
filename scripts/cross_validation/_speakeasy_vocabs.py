@@ -86,7 +86,6 @@ model_config = {
     "hiddenNeurons": [64],
     "layerNorm": False,
     "dropout": 0.3,
-    "mean_over_sequence": False
 }
 
 # dump model config as json

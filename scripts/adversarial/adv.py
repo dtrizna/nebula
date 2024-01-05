@@ -59,7 +59,6 @@ def load_model(skip_embedding=False):
         "hiddenNeurons": [64],  # classifier ffnn dims
         "layerNorm": False,
         "dropout": 0.3,
-        "mean_over_sequence": False,
         "norm_first": True,
         "skip_embedding": skip_embedding
     }

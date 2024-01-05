@@ -17,7 +17,7 @@ else:
 sys.path.append(REPOSITORY_ROOT)
 
 from nebula.lit_pretraining import MaskedLanguageModelTrainer
-from nebula.models.attention import TransformerEncoderChunksLM
+from nebula.models.attention import TransformerEncoderChunks
 from lightning import seed_everything
 
 if __name__ == "__main__":
@@ -70,10 +70,10 @@ if __name__ == "__main__":
         "hiddenNeurons": [64], # classifier ffnn dims
         "layerNorm": False,
         "dropout": 0.1,
-        "mean_over_sequence": False,
-        "norm_first": True
+        "norm_first": True,
+        "pretrain_layers": [1024]
     }
-    model = TransformerEncoderChunksLM(**model_config)
+    model = TransformerEncoderChunks(**model_config)
 
     logging.info(f" [!] Model ready.")
 
@@ -84,8 +84,8 @@ if __name__ == "__main__":
     lit_mlm = MaskedLanguageModelTrainer(
         # pretrain config
         vocab=vocab,
-        pretrain_epochs = 4,
-        remask_epochs = 2,
+        pretrain_epochs=4,
+        rebuild_dataloader_every_n_epochs=2,
         # trainer config
         device="gpu",
         pytorch_model=model,

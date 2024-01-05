@@ -146,7 +146,6 @@ modelArch = {
     "hiddenNeurons": [64],
     "layerNorm": False,
     "dropout": 0.3,
-    "mean_over_sequence": False
 }
 models.append((modelClass, modelArch))
 

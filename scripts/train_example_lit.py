@@ -58,7 +58,7 @@ if __name__ == "__main__":
     # MODELING
     # ===================
     logging.info(f" [*] Loading model...")
-    from nebula.models.attention import TransformerEncoderChunksLM
+    from nebula.models.attention import TransformerEncoderChunks
     model_config = {
         "vocab_size": vocab_size,
         "maxlen": 512,
@@ -71,10 +71,9 @@ if __name__ == "__main__":
         "hiddenNeurons": [64], # classifier ffnn dims
         "layerNorm": False,
         "dropout": 0.3,
-        "mean_over_sequence": False,
         "norm_first": True
     }
-    model = TransformerEncoderChunksLM(**model_config)
+    model = TransformerEncoderChunks(**model_config)
 
     logging.info(f" [!] Model ready.")
 
@@ -84,10 +83,10 @@ if __name__ == "__main__":
     outfolder = f"test_run_{int(time())}"
     lit_trainer = LitTrainerWrapper(
         pytorch_model=model,
-        name = "test_training",
+        name="test_training",
         log_folder=outfolder,
-        epochs = 2,
-        device="gpu",
+        epochs=2,
+        device="cpu",
         log_every_n_steps=1,
         scheduler="onecycle",
         batch_size=256,

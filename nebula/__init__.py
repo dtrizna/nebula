@@ -13,7 +13,8 @@ from nebula.optimization import (
     TriangularSchedule,
     OneCycleSchedule
 )
-from nebula.models import Cnn1DLinearLM, MLP, TransformerEncoderChunks
+from nebula.models import Cnn1DLinearLM, MLP
+from nebula.models import TransformerEncoderChunks
 
 import os
 import time
@@ -116,8 +117,8 @@ class Nebula:
                 "hiddenNeurons": [64], # classifier head depth
                 "layerNorm": False,
                 "dropout": 0.3,
-                "mean_over_sequence": False,
-                "norm_first": True
+                "norm_first": True,
+                "pooling": None
             }
         self.model = TransformerEncoderChunks(**torch_model_config)
 
