@@ -7,7 +7,6 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 import numpy as np
-from sklearn.metrics import f1_score
 from sklearn.utils import shuffle
 
 # correct path to repository root
@@ -18,6 +17,7 @@ else:
 sys.path.append(REPOSITORY_ROOT)
 
 from nebula.evaluation.lit_cv import LitCrossValidation
+from nebula.models import TransformerEncoderChunks
 from nebula.misc import fix_random_seed
 
 if __name__ == "__main__":
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     y_test = np.load(yTestFile)
 
     # shuffle and limit
-    limit = 1000
+    limit = None
     x_train, y_train = shuffle(x_train, y_train, random_state=0)
     x_train = x_train[:limit]
     y_train = y_train[:limit]
@@ -57,7 +57,6 @@ if __name__ == "__main__":
     # MODELING
     # ===================
     logging.info(f" [*] Loading model...")
-    from nebula.models import TransformerEncoderChunks
     model_config = {
         "vocab_size": vocab_size,
         "maxlen": 512,
@@ -73,7 +72,6 @@ if __name__ == "__main__":
         "norm_first": True
     }
     model = TransformerEncoderChunks(**model_config)
-
     logging.info(f" [!] Model ready.")
 
     # ===================

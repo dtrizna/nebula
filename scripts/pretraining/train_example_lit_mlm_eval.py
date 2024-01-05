@@ -15,6 +15,7 @@ sys.path.append(REPOSITORY_ROOT)
 from nebula.lit_pretraining import MaskedLanguageModelTrainer, SelfSupervisedLearningEvalFramework
 from nebula.lit_utils import LitTrainerWrapper
 from nebula.models.attention import TransformerEncoderChunks
+# from nebula.models.attention_legacy import TransformerEncoderChunks, TransformerEncoderChunksLM
 from lightning.lite.utilities.seed import seed_everything
 
 if __name__ == "__main__":
@@ -37,7 +38,7 @@ if __name__ == "__main__":
     y_test = np.load(yTestFile)
 
     # shuffle and limit
-    limit = 10000 # None
+    limit = None
     x_train, y_train = shuffle(x_train, y_train, random_state=0)
     x_train = x_train[:limit]
     y_train = y_train[:limit]
@@ -68,7 +69,8 @@ if __name__ == "__main__":
         "layerNorm": False,
         "dropout": None,
         "norm_first": True,
-        "pretrain_layers": [1024]
+        "pretrain_layers": [1024],
+        "pooling": None
     }
     # NOTE: for pretraining 0 is good, for finetuning try 0.1+
     model_config['dropout'] = 0.0
@@ -85,7 +87,6 @@ if __name__ == "__main__":
     VERBOSE = True
     PRETRAINING_EPOCHS = 2
     DOWNSTREAM_EPOCHS = 3
-    BATCH_SIZE = 256
     DATALOADER_WORKERS = 4
     LOG_EVERY_N_STEPS = 1
     SSL_EVAL_SPLITS = 2
@@ -113,7 +114,6 @@ if __name__ == "__main__":
         "accumulate_grad_batches": ACCUMULATE_GRAD_BATCHES,
         "gradient_clip_val": GRAD_CLIP_VALUE,
         "scheduler": SCHEDULER,
-        # "batch_size": BATCH_SIZE,
         "dataloader_workers": DATALOADER_WORKERS,
         "random_state": random_state,
         "verbose": VERBOSE
@@ -139,7 +139,7 @@ if __name__ == "__main__":
         name = NAME + "_downstream",
         log_folder=f"z_{NAME}_downstream",
         skip_trainer_init=True,
-        batch_size=256,
+        batch_size=128,
         **trainer_config
     )
     eval_run = SelfSupervisedLearningEvalFramework(

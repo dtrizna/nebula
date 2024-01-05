@@ -26,10 +26,10 @@ class TransformerEncoderModel(nn.Module):
             pretrain_layers: Optional[List] = None
     ):
         super().__init__()
+        self.__name__ = 'TransformerEncoderModel'
         assert dModel % nHeads == 0, "nheads must divide evenly into d_model"
         assert pooling in ["mean", "cls", None]
         self.pooling_type = pooling
-        self.__name__ = 'TransformerEncoderModel'
         self.vocab_size = vocab_size
         self.maxlen = maxlen
         self.skip_embedding = skip_embedding
@@ -115,7 +115,7 @@ class TransformerEncoderModel(nn.Module):
         return x
 
     def core(self, src: Tensor, src_mask: Optional[Tensor] = None) -> Tensor:
-        x = self.embed(src) if not self.skip_embedding else src
+        x = src if self.skip_embedding else self.embed(src)
         x = self.transformer_encoder(x, src_mask)
         x = self.pooling(x)
         x = self.ffnn(x)
@@ -141,13 +141,7 @@ class TransformerEncoderChunks(TransformerEncoderModel):
     https://github.com/allenai/longformer/blob/master/longformer/sliding_chunks.py
     """
 
-    def __init__(
-            self,
-            # size of local attention
-            chunk_size: int = 64,
-            *args,
-            **kwargs
-    ):
+    def __init__(self, chunk_size: int = 64, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.__name__ = 'TransformerEncoderChunks'
 
@@ -160,7 +154,6 @@ class TransformerEncoderChunks(TransformerEncoderModel):
             input_neurons = int(self.chunk_size * self.nr_of_chunks * self.d_model)
             self.ffnn_layers = self._build_ffnn_layers(self.ffnn_layers_in, input_neurons)
             self.ffnn = nn.Sequential(*self.ffnn_layers)
-
 
     def split(self, src: Tensor) -> List[Tensor]:
         chunks = []
