@@ -1,6 +1,8 @@
 import logging
 logging.basicConfig(level=logging.INFO)
 
+import sys
+sys.path.append(".")
 from nebula import Nebula
 from nebula.misc import fix_random_seed
 fix_random_seed(0)
