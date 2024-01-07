@@ -15,7 +15,6 @@ sys.path.append(REPOSITORY_ROOT)
 from nebula.lit_pretraining import MaskedLanguageModelTrainer, SelfSupervisedLearningEvalFramework
 from nebula.lit_utils import LitTrainerWrapper
 from nebula.models.attention import TransformerEncoderChunks
-# from nebula.models.attention_legacy import TransformerEncoderChunks, TransformerEncoderChunksLM
 from lightning.lite.utilities.seed import seed_everything
 
 if __name__ == "__main__":
@@ -38,7 +37,7 @@ if __name__ == "__main__":
     y_test = np.load(yTestFile)
 
     # shuffle and limit
-    limit = None
+    limit = 5000
     x_train, y_train = shuffle(x_train, y_train, random_state=0)
     x_train = x_train[:limit]
     y_train = y_train[:limit]
@@ -152,4 +151,4 @@ if __name__ == "__main__":
         n_splits=SSL_EVAL_SPLITS
     )
 
-    eval_run.run_splits(None, x_train, y_train, x_test, y_test)
+    eval_run.run_splits(x_train, y_train, x_test, y_test)

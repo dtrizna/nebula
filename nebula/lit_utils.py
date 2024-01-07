@@ -41,6 +41,7 @@ class PyTorchLightningModelBase(L.LightningModule):
         super().__init__()
 
         self.model = model
+        self.causal = hasattr(self.model, "causal_attention") and self.model.causal_attention
         self.learning_rate = learning_rate
         self.fpr = fpr
         self.loss = loss
@@ -136,9 +137,13 @@ class PyTorchLightningModelBase(L.LightningModule):
     def _shared_step(self, batch: torch.Tensor):
         # used by training_step, validation_step and test_step
         x, y = batch
-        if len(y.shape) == 1:
-            y = y.unsqueeze(1)
         logits = self.forward(x)
+
+        if y.ndim == 2 and logits.ndim == 3: # e.g. autoregressive pre-training
+            logits, y = logits.view(-1, logits.size(-1)), y.view(-1)
+        if y.ndim == 1: # binary classification: (batch_size,) => (batch_size, 1)
+            y = y.unsqueeze(-1)
+
         loss = self.loss(logits, y)
         # NOTE: by returning only loss here we avoid memory leaks
         self.logits = logits.detach().cpu()

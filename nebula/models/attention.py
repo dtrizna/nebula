@@ -23,13 +23,13 @@ class TransformerEncoderModel(nn.Module):
             dropout: float = 0.3,
             pooling: str = "mean",
             skip_embedding: bool = False,
-            pretrain_layers: Optional[List] = None
+            pretrain_layers: Optional[List] = None,
+            causal_attention: bool = False
     ):
         super().__init__()
         self.__name__ = 'TransformerEncoderModel'
         assert dModel % nHeads == 0, "nheads must divide evenly into d_model"
         assert pooling in ["mean", "cls", None]
-        self.pooling_type = pooling
         self.vocab_size = vocab_size
         self.maxlen = maxlen
         self.skip_embedding = skip_embedding
@@ -48,11 +48,17 @@ class TransformerEncoderModel(nn.Module):
         self.layerNorm = layerNorm
         self.dropout = dropout
         self.ffnn_layers_in = hiddenNeurons
-
+        
+        self.pooling_type = pooling
         if pooling == None:
             input_neurons = int(self.maxlen * dModel)
         if pooling == "mean":
             input_neurons = self.d_model
+        
+        self.causal_attention = causal_attention
+        if self.causal_attention: # override pooling settings if causal
+            input_neurons = self.d_model
+        
         self.ffnn_layers = self._build_ffnn_layers(self.ffnn_layers_in, input_neurons)
         self.ffnn = nn.Sequential(*self.ffnn_layers)
         self.ffnn_out_size = hiddenNeurons[-1]
@@ -63,13 +69,13 @@ class TransformerEncoderModel(nn.Module):
 
         self.apply(self._init_weights)
 
+        # NOTE: bias in last layer removed the same as in https://github.com/karpathy/nanoGPT/blob/master/model.py#L133
         if pretrain_layers is not None:
             if len(pretrain_layers) > 0:
                 self.pretrain_layers = self._build_ffnn_layers(pretrain_layers, self.ffnn_out_size)
                 self.pretrain_layers.append(nn.Linear(pretrain_layers[-1], self.vocab_size, bias=False))
             else:
                 self.pretrain_layers = [nn.Linear(self.ffnn_out_size, self.vocab_size, bias=False)]
-            # NOTE: bias in last layer removed the same as in https://github.com/karpathy/nanoGPT/blob/master/model.py#L133
             self.pretrain_layers = nn.Sequential(*self.pretrain_layers)
         else:
             self.pretrain_layers = None
@@ -102,12 +108,20 @@ class TransformerEncoderModel(nn.Module):
             ffnn.append(nn.Sequential(*ffnnBlock))
         return ffnn
 
+    @staticmethod
+    def _generate_square_subsequent_mask(sz: int) -> Tensor:
+        mask = (torch.triu(torch.ones(sz, sz)) == 1).transpose(0, 1)
+        mask = mask.float().masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0))
+        return mask
+
     def embed(self, x: Tensor) -> Tensor:
         encoded_x = self.encoder(x) * math.sqrt(self.d_model)
         encoded = self.pos_encoder(encoded_x)
         return encoded
 
     def pooling(self, x: Tensor) -> Tensor:
+        if self.causal_attention:
+            return x
         if self.pooling_type == None:
             x = x.view(x.size(0), -1)
         if self.pooling_type == "mean":
@@ -116,7 +130,9 @@ class TransformerEncoderModel(nn.Module):
 
     def core(self, src: Tensor, src_mask: Optional[Tensor] = None) -> Tensor:
         x = src if self.skip_embedding else self.embed(src)
-        x = self.transformer_encoder(x, src_mask)
+        if self.causal_attention:
+            src_mask = self._generate_square_subsequent_mask(x.shape[1]).to(x.device)
+        x = self.transformer_encoder(x, src_mask, is_causal=self.causal_attention)
         x = self.pooling(x)
         x = self.ffnn(x)
         return x
@@ -130,7 +146,6 @@ class TransformerEncoderModel(nn.Module):
         x = self.core(x)
         x = self.pretrain_layers(x)
         return x
-
 
 
 class TransformerEncoderChunks(TransformerEncoderModel):

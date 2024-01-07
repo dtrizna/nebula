@@ -4,7 +4,7 @@ import logging
 import numpy as np
 from tqdm import tqdm
 from time import time
-from typing import List
+from typing import List, Optional
 from copy import deepcopy
 from torch import load
 from torch.utils.data import DataLoader
@@ -209,13 +209,13 @@ class MaskedLanguageModelTrainer(LanguageModelTrainer):
 class AutoRegressiveModelTrainer(LanguageModelTrainer):
     def __init__(
             self,
-            block_size: int = 256,
+            context_len: int = 256,
             *args,
             **kwargs
     ):
         super().__init__(*args, **kwargs)
         self.__name__ = "AutoRegressiveModelTrainer"
-        self.block_size = block_size
+        self.context_len = context_len
 
 
     def get_contexts(self, x_unlabeled: np.ndarray, size: int) -> np.ndarray:
@@ -224,9 +224,9 @@ class AutoRegressiveModelTrainer(LanguageModelTrainer):
         # since x_unlabeled.shape is (number_of_samples, sequence_length), not (sequence_length, )
         max_len = x_unlabeled.shape[1]
         random_sample_idx = torch.randint(x_unlabeled.shape[0], size=(size,))
-        random_start_idx = torch.randint(max_len-self.block_size, size=(size,))
-        x = torch.stack([torch.from_numpy((x_unlabeled[i, j:j+self.block_size]).astype(np.int64)) for i, j in zip(random_sample_idx, random_start_idx)])
-        y = torch.stack([torch.from_numpy((x_unlabeled[i, j+1:j+1+self.block_size]).astype(np.int64)) for i, j in zip(random_sample_idx, random_start_idx)])
+        random_start_idx = torch.randint(max_len-self.context_len, size=(size,))
+        x = torch.stack([torch.from_numpy((x_unlabeled[i, j:j+self.context_len]).astype(np.int64)) for i, j in zip(random_sample_idx, random_start_idx)])
+        y = torch.stack([torch.from_numpy((x_unlabeled[i, j+1:j+1+self.context_len]).astype(np.int64)) for i, j in zip(random_sample_idx, random_start_idx)])
         return x, y
 
 
@@ -335,11 +335,11 @@ class SelfSupervisedLearningEvalFramework:
             self,
             x_train: np.ndarray,
             y_train: np.ndarray,
-            x_val: np.ndarray = None,
-            y_val: np.ndarray = None,
-            timestamp: int = None
+            x_val: Optional[np.ndarray] = None,
+            y_val: Optional[np.ndarray] = None,
+            idx: Optional[str] = None
     ):
-        self.timestamp = int(time()) if timestamp is None else timestamp
+        self.timestamp = int(time()) if idx is None else idx
 
         # split x and y into train and validation sets
         if os.path.exists(os.path.join(self.log_folder, f"dataset_splits_{self.timestamp}.npz")):
@@ -397,10 +397,10 @@ class SelfSupervisedLearningEvalFramework:
             self._train_downstream_model(training_type, pretrained_weights)
 
 
-    def run_splits(self, timestamps: list = None, *args, **kwargs):
-        if timestamps is not None:
-            for timestamp in timestamps:
-                self.run_one_split(timestamp=timestamp, *args, **kwargs)
+    def run_splits(self, x_train, y_train, x_val, y_val, previous_run_idxs: Optional[List] = None):
+        if previous_run_idxs is not None:
+            for idx in previous_run_idxs:
+                self.run_one_split(x_train, y_train, x_val, y_val, idx=idx)
             return
 
         for i in range(self.n_splits):
@@ -408,4 +408,4 @@ class SelfSupervisedLearningEvalFramework:
             self.pretrainer.random_state = self.random_state
             self.downstream_trainer.random_state = self.random_state
             print(f'[!] Running pre-training split {i+1}/{self.n_splits}')
-            self.run_one_split(*args, **kwargs)
+            self.run_one_split(x_train, y_train, x_val, y_val,)

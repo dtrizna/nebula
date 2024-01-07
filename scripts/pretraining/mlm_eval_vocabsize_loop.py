@@ -159,7 +159,7 @@ def main(vocab_size_str, random_state=33):
         n_splits=SSL_EVAL_SPLITS,
         training_types = ['pretrained', 'non_pretrained', 'full_data'],
     )
-    eval_run.run_splits(TIMESTAMPS, x_train, y_train, x_test, y_test)
+    eval_run.run_splits(x_train, y_train, x_test, y_test, previous_run_idxs=TIMESTAMPS)
 
 
 if __name__ == "__main__":

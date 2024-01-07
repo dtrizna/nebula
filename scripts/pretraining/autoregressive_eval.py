@@ -15,24 +15,29 @@ sys.path.append(REPOSITORY_ROOT)
 
 from nebula.lit_pretraining import AutoRegressiveModelTrainer, SelfSupervisedLearningEvalFramework
 from nebula.lit_utils import LitTrainerWrapper
-from nebula.models.attention import TransformerEncoderChunks, TransformerEncoderChunks
+from nebula.models.attention import TransformerEncoderChunks, TransformerEncoderModel
 
 VOCABS = {'8k': 8192}#, '16k': 16384, '32k': 32768}
 
 # if clean training
-LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"test_autoregressive_{int(time())}")
-TIMESTAMPS = None
+# LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"autoregressive_{int(time())}")
+# TIMESTAMPS = None
 
 # if previously trained
-# LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"vocab_loop_1704277704")
-# TIMESTAMPS = ["1704277705"]
+LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"autoregressive_1704652486")
+TIMESTAMPS = ["1704652487"]
 
 VERBOSE = True
-LIMIT = 1000
-DEVICE = "cpu"
+LIMIT = None
 
+CONTEXT_LEN = 256
 PRETRAINING_EPOCHS = 3
-DOWNSTREAM_EPOCHS = 2
+PRETRAIN_BATCH_SIZE = 96
+
+DOWNSTREAM_EPOCHS = 5
+DOWNSTREAM_BATCH_SIZE = 32
+
+DEVICE = "gpu"
 DATALOADER_WORKERS = 4
 LOG_EVERY_N_STEPS = 1
 SSL_EVAL_SPLITS = 1
@@ -43,11 +48,13 @@ ACCUMULATE_GRAD_BATCHES = None # default, batch_sizes are big enough
 # NOTE: scheduler is incompatible with REMASK_EVERY_N_EPOCHS 
 # and DUMP_MODEL_EVERY_EPOCH because of lighning nuances
 # USE:
-# SCHEDULER = "onecycle"
+SCHEDULER = "onecycle"
 DUMP_MODEL_EVERY_EPOCH = False
+REBUILD_DL_EVERY_N_EPOCHS = False
 # OR
-SCHEDULER = None
+# SCHEDULER = None
 # DUMP_MODEL_EVERY_EPOCH = True
+# REBUILD_DL_EVERY_N_EPOCHS = 1
 
 
 def main(vocab_size_str, random_state=33):
@@ -88,8 +95,8 @@ def main(vocab_size_str, random_state=33):
     print(f"[*] Loading model...")
     model_config = {
         "vocab_size": vocab_size,
-        "maxlen": 512,
-        "chunk_size": 64, # input splitting to chunks
+        "maxlen": CONTEXT_LEN,
+        # "chunk_size": 64, # input splitting to chunks
         "dModel": 64,  # embedding & transformer dimension
         "nHeads": 8,  # number of heads in nn.MultiheadAttention
         "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
@@ -99,15 +106,18 @@ def main(vocab_size_str, random_state=33):
         "layerNorm": False,
         "dropout": None,
         "norm_first": True,
-        "pretrain_layers": [1024]
+        "pretrain_layers": [1024],
+        "causal_attention": True,
+        # "pooling": None # TODO: when training from scratch: specify this
     }
     # NOTE: for pretraining 0 is good, for finetuning try 0.1+
     model_config['dropout'] = 0.0
-    lm_model = TransformerEncoderChunks(**model_config)
+    lm_model = TransformerEncoderModel(**model_config)
 
     model_config['dropout'] = 0.3
-    model_config["pretrain_layers"] = None
-    downstream_model = TransformerEncoderChunks(**model_config)
+    model_config['pretrain_layers'] = None
+    model_config['causal_attention'] = False
+    downstream_model = TransformerEncoderModel(**model_config)
     print(f"[!] Models ready.")
     
     # ===================
@@ -126,41 +136,43 @@ def main(vocab_size_str, random_state=33):
         "verbose": VERBOSE
     }
     lit_mlm = AutoRegressiveModelTrainer(
+        # autoregressive only
+        context_len=CONTEXT_LEN,
         # pretrainer config
         vocab=vocab,
         pretrain_epochs=PRETRAINING_EPOCHS,
         dump_model_every_epoch=DUMP_MODEL_EVERY_EPOCH,
-        rebuild_dataloader_every_n_epochs=1,
-        # trainer config
+        rebuild_dataloader_every_n_epochs=REBUILD_DL_EVERY_N_EPOCHS,
+        # lit trainer config
         pytorch_model=lm_model,
         name = NAME + "_pretraining",
         log_folder=f"{NAME}_pretraining",
-        batch_size=512,
+        batch_size=PRETRAIN_BATCH_SIZE,
         precision=16,
         **trainer_config
     )
-    lit_mlm.pretrain(x_train)
+    # lit_mlm.pretrain(x_train)
 
-    # downstream_trainer = LitTrainerWrapper(
-    #     # trainer config
-    #     epochs=DOWNSTREAM_EPOCHS,
-    #     pytorch_model=downstream_model,
-    #     name = NAME + "_downstream",
-    #     log_folder=f"{NAME}_downstream",
-    #     skip_trainer_init=True,
-    #     batch_size=256,
-    #     **trainer_config
-    # )
-    # eval_run = SelfSupervisedLearningEvalFramework(
-    #     pretrainer=lit_mlm,
-    #     downstream_trainer=downstream_trainer,
-    #     unlabeled_data_ratio=0.8,
-    #     log_folder=LOG_ROOT_FOLDER,
-    #     dump_data_splits=True,
-    #     random_state=random_state,
-    #     n_splits=SSL_EVAL_SPLITS
-    # )
-    # eval_run.run_splits(TIMESTAMPS, x_train, y_train, x_test, y_test)
+    downstream_trainer = LitTrainerWrapper(
+        # trainer config
+        epochs=DOWNSTREAM_EPOCHS,
+        pytorch_model=downstream_model,
+        name = NAME + "_downstream",
+        log_folder=f"{NAME}_downstream",
+        skip_trainer_init=True,
+        batch_size=DOWNSTREAM_BATCH_SIZE,
+        **trainer_config
+    )
+    eval_run = SelfSupervisedLearningEvalFramework(
+        pretrainer=lit_mlm,
+        downstream_trainer=downstream_trainer,
+        unlabeled_data_ratio=0.8,
+        log_folder=LOG_ROOT_FOLDER,
+        dump_data_splits=True,
+        random_state=random_state,
+        n_splits=SSL_EVAL_SPLITS
+    )
+    eval_run.run_splits(x_train, y_train, x_test, y_test, previous_run_idxs=TIMESTAMPS)
 
 
 if __name__ == "__main__":
