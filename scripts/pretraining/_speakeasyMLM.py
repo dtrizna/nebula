@@ -7,7 +7,7 @@ import numpy as np
 from torch import cuda
 from sklearn.utils import shuffle
 sys.path.extend([r"..\..", '.'])
-from nebula.models.attention import TransformerEncoderChunksLM
+from nebula.models.attention import TransformerEncoderChunks
 from nebula.pretraining import MaskedLanguageModelTrainer
 from nebula.evaluation import SelfSupervisedPretraining
 from nebula.misc import get_path, set_random_seed, clear_cuda_cache
@@ -15,7 +15,7 @@ SCRIPT_PATH = get_path(type="script")
 REPO_ROOT = os.path.join(SCRIPT_PATH, "..", "..")
 
 # ===== LOGGING SETUP =====
-model_class = TransformerEncoderChunksLM
+model_class = TransformerEncoderChunks
 run_name = f"{model_class.__name__}"
 timestamp = int(time.time())
 
@@ -98,7 +98,8 @@ model_config = {
     "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
     "numClasses": 1, # binary classification
     "hiddenNeurons": [64],
-    "dropout": 0.3
+    "dropout": 0.3,
+    "pretrain_layers": [1024]
 }
 # dump model config as json
 with open(os.path.join(output_dir, f"model_config.json"), "w") as f:

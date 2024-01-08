@@ -7,7 +7,7 @@ import os
 import sys
 from sklearn.utils import shuffle
 sys.path.extend(['../..', '.'])
-from nebula.models.attention import TransformerEncoderChunksLM
+from nebula.models.attention import TransformerEncoderChunks
 from nebula.pretraining import MaskedLanguageModelTrainer
 from nebula.evaluation import SelfSupervisedPretraining
 from nebula.misc import get_path, set_random_seed, clear_cuda_cache
@@ -46,7 +46,7 @@ for downsample_unlabeled_data in [0.9]:# [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9
     random_state = 43
     set_random_seed(random_state)
 
-    model_class = TransformerEncoderChunksLM
+    model_class = TransformerEncoderChunks
     run_name = f"downsample_U_{downsample_unlabeled_data}"
     timestamp = int(time.time())
 
@@ -98,7 +98,8 @@ for downsample_unlabeled_data in [0.9]:# [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9
         "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
         "numClasses": 1, # binary classification
         "hiddenNeurons": [64],
-        "dropout": 0.3
+        "dropout": 0.3,
+        "pretrain_layers": [1024]
     }
     # dump model config as json
     with open(os.path.join(output_dir, f"model_config.json"), "w") as f:

@@ -13,7 +13,7 @@ from torch.nn import BCEWithLogitsLoss
 import sys
 sys.path.extend(['../..', '.'])
 from nebula import ModelTrainer
-from nebula.models.attention import TransformerEncoderChunksLM
+from nebula.models.attention import TransformerEncoderChunks
 from nebula.pretraining import MaskedLanguageModelTrainer
 from nebula.evaluation import SelfSupervisedPretraining
 from nebula.misc import get_path, set_random_seed, clear_cuda_cache
@@ -25,7 +25,7 @@ set_random_seed(random_state)
 
 uSize = 0.8
 run_name = f"uSize_{uSize}_mask_every_epoch"
-model_class = TransformerEncoderChunksLM
+model_class = TransformerEncoderChunks
 
 run_config = {
     "unlabeledDataSize": uSize,
@@ -103,7 +103,8 @@ model_config = {
     "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
     "numClasses": 1, # binary classification
     "hiddenNeurons": [64],
-    "dropout": 0.3
+    "dropout": 0.3,
+    "pretrain_layers": [1024]
 }
 
 # ======= PRETRAINING =========

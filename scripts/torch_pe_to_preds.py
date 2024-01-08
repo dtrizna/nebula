@@ -17,7 +17,7 @@ fix_random_seed(0)
 
 # TAKE A PE SAMPLE
 PE = r"C:\Windows\System32\calc.exe"
-TOKENIZER = "bpe" # supports: ["bpe", "whitespace", "wordpunct"]
+TOKENIZER = "bpe" # supports: ["bpe", "whitespace"]
 
 # ===================
 # PREPROCESSING
@@ -102,13 +102,13 @@ model_config = {
     "hiddenNeurons": [64], # classifier ffnn dims
     "layerNorm": False,
     "dropout": 0.3,
-    "mean_over_sequence": False,
-    "norm_first": True
+    "norm_first": True,
+    "pooling": None
 }
 model = TransformerEncoderChunks(**model_config)
 if TOKENIZER == "bpe":
     model_path = os.path.join(REPOSITORY_ROOT, r"nebula\objects\bpe_50000_torch.model")
-if TOKENIZER in ["whitespace", "wordpunct"]:
+if TOKENIZER == "whitespace":
     model_path = os.path.join(REPOSITORY_ROOT, r"nebula\objects\whitespace_50000_torch.model")
 from torch import load
 model.load_state_dict(load(model_path))

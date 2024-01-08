@@ -14,11 +14,8 @@ from nebula import PEDynamicFeatureExtractor, JSONTokenizerBPE
 # SCRIPT CONFIG
 
 LIMIT = None
-VOCAB_SIZES = [50000]
-VOCABS = {10000: "10k", 50000: "50k"}
-OUTFOLDER_SUFFIX = f"_BPE_{VOCABS[VOCAB_SIZES[0]]}_new_v2"
-LOGFILE = f"PreProcessing{OUTFOLDER_SUFFIX}_{int(time.time())}.log"
-MAX_SEQ_LENGTHS = [512]#, 2048]
+VOCABS = {8192: "8k", 16384: "16k", 32768: "32k"}
+MAX_SEQ_LENGTHS = [512]
 
 # from nebula.constants import *
 # PREPROCESSING CONFIG AS DEFINED IN nebula.constants
@@ -44,15 +41,10 @@ SPEAKEASY_TOKEN_STOPWORDS = ['api_name', 'args', 'ret_val', 'event', 'path', 'op
 # DATA CONFIG
 SCRIPT_PATH = get_path(type="script")
 REPO_ROOT = os.path.join(SCRIPT_PATH, "..", "..")
-EMULATION_TRAINSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_trainset")
-EMULATION_TESTSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_testset")
+EMULATION_TRAINSET_PATH = os.path.join(REPO_ROOT, "..", "..", "Data", "Nebula_Kaggle", "windows_emulation_trainset")
+EMULATION_TESTSET_PATH = os.path.join(REPO_ROOT,  "..", "..", "Data", "Nebula_Kaggle", "windows_emulation_testset")
 
 BENIGN_FOLDERS = ["report_clean", "report_windows_syswow64"]
-
-TRAIN_OUT_FOLDER = os.path.join(REPO_ROOT, "data", "data_filtered", f"speakeasy_trainset{OUTFOLDER_SUFFIX}")
-os.makedirs(TRAIN_OUT_FOLDER, exist_ok=True)
-TEST_OUT_FOLDER = os.path.join(REPO_ROOT, "data", "data_filtered", f"speakeasy_testset{OUTFOLDER_SUFFIX}")
-os.makedirs(TEST_OUT_FOLDER, exist_ok=True)
 
 # =========================
 
@@ -75,19 +67,27 @@ def main(limit=None):
         extractor.filter_and_normalize_report,
         limit=limit)
 
-    # dump yHashes
-    with open(os.path.join(TRAIN_OUT_FOLDER, "speakeasy_yHashes.json"), "w") as f:
-        json.dump(yHashesTrain, f, indent=4)
-    with open(os.path.join(TEST_OUT_FOLDER, "speakeasy_yHashes.json"), "w") as f:
-        json.dump(yHashesTest, f, indent=4)
-
-    # dump y
-    np.save(os.path.join(TRAIN_OUT_FOLDER, f"speakeasy_y.npy"), np.array(yTrain, dtype=np.int8))
-    np.save(os.path.join(TEST_OUT_FOLDER, f"speakeasy_y.npy"), np.array(yTest, dtype=np.int8))
-
     # ======= ENCODING REPORTS WITH DIFFERENT MAX SEQ LENGTHS & VOCAB SIZES =====
 
-    for vocab_size in VOCAB_SIZES:
+    for vocab_size in VOCABS.keys():
+        OUTFOLDER_SUFFIX = f"_BPE_{VOCABS[vocab_size]}_lim_{limit}"
+        
+        TRAIN_OUT_FOLDER = os.path.join(REPO_ROOT, "data", "data_filtered", f"speakeasy_trainset{OUTFOLDER_SUFFIX}")
+        os.makedirs(TRAIN_OUT_FOLDER, exist_ok=True)
+        
+        TEST_OUT_FOLDER = os.path.join(REPO_ROOT, "data", "data_filtered", f"speakeasy_testset{OUTFOLDER_SUFFIX}")
+        os.makedirs(TEST_OUT_FOLDER, exist_ok=True)
+
+        # HANDLE Ys
+        with open(os.path.join(TRAIN_OUT_FOLDER, "speakeasy_yHashes.json"), "w") as f:
+            json.dump(yHashesTrain, f, indent=4)
+        with open(os.path.join(TEST_OUT_FOLDER, "speakeasy_yHashes.json"), "w") as f:
+            json.dump(yHashesTest, f, indent=4)
+        np.save(os.path.join(TRAIN_OUT_FOLDER, f"speakeasy_y.npy"), np.array(yTrain, dtype=np.int8))
+        np.save(os.path.join(TEST_OUT_FOLDER, f"speakeasy_y.npy"), np.array(yTest, dtype=np.int8))
+
+
+        # HANDLE Xs
         for maxSeqLen in MAX_SEQ_LENGTHS: 
             tokenizer = JSONTokenizerBPE(
                 cleanup_symbols=JSON_CLEANUP_SYMBOLS,
@@ -120,9 +120,9 @@ def main(limit=None):
             # eventsEncodedPaddedTest = tokenizer.pad_sequences(eventsEncodedTest)
             
             # saving processed arrays
-            logging.warning(f"Saving files with prefix: {filePrefix}_maxLen_{maxSeqLen}")
-            np.save(os.path.join(TRAIN_OUT_FOLDER, f"{filePrefix}_maxLen_{maxSeqLen}_x.npy"), eventsEncodedTrain)
-            np.save(os.path.join(TEST_OUT_FOLDER, f"{filePrefix}_maxLen_{maxSeqLen}_x.npy"), eventsEncodedTest)
+            logging.warning(f"Saving files with prefix: {filePrefix}_maxlen_{maxSeqLen}")
+            np.save(os.path.join(TRAIN_OUT_FOLDER, f"{filePrefix}_maxlen_{maxSeqLen}_x.npy"), eventsEncodedTrain)
+            np.save(os.path.join(TEST_OUT_FOLDER, f"{filePrefix}_maxlen_{maxSeqLen}_x.npy"), eventsEncodedTest)
 
 
 def readAndFilterFolders(subFolders, parserFunction, limit=None):
@@ -155,14 +155,15 @@ def readAndFilterFolders(subFolders, parserFunction, limit=None):
         logging.warning(f"Finished... Took: {timenowEnd - timenowStart:.2f}s")
     return events, y, yHashes
 
+
 if __name__ == "__main__":
 
-    outputRootFolder = rf"{SCRIPT_PATH}\..\data\data_filtered\speakeasy_parsing_logs"
-    outputFolder = os.path.join(outputRootFolder)
-    os.makedirs(outputFolder, exist_ok=True)
-
+    logfolder = rf"{REPO_ROOT}\data\data_filtered\speakeasy_parsing_logs"
+    os.makedirs(logfolder, exist_ok=True)
+    LOGFILE = os.path.join(logfolder, f"PreProcessing_2n_Loop_{int(time.time())}.log")
+    print(f'[!] Logging to {LOGFILE}')
     logging.basicConfig(
-        filename=os.path.join(outputFolder, LOGFILE),
+        filename=LOGFILE,
         level=logging.WARNING,
         format='%(asctime)s %(message)s',
         datefmt='%m/%d/%Y %I:%M:%S %p'

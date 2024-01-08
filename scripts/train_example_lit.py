@@ -8,6 +8,7 @@ logging.basicConfig(level=logging.INFO)
 
 import numpy as np
 from sklearn.metrics import f1_score
+from sklearn.utils import shuffle
 
 # correct path to repository root
 if os.path.basename(os.getcwd()) == "scripts":
@@ -16,7 +17,6 @@ else:
     REPOSITORY_ROOT = os.getcwd()
 sys.path.append(REPOSITORY_ROOT)
 
-from nebula.data_utils import create_dataloader
 from nebula.lit_utils import LitTrainerWrapper
 from nebula.misc import fix_random_seed
 
@@ -39,6 +39,15 @@ if __name__ == "__main__":
     yTestFile = os.path.join(test_folder, "speakeasy_y.npy")
     y_test = np.load(yTestFile)
 
+    # shuffle and limit
+    limit = None # 1000
+    x_train, y_train = shuffle(x_train, y_train, random_state=0)
+    x_train = x_train[:limit]
+    y_train = y_train[:limit]
+    x_test, y_test = shuffle(x_test, y_test, random_state=0)
+    x_test = x_test[:limit]
+    y_test = y_test[:limit]
+
     vocabFile = os.path.join(train_folder, r"speakeasy_vocab_size_50000_tokenizer_vocab.json")
     with open(vocabFile, 'r') as f:
         vocab = json.load(f)
@@ -49,7 +58,7 @@ if __name__ == "__main__":
     # MODELING
     # ===================
     logging.info(f" [*] Loading model...")
-    from nebula.models import TransformerEncoderChunks
+    from nebula.models.attention import TransformerEncoderChunks
     model_config = {
         "vocab_size": vocab_size,
         "maxlen": 512,
@@ -62,7 +71,6 @@ if __name__ == "__main__":
         "hiddenNeurons": [64], # classifier ffnn dims
         "layerNorm": False,
         "dropout": 0.3,
-        "mean_over_sequence": False,
         "norm_first": True
     }
     model = TransformerEncoderChunks(**model_config)
@@ -72,21 +80,23 @@ if __name__ == "__main__":
     # ===================
     # TRAINING
     # ===================
-
-    train_loader = create_dataloader(x_train, y_train, batch_size=256, shuffle=True, workers=4)
-    test_loader = create_dataloader(x_test, y_test, batch_size=256, shuffle=False, workers=4)
-
+    outfolder = f"test_run_{int(time())}"
     lit_trainer = LitTrainerWrapper(
         pytorch_model=model,
-        name = "test_training",
-        log_folder=f"./test_run_{int(time())}",
-        epochs = 2,
+        name="test_training",
+        log_folder=outfolder,
+        epochs=2,
+        device="cpu",
+        log_every_n_steps=1,
         scheduler="onecycle",
-        model_file="test.ckpt",
+        batch_size=256,
+        dataloader_workers=4
     )
+    train_loader = lit_trainer.create_dataloader(x_train, y_train)
+    test_loader = lit_trainer.create_dataloader(x_test, y_test, shuffle=False)
     lit_trainer.train_lit_model(
-        X_train_loader=train_loader,
-        X_test_loader=test_loader,
+        train_loader=train_loader,
+        val_loader=test_loader,
     )
 
     # get f1 scores

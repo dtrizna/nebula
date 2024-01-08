@@ -1,30 +1,133 @@
-from nebula.misc import set_random_seed
-from lightning import Trainer
-
+import os
+import torch
 import logging
 import numpy as np
 from tqdm import tqdm
+from time import time
+from typing import List, Optional
+from copy import deepcopy
+from torch import load
+from torch.utils.data import DataLoader
+from sklearn.model_selection import train_test_split
+from .lit_utils import LitTrainerWrapper, PyTorchLightningModelLM
 
 
-class MaskedLanguageModelTrainer(Trainer):
-    def __init__(self,
-                    vocab,
-                    model_trainer_config,
-                    mask_probability=0.15,
-                    random_state=42,
-                    masked_target_type="onehot"):
-        super().__init__(**model_trainer_config, n_output_classes=len(vocab))
-        self.__name__ = "MaskedLanguageModel"
+class LanguageModelTrainer(LitTrainerWrapper):
+    def __init__(
+            self,
+            vocab: dict,
+            pretrain_epochs: int = 3,
+            # whether to redo language model sampling after nr of remask epochs
+            rebuild_dataloader_every_n_epochs: int = False,
+            dump_model_every_epoch: bool = False,
+            *args,
+            **kwargs
+    ):
+        super().__init__(skip_trainer_init=True, monitor_metric="train_loss", monitor_mode="min", *args, **kwargs)
+        self.__name__ = "LanguageModelTrainer"
+        
+        assert "<pad>" in vocab, "Vocabulary must contain '<pad>' token"
+        assert "<mask>" in vocab, "Vocabulary must contain '<mask>' token"
+        self.vocab = vocab
+        self.pretrain_epochs = pretrain_epochs
+        self.dump_model_every_epoch = dump_model_every_epoch
+        
+        if rebuild_dataloader_every_n_epochs:
+            assert isinstance(rebuild_dataloader_every_n_epochs, int),\
+                "rebuild_dataloader_every_n_epochs must be an integer"
+        self.rebuild_dataloader_every_n_epochs = rebuild_dataloader_every_n_epochs
+
+
+    def setup_lit_language_model(self):
+        if self.scheduler is not None and self.scheduler_budget is None:
+            self.calculate_scheduler_step_budget(max_epochs=self.pretrain_epochs)
+
+        self.lit_model = PyTorchLightningModelLM(
+                model=self.pytorch_model,
+                learning_rate=self.learning_rate,
+                scheduler=self.scheduler,
+                scheduler_step_budget=self.scheduler_budget,
+            )
+
+
+    def create_lm_dataloader(self, x_unlabeled: np.ndarray, shuffle: bool = True) -> DataLoader:
+        raise NotImplementedError("create_lm_dataloader() must be implemented in subclass")
+
+
+    def pretrain(self, x_unlabeled: np.ndarray, epochs: int = None):
+        if epochs is not None:
+            self.pretrain_epochs = epochs
+        # DATA SETUP
+        logging.warning(' [*] Building language model dataloader...')
+        self.train_loader = self.create_lm_dataloader(x_unlabeled)
+
+        # MODEL SETUP
+        if self.lit_model is None:
+            self.setup_lit_language_model()
+        
+        # TRAINER SETUP AND TRAINING
+        if not self.rebuild_dataloader_every_n_epochs and not self.dump_model_every_epoch:
+            self.epochs = self.pretrain_epochs
+            self.setup_trainer()
+            self.trainer.fit(self.lit_model, self.train_loader)
+        else:
+            # need to stop training in between to peform extra logic: saving or remasking
+            # TODO: this doesn't work with 'scheduler', since L.Trainer
+            # calls configure_optimizers() with every .fit()
+            # need to write custom configure_optimizers() for LM model ???
+            # for now avoiding using remask_every_n_epochs and dump_model_every_epoch w/ scheduler    
+            loop_length = self.rebuild_dataloader_every_n_epochs
+            total_loops = self.pretrain_epochs // loop_length
+            if self.dump_model_every_epoch:
+                loop_length = 1
+                total_loops = self.pretrain_epochs
+            self.epochs = loop_length
+            self.setup_trainer()
+            for loop in range(total_loops):
+                if loop > 0 and (not self.dump_model_every_epoch or loop % self.rebuild_dataloader_every_n_epochs == 0):
+                    logging.warning(f' [*] Re-building language model dataloader...')
+                    self.train_loader = self.create_lm_dataloader(x_unlabeled)
+
+                self.trainer.fit(self.lit_model, self.train_loader)
+
+                # NOTE: here we modify the Trainer's fit_loop max_epochs to ensure .fit() can be called again
+                if loop < total_loops - 1:
+                    self.trainer.fit_loop.max_epochs = self.trainer.max_epochs + loop_length
+
+                if self.dump_model_every_epoch:
+                    self.save_torch_model(os.path.join(self.log_folder, f"pretrained_epoch_{loop}.torch"))
+        
+        # NOTE: lit weird behavior: no checkpoint files are saved if train_loss 
+        # is specified as monitor metric in ModelCheckpoint, therefore, saving torch model manually.
+        self.save_torch_model(os.path.join(self.log_folder, "pretrained_final.torch"))
+
+
+class MaskedLanguageModelTrainer(LanguageModelTrainer):
+    def __init__(
+            self,
+            mask_probability: float = 0.15,
+            # mask the token with distribution (80% mask, 10% random, 10% same)
+            # same as Devlin et al (https://arxiv.org/abs/1810.04805)
+            mask_distribution: list = [0.8, 0.1],
+            # how to construct the target for the masked tokens
+            # 1 if onehot, sum of maskings if count
+            masked_target_type: str = "onehot",
+            *args,
+            **kwargs
+    ):
+        super().__init__(*args, **kwargs)
+        self.__name__ = "MaskedLanguageModelTrainer"
+        
+        assert len(mask_distribution) == 2, "mask_distribution must be a list of length 2"
+        self.mask_distribution = mask_distribution
         
         self.mask_probability = mask_probability
-        self.vocab = vocab
-        self.random_state = random_state
-        set_random_seed(self.random_state)
-
+        
         assert masked_target_type in ["onehot", "count"], "masked_target_type must be either 'onehot' or 'count'"
         self.masked_target_type = masked_target_type
 
-    def mask_seq(self, sequence):
+
+    def mask_seq(self, sequence: np.ndarray):
         """
         Mask a sequence with a given probability.
         
@@ -61,10 +164,11 @@ class MaskedLanguageModelTrainer(Trainer):
                 masked_token_idxs[tokenId] = 1
 
             # actually mask the token with distribution (80% mask, 10% random, 10% same)
+            # same as Devlin et al (https://arxiv.org/abs/1810.04805)
             sample = np.random.sample()
-            if sample < 0.8:
+            if sample < self.mask_distribution[0]:
                 masked_sequence[idx] = self.vocab["<mask>"]
-            elif sample < 0.9:
+            elif sample < (self.mask_distribution[0] + self.mask_distribution[1]):
                 masked_sequence[idx] = np.random.randint(0, vocabSize)
             else:
                 masked_sequence[idx] = sequence[idx]
@@ -72,14 +176,20 @@ class MaskedLanguageModelTrainer(Trainer):
         # pad masked sequence to be the same length as original sequence
         origSequenceLength = sequence.squeeze().shape[0]
         padWidth = origSequenceLength - masked_sequence.shape[0]
-        masked_sequence = np.pad(masked_sequence, (0, padWidth), 'constant', constant_values=self.vocab["<pad>"])
+        masked_sequence = np.pad(
+            array=masked_sequence,
+            pad_width=(0, padWidth),
+            mode='constant',
+            constant_values=self.vocab["<pad>"]
+        )
 
         return masked_sequence, masked_token_idxs
 
-    def mask_seq_arr(self, sequence):
+
+    def mask_seq_arr(self, seq_array: np.ndarray):
         seq_masked = []
         target = []
-        for seq in tqdm(sequence):
+        for seq in tqdm(seq_array):
             masked_local, target_local = self.mask_seq(seq)
             seq_masked.append(masked_local)
             target.append(target_local)
@@ -89,97 +199,213 @@ class MaskedLanguageModelTrainer(Trainer):
         target = np.vstack(target)
         return seq_masked, target
 
-    def pretrain(
-        self,
-        x_unlabeled,
-        epochs=5,
-        time_budget=None,
-        dump_model_every_epoch=False,
-        remask_epochs=False
-    ):
-        assert (epochs is not None) ^ (time_budget is not None), \
-            "Either 'epochs' or 'time_budget' should be specified"
-        assert isinstance(epochs, int), "pretrainEpochs must be an integer"
-        if remask_epochs:
-            assert isinstance(remask_epochs, int), "remask_epochs must be an integer"
-            
-            # remove output folder to avoid dumping results every remasking
-            orig_out_folder = self.output_folder
-            self.output_folder = None
 
-            for i in range(epochs):
-                # set output folder back to original value on last iteration
-                if i == epochs-1: 
-                    self.output_folder = orig_out_folder
-                
-                if i % remask_epochs == 0:
-                    logging.warning(f' [*] Re-masking sequences...')
-                    x_masked, y_masked = self.mask_seq_arr(x_unlabeled)
-        
-                self.fit(
-                    x_masked,
-                    y_masked,
-                    epochs=1,
-                    time_budget=time_budget,
-                    dump_model_every_epoch=dump_model_every_epoch,
-                    overwrite_epoch_idx=i
-                )
-        else:
-            logging.warning(' [*] Masking sequences...')
-            x_masked, y_masked = self.mask_seq_arr(x_unlabeled)
-            
-            self.fit(
-                x_masked,
-                y_masked,
-                epochs=epochs,
-                time_budget=time_budget,
-                dump_model_every_epoch=dump_model_every_epoch
-            )
-        
-        return self.model
+    def create_lm_dataloader(self, x_unlabeled: np.ndarray, shuffle: bool = True) -> DataLoader:
+        x_masked, y_masked = self.mask_seq_arr(x_unlabeled)
+        return self.create_dataloader(x_masked, y_masked, shuffle=shuffle)
 
 
-class AutoRegressiveModelTrainer(ModelTrainer):
+
+class AutoRegressiveModelTrainer(LanguageModelTrainer):
     def __init__(
             self,
-            vocab,
-            block_size,
-            model_trainer_config,
-            random_state=42,
+            context_len: int = 256,
+            *args,
+            **kwargs
     ):
-        super().__init__(**model_trainer_config, n_output_classes=len(vocab))
-        self.__name__ = "AutoRegressiveModel"
-        self.block_size = block_size
+        super().__init__(*args, **kwargs)
+        self.__name__ = "AutoRegressiveModelTrainer"
+        self.context_len = context_len
 
+
+    def get_contexts(self, x_unlabeled: np.ndarray, size: int) -> np.ndarray:
+        # NOTE: From: https://github.com/karpathy/nanoGPT/blob/master/train.py#L118
+        # but sample nr of random_sample_idx from 0th dim, and then sample block_size from 1st dim
+        # since x_unlabeled.shape is (number_of_samples, sequence_length), not (sequence_length, )
+        max_len = x_unlabeled.shape[1]
+        random_sample_idx = torch.randint(x_unlabeled.shape[0], size=(size,))
+        random_start_idx = torch.randint(max_len-self.context_len, size=(size,))
+        x = torch.stack([torch.from_numpy((x_unlabeled[i, j:j+self.context_len]).astype(np.int64)) for i, j in zip(random_sample_idx, random_start_idx)])
+        y = torch.stack([torch.from_numpy((x_unlabeled[i, j+1:j+1+self.context_len]).astype(np.int64)) for i, j in zip(random_sample_idx, random_start_idx)])
+        return x, y
+
+
+    def create_lm_dataloader(self, x_unlabeled: np.ndarray, shuffle: bool = True) -> DataLoader:
+        x, y = self.get_contexts(x_unlabeled, size=x_unlabeled.shape[0])
+        # TODO: y shape is torch.Size([nr_samples, 256])
+        # in case of masking it is torch.Size([nr_samples, vocab_size]) with masked elements marked as 1
+        # need to think how to update the model to give existing value to the Transformer
+        # but may be no updates needed, since last layer in Karpathy's GPT is the same as in our LM
+        # might be of value: https://github.com/karpathy/nanoGPT/blob/master/model.py#L187C13-L187C104
+        # loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=-1)
+        loader = self.create_dataloader(x, y, shuffle=shuffle)
+        return loader
+
+
+class SelfSupervisedLearningEvalFramework:
+    def __init__(
+            self,
+            # pretrainer: Union[MaskedLanguageModelTrainer, AutoRegressiveModelTrainer],
+            pretrainer: MaskedLanguageModelTrainer,
+            downstream_trainer: LitTrainerWrapper,
+            training_types: List[str] = ['pretrained', 'non_pretrained', 'full_data'],
+            # eval details
+            unlabeled_data_ratio: float = 0.8,
+            n_splits: int = 5,
+            # logging details
+            log_folder: str = None,
+            dump_data_splits: bool = True,
+            downsample_unlabeled_data: bool = False,
+            false_positive_rates: List[float] = [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
+            random_state: int = None,
+            pretrained_model_path: str = None,
+    ):
+        self.pretrainer = pretrainer
+        self.downstream_trainer = downstream_trainer
+
+        self.training_types = training_types
+        self.unlabeled_data_ratio = unlabeled_data_ratio
+        self.n_splits = n_splits
+
+        tempfolder = os.path.join(os.getcwd(), f"out_self_supervised_eval_{int(time())}")
+        self.log_folder = log_folder if log_folder is not None else tempfolder
+        os.makedirs(self.log_folder, exist_ok=True)
+
+        self.pretrainer.log_folder = os.path.join(self.log_folder, self.pretrainer.log_folder)
+        self.init_pretrain_log_folder = self.pretrainer.log_folder
+        
+        self.downstream_trainer.log_folder = os.path.join(self.log_folder, self.downstream_trainer.log_folder)
+        self.init_downstream_log_folder = self.downstream_trainer.log_folder
+        
+        # NOTE: if not deepcopy, init_weights are overwritten with load_state_dict()
+        self.init_pretrain_model_weights = deepcopy(self.pretrainer.pytorch_model.state_dict())
+        self.init_downstream_model_weights = deepcopy(self.downstream_trainer.pytorch_model.state_dict())
+
+        self.dump_data_splits = dump_data_splits
+        self.downsample_unlabeled_data = downsample_unlabeled_data
+        if self.downsample_unlabeled_data:
+            assert isinstance(downsample_unlabeled_data, float) and 0 < downsample_unlabeled_data < 1
+        self.false_positive_rates = false_positive_rates
         self.random_state = random_state
-        set_random_seed(self.random_state)
+        self.pretrained_model_path = pretrained_model_path
 
-    def pretrain(        
-        self,
-        x_unlabeled,
-        epochs=5,
-        time_budget=None,
-        random_offsets=False,
-        dump_model_every_epoch=False,
-    ):
-        assert (epochs is not None) ^ (time_budget is not None), \
-            "Either 'epochs' or 'time_budget' should be specified"
-        
-        assert isinstance(epochs, int), "epochs must be an integer"
-        
-        if random_offsets:
-            assert isinstance(random_offsets, int), "random_sampling must be an integer"
-            ix = np.random.randint(x_unlabeled.shape[0]-self.block_size, size=(random_offsets,))
-            x = np.stack([x_unlabeled[i:i+self.block_size] for i in ix])
-            y = np.stack([x_unlabeled[i+1:i+self.block_size+1] for i in ix])
-        else: # sequential
-            x = np.stack([x_unlabeled[i:i+self.block_size] for i in range(x_unlabeled.shape[0]-self.block_size)])
-            y = np.stack([x_unlabeled[i+1:i+self.block_size+1] for i in range(x_unlabeled.shape[0]-self.block_size)])
 
-        self.fit(
-                x,
-                y,
-                epochs=epochs,
-                time_budget=time_budget,
-                dump_model_every_epoch=dump_model_every_epoch
+    def _dump_data_splits(self):
+        split_data_file = f"dataset_splits_{self.timestamp}.npz"
+        np.savez_compressed(
+            os.path.join(self.log_folder, split_data_file),
+            unlabeled_data=self.unlabeled_data,
+            labeled_x=self.labeled_x,
+            labeled_y=self.labeled_y
         )
+        print(f"[!] Saved dataset splits to {split_data_file}")
+
+
+    def _train_downstream_model(self, training_type, pretrained_weights=None):
+        self.downstream_trainer.log_folder = self.init_downstream_log_folder + "_" + training_type + "_" + str(self.timestamp)
+        final_model_file = os.path.join(self.downstream_trainer.log_folder, f"{training_type}_final.torch")
+        if os.path.exists(final_model_file):
+            print(f"[!] Downstream model already exists at '{final_model_file}'")
+            return
+        
+        # reset params that should be re-initialized
+        self.downstream_trainer.lit_model = None
+        self.downstream_trainer.scheduler_budget = None
+        self.downstream_trainer.name = training_type
+        
+        if training_type == "pretrained":
+            self.downstream_trainer.pytorch_model.load_state_dict(pretrained_weights)
+        else:
+            self.downstream_trainer.pytorch_model.load_state_dict(self.init_downstream_model_weights)
+        
+        self.downstream_trainer.setup_trainer()
+
+        if training_type == "full_data":
+            self.downstream_trainer.train_loader = self.full_train_loader
+            self.downstream_trainer.setup_lit_model()
+            self.downstream_trainer.train_lit_model(self.full_train_loader, self.val_loader)
+        else:
+            self.downstream_trainer.train_loader = self.train_loader
+            self.downstream_trainer.setup_lit_model()
+            self.downstream_trainer.train_lit_model(self.train_loader, self.val_loader)
+        self.downstream_trainer.save_torch_model(final_model_file)
+
+
+    def run_one_split(
+            self,
+            x_train: np.ndarray,
+            y_train: np.ndarray,
+            x_val: Optional[np.ndarray] = None,
+            y_val: Optional[np.ndarray] = None,
+            idx: Optional[str] = None
+    ):
+        self.timestamp = int(time()) if idx is None else idx
+
+        # split x and y into train and validation sets
+        if os.path.exists(os.path.join(self.log_folder, f"dataset_splits_{self.timestamp}.npz")):
+            print(f"[!] Loading dataset splits from 'dataset_splits_{self.timestamp}.npz'")
+            splits = np.load(os.path.join(self.log_folder, f"dataset_splits_{self.timestamp}.npz"), allow_pickle=True)
+            self.unlabeled_data = splits["unlabeled_data"]
+            self.labeled_x = splits["labeled_x"]
+            self.labeled_y = splits["labeled_y"]
+        else:
+            self.unlabeled_data, self.labeled_x, _, self.labeled_y = train_test_split(
+                x_train, y_train, train_size=self.unlabeled_data_ratio, random_state=self.random_state
+            )
+        
+        # TODO: not sure this is proper strategy -- update
+        if self.downsample_unlabeled_data:
+            # sample N random samples from unlabeled data which is numpy array
+            unlabeled_size = self.unlabeled_data.shape[0]
+            indices = np.random.choice(unlabeled_size, int(self.downsample_unlabeled_data*unlabeled_size), replace=False)
+            self.unlabeled_data = self.unlabeled_data[indices].copy()
+        
+        if self.dump_data_splits:
+            self._dump_data_splits()
+        
+        # checking if pretrained model is provided or if already trained exists
+        self.pretrainer.log_folder = self.init_pretrain_log_folder + "_" + str(self.timestamp)
+        if self.pretrained_model_path is None:
+            self.pretrained_model_path = os.path.join(self.pretrainer.log_folder, "pretrained_final.torch")
+        if os.path.exists(self.pretrained_model_path):
+            print(f"[!] Loading pretrained model from: '{self.pretrained_model_path}'")
+            pretrained_model = load(self.pretrained_model_path)
+            pretrained_weights = pretrained_model.state_dict()
+        else:
+            print("[!] Pre-training model...")
+            # reset model weights -- needed for multiple splits
+            self.pretrainer.pytorch_model.load_state_dict(self.init_pretrain_model_weights)
+            self.pretrainer.pretrain(self.unlabeled_data)
+            pretrained_weights = deepcopy(self.pretrainer.pytorch_model.state_dict())
+
+        # remove pre-train head
+        to_remove = [k for k in pretrained_weights.keys() if k.startswith('pretrain_layers')]
+        for k in to_remove:
+            del pretrained_weights[k]
+        
+        self.train_loader = self.downstream_trainer.create_dataloader(self.labeled_x, self.labeled_y, shuffle=True)
+        if "full_data" in self.training_types:
+            self.full_train_loader = self.downstream_trainer.create_dataloader(x_train, y_train, shuffle=True)
+        
+        if x_val is not None:
+            self.val_loader = self.downstream_trainer.create_dataloader(x_val, y_val, shuffle=False)
+        else:
+            self.val_loader = None
+        
+        for training_type in self.training_types:
+            print(f"[!] Fine-tuning of '{training_type}' model on downstream task...")
+            self._train_downstream_model(training_type, pretrained_weights)
+
+
+    def run_splits(self, x_train, y_train, x_val, y_val, previous_run_idxs: Optional[List] = None):
+        if previous_run_idxs is not None:
+            for idx in previous_run_idxs:
+                self.run_one_split(x_train, y_train, x_val, y_val, idx=idx)
+            return
+
+        for i in range(self.n_splits):
+            self.random_state += i # to get different splits
+            self.pretrainer.random_state = self.random_state
+            self.downstream_trainer.random_state = self.random_state
+            print(f'[!] Running pre-training split {i+1}/{self.n_splits}')
+            self.run_one_split(x_train, y_train, x_val, y_val,)

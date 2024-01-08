@@ -13,7 +13,7 @@ from torch.nn import CrossEntropyLoss
 from torch.optim import AdamW
 
 from nebula.pretraining import AutoRegressiveModelTrainer
-from nebula.models.attention import TransformerEncoderChunksLM
+from nebula.models.attention import TransformerEncoderChunks
 
 # ============ DATA ============
 LIMIT = 100
@@ -35,9 +35,10 @@ model_config = {
     "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
     "numClasses": 1, # binary classification
     "hiddenNeurons": [64],
-    "dropout": 0.3
+    "dropout": 0.3,
+    "pretrain_layers": [1024]
 }
-model = TransformerEncoderChunksLM(**model_config)
+model = TransformerEncoderChunks(**model_config)
 
 # ============ PRE-TRAINING ============
 BATCH_SIZE = 8
