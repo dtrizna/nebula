@@ -141,7 +141,7 @@ class PyTorchLightningModelBase(L.LightningModule):
 
         if y.ndim == 2 and logits.ndim == 3: # e.g. autoregressive pre-training
             logits, y = logits.view(-1, logits.size(-1)), y.view(-1)
-        if y.ndim == 1: # binary classification: (batch_size,) => (batch_size, 1)
+        elif y.ndim == 1: # binary classification: (batch_size,) => (batch_size, 1)
             y = y.unsqueeze(-1)
 
         loss = self.loss(logits, y)

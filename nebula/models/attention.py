@@ -17,7 +17,7 @@ class TransformerEncoderModel(nn.Module):
             dHidden: int = 200,  # dimension of the feedforward network model in nn.TransformerEncoder
             nLayers: int = 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
             numClasses: int = 1,  # 1 ==> binary classification
-            hiddenNeurons: list = [64],  # decoder's classifier FFNN complexity
+            hiddenNeurons: Optional[list] = [64],  # decoder's classifier FFNN complexity
             layerNorm: bool = False,  # whether to normalize decoder's FFNN layers
             norm_first: bool = True,  # whether to normalize before or after FFNN layers
             dropout: float = 0.3,
@@ -49,6 +49,10 @@ class TransformerEncoderModel(nn.Module):
         self.dropout = dropout
         self.ffnn_layers_in = hiddenNeurons
         
+        # TODO: RuntimeError: Error(s) in loading state_dict for TransformerEncoderModel:
+        # size mismatch for ffnn.0.0.weight: copying a param with shape torch.Size([64, 64]) 
+        # from checkpoint, the shape in current model is torch.Size([64, 16384]).
+        # when using autoregressively pre-trained model with "pooling": None
         self.pooling_type = pooling
         if pooling == None:
             input_neurons = int(self.maxlen * dModel)
@@ -58,10 +62,11 @@ class TransformerEncoderModel(nn.Module):
         self.causal_attention = causal_attention
         if self.causal_attention: # override pooling settings if causal
             input_neurons = self.d_model
+            self.pooling_type = None
         
         self.ffnn_layers = self._build_ffnn_layers(self.ffnn_layers_in, input_neurons)
         self.ffnn = nn.Sequential(*self.ffnn_layers)
-        self.ffnn_out_size = hiddenNeurons[-1]
+        self.ffnn_out_size = hiddenNeurons[-1] if hiddenNeurons is not None else self.d_model
         if numClasses == 2: # binary classification
             self.classifier_head = nn.Linear(self.ffnn_out_size, 1)
         else:
@@ -91,6 +96,8 @@ class TransformerEncoderModel(nn.Module):
 
     def _build_ffnn_layers(self, layers: list, start_neurons: int) -> nn.Sequential:
         ffnn = []
+        if layers is None:
+            return ffnn
         for i, h in enumerate(layers):
             ffnnBlock = []
             if i == 0:
