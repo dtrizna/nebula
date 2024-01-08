@@ -20,10 +20,11 @@ from nebula.models.attention import TransformerEncoderChunks
 VOCABS = {'8k': 8192}#, '16k': 16384, '32k': 32768}
 
 # if clean training
-LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"long_pretrain_remask_{int(time())}")
+LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"out_long_pretrain_remask_{int(time())}")
 TIMESTAMPS = None
+
 # if previously trained
-# LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"long_pretrain_remask_1704440720")
+# LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"out_long_pretrain_remask_1704440720")
 # TIMESTAMPS = ["1704440720"]
 
 VERBOSE = False
