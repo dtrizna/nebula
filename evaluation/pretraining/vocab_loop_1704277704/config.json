@@ -1,0 +1,24 @@
+{
+    "REPOSITORY_ROOT": "C:\\Users\\dtrizna\\Code\\nebula",
+    "VOCABS": {
+        "8k": 8192,
+        "16k": 16384,
+        "32k": 32768
+    },
+    "LOG_ROOT_FOLDER": "C:\\Users\\dtrizna\\Code\\nebula\\evaluation\\pretraining\\vocab_loop_1704277704",
+    "TIMESTAMPS": [
+        "1704277705"
+    ],
+    "VERBOSE": true,
+    "LIMIT": null,
+    "PRETRAINING_EPOCHS": 10,
+    "DOWNSTREAM_EPOCHS": 3,
+    "DATALOADER_WORKERS": 4,
+    "LOG_EVERY_N_STEPS": 10,
+    "SSL_EVAL_SPLITS": 2,
+    "GRAD_CLIP_VALUE": 1.0,
+    "ACCUMULATE_GRAD_BATCHES": null,
+    "REMASK_EVERY_N_EPOCHS": false,
+    "DUMP_MODEL_EVERY_EPOCH": false,
+    "SCHEDULER": null
+}

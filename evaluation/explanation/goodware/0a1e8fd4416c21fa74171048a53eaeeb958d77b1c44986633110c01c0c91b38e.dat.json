@@ -1,0 +1,183 @@
+[
+    {
+        "ep_type": "module_entry",
+        "start_addr": "0x404015",
+        "ep_args": [
+            "0x4000",
+            "0x4010",
+            "0x4020",
+            "0x4030"
+        ],
+        "apihash": "4aa13910f3388ae0f677654843b7f14e101cf7e441f6c89a31d0a3999aa09f7e",
+        "apis": [
+            {
+                "pc": "0x404030",
+                "api_name": "KERNEL32.GetModuleHandleA",
+                "args": [
+                    "KERNEL32.dll"
+                ],
+                "ret_val": "0x77000000"
+            },
+            {
+                "pc": "0x40405d",
+                "api_name": "KERNEL32.GetProcAddress",
+                "args": [
+                    "0x77000000",
+                    "VirtualProtect"
+                ],
+                "ret_val": "0xfeee0000"
+            },
+            {
+                "pc": "0x404081",
+                "api_name": "kernel32.VirtualProtect",
+                "args": [
+                    "0x400000",
+                    "0x1000",
+                    "0x4",
+                    "0x404fd0"
+                ],
+                "ret_val": "0x1"
+            },
+            {
+                "pc": "0x4040c0",
+                "api_name": "kernel32.VirtualProtect",
+                "args": [
+                    "0x401000",
+                    "0x1000",
+                    "0x10",
+                    "0x404fd0"
+                ],
+                "ret_val": "0x1"
+            },
+            {
+                "pc": "0x401775",
+                "api_name": "MSVCRT.__set_app_type",
+                "args": [
+                    "0x2"
+                ],
+                "ret_val": null
+            },
+            {
+                "pc": "0x401792",
+                "api_name": "MSVCRT.__p__fmode",
+                "args": [],
+                "ret_val": "0x45f0"
+            },
+            {
+                "pc": "0x4017a0",
+                "api_name": "MSVCRT.__p__commode",
+                "args": [],
+                "ret_val": "0x4600"
+            },
+            {
+                "pc": "0x40190f",
+                "api_name": "MSVCRT._controlfp",
+                "args": [
+                    "0x10000",
+                    "0x30000"
+                ],
+                "ret_val": "0x0"
+            },
+            {
+                "pc": "0x4017e5",
+                "api_name": "MSVCRT._initterm",
+                "args": [
+                    "0x403008",
+                    "0x40300c"
+                ],
+                "ret_val": "0x0"
+            },
+            {
+                "pc": "0x40180e",
+                "api_name": "MSVCRT.__getmainargs",
+                "args": [
+                    "0x1211f84",
+                    "0x1211f74",
+                    "0x1211f80",
+                    "0x0",
+                    "0x1211f78"
+                ],
+                "ret_val": "0x0"
+            },
+            {
+                "pc": "0x401820",
+                "api_name": "MSVCRT._initterm",
+                "args": [
+                    "0x403000",
+                    "0x403004"
+                ],
+                "ret_val": "0x0"
+            },
+            {
+                "pc": "0x401829",
+                "api_name": "MSVCRT.__p__acmdln",
+                "args": [],
+                "ret_val": "0x4610"
+            },
+            {
+                "pc": "0x40186f",
+                "api_name": "KERNEL32.GetStartupInfoA",
+                "args": [
+                    "0x1211f88"
+                ],
+                "ret_val": null
+            },
+            {
+                "pc": "0x401890",
+                "api_name": "KERNEL32.GetModuleHandleA",
+                "args": [
+                    "0x0"
+                ],
+                "ret_val": "0x400000"
+            },
+            {
+                "pc": "0x401485",
+                "api_name": "KERNEL32.GetModuleFileNameA",
+                "args": [
+                    "0x400000",
+                    "C:\\Windows\\system32\\0a1e8fd4416c21fa74171048a53eaeeb958d77b1c44986633110c01c0c91b38e.dat",
+                    "0x106"
+                ],
+                "ret_val": "0x58"
+            }
+        ],
+        "ret_val": "0x58",
+        "error": {
+            "type": "Failed to get character width from function: KERNEL32._lopen",
+            "pc": "0xfeedf074",
+            "address": "0xfeedf074",
+            "instr": "disasm_failed",
+            "regs": {
+                "esp": "0x01211b34",
+                "ebp": "0x01211f5c",
+                "eip": "0xfeedf074",
+                "esi": "0x00004620",
+                "edi": "0x004031c0",
+                "eax": "0x00000058",
+                "ebx": "0x00000000",
+                "ecx": "0x01211f84",
+                "edx": "0x01211f88"
+            },
+            "stack": [
+                "sp+0x00: 0x00401671 -> emu.module.0a1e8fd4416c21fa74171048a53eaeeb958d77b1c44986633110c01c0c91b38e.0x400000",
+                "sp+0x04: 0x004031c0 -> emu.module.0a1e8fd4416c21fa74171048a53eaeeb958d77b1c44986633110c01c0c91b38e.0x400000",
+                "sp+0x08: 0x00000000",
+                "sp+0x0c: 0x00004620 -> api.msvcrt._acmdln.0x4610",
+                "sp+0x10: 0x0040148a -> emu.module.0a1e8fd4416c21fa74171048a53eaeeb958d77b1c44986633110c01c0c91b38e.0x400000",
+                "sp+0x14: 0x00000000",
+                "sp+0x18: 0x00004620 -> api.msvcrt._acmdln.0x4610",
+                "sp+0x1c: 0x00000000",
+                "sp+0x20: 0x00000000",
+                "sp+0x24: 0x00000000",
+                "sp+0x28: 0x00000000",
+                "sp+0x2c: 0x00000000",
+                "sp+0x30: 0x00000000",
+                "sp+0x34: 0x00000000",
+                "sp+0x38: 0x00000000",
+                "sp+0x3c: 0x00000000"
+            ],
+            "traceback": "Traceback (most recent call last):\n  File \"/home/dmitrijs.trizna/.pyenv/versions/3.8-dev/lib/python3.8/site-packages/speakeasy/windows/winemu.py\", line 1168, in handle_import_func\n    rv = self.api.call_api_func(mod, func, argv, ctx=default_ctx)\n  File \"/home/dmitrijs.trizna/.pyenv/versions/3.8-dev/lib/python3.8/site-packages/speakeasy/winenv/api/winapi.py\", line 77, in call_api_func\n    return func(mod, self.emu, argv, ctx)\n  File \"/home/dmitrijs.trizna/.pyenv/versions/3.8-dev/lib/python3.8/site-packages/speakeasy/winenv/api/usermode/kernel32.py\", line 5704, in _lopen\n    cw = self.get_char_width(ctx)\n  File \"/home/dmitrijs.trizna/.pyenv/versions/3.8-dev/lib/python3.8/site-packages/speakeasy/winenv/api/api.py\", line 343, in get_char_width\n    raise ApiEmuError('Failed to get character width from function: %s' % (name))\nspeakeasy.errors.ApiEmuError: Failed to get character width from function: KERNEL32._lopen\n"
+        },
+        "dynamic_code_segments": []
+    }
+]

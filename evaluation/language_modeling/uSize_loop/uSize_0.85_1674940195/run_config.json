@@ -1,0 +1,21 @@
+{
+    "unlabeledDataSize": 0.85,
+    "nSplits": 3,
+    "downStreamEpochs": 3,
+    "preTrainEpochs": 10,
+    "falsePositiveRates": [
+        0.0001,
+        0.0003,
+        0.001,
+        0.003,
+        0.01,
+        0.03,
+        0.1
+    ],
+    "modelType": "TransformerEncoderLM",
+    "train_limit": null,
+    "random_state": 42,
+    "batchSize": 64,
+    "optimizerStep": 5000,
+    "verbosity_batches": 100
+}

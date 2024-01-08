@@ -1,0 +1,141 @@
+2023-03-27 08:25:11,489 WARNING  [!] Skipping since exists: out_speakeasy_multiclass\nebula_speakeasy_vocab_50000_seqlen_512\x_train_full.npy
+2023-03-27 08:25:11,586 WARNING  [!] Skipping since exists: out_speakeasy_multiclass\nebula_speakeasy_vocab_50000_seqlen_512\x_test_full.npy
+2023-03-27 08:25:11,606 WARNING  [!] Skipping since exists: out_speakeasy_multiclass\dmds_speakeasy_vocab_seqlen_512\x_train_full.npy
+2023-03-27 08:25:11,607 WARNING  [!] Skipping since exists: out_speakeasy_multiclass\dmds_speakeasy_vocab_seqlen_512\x_test_full.npy
+2023-03-27 08:25:11,608 WARNING  [!] Skipping since exists: out_speakeasy_multiclass\neurlux_speakeasy_vocab_10000_seqlen_512\x_train_full.npy
+2023-03-27 08:25:11,609 WARNING  [!] Skipping since exists: out_speakeasy_multiclass\neurlux_speakeasy_vocab_10000_seqlen_512\x_test_full.npy
+2023-03-27 08:25:11,610 WARNING  [!] Skipping since exists: out_speakeasy_multiclass\quovadis_speakeasy_vocab_600_seqlen_512\x_train_full.npy
+2023-03-27 08:25:11,611 WARNING  [!] Skipping since exists: out_speakeasy_multiclass\quovadis_speakeasy_vocab_600_seqlen_512\x_test_full.npy
+2023-03-27 08:25:11,615 WARNING  [!] Multiclass classification with 8 classes
+2023-03-27 08:25:11,668 WARNING  [!] Skipping... CV output folder for run neurlux already exists: out_speakeasy_multiclass\cv_neurlux_limNone_r1763_t5
+2023-03-27 08:25:11,668 WARNING  [!] Skipping... CV output folder for run quovadis already exists: out_speakeasy_multiclass\cv_quovadis_limNone_r1763_t5
+2023-03-27 08:25:11,669 WARNING  [!] Skipping... CV output folder for run nebula already exists: out_speakeasy_multiclass\cv_nebula_limNone_r1763_t5
+2023-03-27 08:25:11,669 WARNING  [!!!] Starting CV over dmds!
+2023-03-27 08:25:20,709 WARNING  [!] Training time budget: 300min
+2023-03-27 08:25:20,709 WARNING  [!] Model config: {'ndim': 98, 'seq_len': 512, 'num_classes': 8}
+2023-03-27 08:25:30,257 WARNING  [1/3] Train set size: 50750, Validation set size: 25376
+2023-03-27 08:26:59,671 WARNING  [!] Saved dataset splits to dataset_splits_1679898320.npz
+2023-03-27 08:27:05,209 WARNING  [!] Iniatialized model. Total trainable parameters: 0.4278e6
+2023-03-27 08:27:05,210 WARNING  [*] Training time budget set: 5.0 min
+2023-03-27 08:27:18,486 WARNING  [*] Started epoch: 1
+2023-03-27 08:27:22,946 WARNING  [*] 08:27:22: Train Epoch: 1 [  0  /50750 (0 %)] | Loss: 2.119015 | Elapsed: 4.43s
+2023-03-27 08:27:41,480 WARNING  [*] 08:27:41: Train Epoch: 1 [9600 /50750 (19%)] | Loss: 1.622542 | Elapsed: 18.53s
+2023-03-27 08:28:00,301 WARNING  [*] 08:28:00: Train Epoch: 1 [19200/50750 (38%)] | Loss: 1.145055 | Elapsed: 18.82s
+2023-03-27 08:28:20,022 WARNING  [*] 08:28:20: Train Epoch: 1 [28800/50750 (57%)] | Loss: 1.121850 | Elapsed: 19.72s
+2023-03-27 08:28:40,920 WARNING  [*] 08:28:40: Train Epoch: 1 [38400/50750 (76%)] | Loss: 0.753792 | Elapsed: 20.90s
+2023-03-27 08:29:01,193 WARNING  [*] 08:29:01: Train Epoch: 1 [48000/50750 (95%)] | Loss: 0.907318 | Elapsed: 20.27s
+2023-03-27 08:29:06,883 WARNING  [*] Mon Mar 27 08:29:06 2023:    1    | Tr.loss: 1.193734 | Elapsed:  108.41  s
+2023-03-27 08:29:06,883 WARNING  [*] Started epoch: 2
+2023-03-27 08:29:07,064 WARNING  [*] 08:29:07: Train Epoch: 2 [  0  /50750 (0 %)] | Loss: 0.847776 | Elapsed: 0.18s
+2023-03-27 08:29:26,341 WARNING  [*] 08:29:26: Train Epoch: 2 [9600 /50750 (19%)] | Loss: 0.703914 | Elapsed: 19.28s
+2023-03-27 08:29:46,119 WARNING  [*] 08:29:46: Train Epoch: 2 [19200/50750 (38%)] | Loss: 0.725945 | Elapsed: 19.78s
+2023-03-27 08:30:06,103 WARNING  [*] 08:30:06: Train Epoch: 2 [28800/50750 (57%)] | Loss: 0.751181 | Elapsed: 19.98s
+2023-03-27 08:30:26,297 WARNING  [*] 08:30:26: Train Epoch: 2 [38400/50750 (76%)] | Loss: 0.363455 | Elapsed: 20.19s
+2023-03-27 08:30:46,895 WARNING  [*] 08:30:46: Train Epoch: 2 [48000/50750 (95%)] | Loss: 0.583461 | Elapsed: 20.60s
+2023-03-27 08:30:53,609 WARNING  [*] Mon Mar 27 08:30:53 2023:    2    | Tr.loss: 0.662374 | Elapsed:  106.73  s
+2023-03-27 08:30:53,610 WARNING  [*] Started epoch: 3
+2023-03-27 08:30:53,825 WARNING  [*] 08:30:53: Train Epoch: 3 [  0  /50750 (0 %)] | Loss: 0.506804 | Elapsed: 0.21s
+2023-03-27 08:31:16,468 WARNING  [*] 08:31:16: Train Epoch: 3 [9600 /50750 (19%)] | Loss: 0.708683 | Elapsed: 22.64s
+2023-03-27 08:31:38,296 WARNING  [*] 08:31:38: Train Epoch: 3 [19200/50750 (38%)] | Loss: 0.611066 | Elapsed: 21.83s
+2023-03-27 08:32:00,801 WARNING  [*] 08:32:00: Train Epoch: 3 [28800/50750 (57%)] | Loss: 0.529357 | Elapsed: 22.50s
+2023-03-27 08:32:05,300 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-27 08:32:05,365 WARNING  [!] Mon Mar 27 08:32:05 2023: Dumped results:
+                model       : 1679898320-model.torch
+		train time  : 1679898320-trainTime.npy
+		train losses: 1679898320-trainLosses.npy
+		train AUC   : 1679898320-auc.npy
+		train F1s   : 1679898320-trainF1s.npy
+		train TPRs  : 1679898320-trainTPRs.npy
+2023-03-27 08:32:08,473 WARNING  [!] Evaluating model on training set...
+2023-03-27 08:33:02,805 WARNING  [!] This fold metrics on training set:
+2023-03-27 08:33:03,027 WARNING 	AUC: 0.9756
+2023-03-27 08:33:03,058 WARNING 	F1: 0.6966
+2023-03-27 08:33:03,059 WARNING  [!] Evaluating model on validation set...
+2023-03-27 08:33:22,127 WARNING  [!] This fold metrics on validation set:
+2023-03-27 08:33:22,186 WARNING 	AUC: 0.9756
+2023-03-27 08:33:22,193 WARNING 	F1: 0.6928
+2023-03-27 08:33:56,469 WARNING  [2/3] Train set size: 50751, Validation set size: 25375
+2023-03-27 08:35:55,576 WARNING  [!] Saved dataset splits to dataset_splits_1679898802.npz
+2023-03-27 08:35:55,618 WARNING  [!] Iniatialized model. Total trainable parameters: 0.4278e6
+2023-03-27 08:35:55,618 WARNING  [*] Training time budget set: 5.0 min
+2023-03-27 08:36:16,227 WARNING  [*] Started epoch: 1
+2023-03-27 08:36:16,815 WARNING  [*] 08:36:16: Train Epoch: 1 [  0  /50751 (0 %)] | Loss: 2.137566 | Elapsed: 0.59s
+2023-03-27 08:36:36,932 WARNING  [*] 08:36:36: Train Epoch: 1 [9600 /50751 (19%)] | Loss: 1.745954 | Elapsed: 20.12s
+2023-03-27 08:36:58,938 WARNING  [*] 08:36:58: Train Epoch: 1 [19200/50751 (38%)] | Loss: 1.269275 | Elapsed: 22.01s
+2023-03-27 08:37:20,884 WARNING  [*] 08:37:20: Train Epoch: 1 [28800/50751 (57%)] | Loss: 0.884118 | Elapsed: 21.94s
+2023-03-27 08:37:43,813 WARNING  [*] 08:37:43: Train Epoch: 1 [38400/50751 (76%)] | Loss: 0.981396 | Elapsed: 22.93s
+2023-03-27 08:38:08,701 WARNING  [*] 08:38:08: Train Epoch: 1 [48000/50751 (95%)] | Loss: 0.814604 | Elapsed: 24.89s
+2023-03-27 08:38:16,473 WARNING  [*] Mon Mar 27 08:38:16 2023:    1    | Tr.loss: 1.241799 | Elapsed:  120.23  s
+2023-03-27 08:38:16,473 WARNING  [*] Started epoch: 2
+2023-03-27 08:38:16,680 WARNING  [*] 08:38:16: Train Epoch: 2 [  0  /50751 (0 %)] | Loss: 0.822801 | Elapsed: 0.21s
+2023-03-27 08:38:37,663 WARNING  [*] 08:38:37: Train Epoch: 2 [9600 /50751 (19%)] | Loss: 0.797453 | Elapsed: 20.98s
+2023-03-27 08:38:58,807 WARNING  [*] 08:38:58: Train Epoch: 2 [19200/50751 (38%)] | Loss: 0.753180 | Elapsed: 21.14s
+2023-03-27 08:39:20,519 WARNING  [*] 08:39:20: Train Epoch: 2 [28800/50751 (57%)] | Loss: 0.572826 | Elapsed: 21.71s
+2023-03-27 08:39:42,311 WARNING  [*] 08:39:42: Train Epoch: 2 [38400/50751 (76%)] | Loss: 0.609532 | Elapsed: 21.79s
+2023-03-27 08:40:04,213 WARNING  [*] 08:40:04: Train Epoch: 2 [48000/50751 (95%)] | Loss: 0.489481 | Elapsed: 21.90s
+2023-03-27 08:40:10,278 WARNING  [*] Mon Mar 27 08:40:10 2023:    2    | Tr.loss: 0.676446 | Elapsed:  113.80  s
+2023-03-27 08:40:10,279 WARNING  [*] Started epoch: 3
+2023-03-27 08:40:10,507 WARNING  [*] 08:40:10: Train Epoch: 3 [  0  /50751 (0 %)] | Loss: 0.394202 | Elapsed: 0.23s
+2023-03-27 08:40:32,169 WARNING  [*] 08:40:32: Train Epoch: 3 [9600 /50751 (19%)] | Loss: 0.565731 | Elapsed: 21.66s
+2023-03-27 08:40:53,503 WARNING  [*] 08:40:53: Train Epoch: 3 [19200/50751 (38%)] | Loss: 0.634003 | Elapsed: 21.33s
+2023-03-27 08:40:55,780 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-27 08:40:55,830 WARNING  [!] Mon Mar 27 08:40:55 2023: Dumped results:
+                model       : 1679898802-model.torch
+		train time  : 1679898802-trainTime.npy
+		train losses: 1679898802-trainLosses.npy
+		train AUC   : 1679898802-auc.npy
+		train F1s   : 1679898802-trainF1s.npy
+		train TPRs  : 1679898802-trainTPRs.npy
+2023-03-27 08:40:58,330 WARNING  [!] Evaluating model on training set...
+2023-03-27 08:41:37,644 WARNING  [!] This fold metrics on training set:
+2023-03-27 08:41:37,792 WARNING 	AUC: 0.9711
+2023-03-27 08:41:37,811 WARNING 	F1: 0.7104
+2023-03-27 08:41:37,811 WARNING  [!] Evaluating model on validation set...
+2023-03-27 08:41:59,712 WARNING  [!] This fold metrics on validation set:
+2023-03-27 08:41:59,806 WARNING 	AUC: 0.9699
+2023-03-27 08:41:59,816 WARNING 	F1: 0.7144
+2023-03-27 08:43:03,042 WARNING  [3/3] Train set size: 50751, Validation set size: 25375
+2023-03-27 08:44:58,065 WARNING  [!] Saved dataset splits to dataset_splits_1679899319.npz
+2023-03-27 08:44:58,107 WARNING  [!] Iniatialized model. Total trainable parameters: 0.4278e6
+2023-03-27 08:44:58,107 WARNING  [*] Training time budget set: 5.0 min
+2023-03-27 08:45:12,042 WARNING  [*] Started epoch: 1
+2023-03-27 08:45:12,739 WARNING  [*] 08:45:12: Train Epoch: 1 [  0  /50751 (0 %)] | Loss: 2.076350 | Elapsed: 0.69s
+2023-03-27 08:45:33,678 WARNING  [*] 08:45:33: Train Epoch: 1 [9600 /50751 (19%)] | Loss: 1.625608 | Elapsed: 20.94s
+2023-03-27 08:45:53,967 WARNING  [*] 08:45:53: Train Epoch: 1 [19200/50751 (38%)] | Loss: 1.167660 | Elapsed: 20.29s
+2023-03-27 08:46:14,257 WARNING  [*] 08:46:14: Train Epoch: 1 [28800/50751 (57%)] | Loss: 1.091669 | Elapsed: 20.29s
+2023-03-27 08:46:34,876 WARNING  [*] 08:46:34: Train Epoch: 1 [38400/50751 (76%)] | Loss: 0.926811 | Elapsed: 20.62s
+2023-03-27 08:46:55,525 WARNING  [*] 08:46:55: Train Epoch: 1 [48000/50751 (95%)] | Loss: 0.822075 | Elapsed: 20.65s
+2023-03-27 08:47:01,847 WARNING  [*] Mon Mar 27 08:47:01 2023:    1    | Tr.loss: 1.204728 | Elapsed:  109.80  s
+2023-03-27 08:47:01,847 WARNING  [*] Started epoch: 2
+2023-03-27 08:47:02,049 WARNING  [*] 08:47:02: Train Epoch: 2 [  0  /50751 (0 %)] | Loss: 0.868998 | Elapsed: 0.20s
+2023-03-27 08:47:22,634 WARNING  [*] 08:47:22: Train Epoch: 2 [9600 /50751 (19%)] | Loss: 0.796514 | Elapsed: 20.58s
+2023-03-27 08:47:44,867 WARNING  [*] 08:47:44: Train Epoch: 2 [19200/50751 (38%)] | Loss: 0.658199 | Elapsed: 22.23s
+2023-03-27 08:48:07,115 WARNING  [*] 08:48:07: Train Epoch: 2 [28800/50751 (57%)] | Loss: 0.564050 | Elapsed: 22.25s
+2023-03-27 08:48:28,963 WARNING  [*] 08:48:28: Train Epoch: 2 [38400/50751 (76%)] | Loss: 0.605871 | Elapsed: 21.85s
+2023-03-27 08:48:52,045 WARNING  [*] 08:48:52: Train Epoch: 2 [48000/50751 (95%)] | Loss: 0.661833 | Elapsed: 23.08s
+2023-03-27 08:48:58,285 WARNING  [*] Mon Mar 27 08:48:58 2023:    2    | Tr.loss: 0.665043 | Elapsed:  116.44  s
+2023-03-27 08:48:58,286 WARNING  [*] Started epoch: 3
+2023-03-27 08:48:58,499 WARNING  [*] 08:48:58: Train Epoch: 3 [  0  /50751 (0 %)] | Loss: 0.529016 | Elapsed: 0.21s
+2023-03-27 08:49:19,390 WARNING  [*] 08:49:19: Train Epoch: 3 [9600 /50751 (19%)] | Loss: 0.717788 | Elapsed: 20.89s
+2023-03-27 08:49:41,064 WARNING  [*] 08:49:41: Train Epoch: 3 [19200/50751 (38%)] | Loss: 0.427306 | Elapsed: 21.67s
+2023-03-27 08:49:58,282 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-27 08:49:58,318 WARNING  [!] Mon Mar 27 08:49:58 2023: Dumped results:
+                model       : 1679899319-model.torch
+		train time  : 1679899319-trainTime.npy
+		train losses: 1679899319-trainLosses.npy
+		train AUC   : 1679899319-auc.npy
+		train F1s   : 1679899319-trainF1s.npy
+		train TPRs  : 1679899319-trainTPRs.npy
+2023-03-27 08:50:02,165 WARNING  [!] Evaluating model on training set...
+2023-03-27 08:50:39,702 WARNING  [!] This fold metrics on training set:
+2023-03-27 08:50:39,883 WARNING 	AUC: 0.9683
+2023-03-27 08:50:39,905 WARNING 	F1: 0.7227
+2023-03-27 08:50:39,906 WARNING  [!] Evaluating model on validation set...
+2023-03-27 08:50:58,514 WARNING  [!] This fold metrics on validation set:
+2023-03-27 08:50:58,597 WARNING 	AUC: 0.9663
+2023-03-27 08:50:58,605 WARNING 	F1: 0.7105
+2023-03-27 08:51:00,506 WARNING  [!] Metrics saved to out_speakeasy_multiclass\cv_dmds_limNone_r1763_t5\dmds_metrics_validation.json
+2023-03-27 08:51:00,508 WARNING  [!] Metrics saved to out_speakeasy_multiclass\cv_dmds_limNone_r1763_t5\dmds_metrics_training.json
+2023-03-27 08:51:00,508 WARNING  [!] Average epoch time: 0.02s | Mean values over 3 folds:
+	AUC: 0.9706
+

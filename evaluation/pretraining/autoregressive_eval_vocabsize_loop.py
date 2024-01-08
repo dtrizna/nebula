@@ -20,22 +20,22 @@ from nebula.models.attention import TransformerEncoderChunks, TransformerEncoder
 VOCABS = {'8k': 8192}#, '16k': 16384, '32k': 32768}
 
 # if clean training
-# LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"autoregressive_{int(time())}")
-# TIMESTAMPS = None
+LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"autoregressive_no_ffnn_{int(time())}")
+TIMESTAMPS = None
 
 # if previously trained
-LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"autoregressive_1704652486")
-TIMESTAMPS = ["1704652487"]
+# LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"autoregressive_1704652486")
+# TIMESTAMPS = ["1704652487"]
 
 VERBOSE = True
 LIMIT = None
 
 CONTEXT_LEN = 256
 PRETRAINING_EPOCHS = 3
-PRETRAIN_BATCH_SIZE = 96
+PRETRAIN_BATCH_SIZE = 64
 
 DOWNSTREAM_EPOCHS = 5
-DOWNSTREAM_BATCH_SIZE = 32
+DOWNSTREAM_BATCH_SIZE = 16
 
 DEVICE = "gpu"
 DATALOADER_WORKERS = 4
@@ -43,7 +43,7 @@ LOG_EVERY_N_STEPS = 1
 SSL_EVAL_SPLITS = 1
 # efficient training methods
 GRAD_CLIP_VALUE = 1.0
-ACCUMULATE_GRAD_BATCHES = None # default, batch_sizes are big enough
+ACCUMULATE_GRAD_BATCHES = 4 # default, batch_sizes are big enough
 
 # NOTE: scheduler is incompatible with REMASK_EVERY_N_EPOCHS 
 # and DUMP_MODEL_EVERY_EPOCH because of lighning nuances
@@ -102,13 +102,13 @@ def main(vocab_size_str, random_state=33):
         "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
         "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
         "numClasses": 1, # binary classification
-        "hiddenNeurons": [64], # classifier ffnn dims
+        "hiddenNeurons": None, # classifier ffnn dims
         "layerNorm": False,
         "dropout": None,
         "norm_first": True,
         "pretrain_layers": [1024],
         "causal_attention": True,
-        # "pooling": None # TODO: when training from scratch: specify this
+        "pooling": None
     }
     # NOTE: for pretraining 0 is good, for finetuning try 0.1+
     model_config['dropout'] = 0.0
@@ -117,6 +117,8 @@ def main(vocab_size_str, random_state=33):
     model_config['dropout'] = 0.3
     model_config['pretrain_layers'] = None
     model_config['causal_attention'] = False
+    # NOTE: downstream model requires pooling to aggregate Transformer output
+    model_config['pooling'] = "mean"
     downstream_model = TransformerEncoderModel(**model_config)
     print(f"[!] Models ready.")
     
