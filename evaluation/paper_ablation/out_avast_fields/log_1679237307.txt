@@ -1,0 +1,1500 @@
+2023-03-19 15:48:27,038 WARNING  [!!!] Working on resolved_apis!
+2023-03-19 15:48:27,039 WARNING  [!] Reading and normalizing reports...
+2023-03-19 15:58:48,721 WARNING  [!] Tokenizing and encoding train data!
+2023-03-19 15:58:48,721 WARNING  [!] Size: 39180 | Class counts in test:
+Counter({1: 11557, 5: 10094, 4: 3881, 3: 3362, 6: 3337, 9: 2701, 8: 2088, 7: 1062, 0: 566, 2: 532})
+2023-03-19 15:58:48,721 WARNING  [*] Initializing tokenizer training...
+2023-03-19 15:58:59,006 WARNING Dumped vocab to out_avast_fields_1679237307\resolved_apis_vocab_30000_seqlen_512\tokenizer_30000_vocab.json
+2023-03-19 15:58:59,039 WARNING Dumped vocab counter to out_avast_fields_1679237307\resolved_apis_vocab_30000_seqlen_512\tokenizer_30000_counter.json
+2023-03-19 15:59:10,889 WARNING [!] Tokenizing and encoding test data!
+2023-03-19 15:59:10,889 WARNING  [!] Size: 9796 | Class counts in test:
+Counter({1: 11557, 5: 10094, 4: 3881, 3: 3362, 6: 3337, 9: 2701, 8: 2088, 7: 1062, 0: 566, 2: 532})
+2023-03-19 15:59:13,992 WARNING  [!!!] Starting CV over resolved_apis!
+2023-03-19 15:59:14,079 WARNING  [!] Training time budget: 300min
+2023-03-19 15:59:14,079 WARNING  [!] Model config: {'vocab_size': 13908, 'maxlen': 512, 'chunk_size': 64, 'dModel': 64, 'nHeads': 8, 'dHidden': 256, 'nLayers': 2, 'numClasses': 10, 'hiddenNeurons': [64], 'layerNorm': False, 'dropout': 0.3, 'mean_over_sequence': False, 'norm_first': True}
+2023-03-19 15:59:14,122 WARNING  [1/3] Train set size: 26120, Validation set size: 13060
+2023-03-19 15:59:15,367 WARNING  [!] Saved dataset splits to dataset_splits_1679237954.npz
+2023-03-19 15:59:16,477 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 3.0879e6
+2023-03-19 15:59:16,477 WARNING  [*] Training time budget set: 5.0 min
+2023-03-19 15:59:16,485 WARNING  [*] Started epoch: 1
+2023-03-19 15:59:18,433 WARNING  [*] 15:59:18: Train Epoch: 1 [  0  /26120 (0 %)] | Loss: 9.920627 | Elapsed: 1.95s
+2023-03-19 15:59:28,372 WARNING  [*] 15:59:28: Train Epoch: 1 [9600 /26120 (37%)] | Loss: 1.192610 | Elapsed: 9.94s
+2023-03-19 15:59:38,043 WARNING  [*] 15:59:38: Train Epoch: 1 [19200/26120 (73%)] | Loss: 1.056011 | Elapsed: 9.67s
+2023-03-19 15:59:44,979 WARNING  [*] Sun Mar 19 15:59:44 2023:    1    | Tr.loss: 1.427544 | Elapsed:   28.49  s
+2023-03-19 15:59:44,979 WARNING  [*] Started epoch: 2
+2023-03-19 15:59:45,087 WARNING  [*] 15:59:45: Train Epoch: 2 [  0  /26120 (0 %)] | Loss: 0.849098 | Elapsed: 0.11s
+2023-03-19 15:59:54,810 WARNING  [*] 15:59:54: Train Epoch: 2 [9600 /26120 (37%)] | Loss: 0.694252 | Elapsed: 9.72s
+2023-03-19 16:00:04,575 WARNING  [*] 16:00:04: Train Epoch: 2 [19200/26120 (73%)] | Loss: 0.756973 | Elapsed: 9.77s
+2023-03-19 16:00:11,603 WARNING  [*] Sun Mar 19 16:00:11 2023:    2    | Tr.loss: 0.712680 | Elapsed:   26.62  s
+2023-03-19 16:00:11,603 WARNING  [*] Started epoch: 3
+2023-03-19 16:00:11,701 WARNING  [*] 16:00:11: Train Epoch: 3 [  0  /26120 (0 %)] | Loss: 0.485978 | Elapsed: 0.10s
+2023-03-19 16:00:21,470 WARNING  [*] 16:00:21: Train Epoch: 3 [9600 /26120 (37%)] | Loss: 0.575986 | Elapsed: 9.77s
+2023-03-19 16:00:31,461 WARNING  [*] 16:00:31: Train Epoch: 3 [19200/26120 (73%)] | Loss: 0.341037 | Elapsed: 9.99s
+2023-03-19 16:00:38,473 WARNING  [*] Sun Mar 19 16:00:38 2023:    3    | Tr.loss: 0.466531 | Elapsed:   26.87  s
+2023-03-19 16:00:38,473 WARNING  [*] Started epoch: 4
+2023-03-19 16:00:38,563 WARNING  [*] 16:00:38: Train Epoch: 4 [  0  /26120 (0 %)] | Loss: 0.290296 | Elapsed: 0.09s
+2023-03-19 16:00:48,350 WARNING  [*] 16:00:48: Train Epoch: 4 [9600 /26120 (37%)] | Loss: 0.490010 | Elapsed: 9.79s
+2023-03-19 16:00:58,167 WARNING  [*] 16:00:58: Train Epoch: 4 [19200/26120 (73%)] | Loss: 0.302283 | Elapsed: 9.82s
+2023-03-19 16:01:05,217 WARNING  [*] Sun Mar 19 16:01:05 2023:    4    | Tr.loss: 0.318473 | Elapsed:   26.74  s
+2023-03-19 16:01:05,217 WARNING  [*] Started epoch: 5
+2023-03-19 16:01:05,317 WARNING  [*] 16:01:05: Train Epoch: 5 [  0  /26120 (0 %)] | Loss: 0.123122 | Elapsed: 0.10s
+2023-03-19 16:01:15,120 WARNING  [*] 16:01:15: Train Epoch: 5 [9600 /26120 (37%)] | Loss: 0.151250 | Elapsed: 9.80s
+2023-03-19 16:01:24,972 WARNING  [*] 16:01:24: Train Epoch: 5 [19200/26120 (73%)] | Loss: 0.164344 | Elapsed: 9.85s
+2023-03-19 16:01:32,022 WARNING  [*] Sun Mar 19 16:01:32 2023:    5    | Tr.loss: 0.223888 | Elapsed:   26.80  s
+2023-03-19 16:01:32,022 WARNING  [*] Started epoch: 6
+2023-03-19 16:01:32,130 WARNING  [*] 16:01:32: Train Epoch: 6 [  0  /26120 (0 %)] | Loss: 0.144044 | Elapsed: 0.11s
+2023-03-19 16:01:41,947 WARNING  [*] 16:01:41: Train Epoch: 6 [9600 /26120 (37%)] | Loss: 0.111659 | Elapsed: 9.82s
+2023-03-19 16:01:51,971 WARNING  [*] 16:01:51: Train Epoch: 6 [19200/26120 (73%)] | Loss: 0.167842 | Elapsed: 10.02s
+2023-03-19 16:01:59,013 WARNING  [*] Sun Mar 19 16:01:59 2023:    6    | Tr.loss: 0.166373 | Elapsed:   26.99  s
+2023-03-19 16:01:59,013 WARNING  [*] Started epoch: 7
+2023-03-19 16:01:59,111 WARNING  [*] 16:01:59: Train Epoch: 7 [  0  /26120 (0 %)] | Loss: 0.163291 | Elapsed: 0.10s
+2023-03-19 16:02:08,925 WARNING  [*] 16:02:08: Train Epoch: 7 [9600 /26120 (37%)] | Loss: 0.146331 | Elapsed: 9.81s
+2023-03-19 16:02:18,745 WARNING  [*] 16:02:18: Train Epoch: 7 [19200/26120 (73%)] | Loss: 0.102771 | Elapsed: 9.82s
+2023-03-19 16:02:25,786 WARNING  [*] Sun Mar 19 16:02:25 2023:    7    | Tr.loss: 0.135639 | Elapsed:   26.77  s
+2023-03-19 16:02:25,786 WARNING  [*] Started epoch: 8
+2023-03-19 16:02:25,893 WARNING  [*] 16:02:25: Train Epoch: 8 [  0  /26120 (0 %)] | Loss: 0.083404 | Elapsed: 0.11s
+2023-03-19 16:02:35,719 WARNING  [*] 16:02:35: Train Epoch: 8 [9600 /26120 (37%)] | Loss: 0.324761 | Elapsed: 9.83s
+2023-03-19 16:02:45,536 WARNING  [*] 16:02:45: Train Epoch: 8 [19200/26120 (73%)] | Loss: 0.095691 | Elapsed: 9.82s
+2023-03-19 16:02:52,577 WARNING  [*] Sun Mar 19 16:02:52 2023:    8    | Tr.loss: 0.112817 | Elapsed:   26.79  s
+2023-03-19 16:02:52,577 WARNING  [*] Started epoch: 9
+2023-03-19 16:02:52,691 WARNING  [*] 16:02:52: Train Epoch: 9 [  0  /26120 (0 %)] | Loss: 0.113944 | Elapsed: 0.11s
+2023-03-19 16:03:02,495 WARNING  [*] 16:03:02: Train Epoch: 9 [9600 /26120 (37%)] | Loss: 0.209214 | Elapsed: 9.80s
+2023-03-19 16:03:12,524 WARNING  [*] 16:03:12: Train Epoch: 9 [19200/26120 (73%)] | Loss: 0.121438 | Elapsed: 10.03s
+2023-03-19 16:03:19,567 WARNING  [*] Sun Mar 19 16:03:19 2023:    9    | Tr.loss: 0.098396 | Elapsed:   26.99  s
+2023-03-19 16:03:19,567 WARNING  [*] Started epoch: 10
+2023-03-19 16:03:19,670 WARNING  [*] 16:03:19: Train Epoch: 10 [  0  /26120 (0 %)] | Loss: 0.023928 | Elapsed: 0.10s
+2023-03-19 16:03:29,494 WARNING  [*] 16:03:29: Train Epoch: 10 [9600 /26120 (37%)] | Loss: 0.035253 | Elapsed: 9.82s
+2023-03-19 16:03:39,325 WARNING  [*] 16:03:39: Train Epoch: 10 [19200/26120 (73%)] | Loss: 0.200569 | Elapsed: 9.83s
+2023-03-19 16:03:46,391 WARNING  [*] Sun Mar 19 16:03:46 2023:   10    | Tr.loss: 0.083808 | Elapsed:   26.82  s
+2023-03-19 16:03:46,391 WARNING  [*] Started epoch: 11
+2023-03-19 16:03:46,489 WARNING  [*] 16:03:46: Train Epoch: 11 [  0  /26120 (0 %)] | Loss: 0.044147 | Elapsed: 0.10s
+2023-03-19 16:03:56,345 WARNING  [*] 16:03:56: Train Epoch: 11 [9600 /26120 (37%)] | Loss: 0.101076 | Elapsed: 9.86s
+2023-03-19 16:04:06,180 WARNING  [*] 16:04:06: Train Epoch: 11 [19200/26120 (73%)] | Loss: 0.038577 | Elapsed: 9.83s
+2023-03-19 16:04:13,234 WARNING  [*] Sun Mar 19 16:04:13 2023:   11    | Tr.loss: 0.071609 | Elapsed:   26.84  s
+2023-03-19 16:04:13,234 WARNING  [*] Started epoch: 12
+2023-03-19 16:04:13,333 WARNING  [*] 16:04:13: Train Epoch: 12 [  0  /26120 (0 %)] | Loss: 0.025607 | Elapsed: 0.10s
+2023-03-19 16:04:16,478 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-19 16:04:16,522 WARNING  [!] Sun Mar 19 16:04:16 2023: Dumped results:
+                model       : 1679237954-model.torch
+		train time  : 1679237954-trainTime.npy
+		train losses: 1679237954-trainLosses.npy
+		train AUC   : 1679237954-auc.npy
+		train F1s   : 1679237954-trainF1s.npy
+		train TPRs  : 1679237954-trainTPRs.npy
+2023-03-19 16:04:16,530 WARNING  [!] Evaluating model on training set...
+2023-03-19 16:04:23,545 WARNING  [!] This fold metrics on training set:
+2023-03-19 16:04:23,593 WARNING 	AUC: 0.9998
+2023-03-19 16:04:23,606 WARNING 	F1: 0.9793
+2023-03-19 16:04:23,606 WARNING  [!] Evaluating model on validation set...
+2023-03-19 16:04:27,122 WARNING  [!] This fold metrics on validation set:
+2023-03-19 16:04:27,139 WARNING 	AUC: 0.9992
+2023-03-19 16:04:27,148 WARNING 	F1: 0.9725
+2023-03-19 16:04:27,379 WARNING  [2/3] Train set size: 26120, Validation set size: 13060
+2023-03-19 16:04:28,551 WARNING  [!] Saved dataset splits to dataset_splits_1679238267.npz
+2023-03-19 16:04:28,616 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 3.0879e6
+2023-03-19 16:04:28,616 WARNING  [*] Training time budget set: 5.0 min
+2023-03-19 16:04:28,626 WARNING  [*] Started epoch: 1
+2023-03-19 16:04:28,750 WARNING  [*] 16:04:28: Train Epoch: 1 [  0  /26120 (0 %)] | Loss: 7.563233 | Elapsed: 0.12s
+2023-03-19 16:04:38,594 WARNING  [*] 16:04:38: Train Epoch: 1 [9600 /26120 (37%)] | Loss: 1.377014 | Elapsed: 9.84s
+2023-03-19 16:04:48,422 WARNING  [*] 16:04:48: Train Epoch: 1 [19200/26120 (73%)] | Loss: 1.000085 | Elapsed: 9.83s
+2023-03-19 16:04:55,472 WARNING  [*] Sun Mar 19 16:04:55 2023:    1    | Tr.loss: 1.354994 | Elapsed:   26.85  s
+2023-03-19 16:04:55,472 WARNING  [*] Started epoch: 2
+2023-03-19 16:04:55,583 WARNING  [*] 16:04:55: Train Epoch: 2 [  0  /26120 (0 %)] | Loss: 0.843761 | Elapsed: 0.10s
+2023-03-19 16:05:05,421 WARNING  [*] 16:05:05: Train Epoch: 2 [9600 /26120 (37%)] | Loss: 0.752585 | Elapsed: 9.84s
+2023-03-19 16:05:15,244 WARNING  [*] 16:05:15: Train Epoch: 2 [19200/26120 (73%)] | Loss: 0.819202 | Elapsed: 9.82s
+2023-03-19 16:05:22,318 WARNING  [*] Sun Mar 19 16:05:22 2023:    2    | Tr.loss: 0.767918 | Elapsed:   26.85  s
+2023-03-19 16:05:22,318 WARNING  [*] Started epoch: 3
+2023-03-19 16:05:22,421 WARNING  [*] 16:05:22: Train Epoch: 3 [  0  /26120 (0 %)] | Loss: 0.567012 | Elapsed: 0.10s
+2023-03-19 16:05:32,270 WARNING  [*] 16:05:32: Train Epoch: 3 [9600 /26120 (37%)] | Loss: 0.568621 | Elapsed: 9.85s
+2023-03-19 16:05:42,123 WARNING  [*] 16:05:42: Train Epoch: 3 [19200/26120 (73%)] | Loss: 0.466649 | Elapsed: 9.85s
+2023-03-19 16:05:49,399 WARNING  [*] Sun Mar 19 16:05:49 2023:    3    | Tr.loss: 0.538732 | Elapsed:   27.08  s
+2023-03-19 16:05:49,399 WARNING  [*] Started epoch: 4
+2023-03-19 16:05:49,513 WARNING  [*] 16:05:49: Train Epoch: 4 [  0  /26120 (0 %)] | Loss: 0.671843 | Elapsed: 0.11s
+2023-03-19 16:05:59,351 WARNING  [*] 16:05:59: Train Epoch: 4 [9600 /26120 (37%)] | Loss: 0.400386 | Elapsed: 9.84s
+2023-03-19 16:06:09,200 WARNING  [*] 16:06:09: Train Epoch: 4 [19200/26120 (73%)] | Loss: 0.260962 | Elapsed: 9.85s
+2023-03-19 16:06:16,310 WARNING  [*] Sun Mar 19 16:06:16 2023:    4    | Tr.loss: 0.389494 | Elapsed:   26.91  s
+2023-03-19 16:06:16,310 WARNING  [*] Started epoch: 5
+2023-03-19 16:06:16,410 WARNING  [*] 16:06:16: Train Epoch: 5 [  0  /26120 (0 %)] | Loss: 0.241770 | Elapsed: 0.10s
+2023-03-19 16:06:26,247 WARNING  [*] 16:06:26: Train Epoch: 5 [9600 /26120 (37%)] | Loss: 0.325122 | Elapsed: 9.84s
+2023-03-19 16:06:36,105 WARNING  [*] 16:06:36: Train Epoch: 5 [19200/26120 (73%)] | Loss: 0.264434 | Elapsed: 9.86s
+2023-03-19 16:06:43,162 WARNING  [*] Sun Mar 19 16:06:43 2023:    5    | Tr.loss: 0.272194 | Elapsed:   26.85  s
+2023-03-19 16:06:43,173 WARNING  [*] Started epoch: 6
+2023-03-19 16:06:43,273 WARNING  [*] 16:06:43: Train Epoch: 6 [  0  /26120 (0 %)] | Loss: 0.254042 | Elapsed: 0.10s
+2023-03-19 16:06:53,153 WARNING  [*] 16:06:53: Train Epoch: 6 [9600 /26120 (37%)] | Loss: 0.203311 | Elapsed: 9.88s
+2023-03-19 16:07:02,994 WARNING  [*] 16:07:02: Train Epoch: 6 [19200/26120 (73%)] | Loss: 0.158613 | Elapsed: 9.84s
+2023-03-19 16:07:10,045 WARNING  [*] Sun Mar 19 16:07:10 2023:    6    | Tr.loss: 0.198290 | Elapsed:   26.88  s
+2023-03-19 16:07:10,045 WARNING  [*] Started epoch: 7
+2023-03-19 16:07:10,150 WARNING  [*] 16:07:10: Train Epoch: 7 [  0  /26120 (0 %)] | Loss: 0.290472 | Elapsed: 0.10s
+2023-03-19 16:07:20,178 WARNING  [*] 16:07:20: Train Epoch: 7 [9600 /26120 (37%)] | Loss: 0.216806 | Elapsed: 10.03s
+2023-03-19 16:07:30,028 WARNING  [*] 16:07:30: Train Epoch: 7 [19200/26120 (73%)] | Loss: 0.100845 | Elapsed: 9.85s
+2023-03-19 16:07:37,099 WARNING  [*] Sun Mar 19 16:07:37 2023:    7    | Tr.loss: 0.158396 | Elapsed:   27.05  s
+2023-03-19 16:07:37,099 WARNING  [*] Started epoch: 8
+2023-03-19 16:07:37,202 WARNING  [*] 16:07:37: Train Epoch: 8 [  0  /26120 (0 %)] | Loss: 0.157930 | Elapsed: 0.10s
+2023-03-19 16:07:47,047 WARNING  [*] 16:07:47: Train Epoch: 8 [9600 /26120 (37%)] | Loss: 0.077186 | Elapsed: 9.85s
+2023-03-19 16:07:56,898 WARNING  [*] 16:07:56: Train Epoch: 8 [19200/26120 (73%)] | Loss: 0.148551 | Elapsed: 9.85s
+2023-03-19 16:08:03,980 WARNING  [*] Sun Mar 19 16:08:03 2023:    8    | Tr.loss: 0.134600 | Elapsed:   26.88  s
+2023-03-19 16:08:03,996 WARNING  [*] Started epoch: 9
+2023-03-19 16:08:04,094 WARNING  [*] 16:08:04: Train Epoch: 9 [  0  /26120 (0 %)] | Loss: 0.066146 | Elapsed: 0.10s
+2023-03-19 16:08:13,941 WARNING  [*] 16:08:13: Train Epoch: 9 [9600 /26120 (37%)] | Loss: 0.123608 | Elapsed: 9.85s
+2023-03-19 16:08:23,799 WARNING  [*] 16:08:23: Train Epoch: 9 [19200/26120 (73%)] | Loss: 0.042610 | Elapsed: 9.86s
+2023-03-19 16:08:30,866 WARNING  [*] Sun Mar 19 16:08:30 2023:    9    | Tr.loss: 0.107018 | Elapsed:   26.87  s
+2023-03-19 16:08:30,866 WARNING  [*] Started epoch: 10
+2023-03-19 16:08:30,969 WARNING  [*] 16:08:30: Train Epoch: 10 [  0  /26120 (0 %)] | Loss: 0.148276 | Elapsed: 0.10s
+2023-03-19 16:08:40,818 WARNING  [*] 16:08:40: Train Epoch: 10 [9600 /26120 (37%)] | Loss: 0.096340 | Elapsed: 9.85s
+2023-03-19 16:08:50,882 WARNING  [*] 16:08:50: Train Epoch: 10 [19200/26120 (73%)] | Loss: 0.087906 | Elapsed: 10.06s
+2023-03-19 16:08:57,955 WARNING  [*] Sun Mar 19 16:08:57 2023:   10    | Tr.loss: 0.096314 | Elapsed:   27.09  s
+2023-03-19 16:08:57,955 WARNING  [*] Started epoch: 11
+2023-03-19 16:08:58,062 WARNING  [*] 16:08:58: Train Epoch: 11 [  0  /26120 (0 %)] | Loss: 0.061328 | Elapsed: 0.11s
+2023-03-19 16:09:07,917 WARNING  [*] 16:09:07: Train Epoch: 11 [9600 /26120 (37%)] | Loss: 0.076612 | Elapsed: 9.86s
+2023-03-19 16:09:17,770 WARNING  [*] 16:09:17: Train Epoch: 11 [19200/26120 (73%)] | Loss: 0.087346 | Elapsed: 9.85s
+2023-03-19 16:09:24,828 WARNING  [*] Sun Mar 19 16:09:24 2023:   11    | Tr.loss: 0.086738 | Elapsed:   26.87  s
+2023-03-19 16:09:24,828 WARNING  [*] Started epoch: 12
+2023-03-19 16:09:24,941 WARNING  [*] 16:09:24: Train Epoch: 12 [  0  /26120 (0 %)] | Loss: 0.072536 | Elapsed: 0.11s
+2023-03-19 16:09:28,683 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-19 16:09:28,706 WARNING  [!] Sun Mar 19 16:09:28 2023: Dumped results:
+                model       : 1679238267-model.torch
+		train time  : 1679238267-trainTime.npy
+		train losses: 1679238267-trainLosses.npy
+		train AUC   : 1679238267-auc.npy
+		train F1s   : 1679238267-trainF1s.npy
+		train TPRs  : 1679238267-trainTPRs.npy
+2023-03-19 16:09:28,731 WARNING  [!] Evaluating model on training set...
+2023-03-19 16:09:35,746 WARNING  [!] This fold metrics on training set:
+2023-03-19 16:09:35,799 WARNING 	AUC: 0.9998
+2023-03-19 16:09:35,803 WARNING 	F1: 0.9831
+2023-03-19 16:09:35,803 WARNING  [!] Evaluating model on validation set...
+2023-03-19 16:09:39,325 WARNING  [!] This fold metrics on validation set:
+2023-03-19 16:09:39,344 WARNING 	AUC: 0.9993
+2023-03-19 16:09:39,349 WARNING 	F1: 0.9719
+2023-03-19 16:09:39,599 WARNING  [3/3] Train set size: 26120, Validation set size: 13060
+2023-03-19 16:09:40,765 WARNING  [!] Saved dataset splits to dataset_splits_1679238579.npz
+2023-03-19 16:09:40,836 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 3.0879e6
+2023-03-19 16:09:40,836 WARNING  [*] Training time budget set: 5.0 min
+2023-03-19 16:09:40,849 WARNING  [*] Started epoch: 1
+2023-03-19 16:09:41,002 WARNING  [*] 16:09:41: Train Epoch: 1 [  0  /26120 (0 %)] | Loss: 9.136636 | Elapsed: 0.15s
+2023-03-19 16:09:50,841 WARNING  [*] 16:09:50: Train Epoch: 1 [9600 /26120 (37%)] | Loss: 1.354939 | Elapsed: 9.84s
+2023-03-19 16:10:00,696 WARNING  [*] 16:10:00: Train Epoch: 1 [19200/26120 (73%)] | Loss: 0.958730 | Elapsed: 9.86s
+2023-03-19 16:10:07,763 WARNING  [*] Sun Mar 19 16:10:07 2023:    1    | Tr.loss: 1.453721 | Elapsed:   26.91  s
+2023-03-19 16:10:07,763 WARNING  [*] Started epoch: 2
+2023-03-19 16:10:07,874 WARNING  [*] 16:10:07: Train Epoch: 2 [  0  /26120 (0 %)] | Loss: 1.011277 | Elapsed: 0.11s
+2023-03-19 16:10:17,733 WARNING  [*] 16:10:17: Train Epoch: 2 [9600 /26120 (37%)] | Loss: 0.850486 | Elapsed: 9.86s
+2023-03-19 16:10:27,591 WARNING  [*] 16:10:27: Train Epoch: 2 [19200/26120 (73%)] | Loss: 0.703492 | Elapsed: 9.86s
+2023-03-19 16:10:34,676 WARNING  [*] Sun Mar 19 16:10:34 2023:    2    | Tr.loss: 0.764151 | Elapsed:   26.91  s
+2023-03-19 16:10:34,676 WARNING  [*] Started epoch: 3
+2023-03-19 16:10:34,779 WARNING  [*] 16:10:34: Train Epoch: 3 [  0  /26120 (0 %)] | Loss: 0.514583 | Elapsed: 0.10s
+2023-03-19 16:10:44,625 WARNING  [*] 16:10:44: Train Epoch: 3 [9600 /26120 (37%)] | Loss: 0.442774 | Elapsed: 9.85s
+2023-03-19 16:10:54,488 WARNING  [*] 16:10:54: Train Epoch: 3 [19200/26120 (73%)] | Loss: 0.357258 | Elapsed: 9.86s
+2023-03-19 16:11:01,762 WARNING  [*] Sun Mar 19 16:11:01 2023:    3    | Tr.loss: 0.460888 | Elapsed:   27.09  s
+2023-03-19 16:11:01,762 WARNING  [*] Started epoch: 4
+2023-03-19 16:11:01,868 WARNING  [*] 16:11:01: Train Epoch: 4 [  0  /26120 (0 %)] | Loss: 0.425398 | Elapsed: 0.11s
+2023-03-19 16:11:11,744 WARNING  [*] 16:11:11: Train Epoch: 4 [9600 /26120 (37%)] | Loss: 0.375800 | Elapsed: 9.88s
+2023-03-19 16:11:21,583 WARNING  [*] 16:11:21: Train Epoch: 4 [19200/26120 (73%)] | Loss: 0.224923 | Elapsed: 9.84s
+2023-03-19 16:11:28,655 WARNING  [*] Sun Mar 19 16:11:28 2023:    4    | Tr.loss: 0.293493 | Elapsed:   26.89  s
+2023-03-19 16:11:28,655 WARNING  [*] Started epoch: 5
+2023-03-19 16:11:28,751 WARNING  [*] 16:11:28: Train Epoch: 5 [  0  /26120 (0 %)] | Loss: 0.394717 | Elapsed: 0.10s
+2023-03-19 16:11:38,634 WARNING  [*] 16:11:38: Train Epoch: 5 [9600 /26120 (37%)] | Loss: 0.151175 | Elapsed: 9.88s
+2023-03-19 16:11:48,493 WARNING  [*] 16:11:48: Train Epoch: 5 [19200/26120 (73%)] | Loss: 0.132767 | Elapsed: 9.86s
+2023-03-19 16:11:55,561 WARNING  [*] Sun Mar 19 16:11:55 2023:    5    | Tr.loss: 0.215137 | Elapsed:   26.91  s
+2023-03-19 16:11:55,561 WARNING  [*] Started epoch: 6
+2023-03-19 16:11:55,674 WARNING  [*] 16:11:55: Train Epoch: 6 [  0  /26120 (0 %)] | Loss: 0.107341 | Elapsed: 0.11s
+2023-03-19 16:12:05,531 WARNING  [*] 16:12:05: Train Epoch: 6 [9600 /26120 (37%)] | Loss: 0.147047 | Elapsed: 9.86s
+2023-03-19 16:12:15,392 WARNING  [*] 16:12:15: Train Epoch: 6 [19200/26120 (73%)] | Loss: 0.091691 | Elapsed: 9.86s
+2023-03-19 16:12:22,461 WARNING  [*] Sun Mar 19 16:12:22 2023:    6    | Tr.loss: 0.166750 | Elapsed:   26.90  s
+2023-03-19 16:12:22,461 WARNING  [*] Started epoch: 7
+2023-03-19 16:12:22,569 WARNING  [*] 16:12:22: Train Epoch: 7 [  0  /26120 (0 %)] | Loss: 0.143636 | Elapsed: 0.11s
+2023-03-19 16:12:32,617 WARNING  [*] 16:12:32: Train Epoch: 7 [9600 /26120 (37%)] | Loss: 0.085612 | Elapsed: 10.05s
+2023-03-19 16:12:42,458 WARNING  [*] 16:12:42: Train Epoch: 7 [19200/26120 (73%)] | Loss: 0.005282 | Elapsed: 9.84s
+2023-03-19 16:12:49,529 WARNING  [*] Sun Mar 19 16:12:49 2023:    7    | Tr.loss: 0.132711 | Elapsed:   27.07  s
+2023-03-19 16:12:49,529 WARNING  [*] Started epoch: 8
+2023-03-19 16:12:49,622 WARNING  [*] 16:12:49: Train Epoch: 8 [  0  /26120 (0 %)] | Loss: 0.066318 | Elapsed: 0.09s
+2023-03-19 16:12:59,480 WARNING  [*] 16:12:59: Train Epoch: 8 [9600 /26120 (37%)] | Loss: 0.064434 | Elapsed: 9.84s
+2023-03-19 16:13:09,346 WARNING  [*] 16:13:09: Train Epoch: 8 [19200/26120 (73%)] | Loss: 0.164267 | Elapsed: 9.87s
+2023-03-19 16:13:16,406 WARNING  [*] Sun Mar 19 16:13:16 2023:    8    | Tr.loss: 0.120828 | Elapsed:   26.88  s
+2023-03-19 16:13:16,406 WARNING  [*] Started epoch: 9
+2023-03-19 16:13:16,520 WARNING  [*] 16:13:16: Train Epoch: 9 [  0  /26120 (0 %)] | Loss: 0.084339 | Elapsed: 0.11s
+2023-03-19 16:13:26,367 WARNING  [*] 16:13:26: Train Epoch: 9 [9600 /26120 (37%)] | Loss: 0.071898 | Elapsed: 9.85s
+2023-03-19 16:13:36,234 WARNING  [*] 16:13:36: Train Epoch: 9 [19200/26120 (73%)] | Loss: 0.226515 | Elapsed: 9.87s
+2023-03-19 16:13:43,299 WARNING  [*] Sun Mar 19 16:13:43 2023:    9    | Tr.loss: 0.097321 | Elapsed:   26.89  s
+2023-03-19 16:13:43,299 WARNING  [*] Started epoch: 10
+2023-03-19 16:13:43,396 WARNING  [*] 16:13:43: Train Epoch: 10 [  0  /26120 (0 %)] | Loss: 0.084252 | Elapsed: 0.10s
+2023-03-19 16:13:53,293 WARNING  [*] 16:13:53: Train Epoch: 10 [9600 /26120 (37%)] | Loss: 0.221770 | Elapsed: 9.90s
+2023-03-19 16:14:03,356 WARNING  [*] 16:14:03: Train Epoch: 10 [19200/26120 (73%)] | Loss: 0.041166 | Elapsed: 10.06s
+2023-03-19 16:14:10,423 WARNING  [*] Sun Mar 19 16:14:10 2023:   10    | Tr.loss: 0.095419 | Elapsed:   27.12  s
+2023-03-19 16:14:10,423 WARNING  [*] Started epoch: 11
+2023-03-19 16:14:10,519 WARNING  [*] 16:14:10: Train Epoch: 11 [  0  /26120 (0 %)] | Loss: 0.082424 | Elapsed: 0.10s
+2023-03-19 16:14:20,386 WARNING  [*] 16:14:20: Train Epoch: 11 [9600 /26120 (37%)] | Loss: 0.006328 | Elapsed: 9.87s
+2023-03-19 16:14:30,254 WARNING  [*] 16:14:30: Train Epoch: 11 [19200/26120 (73%)] | Loss: 0.220042 | Elapsed: 9.87s
+2023-03-19 16:14:37,338 WARNING  [*] Sun Mar 19 16:14:37 2023:   11    | Tr.loss: 0.082524 | Elapsed:   26.91  s
+2023-03-19 16:14:37,338 WARNING  [*] Started epoch: 12
+2023-03-19 16:14:37,441 WARNING  [*] 16:14:37: Train Epoch: 12 [  0  /26120 (0 %)] | Loss: 0.050523 | Elapsed: 0.10s
+2023-03-19 16:14:40,881 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-19 16:14:40,911 WARNING  [!] Sun Mar 19 16:14:40 2023: Dumped results:
+                model       : 1679238579-model.torch
+		train time  : 1679238579-trainTime.npy
+		train losses: 1679238579-trainLosses.npy
+		train AUC   : 1679238579-auc.npy
+		train F1s   : 1679238579-trainF1s.npy
+		train TPRs  : 1679238579-trainTPRs.npy
+2023-03-19 16:14:40,936 WARNING  [!] Evaluating model on training set...
+2023-03-19 16:14:47,974 WARNING  [!] This fold metrics on training set:
+2023-03-19 16:14:48,026 WARNING 	AUC: 0.9997
+2023-03-19 16:14:48,032 WARNING 	F1: 0.9788
+2023-03-19 16:14:48,032 WARNING  [!] Evaluating model on validation set...
+2023-03-19 16:14:51,569 WARNING  [!] This fold metrics on validation set:
+2023-03-19 16:14:51,580 WARNING 	AUC: 0.9994
+2023-03-19 16:14:51,597 WARNING 	F1: 0.9748
+2023-03-19 16:14:51,807 WARNING  [!] Metrics saved to out_avast_fields_1679237307\cv_resolved_apis_limNone_r1763_t5\resolved_apis_metrics_validation.json
+2023-03-19 16:14:51,807 WARNING  [!] Metrics saved to out_avast_fields_1679237307\cv_resolved_apis_limNone_r1763_t5\resolved_apis_metrics_training.json
+2023-03-19 16:14:51,815 WARNING  [!] Average epoch time: 0.03s | Mean values over 3 folds:
+	AUC: 0.9993
+
+2023-03-19 16:14:52,019 WARNING  [!!!] Working on executed_commands!
+2023-03-19 16:14:52,021 WARNING  [!] Reading and normalizing reports...
+2023-03-19 16:24:13,743 WARNING  [!] Tokenizing and encoding train data!
+2023-03-19 16:24:13,756 WARNING  [!] Size: 39180 | Class counts in test:
+Counter({1: 11557, 5: 10094, 4: 3881, 3: 3362, 6: 3337, 9: 2701, 8: 2088, 7: 1062, 0: 566, 2: 532})
+2023-03-19 16:24:13,758 WARNING  [*] Initializing tokenizer training...
+2023-03-19 16:24:14,545 WARNING Dumped vocab to out_avast_fields_1679237307\executed_commands_vocab_30000_seqlen_512\tokenizer_30000_vocab.json
+2023-03-19 16:24:14,620 WARNING Dumped vocab counter to out_avast_fields_1679237307\executed_commands_vocab_30000_seqlen_512\tokenizer_30000_counter.json
+2023-03-19 16:24:16,027 WARNING [!] Tokenizing and encoding test data!
+2023-03-19 16:24:16,031 WARNING  [!] Size: 9796 | Class counts in test:
+Counter({1: 11557, 5: 10094, 4: 3881, 3: 3362, 6: 3337, 9: 2701, 8: 2088, 7: 1062, 0: 566, 2: 532})
+2023-03-19 16:24:16,494 WARNING  [!!!] Starting CV over executed_commands!
+2023-03-19 16:24:16,546 WARNING  [!] Training time budget: 300min
+2023-03-19 16:24:16,546 WARNING  [!] Model config: {'vocab_size': 30000, 'maxlen': 512, 'chunk_size': 64, 'dModel': 64, 'nHeads': 8, 'dHidden': 256, 'nLayers': 2, 'numClasses': 10, 'hiddenNeurons': [64], 'layerNorm': False, 'dropout': 0.3, 'mean_over_sequence': False, 'norm_first': True}
+2023-03-19 16:24:16,580 WARNING  [1/3] Train set size: 26120, Validation set size: 13060
+2023-03-19 16:24:17,012 WARNING  [!] Saved dataset splits to dataset_splits_1679239456.npz
+2023-03-19 16:24:17,423 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 4.1178e6
+2023-03-19 16:24:17,423 WARNING  [*] Training time budget set: 5.0 min
+2023-03-19 16:24:17,434 WARNING  [*] Started epoch: 1
+2023-03-19 16:24:17,903 WARNING  [*] 16:24:17: Train Epoch: 1 [  0  /26120 (0 %)] | Loss: 12.199249 | Elapsed: 0.47s
+2023-03-19 16:24:27,509 WARNING  [*] 16:24:27: Train Epoch: 1 [9600 /26120 (37%)] | Loss: 2.027143 | Elapsed: 9.61s
+2023-03-19 16:24:37,190 WARNING  [*] 16:24:37: Train Epoch: 1 [19200/26120 (73%)] | Loss: 2.010824 | Elapsed: 9.68s
+2023-03-19 16:24:44,126 WARNING  [*] Sun Mar 19 16:24:44 2023:    1    | Tr.loss: 2.157762 | Elapsed:   26.69  s
+2023-03-19 16:24:44,126 WARNING  [*] Started epoch: 2
+2023-03-19 16:24:44,229 WARNING  [*] 16:24:44: Train Epoch: 2 [  0  /26120 (0 %)] | Loss: 1.789864 | Elapsed: 0.10s
+2023-03-19 16:24:53,924 WARNING  [*] 16:24:53: Train Epoch: 2 [9600 /26120 (37%)] | Loss: 1.541940 | Elapsed: 9.69s
+2023-03-19 16:25:03,713 WARNING  [*] 16:25:03: Train Epoch: 2 [19200/26120 (73%)] | Loss: 1.106267 | Elapsed: 9.79s
+2023-03-19 16:25:10,835 WARNING  [*] Sun Mar 19 16:25:10 2023:    2    | Tr.loss: 1.430769 | Elapsed:   26.71  s
+2023-03-19 16:25:10,835 WARNING  [*] Started epoch: 3
+2023-03-19 16:25:10,934 WARNING  [*] 16:25:10: Train Epoch: 3 [  0  /26120 (0 %)] | Loss: 1.076410 | Elapsed: 0.10s
+2023-03-19 16:25:20,819 WARNING  [*] 16:25:20: Train Epoch: 3 [9600 /26120 (37%)] | Loss: 0.988668 | Elapsed: 9.89s
+2023-03-19 16:25:30,846 WARNING  [*] 16:25:30: Train Epoch: 3 [19200/26120 (73%)] | Loss: 0.949601 | Elapsed: 10.03s
+2023-03-19 16:25:37,910 WARNING  [*] Sun Mar 19 16:25:37 2023:    3    | Tr.loss: 1.031891 | Elapsed:   27.08  s
+2023-03-19 16:25:37,910 WARNING  [*] Started epoch: 4
+2023-03-19 16:25:38,021 WARNING  [*] 16:25:38: Train Epoch: 4 [  0  /26120 (0 %)] | Loss: 1.011187 | Elapsed: 0.11s
+2023-03-19 16:25:47,929 WARNING  [*] 16:25:47: Train Epoch: 4 [9600 /26120 (37%)] | Loss: 0.968322 | Elapsed: 9.91s
+2023-03-19 16:25:57,755 WARNING  [*] 16:25:57: Train Epoch: 4 [19200/26120 (73%)] | Loss: 1.091061 | Elapsed: 9.83s
+2023-03-19 16:26:04,814 WARNING  [*] Sun Mar 19 16:26:04 2023:    4    | Tr.loss: 0.929619 | Elapsed:   26.90  s
+2023-03-19 16:26:04,814 WARNING  [*] Started epoch: 5
+2023-03-19 16:26:04,914 WARNING  [*] 16:26:04: Train Epoch: 5 [  0  /26120 (0 %)] | Loss: 0.631551 | Elapsed: 0.10s
+2023-03-19 16:26:14,777 WARNING  [*] 16:26:14: Train Epoch: 5 [9600 /26120 (37%)] | Loss: 0.916160 | Elapsed: 9.85s
+2023-03-19 16:26:24,635 WARNING  [*] 16:26:24: Train Epoch: 5 [19200/26120 (73%)] | Loss: 0.713461 | Elapsed: 9.86s
+2023-03-19 16:26:31,717 WARNING  [*] Sun Mar 19 16:26:31 2023:    5    | Tr.loss: 0.826283 | Elapsed:   26.90  s
+2023-03-19 16:26:31,717 WARNING  [*] Started epoch: 6
+2023-03-19 16:26:31,816 WARNING  [*] 16:26:31: Train Epoch: 6 [  0  /26120 (0 %)] | Loss: 0.949730 | Elapsed: 0.10s
+2023-03-19 16:26:41,688 WARNING  [*] 16:26:41: Train Epoch: 6 [9600 /26120 (37%)] | Loss: 0.914410 | Elapsed: 9.87s
+2023-03-19 16:26:51,600 WARNING  [*] 16:26:51: Train Epoch: 6 [19200/26120 (73%)] | Loss: 0.627412 | Elapsed: 9.91s
+2023-03-19 16:26:58,673 WARNING  [*] Sun Mar 19 16:26:58 2023:    6    | Tr.loss: 0.784066 | Elapsed:   26.96  s
+2023-03-19 16:26:58,673 WARNING  [*] Started epoch: 7
+2023-03-19 16:26:58,778 WARNING  [*] 16:26:58: Train Epoch: 7 [  0  /26120 (0 %)] | Loss: 0.785833 | Elapsed: 0.10s
+2023-03-19 16:27:08,639 WARNING  [*] 16:27:08: Train Epoch: 7 [9600 /26120 (37%)] | Loss: 0.571246 | Elapsed: 9.86s
+2023-03-19 16:27:18,603 WARNING  [*] 16:27:18: Train Epoch: 7 [19200/26120 (73%)] | Loss: 0.702733 | Elapsed: 9.96s
+2023-03-19 16:27:25,684 WARNING  [*] Sun Mar 19 16:27:25 2023:    7    | Tr.loss: 0.758319 | Elapsed:   27.01  s
+2023-03-19 16:27:25,684 WARNING  [*] Started epoch: 8
+2023-03-19 16:27:25,793 WARNING  [*] 16:27:25: Train Epoch: 8 [  0  /26120 (0 %)] | Loss: 0.764557 | Elapsed: 0.11s
+2023-03-19 16:27:35,666 WARNING  [*] 16:27:35: Train Epoch: 8 [9600 /26120 (37%)] | Loss: 0.671685 | Elapsed: 9.87s
+2023-03-19 16:27:45,567 WARNING  [*] 16:27:45: Train Epoch: 8 [19200/26120 (73%)] | Loss: 0.608218 | Elapsed: 9.90s
+2023-03-19 16:27:52,660 WARNING  [*] Sun Mar 19 16:27:52 2023:    8    | Tr.loss: 0.691601 | Elapsed:   26.98  s
+2023-03-19 16:27:52,660 WARNING  [*] Started epoch: 9
+2023-03-19 16:27:52,759 WARNING  [*] 16:27:52: Train Epoch: 9 [  0  /26120 (0 %)] | Loss: 0.830141 | Elapsed: 0.10s
+2023-03-19 16:28:02,656 WARNING  [*] 16:28:02: Train Epoch: 9 [9600 /26120 (37%)] | Loss: 0.579382 | Elapsed: 9.90s
+2023-03-19 16:28:12,548 WARNING  [*] 16:28:12: Train Epoch: 9 [19200/26120 (73%)] | Loss: 0.641838 | Elapsed: 9.89s
+2023-03-19 16:28:19,641 WARNING  [*] Sun Mar 19 16:28:19 2023:    9    | Tr.loss: 0.651820 | Elapsed:   26.98  s
+2023-03-19 16:28:19,641 WARNING  [*] Started epoch: 10
+2023-03-19 16:28:19,737 WARNING  [*] 16:28:19: Train Epoch: 10 [  0  /26120 (0 %)] | Loss: 0.599340 | Elapsed: 0.10s
+2023-03-19 16:28:29,641 WARNING  [*] 16:28:29: Train Epoch: 10 [9600 /26120 (37%)] | Loss: 0.497322 | Elapsed: 9.89s
+2023-03-19 16:28:39,609 WARNING  [*] 16:28:39: Train Epoch: 10 [19200/26120 (73%)] | Loss: 0.618650 | Elapsed: 9.97s
+2023-03-19 16:28:46,718 WARNING  [*] Sun Mar 19 16:28:46 2023:   10    | Tr.loss: 0.596124 | Elapsed:   27.06  s
+2023-03-19 16:28:46,718 WARNING  [*] Started epoch: 11
+2023-03-19 16:28:46,818 WARNING  [*] 16:28:46: Train Epoch: 11 [  0  /26120 (0 %)] | Loss: 0.574180 | Elapsed: 0.10s
+2023-03-19 16:28:56,738 WARNING  [*] 16:28:56: Train Epoch: 11 [9600 /26120 (37%)] | Loss: 0.598669 | Elapsed: 9.92s
+2023-03-19 16:29:06,646 WARNING  [*] 16:29:06: Train Epoch: 11 [19200/26120 (73%)] | Loss: 0.486580 | Elapsed: 9.91s
+2023-03-19 16:29:13,755 WARNING  [*] Sun Mar 19 16:29:13 2023:   11    | Tr.loss: 0.547150 | Elapsed:   27.04  s
+2023-03-19 16:29:13,755 WARNING  [*] Started epoch: 12
+2023-03-19 16:29:13,855 WARNING  [*] 16:29:13: Train Epoch: 12 [  0  /26120 (0 %)] | Loss: 0.586505 | Elapsed: 0.10s
+2023-03-19 16:29:17,514 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-19 16:29:17,543 WARNING  [!] Sun Mar 19 16:29:17 2023: Dumped results:
+                model       : 1679239456-model.torch
+		train time  : 1679239456-trainTime.npy
+		train losses: 1679239456-trainLosses.npy
+		train AUC   : 1679239456-auc.npy
+		train F1s   : 1679239456-trainF1s.npy
+		train TPRs  : 1679239456-trainTPRs.npy
+2023-03-19 16:29:17,572 WARNING  [!] Evaluating model on training set...
+2023-03-19 16:29:24,539 WARNING  [!] This fold metrics on training set:
+2023-03-19 16:29:24,589 WARNING 	AUC: 0.9735
+2023-03-19 16:29:24,594 WARNING 	F1: 0.6436
+2023-03-19 16:29:24,594 WARNING  [!] Evaluating model on validation set...
+2023-03-19 16:29:28,090 WARNING  [!] This fold metrics on validation set:
+2023-03-19 16:29:28,110 WARNING 	AUC: 0.9614
+2023-03-19 16:29:28,118 WARNING 	F1: 0.6298
+2023-03-19 16:29:28,239 WARNING  [2/3] Train set size: 26120, Validation set size: 13060
+2023-03-19 16:29:28,717 WARNING  [!] Saved dataset splits to dataset_splits_1679239768.npz
+2023-03-19 16:29:28,782 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 4.1178e6
+2023-03-19 16:29:28,783 WARNING  [*] Training time budget set: 5.0 min
+2023-03-19 16:29:28,790 WARNING  [*] Started epoch: 1
+2023-03-19 16:29:28,897 WARNING  [*] 16:29:28: Train Epoch: 1 [  0  /26120 (0 %)] | Loss: 11.542274 | Elapsed: 0.11s
+2023-03-19 16:29:38,805 WARNING  [*] 16:29:38: Train Epoch: 1 [9600 /26120 (37%)] | Loss: 2.234205 | Elapsed: 9.91s
+2023-03-19 16:29:48,697 WARNING  [*] 16:29:48: Train Epoch: 1 [19200/26120 (73%)] | Loss: 1.726806 | Elapsed: 9.89s
+2023-03-19 16:29:55,794 WARNING  [*] Sun Mar 19 16:29:55 2023:    1    | Tr.loss: 2.095597 | Elapsed:   27.00  s
+2023-03-19 16:29:55,794 WARNING  [*] Started epoch: 2
+2023-03-19 16:29:55,908 WARNING  [*] 16:29:55: Train Epoch: 2 [  0  /26120 (0 %)] | Loss: 1.656417 | Elapsed: 0.11s
+2023-03-19 16:30:05,790 WARNING  [*] 16:30:05: Train Epoch: 2 [9600 /26120 (37%)] | Loss: 1.349623 | Elapsed: 9.88s
+2023-03-19 16:30:15,718 WARNING  [*] 16:30:15: Train Epoch: 2 [19200/26120 (73%)] | Loss: 1.026459 | Elapsed: 9.91s
+2023-03-19 16:30:22,969 WARNING  [*] Sun Mar 19 16:30:22 2023:    2    | Tr.loss: 1.362670 | Elapsed:   27.18  s
+2023-03-19 16:30:22,969 WARNING  [*] Started epoch: 3
+2023-03-19 16:30:23,077 WARNING  [*] 16:30:23: Train Epoch: 3 [  0  /26120 (0 %)] | Loss: 1.148891 | Elapsed: 0.11s
+2023-03-19 16:30:33,006 WARNING  [*] 16:30:33: Train Epoch: 3 [9600 /26120 (37%)] | Loss: 0.977901 | Elapsed: 9.93s
+2023-03-19 16:30:42,920 WARNING  [*] 16:30:42: Train Epoch: 3 [19200/26120 (73%)] | Loss: 0.840954 | Elapsed: 9.91s
+2023-03-19 16:30:50,122 WARNING  [*] Sun Mar 19 16:30:50 2023:    3    | Tr.loss: 0.845794 | Elapsed:   27.15  s
+2023-03-19 16:30:50,122 WARNING  [*] Started epoch: 4
+2023-03-19 16:30:50,222 WARNING  [*] 16:30:50: Train Epoch: 4 [  0  /26120 (0 %)] | Loss: 0.761128 | Elapsed: 0.10s
+2023-03-19 16:31:00,146 WARNING  [*] 16:31:00: Train Epoch: 4 [9600 /26120 (37%)] | Loss: 0.750563 | Elapsed: 9.92s
+2023-03-19 16:31:10,064 WARNING  [*] 16:31:10: Train Epoch: 4 [19200/26120 (73%)] | Loss: 0.660541 | Elapsed: 9.92s
+2023-03-19 16:31:17,204 WARNING  [*] Sun Mar 19 16:31:17 2023:    4    | Tr.loss: 0.711378 | Elapsed:   27.08  s
+2023-03-19 16:31:17,204 WARNING  [*] Started epoch: 5
+2023-03-19 16:31:17,308 WARNING  [*] 16:31:17: Train Epoch: 5 [  0  /26120 (0 %)] | Loss: 0.584598 | Elapsed: 0.10s
+2023-03-19 16:31:27,244 WARNING  [*] 16:31:27: Train Epoch: 5 [9600 /26120 (37%)] | Loss: 0.466645 | Elapsed: 9.94s
+2023-03-19 16:31:37,175 WARNING  [*] 16:31:37: Train Epoch: 5 [19200/26120 (73%)] | Loss: 0.464007 | Elapsed: 9.93s
+2023-03-19 16:31:44,299 WARNING  [*] Sun Mar 19 16:31:44 2023:    5    | Tr.loss: 0.629710 | Elapsed:   27.09  s
+2023-03-19 16:31:44,299 WARNING  [*] Started epoch: 6
+2023-03-19 16:31:44,408 WARNING  [*] 16:31:44: Train Epoch: 6 [  0  /26120 (0 %)] | Loss: 0.456324 | Elapsed: 0.11s
+2023-03-19 16:31:54,326 WARNING  [*] 16:31:54: Train Epoch: 6 [9600 /26120 (37%)] | Loss: 0.571564 | Elapsed: 9.92s
+2023-03-19 16:32:04,259 WARNING  [*] 16:32:04: Train Epoch: 6 [19200/26120 (73%)] | Loss: 0.711676 | Elapsed: 9.93s
+2023-03-19 16:32:11,363 WARNING  [*] Sun Mar 19 16:32:11 2023:    6    | Tr.loss: 0.570233 | Elapsed:   27.06  s
+2023-03-19 16:32:11,363 WARNING  [*] Started epoch: 7
+2023-03-19 16:32:11,469 WARNING  [*] 16:32:11: Train Epoch: 7 [  0  /26120 (0 %)] | Loss: 0.411327 | Elapsed: 0.11s
+2023-03-19 16:32:21,458 WARNING  [*] 16:32:21: Train Epoch: 7 [9600 /26120 (37%)] | Loss: 0.435550 | Elapsed: 9.99s
+2023-03-19 16:32:31,381 WARNING  [*] 16:32:31: Train Epoch: 7 [19200/26120 (73%)] | Loss: 0.300980 | Elapsed: 9.92s
+2023-03-19 16:32:38,500 WARNING  [*] Sun Mar 19 16:32:38 2023:    7    | Tr.loss: 0.532274 | Elapsed:   27.14  s
+2023-03-19 16:32:38,500 WARNING  [*] Started epoch: 8
+2023-03-19 16:32:38,602 WARNING  [*] 16:32:38: Train Epoch: 8 [  0  /26120 (0 %)] | Loss: 0.574797 | Elapsed: 0.10s
+2023-03-19 16:32:48,536 WARNING  [*] 16:32:48: Train Epoch: 8 [9600 /26120 (37%)] | Loss: 0.525519 | Elapsed: 9.93s
+2023-03-19 16:32:58,496 WARNING  [*] 16:32:58: Train Epoch: 8 [19200/26120 (73%)] | Loss: 0.416383 | Elapsed: 9.96s
+2023-03-19 16:33:05,616 WARNING  [*] Sun Mar 19 16:33:05 2023:    8    | Tr.loss: 0.503882 | Elapsed:   27.12  s
+2023-03-19 16:33:05,616 WARNING  [*] Started epoch: 9
+2023-03-19 16:33:05,720 WARNING  [*] 16:33:05: Train Epoch: 9 [  0  /26120 (0 %)] | Loss: 0.317665 | Elapsed: 0.10s
+2023-03-19 16:33:15,641 WARNING  [*] 16:33:15: Train Epoch: 9 [9600 /26120 (37%)] | Loss: 0.451856 | Elapsed: 9.92s
+2023-03-19 16:33:25,580 WARNING  [*] 16:33:25: Train Epoch: 9 [19200/26120 (73%)] | Loss: 0.501177 | Elapsed: 9.93s
+2023-03-19 16:33:32,689 WARNING  [*] Sun Mar 19 16:33:32 2023:    9    | Tr.loss: 0.488569 | Elapsed:   27.07  s
+2023-03-19 16:33:32,689 WARNING  [*] Started epoch: 10
+2023-03-19 16:33:32,791 WARNING  [*] 16:33:32: Train Epoch: 10 [  0  /26120 (0 %)] | Loss: 0.399631 | Elapsed: 0.10s
+2023-03-19 16:33:42,713 WARNING  [*] 16:33:42: Train Epoch: 10 [9600 /26120 (37%)] | Loss: 0.416757 | Elapsed: 9.92s
+2023-03-19 16:33:52,780 WARNING  [*] 16:33:52: Train Epoch: 10 [19200/26120 (73%)] | Loss: 0.456201 | Elapsed: 10.07s
+2023-03-19 16:33:59,907 WARNING  [*] Sun Mar 19 16:33:59 2023:   10    | Tr.loss: 0.463582 | Elapsed:   27.22  s
+2023-03-19 16:33:59,907 WARNING  [*] Started epoch: 11
+2023-03-19 16:34:00,006 WARNING  [*] 16:34:00: Train Epoch: 11 [  0  /26120 (0 %)] | Loss: 0.366741 | Elapsed: 0.10s
+2023-03-19 16:34:09,941 WARNING  [*] 16:34:09: Train Epoch: 11 [9600 /26120 (37%)] | Loss: 0.352474 | Elapsed: 9.93s
+2023-03-19 16:34:19,871 WARNING  [*] 16:34:19: Train Epoch: 11 [19200/26120 (73%)] | Loss: 0.401680 | Elapsed: 9.93s
+2023-03-19 16:34:26,989 WARNING  [*] Sun Mar 19 16:34:26 2023:   11    | Tr.loss: 0.449926 | Elapsed:   27.08  s
+2023-03-19 16:34:26,989 WARNING  [*] Started epoch: 12
+2023-03-19 16:34:27,095 WARNING  [*] 16:34:27: Train Epoch: 12 [  0  /26120 (0 %)] | Loss: 0.426766 | Elapsed: 0.11s
+2023-03-19 16:34:28,889 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-19 16:34:28,926 WARNING  [!] Sun Mar 19 16:34:28 2023: Dumped results:
+                model       : 1679239768-model.torch
+		train time  : 1679239768-trainTime.npy
+		train losses: 1679239768-trainLosses.npy
+		train AUC   : 1679239768-auc.npy
+		train F1s   : 1679239768-trainF1s.npy
+		train TPRs  : 1679239768-trainTPRs.npy
+2023-03-19 16:34:28,940 WARNING  [!] Evaluating model on training set...
+2023-03-19 16:34:35,922 WARNING  [!] This fold metrics on training set:
+2023-03-19 16:34:35,974 WARNING 	AUC: 0.9732
+2023-03-19 16:34:35,981 WARNING 	F1: 0.6231
+2023-03-19 16:34:35,981 WARNING  [!] Evaluating model on validation set...
+2023-03-19 16:34:39,493 WARNING  [!] This fold metrics on validation set:
+2023-03-19 16:34:39,510 WARNING 	AUC: 0.9590
+2023-03-19 16:34:39,524 WARNING 	F1: 0.5921
+2023-03-19 16:34:39,641 WARNING  [3/3] Train set size: 26120, Validation set size: 13060
+2023-03-19 16:34:40,118 WARNING  [!] Saved dataset splits to dataset_splits_1679240079.npz
+2023-03-19 16:34:40,178 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 4.1178e6
+2023-03-19 16:34:40,178 WARNING  [*] Training time budget set: 5.0 min
+2023-03-19 16:34:40,204 WARNING  [*] Started epoch: 1
+2023-03-19 16:34:40,326 WARNING  [*] 16:34:40: Train Epoch: 1 [  0  /26120 (0 %)] | Loss: 9.501069 | Elapsed: 0.12s
+2023-03-19 16:34:50,287 WARNING  [*] 16:34:50: Train Epoch: 1 [9600 /26120 (37%)] | Loss: 1.995000 | Elapsed: 9.96s
+2023-03-19 16:35:00,215 WARNING  [*] 16:35:00: Train Epoch: 1 [19200/26120 (73%)] | Loss: 1.697320 | Elapsed: 9.93s
+2023-03-19 16:35:07,344 WARNING  [*] Sun Mar 19 16:35:07 2023:    1    | Tr.loss: 1.982792 | Elapsed:   27.14  s
+2023-03-19 16:35:07,344 WARNING  [*] Started epoch: 2
+2023-03-19 16:35:07,443 WARNING  [*] 16:35:07: Train Epoch: 2 [  0  /26120 (0 %)] | Loss: 1.716462 | Elapsed: 0.10s
+2023-03-19 16:35:17,360 WARNING  [*] 16:35:17: Train Epoch: 2 [9600 /26120 (37%)] | Loss: 1.277383 | Elapsed: 9.92s
+2023-03-19 16:35:27,314 WARNING  [*] 16:35:27: Train Epoch: 2 [19200/26120 (73%)] | Loss: 1.387703 | Elapsed: 9.94s
+2023-03-19 16:35:34,444 WARNING  [*] Sun Mar 19 16:35:34 2023:    2    | Tr.loss: 1.283487 | Elapsed:   27.10  s
+2023-03-19 16:35:34,444 WARNING  [*] Started epoch: 3
+2023-03-19 16:35:34,545 WARNING  [*] 16:35:34: Train Epoch: 3 [  0  /26120 (0 %)] | Loss: 0.836010 | Elapsed: 0.10s
+2023-03-19 16:35:44,504 WARNING  [*] 16:35:44: Train Epoch: 3 [9600 /26120 (37%)] | Loss: 0.929735 | Elapsed: 9.96s
+2023-03-19 16:35:54,451 WARNING  [*] 16:35:54: Train Epoch: 3 [19200/26120 (73%)] | Loss: 0.848564 | Elapsed: 9.95s
+2023-03-19 16:36:01,649 WARNING  [*] Sun Mar 19 16:36:01 2023:    3    | Tr.loss: 0.909676 | Elapsed:   27.21  s
+2023-03-19 16:36:01,649 WARNING  [*] Started epoch: 4
+2023-03-19 16:36:01,752 WARNING  [*] 16:36:01: Train Epoch: 4 [  0  /26120 (0 %)] | Loss: 0.804507 | Elapsed: 0.10s
+2023-03-19 16:36:11,675 WARNING  [*] 16:36:11: Train Epoch: 4 [9600 /26120 (37%)] | Loss: 0.542614 | Elapsed: 9.92s
+2023-03-19 16:36:21,593 WARNING  [*] 16:36:21: Train Epoch: 4 [19200/26120 (73%)] | Loss: 0.640165 | Elapsed: 9.92s
+2023-03-19 16:36:28,732 WARNING  [*] Sun Mar 19 16:36:28 2023:    4    | Tr.loss: 0.750675 | Elapsed:   27.08  s
+2023-03-19 16:36:28,732 WARNING  [*] Started epoch: 5
+2023-03-19 16:36:28,835 WARNING  [*] 16:36:28: Train Epoch: 5 [  0  /26120 (0 %)] | Loss: 0.938979 | Elapsed: 0.10s
+2023-03-19 16:36:38,776 WARNING  [*] 16:36:38: Train Epoch: 5 [9600 /26120 (37%)] | Loss: 0.740961 | Elapsed: 9.94s
+2023-03-19 16:36:48,746 WARNING  [*] 16:36:48: Train Epoch: 5 [19200/26120 (73%)] | Loss: 0.647230 | Elapsed: 9.97s
+2023-03-19 16:36:55,874 WARNING  [*] Sun Mar 19 16:36:55 2023:    5    | Tr.loss: 0.692011 | Elapsed:   27.14  s
+2023-03-19 16:36:55,874 WARNING  [*] Started epoch: 6
+2023-03-19 16:36:55,976 WARNING  [*] 16:36:55: Train Epoch: 6 [  0  /26120 (0 %)] | Loss: 0.688341 | Elapsed: 0.10s
+2023-03-19 16:37:05,916 WARNING  [*] 16:37:05: Train Epoch: 6 [9600 /26120 (37%)] | Loss: 0.894216 | Elapsed: 9.94s
+2023-03-19 16:37:15,835 WARNING  [*] 16:37:15: Train Epoch: 6 [19200/26120 (73%)] | Loss: 0.659182 | Elapsed: 9.92s
+2023-03-19 16:37:22,966 WARNING  [*] Sun Mar 19 16:37:22 2023:    6    | Tr.loss: 0.663543 | Elapsed:   27.09  s
+2023-03-19 16:37:22,966 WARNING  [*] Started epoch: 7
+2023-03-19 16:37:23,067 WARNING  [*] 16:37:23: Train Epoch: 7 [  0  /26120 (0 %)] | Loss: 0.610205 | Elapsed: 0.10s
+2023-03-19 16:37:33,053 WARNING  [*] 16:37:33: Train Epoch: 7 [9600 /26120 (37%)] | Loss: 0.855476 | Elapsed: 9.98s
+2023-03-19 16:37:43,002 WARNING  [*] 16:37:43: Train Epoch: 7 [19200/26120 (73%)] | Loss: 0.596169 | Elapsed: 9.95s
+2023-03-19 16:37:50,122 WARNING  [*] Sun Mar 19 16:37:50 2023:    7    | Tr.loss: 0.630779 | Elapsed:   27.16  s
+2023-03-19 16:37:50,122 WARNING  [*] Started epoch: 8
+2023-03-19 16:37:50,226 WARNING  [*] 16:37:50: Train Epoch: 8 [  0  /26120 (0 %)] | Loss: 0.560455 | Elapsed: 0.10s
+2023-03-19 16:38:00,141 WARNING  [*] 16:38:00: Train Epoch: 8 [9600 /26120 (37%)] | Loss: 0.620159 | Elapsed: 9.92s
+2023-03-19 16:38:10,080 WARNING  [*] 16:38:10: Train Epoch: 8 [19200/26120 (73%)] | Loss: 0.537446 | Elapsed: 9.92s
+2023-03-19 16:38:17,209 WARNING  [*] Sun Mar 19 16:38:17 2023:    8    | Tr.loss: 0.586810 | Elapsed:   27.09  s
+2023-03-19 16:38:17,209 WARNING  [*] Started epoch: 9
+2023-03-19 16:38:17,313 WARNING  [*] 16:38:17: Train Epoch: 9 [  0  /26120 (0 %)] | Loss: 0.627125 | Elapsed: 0.10s
+2023-03-19 16:38:27,257 WARNING  [*] 16:38:27: Train Epoch: 9 [9600 /26120 (37%)] | Loss: 0.527249 | Elapsed: 9.94s
+2023-03-19 16:38:37,195 WARNING  [*] 16:38:37: Train Epoch: 9 [19200/26120 (73%)] | Loss: 0.429844 | Elapsed: 9.94s
+2023-03-19 16:38:44,316 WARNING  [*] Sun Mar 19 16:38:44 2023:    9    | Tr.loss: 0.557651 | Elapsed:   27.11  s
+2023-03-19 16:38:44,316 WARNING  [*] Started epoch: 10
+2023-03-19 16:38:44,419 WARNING  [*] 16:38:44: Train Epoch: 10 [  0  /26120 (0 %)] | Loss: 0.522817 | Elapsed: 0.10s
+2023-03-19 16:38:54,352 WARNING  [*] 16:38:54: Train Epoch: 10 [9600 /26120 (37%)] | Loss: 0.550572 | Elapsed: 9.93s
+2023-03-19 16:39:04,352 WARNING  [*] 16:39:04: Train Epoch: 10 [19200/26120 (73%)] | Loss: 0.536127 | Elapsed: 10.00s
+2023-03-19 16:39:11,465 WARNING  [*] Sun Mar 19 16:39:11 2023:   10    | Tr.loss: 0.521394 | Elapsed:   27.15  s
+2023-03-19 16:39:11,465 WARNING  [*] Started epoch: 11
+2023-03-19 16:39:11,564 WARNING  [*] 16:39:11: Train Epoch: 11 [  0  /26120 (0 %)] | Loss: 0.469376 | Elapsed: 0.10s
+2023-03-19 16:39:21,504 WARNING  [*] 16:39:21: Train Epoch: 11 [9600 /26120 (37%)] | Loss: 0.516638 | Elapsed: 9.94s
+2023-03-19 16:39:31,433 WARNING  [*] 16:39:31: Train Epoch: 11 [19200/26120 (73%)] | Loss: 0.495332 | Elapsed: 9.93s
+2023-03-19 16:39:38,555 WARNING  [*] Sun Mar 19 16:39:38 2023:   11    | Tr.loss: 0.496467 | Elapsed:   27.09  s
+2023-03-19 16:39:38,555 WARNING  [*] Started epoch: 12
+2023-03-19 16:39:38,658 WARNING  [*] 16:39:38: Train Epoch: 12 [  0  /26120 (0 %)] | Loss: 0.380725 | Elapsed: 0.10s
+2023-03-19 16:39:40,248 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-19 16:39:40,289 WARNING  [!] Sun Mar 19 16:39:40 2023: Dumped results:
+                model       : 1679240079-model.torch
+		train time  : 1679240079-trainTime.npy
+		train losses: 1679240079-trainLosses.npy
+		train AUC   : 1679240079-auc.npy
+		train F1s   : 1679240079-trainF1s.npy
+		train TPRs  : 1679240079-trainTPRs.npy
+2023-03-19 16:39:40,300 WARNING  [!] Evaluating model on training set...
+2023-03-19 16:39:47,302 WARNING  [!] This fold metrics on training set:
+2023-03-19 16:39:47,359 WARNING 	AUC: 0.9700
+2023-03-19 16:39:47,369 WARNING 	F1: 0.6529
+2023-03-19 16:39:47,370 WARNING  [!] Evaluating model on validation set...
+2023-03-19 16:39:50,860 WARNING  [!] This fold metrics on validation set:
+2023-03-19 16:39:50,896 WARNING 	AUC: 0.9597
+2023-03-19 16:39:50,898 WARNING 	F1: 0.6509
+2023-03-19 16:39:50,989 WARNING  [!] Metrics saved to out_avast_fields_1679237307\cv_executed_commands_limNone_r1763_t5\executed_commands_metrics_validation.json
+2023-03-19 16:39:50,990 WARNING  [!] Metrics saved to out_avast_fields_1679237307\cv_executed_commands_limNone_r1763_t5\executed_commands_metrics_training.json
+2023-03-19 16:39:50,990 WARNING  [!] Average epoch time: 0.03s | Mean values over 3 folds:
+	AUC: 0.9601
+
+2023-03-19 16:39:51,059 WARNING  [!!!] Working on mutexes!
+2023-03-19 16:39:51,062 WARNING  [!] Reading and normalizing reports...
+2023-03-19 16:49:53,790 WARNING  [!] Tokenizing and encoding train data!
+2023-03-19 16:49:53,802 WARNING  [!] Size: 39180 | Class counts in test:
+Counter({1: 11557, 5: 10094, 4: 3881, 3: 3362, 6: 3337, 9: 2701, 8: 2088, 7: 1062, 0: 566, 2: 532})
+2023-03-19 16:49:53,804 WARNING  [*] Initializing tokenizer training...
+2023-03-19 16:49:54,282 WARNING Dumped vocab to out_avast_fields_1679237307\mutexes_vocab_30000_seqlen_512\tokenizer_30000_vocab.json
+2023-03-19 16:49:54,329 WARNING Dumped vocab counter to out_avast_fields_1679237307\mutexes_vocab_30000_seqlen_512\tokenizer_30000_counter.json
+2023-03-19 16:49:55,414 WARNING [!] Tokenizing and encoding test data!
+2023-03-19 16:49:55,429 WARNING  [!] Size: 9796 | Class counts in test:
+Counter({1: 11557, 5: 10094, 4: 3881, 3: 3362, 6: 3337, 9: 2701, 8: 2088, 7: 1062, 0: 566, 2: 532})
+2023-03-19 16:49:55,872 WARNING  [!!!] Starting CV over mutexes!
+2023-03-19 16:49:55,920 WARNING  [!] Training time budget: 300min
+2023-03-19 16:49:55,920 WARNING  [!] Model config: {'vocab_size': 25394, 'maxlen': 512, 'chunk_size': 64, 'dModel': 64, 'nHeads': 8, 'dHidden': 256, 'nLayers': 2, 'numClasses': 10, 'hiddenNeurons': [64], 'layerNorm': False, 'dropout': 0.3, 'mean_over_sequence': False, 'norm_first': True}
+2023-03-19 16:49:55,956 WARNING  [1/3] Train set size: 26120, Validation set size: 13060
+2023-03-19 16:49:56,393 WARNING  [!] Saved dataset splits to dataset_splits_1679240995.npz
+2023-03-19 16:49:56,784 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 3.8230e6
+2023-03-19 16:49:56,784 WARNING  [*] Training time budget set: 5.0 min
+2023-03-19 16:49:56,800 WARNING  [*] Started epoch: 1
+2023-03-19 16:49:57,267 WARNING  [*] 16:49:57: Train Epoch: 1 [  0  /26120 (0 %)] | Loss: 10.093579 | Elapsed: 0.47s
+2023-03-19 16:50:06,873 WARNING  [*] 16:50:06: Train Epoch: 1 [9600 /26120 (37%)] | Loss: 2.087060 | Elapsed: 9.61s
+2023-03-19 16:50:16,540 WARNING  [*] 16:50:16: Train Epoch: 1 [19200/26120 (73%)] | Loss: 2.133332 | Elapsed: 9.65s
+2023-03-19 16:50:23,474 WARNING  [*] Sun Mar 19 16:50:23 2023:    1    | Tr.loss: 2.255920 | Elapsed:   26.67  s
+2023-03-19 16:50:23,474 WARNING  [*] Started epoch: 2
+2023-03-19 16:50:23,576 WARNING  [*] 16:50:23: Train Epoch: 2 [  0  /26120 (0 %)] | Loss: 2.012602 | Elapsed: 0.10s
+2023-03-19 16:50:33,283 WARNING  [*] 16:50:33: Train Epoch: 2 [9600 /26120 (37%)] | Loss: 1.631919 | Elapsed: 9.71s
+2023-03-19 16:50:43,015 WARNING  [*] 16:50:43: Train Epoch: 2 [19200/26120 (73%)] | Loss: 1.456677 | Elapsed: 9.73s
+2023-03-19 16:50:50,015 WARNING  [*] Sun Mar 19 16:50:50 2023:    2    | Tr.loss: 1.591360 | Elapsed:   26.54  s
+2023-03-19 16:50:50,030 WARNING  [*] Started epoch: 3
+2023-03-19 16:50:50,130 WARNING  [*] 16:50:50: Train Epoch: 3 [  0  /26120 (0 %)] | Loss: 1.246546 | Elapsed: 0.10s
+2023-03-19 16:50:59,972 WARNING  [*] 16:50:59: Train Epoch: 3 [9600 /26120 (37%)] | Loss: 1.483231 | Elapsed: 9.84s
+2023-03-19 16:51:09,764 WARNING  [*] 16:51:09: Train Epoch: 3 [19200/26120 (73%)] | Loss: 1.279823 | Elapsed: 9.79s
+2023-03-19 16:51:16,801 WARNING  [*] Sun Mar 19 16:51:16 2023:    3    | Tr.loss: 1.341350 | Elapsed:   26.77  s
+2023-03-19 16:51:16,801 WARNING  [*] Started epoch: 4
+2023-03-19 16:51:16,900 WARNING  [*] 16:51:16: Train Epoch: 4 [  0  /26120 (0 %)] | Loss: 1.158581 | Elapsed: 0.10s
+2023-03-19 16:51:26,681 WARNING  [*] 16:51:26: Train Epoch: 4 [9600 /26120 (37%)] | Loss: 1.280724 | Elapsed: 9.78s
+2023-03-19 16:51:36,483 WARNING  [*] 16:51:36: Train Epoch: 4 [19200/26120 (73%)] | Loss: 1.214398 | Elapsed: 9.80s
+2023-03-19 16:51:43,546 WARNING  [*] Sun Mar 19 16:51:43 2023:    4    | Tr.loss: 1.189511 | Elapsed:   26.74  s
+2023-03-19 16:51:43,546 WARNING  [*] Started epoch: 5
+2023-03-19 16:51:43,645 WARNING  [*] 16:51:43: Train Epoch: 5 [  0  /26120 (0 %)] | Loss: 1.199162 | Elapsed: 0.10s
+2023-03-19 16:51:53,468 WARNING  [*] 16:51:53: Train Epoch: 5 [9600 /26120 (37%)] | Loss: 1.415658 | Elapsed: 9.82s
+2023-03-19 16:52:03,303 WARNING  [*] 16:52:03: Train Epoch: 5 [19200/26120 (73%)] | Loss: 1.043405 | Elapsed: 9.83s
+2023-03-19 16:52:10,366 WARNING  [*] Sun Mar 19 16:52:10 2023:    5    | Tr.loss: 1.139098 | Elapsed:   26.82  s
+2023-03-19 16:52:10,366 WARNING  [*] Started epoch: 6
+2023-03-19 16:52:10,466 WARNING  [*] 16:52:10: Train Epoch: 6 [  0  /26120 (0 %)] | Loss: 1.077016 | Elapsed: 0.10s
+2023-03-19 16:52:20,295 WARNING  [*] 16:52:20: Train Epoch: 6 [9600 /26120 (37%)] | Loss: 1.230845 | Elapsed: 9.83s
+2023-03-19 16:52:30,218 WARNING  [*] 16:52:30: Train Epoch: 6 [19200/26120 (73%)] | Loss: 1.132083 | Elapsed: 9.92s
+2023-03-19 16:52:37,291 WARNING  [*] Sun Mar 19 16:52:37 2023:    6    | Tr.loss: 1.119333 | Elapsed:   26.92  s
+2023-03-19 16:52:37,291 WARNING  [*] Started epoch: 7
+2023-03-19 16:52:37,391 WARNING  [*] 16:52:37: Train Epoch: 7 [  0  /26120 (0 %)] | Loss: 1.236072 | Elapsed: 0.10s
+2023-03-19 16:52:47,246 WARNING  [*] 16:52:47: Train Epoch: 7 [9600 /26120 (37%)] | Loss: 1.097268 | Elapsed: 9.85s
+2023-03-19 16:52:57,098 WARNING  [*] 16:52:57: Train Epoch: 7 [19200/26120 (73%)] | Loss: 0.966363 | Elapsed: 9.85s
+2023-03-19 16:53:04,178 WARNING  [*] Sun Mar 19 16:53:04 2023:    7    | Tr.loss: 1.050776 | Elapsed:   26.89  s
+2023-03-19 16:53:04,178 WARNING  [*] Started epoch: 8
+2023-03-19 16:53:04,275 WARNING  [*] 16:53:04: Train Epoch: 8 [  0  /26120 (0 %)] | Loss: 0.866266 | Elapsed: 0.10s
+2023-03-19 16:53:14,133 WARNING  [*] 16:53:14: Train Epoch: 8 [9600 /26120 (37%)] | Loss: 0.740945 | Elapsed: 9.86s
+2023-03-19 16:53:24,003 WARNING  [*] 16:53:24: Train Epoch: 8 [19200/26120 (73%)] | Loss: 0.971657 | Elapsed: 9.87s
+2023-03-19 16:53:31,077 WARNING  [*] Sun Mar 19 16:53:31 2023:    8    | Tr.loss: 0.932948 | Elapsed:   26.90  s
+2023-03-19 16:53:31,077 WARNING  [*] Started epoch: 9
+2023-03-19 16:53:31,176 WARNING  [*] 16:53:31: Train Epoch: 9 [  0  /26120 (0 %)] | Loss: 1.010817 | Elapsed: 0.10s
+2023-03-19 16:53:41,027 WARNING  [*] 16:53:41: Train Epoch: 9 [9600 /26120 (37%)] | Loss: 1.276564 | Elapsed: 9.85s
+2023-03-19 16:53:50,922 WARNING  [*] 16:53:50: Train Epoch: 9 [19200/26120 (73%)] | Loss: 0.937007 | Elapsed: 9.90s
+2023-03-19 16:53:58,108 WARNING  [*] Sun Mar 19 16:53:58 2023:    9    | Tr.loss: 0.886840 | Elapsed:   27.03  s
+2023-03-19 16:53:58,108 WARNING  [*] Started epoch: 10
+2023-03-19 16:53:58,210 WARNING  [*] 16:53:58: Train Epoch: 10 [  0  /26120 (0 %)] | Loss: 0.937295 | Elapsed: 0.10s
+2023-03-19 16:54:08,084 WARNING  [*] 16:54:08: Train Epoch: 10 [9600 /26120 (37%)] | Loss: 0.771982 | Elapsed: 9.87s
+2023-03-19 16:54:17,963 WARNING  [*] 16:54:17: Train Epoch: 10 [19200/26120 (73%)] | Loss: 0.987876 | Elapsed: 9.88s
+2023-03-19 16:54:25,058 WARNING  [*] Sun Mar 19 16:54:25 2023:   10    | Tr.loss: 0.836123 | Elapsed:   26.95  s
+2023-03-19 16:54:25,058 WARNING  [*] Started epoch: 11
+2023-03-19 16:54:25,156 WARNING  [*] 16:54:25: Train Epoch: 11 [  0  /26120 (0 %)] | Loss: 0.947155 | Elapsed: 0.10s
+2023-03-19 16:54:35,033 WARNING  [*] 16:54:35: Train Epoch: 11 [9600 /26120 (37%)] | Loss: 0.953292 | Elapsed: 9.88s
+2023-03-19 16:54:44,922 WARNING  [*] 16:54:44: Train Epoch: 11 [19200/26120 (73%)] | Loss: 0.933621 | Elapsed: 9.89s
+2023-03-19 16:54:52,008 WARNING  [*] Sun Mar 19 16:54:52 2023:   11    | Tr.loss: 0.809767 | Elapsed:   26.95  s
+2023-03-19 16:54:52,008 WARNING  [*] Started epoch: 12
+2023-03-19 16:54:52,114 WARNING  [*] 16:54:52: Train Epoch: 12 [  0  /26120 (0 %)] | Loss: 0.816615 | Elapsed: 0.11s
+2023-03-19 16:54:56,852 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-19 16:54:56,893 WARNING  [!] Sun Mar 19 16:54:56 2023: Dumped results:
+                model       : 1679240995-model.torch
+		train time  : 1679240995-trainTime.npy
+		train losses: 1679240995-trainLosses.npy
+		train AUC   : 1679240995-auc.npy
+		train F1s   : 1679240995-trainF1s.npy
+		train TPRs  : 1679240995-trainTPRs.npy
+2023-03-19 16:54:56,906 WARNING  [!] Evaluating model on training set...
+2023-03-19 16:55:03,888 WARNING  [!] This fold metrics on training set:
+2023-03-19 16:55:03,938 WARNING 	AUC: 0.8955
+2023-03-19 16:55:03,947 WARNING 	F1: 0.5214
+2023-03-19 16:55:03,947 WARNING  [!] Evaluating model on validation set...
+2023-03-19 16:55:07,437 WARNING  [!] This fold metrics on validation set:
+2023-03-19 16:55:07,457 WARNING 	AUC: 0.8975
+2023-03-19 16:55:07,472 WARNING 	F1: 0.5236
+2023-03-19 16:55:07,587 WARNING  [2/3] Train set size: 26120, Validation set size: 13060
+2023-03-19 16:55:08,010 WARNING  [!] Saved dataset splits to dataset_splits_1679241307.npz
+2023-03-19 16:55:08,066 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 3.8230e6
+2023-03-19 16:55:08,066 WARNING  [*] Training time budget set: 5.0 min
+2023-03-19 16:55:08,094 WARNING  [*] Started epoch: 1
+2023-03-19 16:55:08,215 WARNING  [*] 16:55:08: Train Epoch: 1 [  0  /26120 (0 %)] | Loss: 10.351906 | Elapsed: 0.12s
+2023-03-19 16:55:18,094 WARNING  [*] 16:55:18: Train Epoch: 1 [9600 /26120 (37%)] | Loss: 2.039248 | Elapsed: 9.88s
+2023-03-19 16:55:28,009 WARNING  [*] 16:55:28: Train Epoch: 1 [19200/26120 (73%)] | Loss: 2.047822 | Elapsed: 9.91s
+2023-03-19 16:55:35,102 WARNING  [*] Sun Mar 19 16:55:35 2023:    1    | Tr.loss: 2.156989 | Elapsed:   27.01  s
+2023-03-19 16:55:35,102 WARNING  [*] Started epoch: 2
+2023-03-19 16:55:35,201 WARNING  [*] 16:55:35: Train Epoch: 2 [  0  /26120 (0 %)] | Loss: 1.843933 | Elapsed: 0.10s
+2023-03-19 16:55:45,098 WARNING  [*] 16:55:45: Train Epoch: 2 [9600 /26120 (37%)] | Loss: 1.467685 | Elapsed: 9.90s
+2023-03-19 16:55:54,999 WARNING  [*] 16:55:54: Train Epoch: 2 [19200/26120 (73%)] | Loss: 1.493362 | Elapsed: 9.90s
+2023-03-19 16:56:02,091 WARNING  [*] Sun Mar 19 16:56:02 2023:    2    | Tr.loss: 1.532606 | Elapsed:   26.99  s
+2023-03-19 16:56:02,091 WARNING  [*] Started epoch: 3
+2023-03-19 16:56:02,191 WARNING  [*] 16:56:02: Train Epoch: 3 [  0  /26120 (0 %)] | Loss: 1.475539 | Elapsed: 0.10s
+2023-03-19 16:56:12,089 WARNING  [*] 16:56:12: Train Epoch: 3 [9600 /26120 (37%)] | Loss: 1.420913 | Elapsed: 9.90s
+2023-03-19 16:56:21,978 WARNING  [*] 16:56:21: Train Epoch: 3 [19200/26120 (73%)] | Loss: 1.503022 | Elapsed: 9.89s
+2023-03-19 16:56:29,146 WARNING  [*] Sun Mar 19 16:56:29 2023:    3    | Tr.loss: 1.345285 | Elapsed:   27.06  s
+2023-03-19 16:56:29,146 WARNING  [*] Started epoch: 4
+2023-03-19 16:56:29,251 WARNING  [*] 16:56:29: Train Epoch: 4 [  0  /26120 (0 %)] | Loss: 1.173602 | Elapsed: 0.11s
+2023-03-19 16:56:39,142 WARNING  [*] 16:56:39: Train Epoch: 4 [9600 /26120 (37%)] | Loss: 1.114695 | Elapsed: 9.89s
+2023-03-19 16:56:49,085 WARNING  [*] 16:56:49: Train Epoch: 4 [19200/26120 (73%)] | Loss: 1.173467 | Elapsed: 9.94s
+2023-03-19 16:56:56,174 WARNING  [*] Sun Mar 19 16:56:56 2023:    4    | Tr.loss: 1.233380 | Elapsed:   27.03  s
+2023-03-19 16:56:56,174 WARNING  [*] Started epoch: 5
+2023-03-19 16:56:56,275 WARNING  [*] 16:56:56: Train Epoch: 5 [  0  /26120 (0 %)] | Loss: 1.123531 | Elapsed: 0.10s
+2023-03-19 16:57:06,166 WARNING  [*] 16:57:06: Train Epoch: 5 [9600 /26120 (37%)] | Loss: 1.325850 | Elapsed: 9.89s
+2023-03-19 16:57:16,061 WARNING  [*] 16:57:16: Train Epoch: 5 [19200/26120 (73%)] | Loss: 1.226096 | Elapsed: 9.90s
+2023-03-19 16:57:23,144 WARNING  [*] Sun Mar 19 16:57:23 2023:    5    | Tr.loss: 1.156022 | Elapsed:   26.97  s
+2023-03-19 16:57:23,144 WARNING  [*] Started epoch: 6
+2023-03-19 16:57:23,257 WARNING  [*] 16:57:23: Train Epoch: 6 [  0  /26120 (0 %)] | Loss: 1.010911 | Elapsed: 0.11s
+2023-03-19 16:57:33,207 WARNING  [*] 16:57:33: Train Epoch: 6 [9600 /26120 (37%)] | Loss: 1.085867 | Elapsed: 9.95s
+2023-03-19 16:57:43,092 WARNING  [*] 16:57:43: Train Epoch: 6 [19200/26120 (73%)] | Loss: 0.972763 | Elapsed: 9.89s
+2023-03-19 16:57:50,198 WARNING  [*] Sun Mar 19 16:57:50 2023:    6    | Tr.loss: 1.117759 | Elapsed:   27.05  s
+2023-03-19 16:57:50,198 WARNING  [*] Started epoch: 7
+2023-03-19 16:57:50,311 WARNING  [*] 16:57:50: Train Epoch: 7 [  0  /26120 (0 %)] | Loss: 1.176478 | Elapsed: 0.11s
+2023-03-19 16:58:00,263 WARNING  [*] 16:58:00: Train Epoch: 7 [9600 /26120 (37%)] | Loss: 1.129673 | Elapsed: 9.95s
+2023-03-19 16:58:10,170 WARNING  [*] 16:58:10: Train Epoch: 7 [19200/26120 (73%)] | Loss: 1.042138 | Elapsed: 9.91s
+2023-03-19 16:58:17,266 WARNING  [*] Sun Mar 19 16:58:17 2023:    7    | Tr.loss: 1.099452 | Elapsed:   27.07  s
+2023-03-19 16:58:17,266 WARNING  [*] Started epoch: 8
+2023-03-19 16:58:17,366 WARNING  [*] 16:58:17: Train Epoch: 8 [  0  /26120 (0 %)] | Loss: 0.968356 | Elapsed: 0.10s
+2023-03-19 16:58:27,298 WARNING  [*] 16:58:27: Train Epoch: 8 [9600 /26120 (37%)] | Loss: 1.294402 | Elapsed: 9.93s
+2023-03-19 16:58:37,200 WARNING  [*] 16:58:37: Train Epoch: 8 [19200/26120 (73%)] | Loss: 1.139217 | Elapsed: 9.90s
+2023-03-19 16:58:44,492 WARNING  [*] Sun Mar 19 16:58:44 2023:    8    | Tr.loss: 1.081986 | Elapsed:   27.23  s
+2023-03-19 16:58:44,492 WARNING  [*] Started epoch: 9
+2023-03-19 16:58:44,591 WARNING  [*] 16:58:44: Train Epoch: 9 [  0  /26120 (0 %)] | Loss: 1.265758 | Elapsed: 0.10s
+2023-03-19 16:58:54,634 WARNING  [*] 16:58:54: Train Epoch: 9 [9600 /26120 (37%)] | Loss: 1.030802 | Elapsed: 10.04s
+2023-03-19 16:59:04,520 WARNING  [*] 16:59:04: Train Epoch: 9 [19200/26120 (73%)] | Loss: 1.109270 | Elapsed: 9.89s
+2023-03-19 16:59:11,629 WARNING  [*] Sun Mar 19 16:59:11 2023:    9    | Tr.loss: 1.054315 | Elapsed:   27.14  s
+2023-03-19 16:59:11,629 WARNING  [*] Started epoch: 10
+2023-03-19 16:59:11,729 WARNING  [*] 16:59:11: Train Epoch: 10 [  0  /26120 (0 %)] | Loss: 0.820933 | Elapsed: 0.10s
+2023-03-19 16:59:21,618 WARNING  [*] 16:59:21: Train Epoch: 10 [9600 /26120 (37%)] | Loss: 1.117646 | Elapsed: 9.89s
+2023-03-19 16:59:31,602 WARNING  [*] 16:59:31: Train Epoch: 10 [19200/26120 (73%)] | Loss: 0.965560 | Elapsed: 9.98s
+2023-03-19 16:59:38,709 WARNING  [*] Sun Mar 19 16:59:38 2023:   10    | Tr.loss: 1.039091 | Elapsed:   27.08  s
+2023-03-19 16:59:38,709 WARNING  [*] Started epoch: 11
+2023-03-19 16:59:38,809 WARNING  [*] 16:59:38: Train Epoch: 11 [  0  /26120 (0 %)] | Loss: 1.206845 | Elapsed: 0.10s
+2023-03-19 16:59:48,728 WARNING  [*] 16:59:48: Train Epoch: 11 [9600 /26120 (37%)] | Loss: 0.967758 | Elapsed: 9.92s
+2023-03-19 16:59:58,618 WARNING  [*] 16:59:58: Train Epoch: 11 [19200/26120 (73%)] | Loss: 0.974604 | Elapsed: 9.89s
+2023-03-19 17:00:05,740 WARNING  [*] Sun Mar 19 17:00:05 2023:   11    | Tr.loss: 1.021299 | Elapsed:   27.03  s
+2023-03-19 17:00:05,740 WARNING  [*] Started epoch: 12
+2023-03-19 17:00:05,841 WARNING  [*] 17:00:05: Train Epoch: 12 [  0  /26120 (0 %)] | Loss: 1.270191 | Elapsed: 0.10s
+2023-03-19 17:00:08,118 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-19 17:00:08,152 WARNING  [!] Sun Mar 19 17:00:08 2023: Dumped results:
+                model       : 1679241307-model.torch
+		train time  : 1679241307-trainTime.npy
+		train losses: 1679241307-trainLosses.npy
+		train AUC   : 1679241307-auc.npy
+		train F1s   : 1679241307-trainF1s.npy
+		train TPRs  : 1679241307-trainTPRs.npy
+2023-03-19 17:00:08,167 WARNING  [!] Evaluating model on training set...
+2023-03-19 17:00:15,164 WARNING  [!] This fold metrics on training set:
+2023-03-19 17:00:15,222 WARNING 	AUC: 0.8710
+2023-03-19 17:00:15,231 WARNING 	F1: 0.3750
+2023-03-19 17:00:15,232 WARNING  [!] Evaluating model on validation set...
+2023-03-19 17:00:18,737 WARNING  [!] This fold metrics on validation set:
+2023-03-19 17:00:18,756 WARNING 	AUC: 0.8729
+2023-03-19 17:00:18,764 WARNING 	F1: 0.3743
+2023-03-19 17:00:18,895 WARNING  [3/3] Train set size: 26120, Validation set size: 13060
+2023-03-19 17:00:19,322 WARNING  [!] Saved dataset splits to dataset_splits_1679241618.npz
+2023-03-19 17:00:19,379 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 3.8230e6
+2023-03-19 17:00:19,379 WARNING  [*] Training time budget set: 5.0 min
+2023-03-19 17:00:19,403 WARNING  [*] Started epoch: 1
+2023-03-19 17:00:19,507 WARNING  [*] 17:00:19: Train Epoch: 1 [  0  /26120 (0 %)] | Loss: 11.951449 | Elapsed: 0.10s
+2023-03-19 17:00:29,454 WARNING  [*] 17:00:29: Train Epoch: 1 [9600 /26120 (37%)] | Loss: 2.131633 | Elapsed: 9.95s
+2023-03-19 17:00:39,353 WARNING  [*] 17:00:39: Train Epoch: 1 [19200/26120 (73%)] | Loss: 2.000506 | Elapsed: 9.90s
+2023-03-19 17:00:46,450 WARNING  [*] Sun Mar 19 17:00:46 2023:    1    | Tr.loss: 2.209050 | Elapsed:   27.05  s
+2023-03-19 17:00:46,450 WARNING  [*] Started epoch: 2
+2023-03-19 17:00:46,561 WARNING  [*] 17:00:46: Train Epoch: 2 [  0  /26120 (0 %)] | Loss: 1.823298 | Elapsed: 0.11s
+2023-03-19 17:00:56,463 WARNING  [*] 17:00:56: Train Epoch: 2 [9600 /26120 (37%)] | Loss: 1.443384 | Elapsed: 9.90s
+2023-03-19 17:01:06,370 WARNING  [*] 17:01:06: Train Epoch: 2 [19200/26120 (73%)] | Loss: 1.145879 | Elapsed: 9.91s
+2023-03-19 17:01:13,538 WARNING  [*] Sun Mar 19 17:01:13 2023:    2    | Tr.loss: 1.428941 | Elapsed:   27.09  s
+2023-03-19 17:01:13,538 WARNING  [*] Started epoch: 3
+2023-03-19 17:01:13,643 WARNING  [*] 17:01:13: Train Epoch: 3 [  0  /26120 (0 %)] | Loss: 0.998623 | Elapsed: 0.11s
+2023-03-19 17:01:23,550 WARNING  [*] 17:01:23: Train Epoch: 3 [9600 /26120 (37%)] | Loss: 1.180411 | Elapsed: 9.91s
+2023-03-19 17:01:33,454 WARNING  [*] 17:01:33: Train Epoch: 3 [19200/26120 (73%)] | Loss: 1.184464 | Elapsed: 9.90s
+2023-03-19 17:01:40,654 WARNING  [*] Sun Mar 19 17:01:40 2023:    3    | Tr.loss: 1.089025 | Elapsed:   27.12  s
+2023-03-19 17:01:40,654 WARNING  [*] Started epoch: 4
+2023-03-19 17:01:40,742 WARNING  [*] 17:01:40: Train Epoch: 4 [  0  /26120 (0 %)] | Loss: 1.275076 | Elapsed: 0.09s
+2023-03-19 17:01:50,658 WARNING  [*] 17:01:50: Train Epoch: 4 [9600 /26120 (37%)] | Loss: 1.071802 | Elapsed: 9.90s
+2023-03-19 17:02:00,595 WARNING  [*] 17:02:00: Train Epoch: 4 [19200/26120 (73%)] | Loss: 0.952889 | Elapsed: 9.92s
+2023-03-19 17:02:07,685 WARNING  [*] Sun Mar 19 17:02:07 2023:    4    | Tr.loss: 0.997796 | Elapsed:   27.03  s
+2023-03-19 17:02:07,685 WARNING  [*] Started epoch: 5
+2023-03-19 17:02:07,786 WARNING  [*] 17:02:07: Train Epoch: 5 [  0  /26120 (0 %)] | Loss: 0.674609 | Elapsed: 0.10s
+2023-03-19 17:02:17,711 WARNING  [*] 17:02:17: Train Epoch: 5 [9600 /26120 (37%)] | Loss: 0.967435 | Elapsed: 9.92s
+2023-03-19 17:02:27,619 WARNING  [*] 17:02:27: Train Epoch: 5 [19200/26120 (73%)] | Loss: 0.926160 | Elapsed: 9.91s
+2023-03-19 17:02:34,730 WARNING  [*] Sun Mar 19 17:02:34 2023:    5    | Tr.loss: 0.905152 | Elapsed:   27.05  s
+2023-03-19 17:02:34,730 WARNING  [*] Started epoch: 6
+2023-03-19 17:02:34,830 WARNING  [*] 17:02:34: Train Epoch: 6 [  0  /26120 (0 %)] | Loss: 0.858557 | Elapsed: 0.10s
+2023-03-19 17:02:44,734 WARNING  [*] 17:02:44: Train Epoch: 6 [9600 /26120 (37%)] | Loss: 0.740258 | Elapsed: 9.90s
+2023-03-19 17:02:54,638 WARNING  [*] 17:02:54: Train Epoch: 6 [19200/26120 (73%)] | Loss: 0.839468 | Elapsed: 9.90s
+2023-03-19 17:03:01,750 WARNING  [*] Sun Mar 19 17:03:01 2023:    6    | Tr.loss: 0.851772 | Elapsed:   27.02  s
+2023-03-19 17:03:01,750 WARNING  [*] Started epoch: 7
+2023-03-19 17:03:01,863 WARNING  [*] 17:03:01: Train Epoch: 7 [  0  /26120 (0 %)] | Loss: 0.852677 | Elapsed: 0.11s
+2023-03-19 17:03:11,821 WARNING  [*] 17:03:11: Train Epoch: 7 [9600 /26120 (37%)] | Loss: 0.754388 | Elapsed: 9.96s
+2023-03-19 17:03:21,737 WARNING  [*] 17:03:21: Train Epoch: 7 [19200/26120 (73%)] | Loss: 1.020015 | Elapsed: 9.92s
+2023-03-19 17:03:28,843 WARNING  [*] Sun Mar 19 17:03:28 2023:    7    | Tr.loss: 0.830366 | Elapsed:   27.09  s
+2023-03-19 17:03:28,843 WARNING  [*] Started epoch: 8
+2023-03-19 17:03:28,948 WARNING  [*] 17:03:28: Train Epoch: 8 [  0  /26120 (0 %)] | Loss: 0.708212 | Elapsed: 0.10s
+2023-03-19 17:03:38,857 WARNING  [*] 17:03:38: Train Epoch: 8 [9600 /26120 (37%)] | Loss: 0.893813 | Elapsed: 9.91s
+2023-03-19 17:03:48,796 WARNING  [*] 17:03:48: Train Epoch: 8 [19200/26120 (73%)] | Loss: 0.673775 | Elapsed: 9.94s
+2023-03-19 17:03:55,904 WARNING  [*] Sun Mar 19 17:03:55 2023:    8    | Tr.loss: 0.793383 | Elapsed:   27.06  s
+2023-03-19 17:03:55,904 WARNING  [*] Started epoch: 9
+2023-03-19 17:03:56,010 WARNING  [*] 17:03:56: Train Epoch: 9 [  0  /26120 (0 %)] | Loss: 0.964996 | Elapsed: 0.11s
+2023-03-19 17:04:05,918 WARNING  [*] 17:04:05: Train Epoch: 9 [9600 /26120 (37%)] | Loss: 0.856886 | Elapsed: 9.91s
+2023-03-19 17:04:15,836 WARNING  [*] 17:04:15: Train Epoch: 9 [19200/26120 (73%)] | Loss: 0.835791 | Elapsed: 9.92s
+2023-03-19 17:04:22,947 WARNING  [*] Sun Mar 19 17:04:22 2023:    9    | Tr.loss: 0.777710 | Elapsed:   27.04  s
+2023-03-19 17:04:22,947 WARNING  [*] Started epoch: 10
+2023-03-19 17:04:23,046 WARNING  [*] 17:04:23: Train Epoch: 10 [  0  /26120 (0 %)] | Loss: 0.612118 | Elapsed: 0.10s
+2023-03-19 17:04:32,941 WARNING  [*] 17:04:32: Train Epoch: 10 [9600 /26120 (37%)] | Loss: 0.727496 | Elapsed: 9.90s
+2023-03-19 17:04:42,925 WARNING  [*] 17:04:42: Train Epoch: 10 [19200/26120 (73%)] | Loss: 0.737800 | Elapsed: 9.98s
+2023-03-19 17:04:50,036 WARNING  [*] Sun Mar 19 17:04:50 2023:   10    | Tr.loss: 0.753796 | Elapsed:   27.09  s
+2023-03-19 17:04:50,036 WARNING  [*] Started epoch: 11
+2023-03-19 17:04:50,135 WARNING  [*] 17:04:50: Train Epoch: 11 [  0  /26120 (0 %)] | Loss: 0.520534 | Elapsed: 0.10s
+2023-03-19 17:05:00,028 WARNING  [*] 17:05:00: Train Epoch: 11 [9600 /26120 (37%)] | Loss: 0.743433 | Elapsed: 9.89s
+2023-03-19 17:05:09,967 WARNING  [*] 17:05:09: Train Epoch: 11 [19200/26120 (73%)] | Loss: 0.882633 | Elapsed: 9.94s
+2023-03-19 17:05:17,084 WARNING  [*] Sun Mar 19 17:05:17 2023:   11    | Tr.loss: 0.746447 | Elapsed:   27.05  s
+2023-03-19 17:05:17,084 WARNING  [*] Started epoch: 12
+2023-03-19 17:05:17,184 WARNING  [*] 17:05:17: Train Epoch: 12 [  0  /26120 (0 %)] | Loss: 0.696731 | Elapsed: 0.10s
+2023-03-19 17:05:19,461 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-19 17:05:19,488 WARNING  [!] Sun Mar 19 17:05:19 2023: Dumped results:
+                model       : 1679241618-model.torch
+		train time  : 1679241618-trainTime.npy
+		train losses: 1679241618-trainLosses.npy
+		train AUC   : 1679241618-auc.npy
+		train F1s   : 1679241618-trainF1s.npy
+		train TPRs  : 1679241618-trainTPRs.npy
+2023-03-19 17:05:19,518 WARNING  [!] Evaluating model on training set...
+2023-03-19 17:05:26,521 WARNING  [!] This fold metrics on training set:
+2023-03-19 17:05:26,572 WARNING 	AUC: 0.9174
+2023-03-19 17:05:26,580 WARNING 	F1: 0.5316
+2023-03-19 17:05:26,580 WARNING  [!] Evaluating model on validation set...
+2023-03-19 17:05:30,091 WARNING  [!] This fold metrics on validation set:
+2023-03-19 17:05:30,111 WARNING 	AUC: 0.9175
+2023-03-19 17:05:30,117 WARNING 	F1: 0.5288
+2023-03-19 17:05:30,214 WARNING  [!] Metrics saved to out_avast_fields_1679237307\cv_mutexes_limNone_r1763_t5\mutexes_metrics_validation.json
+2023-03-19 17:05:30,215 WARNING  [!] Metrics saved to out_avast_fields_1679237307\cv_mutexes_limNone_r1763_t5\mutexes_metrics_training.json
+2023-03-19 17:05:30,216 WARNING  [!] Average epoch time: 0.03s | Mean values over 3 folds:
+	AUC: 0.8960
+
+2023-03-19 17:05:30,285 WARNING  [!!!] Working on files!
+2023-03-19 17:05:30,292 WARNING  [!] Reading and normalizing reports...
+2023-03-19 17:16:54,144 WARNING  [!] Tokenizing and encoding train data!
+2023-03-19 17:16:54,146 WARNING  [!] Size: 39180 | Class counts in test:
+Counter({1: 11557, 5: 10094, 4: 3881, 3: 3362, 6: 3337, 9: 2701, 8: 2088, 7: 1062, 0: 566, 2: 532})
+2023-03-19 17:16:54,147 WARNING  [*] Initializing tokenizer training...
+2023-03-19 17:17:03,120 WARNING Dumped vocab to out_avast_fields_1679237307\files_vocab_30000_seqlen_512\tokenizer_30000_vocab.json
+2023-03-19 17:17:03,880 WARNING Dumped vocab counter to out_avast_fields_1679237307\files_vocab_30000_seqlen_512\tokenizer_30000_counter.json
+2023-03-19 17:17:12,517 WARNING [!] Tokenizing and encoding test data!
+2023-03-19 17:17:12,524 WARNING  [!] Size: 9796 | Class counts in test:
+Counter({1: 11557, 5: 10094, 4: 3881, 3: 3362, 6: 3337, 9: 2701, 8: 2088, 7: 1062, 0: 566, 2: 532})
+2023-03-19 17:17:14,953 WARNING  [!!!] Starting CV over files!
+2023-03-19 17:17:14,996 WARNING  [!] Training time budget: 300min
+2023-03-19 17:17:14,996 WARNING  [!] Model config: {'vocab_size': 30000, 'maxlen': 512, 'chunk_size': 64, 'dModel': 64, 'nHeads': 8, 'dHidden': 256, 'nLayers': 2, 'numClasses': 10, 'hiddenNeurons': [64], 'layerNorm': False, 'dropout': 0.3, 'mean_over_sequence': False, 'norm_first': True}
+2023-03-19 17:17:15,024 WARNING  [1/3] Train set size: 26120, Validation set size: 13060
+2023-03-19 17:17:15,727 WARNING  [!] Saved dataset splits to dataset_splits_1679242634.npz
+2023-03-19 17:17:16,124 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 4.1178e6
+2023-03-19 17:17:16,124 WARNING  [*] Training time budget set: 5.0 min
+2023-03-19 17:17:16,138 WARNING  [*] Started epoch: 1
+2023-03-19 17:17:16,601 WARNING  [*] 17:17:16: Train Epoch: 1 [  0  /26120 (0 %)] | Loss: 12.840909 | Elapsed: 0.46s
+2023-03-19 17:17:26,242 WARNING  [*] 17:17:26: Train Epoch: 1 [9600 /26120 (37%)] | Loss: 1.524142 | Elapsed: 9.64s
+2023-03-19 17:17:35,959 WARNING  [*] 17:17:35: Train Epoch: 1 [19200/26120 (73%)] | Loss: 1.108728 | Elapsed: 9.72s
+2023-03-19 17:17:42,951 WARNING  [*] Sun Mar 19 17:17:42 2023:    1    | Tr.loss: 1.623052 | Elapsed:   26.81  s
+2023-03-19 17:17:42,966 WARNING  [*] Started epoch: 2
+2023-03-19 17:17:43,053 WARNING  [*] 17:17:43: Train Epoch: 2 [  0  /26120 (0 %)] | Loss: 0.945713 | Elapsed: 0.09s
+2023-03-19 17:17:52,862 WARNING  [*] 17:17:52: Train Epoch: 2 [9600 /26120 (37%)] | Loss: 0.857849 | Elapsed: 9.81s
+2023-03-19 17:18:02,708 WARNING  [*] 17:18:02: Train Epoch: 2 [19200/26120 (73%)] | Loss: 0.566630 | Elapsed: 9.85s
+2023-03-19 17:18:09,785 WARNING  [*] Sun Mar 19 17:18:09 2023:    2    | Tr.loss: 0.763996 | Elapsed:   26.82  s
+2023-03-19 17:18:09,785 WARNING  [*] Started epoch: 3
+2023-03-19 17:18:09,898 WARNING  [*] 17:18:09: Train Epoch: 3 [  0  /26120 (0 %)] | Loss: 0.668185 | Elapsed: 0.11s
+2023-03-19 17:18:19,805 WARNING  [*] 17:18:19: Train Epoch: 3 [9600 /26120 (37%)] | Loss: 0.318023 | Elapsed: 9.91s
+2023-03-19 17:18:29,721 WARNING  [*] 17:18:29: Train Epoch: 3 [19200/26120 (73%)] | Loss: 0.380070 | Elapsed: 9.92s
+2023-03-19 17:18:36,990 WARNING  [*] Sun Mar 19 17:18:36 2023:    3    | Tr.loss: 0.530296 | Elapsed:   27.21  s
+2023-03-19 17:18:36,990 WARNING  [*] Started epoch: 4
+2023-03-19 17:18:37,094 WARNING  [*] 17:18:37: Train Epoch: 4 [  0  /26120 (0 %)] | Loss: 0.518464 | Elapsed: 0.10s
+2023-03-19 17:18:47,023 WARNING  [*] 17:18:47: Train Epoch: 4 [9600 /26120 (37%)] | Loss: 0.389036 | Elapsed: 9.93s
+2023-03-19 17:18:56,972 WARNING  [*] 17:18:56: Train Epoch: 4 [19200/26120 (73%)] | Loss: 0.490062 | Elapsed: 9.95s
+2023-03-19 17:19:04,058 WARNING  [*] Sun Mar 19 17:19:04 2023:    4    | Tr.loss: 0.413275 | Elapsed:   27.07  s
+2023-03-19 17:19:04,058 WARNING  [*] Started epoch: 5
+2023-03-19 17:19:04,165 WARNING  [*] 17:19:04: Train Epoch: 5 [  0  /26120 (0 %)] | Loss: 0.259525 | Elapsed: 0.11s
+2023-03-19 17:19:14,014 WARNING  [*] 17:19:14: Train Epoch: 5 [9600 /26120 (37%)] | Loss: 0.288597 | Elapsed: 9.85s
+2023-03-19 17:19:23,892 WARNING  [*] 17:19:23: Train Epoch: 5 [19200/26120 (73%)] | Loss: 0.371801 | Elapsed: 9.88s
+2023-03-19 17:19:30,969 WARNING  [*] Sun Mar 19 17:19:30 2023:    5    | Tr.loss: 0.326836 | Elapsed:   26.91  s
+2023-03-19 17:19:30,969 WARNING  [*] Started epoch: 6
+2023-03-19 17:19:31,070 WARNING  [*] 17:19:31: Train Epoch: 6 [  0  /26120 (0 %)] | Loss: 0.350148 | Elapsed: 0.10s
+2023-03-19 17:19:40,930 WARNING  [*] 17:19:40: Train Epoch: 6 [9600 /26120 (37%)] | Loss: 0.291840 | Elapsed: 9.86s
+2023-03-19 17:19:50,810 WARNING  [*] 17:19:50: Train Epoch: 6 [19200/26120 (73%)] | Loss: 0.219251 | Elapsed: 9.88s
+2023-03-19 17:19:57,902 WARNING  [*] Sun Mar 19 17:19:57 2023:    6    | Tr.loss: 0.272915 | Elapsed:   26.93  s
+2023-03-19 17:19:57,902 WARNING  [*] Started epoch: 7
+2023-03-19 17:19:58,012 WARNING  [*] 17:19:58: Train Epoch: 7 [  0  /26120 (0 %)] | Loss: 0.163537 | Elapsed: 0.11s
+2023-03-19 17:20:08,030 WARNING  [*] 17:20:08: Train Epoch: 7 [9600 /26120 (37%)] | Loss: 0.221296 | Elapsed: 10.02s
+2023-03-19 17:20:17,946 WARNING  [*] 17:20:17: Train Epoch: 7 [19200/26120 (73%)] | Loss: 0.167207 | Elapsed: 9.92s
+2023-03-19 17:20:25,086 WARNING  [*] Sun Mar 19 17:20:25 2023:    7    | Tr.loss: 0.238067 | Elapsed:   27.18  s
+2023-03-19 17:20:25,086 WARNING  [*] Started epoch: 8
+2023-03-19 17:20:25,182 WARNING  [*] 17:20:25: Train Epoch: 8 [  0  /26120 (0 %)] | Loss: 0.091586 | Elapsed: 0.10s
+2023-03-19 17:20:35,078 WARNING  [*] 17:20:35: Train Epoch: 8 [9600 /26120 (37%)] | Loss: 0.116358 | Elapsed: 9.90s
+2023-03-19 17:20:44,982 WARNING  [*] 17:20:44: Train Epoch: 8 [19200/26120 (73%)] | Loss: 0.108374 | Elapsed: 9.90s
+2023-03-19 17:20:52,095 WARNING  [*] Sun Mar 19 17:20:52 2023:    8    | Tr.loss: 0.200396 | Elapsed:   27.01  s
+2023-03-19 17:20:52,095 WARNING  [*] Started epoch: 9
+2023-03-19 17:20:52,195 WARNING  [*] 17:20:52: Train Epoch: 9 [  0  /26120 (0 %)] | Loss: 0.256965 | Elapsed: 0.10s
+2023-03-19 17:21:02,105 WARNING  [*] 17:21:02: Train Epoch: 9 [9600 /26120 (37%)] | Loss: 0.261379 | Elapsed: 9.91s
+2023-03-19 17:21:12,000 WARNING  [*] 17:21:12: Train Epoch: 9 [19200/26120 (73%)] | Loss: 0.257959 | Elapsed: 9.90s
+2023-03-19 17:21:19,108 WARNING  [*] Sun Mar 19 17:21:19 2023:    9    | Tr.loss: 0.181137 | Elapsed:   27.01  s
+2023-03-19 17:21:19,108 WARNING  [*] Started epoch: 10
+2023-03-19 17:21:19,217 WARNING  [*] 17:21:19: Train Epoch: 10 [  0  /26120 (0 %)] | Loss: 0.138111 | Elapsed: 0.11s
+2023-03-19 17:21:29,111 WARNING  [*] 17:21:29: Train Epoch: 10 [9600 /26120 (37%)] | Loss: 0.146468 | Elapsed: 9.89s
+2023-03-19 17:21:39,181 WARNING  [*] 17:21:39: Train Epoch: 10 [19200/26120 (73%)] | Loss: 0.163101 | Elapsed: 10.07s
+2023-03-19 17:21:46,298 WARNING  [*] Sun Mar 19 17:21:46 2023:   10    | Tr.loss: 0.170916 | Elapsed:   27.19  s
+2023-03-19 17:21:46,298 WARNING  [*] Started epoch: 11
+2023-03-19 17:21:46,411 WARNING  [*] 17:21:46: Train Epoch: 11 [  0  /26120 (0 %)] | Loss: 0.109819 | Elapsed: 0.11s
+2023-03-19 17:21:56,332 WARNING  [*] 17:21:56: Train Epoch: 11 [9600 /26120 (37%)] | Loss: 0.288023 | Elapsed: 9.92s
+2023-03-19 17:22:06,253 WARNING  [*] 17:22:06: Train Epoch: 11 [19200/26120 (73%)] | Loss: 0.123269 | Elapsed: 9.92s
+2023-03-19 17:22:13,371 WARNING  [*] Sun Mar 19 17:22:13 2023:   11    | Tr.loss: 0.158540 | Elapsed:   27.07  s
+2023-03-19 17:22:13,371 WARNING  [*] Started epoch: 12
+2023-03-19 17:22:13,473 WARNING  [*] 17:22:13: Train Epoch: 12 [  0  /26120 (0 %)] | Loss: 0.141979 | Elapsed: 0.10s
+2023-03-19 17:22:16,149 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-19 17:22:16,185 WARNING  [!] Sun Mar 19 17:22:16 2023: Dumped results:
+                model       : 1679242634-model.torch
+		train time  : 1679242634-trainTime.npy
+		train losses: 1679242634-trainLosses.npy
+		train AUC   : 1679242634-auc.npy
+		train F1s   : 1679242634-trainF1s.npy
+		train TPRs  : 1679242634-trainTPRs.npy
+2023-03-19 17:22:16,192 WARNING  [!] Evaluating model on training set...
+2023-03-19 17:22:23,205 WARNING  [!] This fold metrics on training set:
+2023-03-19 17:22:23,265 WARNING 	AUC: 0.9986
+2023-03-19 17:22:23,269 WARNING 	F1: 0.9534
+2023-03-19 17:22:23,269 WARNING  [!] Evaluating model on validation set...
+2023-03-19 17:22:26,777 WARNING  [!] This fold metrics on validation set:
+2023-03-19 17:22:26,793 WARNING 	AUC: 0.9980
+2023-03-19 17:22:26,812 WARNING 	F1: 0.9462
+2023-03-19 17:22:27,005 WARNING  [2/3] Train set size: 26120, Validation set size: 13060
+2023-03-19 17:22:27,712 WARNING  [!] Saved dataset splits to dataset_splits_1679242946.npz
+2023-03-19 17:22:27,771 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 4.1178e6
+2023-03-19 17:22:27,772 WARNING  [*] Training time budget set: 5.0 min
+2023-03-19 17:22:27,775 WARNING  [*] Started epoch: 1
+2023-03-19 17:22:27,885 WARNING  [*] 17:22:27: Train Epoch: 1 [  0  /26120 (0 %)] | Loss: 12.963866 | Elapsed: 0.11s
+2023-03-19 17:22:37,810 WARNING  [*] 17:22:37: Train Epoch: 1 [9600 /26120 (37%)] | Loss: 1.473845 | Elapsed: 9.92s
+2023-03-19 17:22:47,724 WARNING  [*] 17:22:47: Train Epoch: 1 [19200/26120 (73%)] | Loss: 1.222980 | Elapsed: 9.91s
+2023-03-19 17:22:54,846 WARNING  [*] Sun Mar 19 17:22:54 2023:    1    | Tr.loss: 1.465847 | Elapsed:   27.07  s
+2023-03-19 17:22:54,846 WARNING  [*] Started epoch: 2
+2023-03-19 17:22:54,947 WARNING  [*] 17:22:54: Train Epoch: 2 [  0  /26120 (0 %)] | Loss: 0.794272 | Elapsed: 0.10s
+2023-03-19 17:23:04,877 WARNING  [*] 17:23:04: Train Epoch: 2 [9600 /26120 (37%)] | Loss: 0.801239 | Elapsed: 9.93s
+2023-03-19 17:23:14,790 WARNING  [*] 17:23:14: Train Epoch: 2 [19200/26120 (73%)] | Loss: 0.614246 | Elapsed: 9.91s
+2023-03-19 17:23:21,902 WARNING  [*] Sun Mar 19 17:23:21 2023:    2    | Tr.loss: 0.654730 | Elapsed:   27.06  s
+2023-03-19 17:23:21,902 WARNING  [*] Started epoch: 3
+2023-03-19 17:23:22,017 WARNING  [*] 17:23:22: Train Epoch: 3 [  0  /26120 (0 %)] | Loss: 0.666076 | Elapsed: 0.11s
+2023-03-19 17:23:31,937 WARNING  [*] 17:23:31: Train Epoch: 3 [9600 /26120 (37%)] | Loss: 0.517893 | Elapsed: 9.92s
+2023-03-19 17:23:41,864 WARNING  [*] 17:23:41: Train Epoch: 3 [19200/26120 (73%)] | Loss: 0.420949 | Elapsed: 9.93s
+2023-03-19 17:23:49,195 WARNING  [*] Sun Mar 19 17:23:49 2023:    3    | Tr.loss: 0.455798 | Elapsed:   27.29  s
+2023-03-19 17:23:49,195 WARNING  [*] Started epoch: 4
+2023-03-19 17:23:49,294 WARNING  [*] 17:23:49: Train Epoch: 4 [  0  /26120 (0 %)] | Loss: 0.357420 | Elapsed: 0.10s
+2023-03-19 17:23:59,259 WARNING  [*] 17:23:59: Train Epoch: 4 [9600 /26120 (37%)] | Loss: 0.349177 | Elapsed: 9.97s
+2023-03-19 17:24:09,195 WARNING  [*] 17:24:09: Train Epoch: 4 [19200/26120 (73%)] | Loss: 0.355107 | Elapsed: 9.94s
+2023-03-19 17:24:16,317 WARNING  [*] Sun Mar 19 17:24:16 2023:    4    | Tr.loss: 0.371161 | Elapsed:   27.12  s
+2023-03-19 17:24:16,330 WARNING  [*] Started epoch: 5
+2023-03-19 17:24:16,428 WARNING  [*] 17:24:16: Train Epoch: 5 [  0  /26120 (0 %)] | Loss: 0.363335 | Elapsed: 0.10s
+2023-03-19 17:24:26,351 WARNING  [*] 17:24:26: Train Epoch: 5 [9600 /26120 (37%)] | Loss: 0.254479 | Elapsed: 9.92s
+2023-03-19 17:24:36,297 WARNING  [*] 17:24:36: Train Epoch: 5 [19200/26120 (73%)] | Loss: 0.148255 | Elapsed: 9.95s
+2023-03-19 17:24:43,426 WARNING  [*] Sun Mar 19 17:24:43 2023:    5    | Tr.loss: 0.286909 | Elapsed:   27.10  s
+2023-03-19 17:24:43,426 WARNING  [*] Started epoch: 6
+2023-03-19 17:24:43,521 WARNING  [*] 17:24:43: Train Epoch: 6 [  0  /26120 (0 %)] | Loss: 0.164899 | Elapsed: 0.10s
+2023-03-19 17:24:53,465 WARNING  [*] 17:24:53: Train Epoch: 6 [9600 /26120 (37%)] | Loss: 0.215669 | Elapsed: 9.94s
+2023-03-19 17:25:03,400 WARNING  [*] 17:25:03: Train Epoch: 6 [19200/26120 (73%)] | Loss: 0.245868 | Elapsed: 9.93s
+2023-03-19 17:25:10,532 WARNING  [*] Sun Mar 19 17:25:10 2023:    6    | Tr.loss: 0.241120 | Elapsed:   27.11  s
+2023-03-19 17:25:10,532 WARNING  [*] Started epoch: 7
+2023-03-19 17:25:10,630 WARNING  [*] 17:25:10: Train Epoch: 7 [  0  /26120 (0 %)] | Loss: 0.228124 | Elapsed: 0.10s
+2023-03-19 17:25:20,724 WARNING  [*] 17:25:20: Train Epoch: 7 [9600 /26120 (37%)] | Loss: 0.162058 | Elapsed: 10.09s
+2023-03-19 17:25:30,657 WARNING  [*] 17:25:30: Train Epoch: 7 [19200/26120 (73%)] | Loss: 0.163835 | Elapsed: 9.93s
+2023-03-19 17:25:37,833 WARNING  [*] Sun Mar 19 17:25:37 2023:    7    | Tr.loss: 0.207860 | Elapsed:   27.30  s
+2023-03-19 17:25:37,833 WARNING  [*] Started epoch: 8
+2023-03-19 17:25:37,932 WARNING  [*] 17:25:37: Train Epoch: 8 [  0  /26120 (0 %)] | Loss: 0.095948 | Elapsed: 0.10s
+2023-03-19 17:25:47,879 WARNING  [*] 17:25:47: Train Epoch: 8 [9600 /26120 (37%)] | Loss: 0.154901 | Elapsed: 9.95s
+2023-03-19 17:25:57,839 WARNING  [*] 17:25:57: Train Epoch: 8 [19200/26120 (73%)] | Loss: 0.167825 | Elapsed: 9.96s
+2023-03-19 17:26:04,973 WARNING  [*] Sun Mar 19 17:26:04 2023:    8    | Tr.loss: 0.183758 | Elapsed:   27.14  s
+2023-03-19 17:26:04,973 WARNING  [*] Started epoch: 9
+2023-03-19 17:26:05,073 WARNING  [*] 17:26:05: Train Epoch: 9 [  0  /26120 (0 %)] | Loss: 0.132940 | Elapsed: 0.10s
+2023-03-19 17:26:15,010 WARNING  [*] 17:26:15: Train Epoch: 9 [9600 /26120 (37%)] | Loss: 0.127415 | Elapsed: 9.94s
+2023-03-19 17:26:24,945 WARNING  [*] 17:26:24: Train Epoch: 9 [19200/26120 (73%)] | Loss: 0.270829 | Elapsed: 9.94s
+2023-03-19 17:26:32,079 WARNING  [*] Sun Mar 19 17:26:32 2023:    9    | Tr.loss: 0.173276 | Elapsed:   27.11  s
+2023-03-19 17:26:32,079 WARNING  [*] Started epoch: 10
+2023-03-19 17:26:32,183 WARNING  [*] 17:26:32: Train Epoch: 10 [  0  /26120 (0 %)] | Loss: 0.074155 | Elapsed: 0.10s
+2023-03-19 17:26:42,155 WARNING  [*] 17:26:42: Train Epoch: 10 [9600 /26120 (37%)] | Loss: 0.116349 | Elapsed: 9.97s
+2023-03-19 17:26:52,317 WARNING  [*] 17:26:52: Train Epoch: 10 [19200/26120 (73%)] | Loss: 0.165346 | Elapsed: 10.16s
+2023-03-19 17:26:59,447 WARNING  [*] Sun Mar 19 17:26:59 2023:   10    | Tr.loss: 0.156009 | Elapsed:   27.37  s
+2023-03-19 17:26:59,457 WARNING  [*] Started epoch: 11
+2023-03-19 17:26:59,555 WARNING  [*] 17:26:59: Train Epoch: 11 [  0  /26120 (0 %)] | Loss: 0.188881 | Elapsed: 0.10s
+2023-03-19 17:27:09,508 WARNING  [*] 17:27:09: Train Epoch: 11 [9600 /26120 (37%)] | Loss: 0.118500 | Elapsed: 9.95s
+2023-03-19 17:27:19,455 WARNING  [*] 17:27:19: Train Epoch: 11 [19200/26120 (73%)] | Loss: 0.113920 | Elapsed: 9.95s
+2023-03-19 17:27:26,587 WARNING  [*] Sun Mar 19 17:27:26 2023:   11    | Tr.loss: 0.145391 | Elapsed:   27.13  s
+2023-03-19 17:27:26,587 WARNING  [*] Started epoch: 12
+2023-03-19 17:27:26,697 WARNING  [*] 17:27:26: Train Epoch: 12 [  0  /26120 (0 %)] | Loss: 0.157855 | Elapsed: 0.11s
+2023-03-19 17:27:27,791 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-19 17:27:27,820 WARNING  [!] Sun Mar 19 17:27:27 2023: Dumped results:
+                model       : 1679242946-model.torch
+		train time  : 1679242946-trainTime.npy
+		train losses: 1679242946-trainLosses.npy
+		train AUC   : 1679242946-auc.npy
+		train F1s   : 1679242946-trainF1s.npy
+		train TPRs  : 1679242946-trainTPRs.npy
+2023-03-19 17:27:27,831 WARNING  [!] Evaluating model on training set...
+2023-03-19 17:27:34,840 WARNING  [!] This fold metrics on training set:
+2023-03-19 17:27:34,885 WARNING 	AUC: 0.9987
+2023-03-19 17:27:34,899 WARNING 	F1: 0.9546
+2023-03-19 17:27:34,899 WARNING  [!] Evaluating model on validation set...
+2023-03-19 17:27:38,404 WARNING  [!] This fold metrics on validation set:
+2023-03-19 17:27:38,438 WARNING 	AUC: 0.9981
+2023-03-19 17:27:38,441 WARNING 	F1: 0.9475
+2023-03-19 17:27:38,641 WARNING  [3/3] Train set size: 26120, Validation set size: 13060
+2023-03-19 17:27:39,339 WARNING  [!] Saved dataset splits to dataset_splits_1679243258.npz
+2023-03-19 17:27:39,400 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 4.1178e6
+2023-03-19 17:27:39,400 WARNING  [*] Training time budget set: 5.0 min
+2023-03-19 17:27:39,405 WARNING  [*] Started epoch: 1
+2023-03-19 17:27:39,516 WARNING  [*] 17:27:39: Train Epoch: 1 [  0  /26120 (0 %)] | Loss: 11.373089 | Elapsed: 0.11s
+2023-03-19 17:27:49,501 WARNING  [*] 17:27:49: Train Epoch: 1 [9600 /26120 (37%)] | Loss: 1.669904 | Elapsed: 9.98s
+2023-03-19 17:27:59,451 WARNING  [*] 17:27:59: Train Epoch: 1 [19200/26120 (73%)] | Loss: 1.133976 | Elapsed: 9.95s
+2023-03-19 17:28:06,587 WARNING  [*] Sun Mar 19 17:28:06 2023:    1    | Tr.loss: 1.478331 | Elapsed:   27.18  s
+2023-03-19 17:28:06,587 WARNING  [*] Started epoch: 2
+2023-03-19 17:28:06,691 WARNING  [*] 17:28:06: Train Epoch: 2 [  0  /26120 (0 %)] | Loss: 0.945139 | Elapsed: 0.10s
+2023-03-19 17:28:16,624 WARNING  [*] 17:28:16: Train Epoch: 2 [9600 /26120 (37%)] | Loss: 0.792387 | Elapsed: 9.93s
+2023-03-19 17:28:26,591 WARNING  [*] 17:28:26: Train Epoch: 2 [19200/26120 (73%)] | Loss: 0.762184 | Elapsed: 9.97s
+2023-03-19 17:28:33,734 WARNING  [*] Sun Mar 19 17:28:33 2023:    2    | Tr.loss: 0.670715 | Elapsed:   27.15  s
+2023-03-19 17:28:33,734 WARNING  [*] Started epoch: 3
+2023-03-19 17:28:33,837 WARNING  [*] 17:28:33: Train Epoch: 3 [  0  /26120 (0 %)] | Loss: 0.476304 | Elapsed: 0.10s
+2023-03-19 17:28:43,789 WARNING  [*] 17:28:43: Train Epoch: 3 [9600 /26120 (37%)] | Loss: 0.323108 | Elapsed: 9.95s
+2023-03-19 17:28:53,749 WARNING  [*] 17:28:53: Train Epoch: 3 [19200/26120 (73%)] | Loss: 0.462748 | Elapsed: 9.96s
+2023-03-19 17:29:01,056 WARNING  [*] Sun Mar 19 17:29:01 2023:    3    | Tr.loss: 0.445451 | Elapsed:   27.32  s
+2023-03-19 17:29:01,056 WARNING  [*] Started epoch: 4
+2023-03-19 17:29:01,158 WARNING  [*] 17:29:01: Train Epoch: 4 [  0  /26120 (0 %)] | Loss: 0.411796 | Elapsed: 0.10s
+2023-03-19 17:29:11,104 WARNING  [*] 17:29:11: Train Epoch: 4 [9600 /26120 (37%)] | Loss: 0.461398 | Elapsed: 9.95s
+2023-03-19 17:29:21,048 WARNING  [*] 17:29:21: Train Epoch: 4 [19200/26120 (73%)] | Loss: 0.213271 | Elapsed: 9.94s
+2023-03-19 17:29:28,186 WARNING  [*] Sun Mar 19 17:29:28 2023:    4    | Tr.loss: 0.356806 | Elapsed:   27.13  s
+2023-03-19 17:29:28,186 WARNING  [*] Started epoch: 5
+2023-03-19 17:29:28,285 WARNING  [*] 17:29:28: Train Epoch: 5 [  0  /26120 (0 %)] | Loss: 0.562868 | Elapsed: 0.10s
+2023-03-19 17:29:38,223 WARNING  [*] 17:29:38: Train Epoch: 5 [9600 /26120 (37%)] | Loss: 0.286323 | Elapsed: 9.94s
+2023-03-19 17:29:48,209 WARNING  [*] 17:29:48: Train Epoch: 5 [19200/26120 (73%)] | Loss: 0.292682 | Elapsed: 9.99s
+2023-03-19 17:29:55,380 WARNING  [*] Sun Mar 19 17:29:55 2023:    5    | Tr.loss: 0.293602 | Elapsed:   27.19  s
+2023-03-19 17:29:55,380 WARNING  [*] Started epoch: 6
+2023-03-19 17:29:55,494 WARNING  [*] 17:29:55: Train Epoch: 6 [  0  /26120 (0 %)] | Loss: 0.282740 | Elapsed: 0.11s
+2023-03-19 17:30:05,460 WARNING  [*] 17:30:05: Train Epoch: 6 [9600 /26120 (37%)] | Loss: 0.254703 | Elapsed: 9.97s
+2023-03-19 17:30:15,408 WARNING  [*] 17:30:15: Train Epoch: 6 [19200/26120 (73%)] | Loss: 0.228218 | Elapsed: 9.95s
+2023-03-19 17:30:22,542 WARNING  [*] Sun Mar 19 17:30:22 2023:    6    | Tr.loss: 0.243637 | Elapsed:   27.16  s
+2023-03-19 17:30:22,542 WARNING  [*] Started epoch: 7
+2023-03-19 17:30:22,646 WARNING  [*] 17:30:22: Train Epoch: 7 [  0  /26120 (0 %)] | Loss: 0.246375 | Elapsed: 0.10s
+2023-03-19 17:30:32,731 WARNING  [*] 17:30:32: Train Epoch: 7 [9600 /26120 (37%)] | Loss: 0.309809 | Elapsed: 10.08s
+2023-03-19 17:30:42,699 WARNING  [*] 17:30:42: Train Epoch: 7 [19200/26120 (73%)] | Loss: 0.083305 | Elapsed: 9.97s
+2023-03-19 17:30:49,844 WARNING  [*] Sun Mar 19 17:30:49 2023:    7    | Tr.loss: 0.216214 | Elapsed:   27.30  s
+2023-03-19 17:30:49,844 WARNING  [*] Started epoch: 8
+2023-03-19 17:30:49,943 WARNING  [*] 17:30:49: Train Epoch: 8 [  0  /26120 (0 %)] | Loss: 0.272799 | Elapsed: 0.10s
+2023-03-19 17:30:59,895 WARNING  [*] 17:30:59: Train Epoch: 8 [9600 /26120 (37%)] | Loss: 0.234248 | Elapsed: 9.95s
+2023-03-19 17:31:09,865 WARNING  [*] 17:31:09: Train Epoch: 8 [19200/26120 (73%)] | Loss: 0.085052 | Elapsed: 9.97s
+2023-03-19 17:31:17,009 WARNING  [*] Sun Mar 19 17:31:17 2023:    8    | Tr.loss: 0.192577 | Elapsed:   27.17  s
+2023-03-19 17:31:17,009 WARNING  [*] Started epoch: 9
+2023-03-19 17:31:17,114 WARNING  [*] 17:31:17: Train Epoch: 9 [  0  /26120 (0 %)] | Loss: 0.182661 | Elapsed: 0.10s
+2023-03-19 17:31:27,053 WARNING  [*] 17:31:27: Train Epoch: 9 [9600 /26120 (37%)] | Loss: 0.122557 | Elapsed: 9.94s
+2023-03-19 17:31:37,012 WARNING  [*] 17:31:37: Train Epoch: 9 [19200/26120 (73%)] | Loss: 0.080396 | Elapsed: 9.96s
+2023-03-19 17:31:44,170 WARNING  [*] Sun Mar 19 17:31:44 2023:    9    | Tr.loss: 0.168675 | Elapsed:   27.16  s
+2023-03-19 17:31:44,170 WARNING  [*] Started epoch: 10
+2023-03-19 17:31:44,274 WARNING  [*] 17:31:44: Train Epoch: 10 [  0  /26120 (0 %)] | Loss: 0.160613 | Elapsed: 0.10s
+2023-03-19 17:31:54,241 WARNING  [*] 17:31:54: Train Epoch: 10 [9600 /26120 (37%)] | Loss: 0.102064 | Elapsed: 9.97s
+2023-03-19 17:32:04,404 WARNING  [*] 17:32:04: Train Epoch: 10 [19200/26120 (73%)] | Loss: 0.265268 | Elapsed: 10.16s
+2023-03-19 17:32:11,543 WARNING  [*] Sun Mar 19 17:32:11 2023:   10    | Tr.loss: 0.160354 | Elapsed:   27.37  s
+2023-03-19 17:32:11,543 WARNING  [*] Started epoch: 11
+2023-03-19 17:32:11,644 WARNING  [*] 17:32:11: Train Epoch: 11 [  0  /26120 (0 %)] | Loss: 0.120171 | Elapsed: 0.10s
+2023-03-19 17:32:21,608 WARNING  [*] 17:32:21: Train Epoch: 11 [9600 /26120 (37%)] | Loss: 0.154961 | Elapsed: 9.96s
+2023-03-19 17:32:31,548 WARNING  [*] 17:32:31: Train Epoch: 11 [19200/26120 (73%)] | Loss: 0.193070 | Elapsed: 9.94s
+2023-03-19 17:32:38,673 WARNING  [*] Sun Mar 19 17:32:38 2023:   11    | Tr.loss: 0.146735 | Elapsed:   27.13  s
+2023-03-19 17:32:38,673 WARNING  [*] Started epoch: 12
+2023-03-19 17:32:38,787 WARNING  [*] 17:32:38: Train Epoch: 12 [  0  /26120 (0 %)] | Loss: 0.135468 | Elapsed: 0.11s
+2023-03-19 17:32:39,470 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-19 17:32:39,504 WARNING  [!] Sun Mar 19 17:32:39 2023: Dumped results:
+                model       : 1679243258-model.torch
+		train time  : 1679243258-trainTime.npy
+		train losses: 1679243258-trainLosses.npy
+		train AUC   : 1679243258-auc.npy
+		train F1s   : 1679243258-trainF1s.npy
+		train TPRs  : 1679243258-trainTPRs.npy
+2023-03-19 17:32:39,515 WARNING  [!] Evaluating model on training set...
+2023-03-19 17:32:46,541 WARNING  [!] This fold metrics on training set:
+2023-03-19 17:32:46,597 WARNING 	AUC: 0.9988
+2023-03-19 17:32:46,600 WARNING 	F1: 0.9541
+2023-03-19 17:32:46,600 WARNING  [!] Evaluating model on validation set...
+2023-03-19 17:32:50,116 WARNING  [!] This fold metrics on validation set:
+2023-03-19 17:32:50,148 WARNING 	AUC: 0.9982
+2023-03-19 17:32:50,152 WARNING 	F1: 0.9458
+2023-03-19 17:32:50,311 WARNING  [!] Metrics saved to out_avast_fields_1679237307\cv_files_limNone_r1763_t5\files_metrics_validation.json
+2023-03-19 17:32:50,311 WARNING  [!] Metrics saved to out_avast_fields_1679237307\cv_files_limNone_r1763_t5\files_metrics_training.json
+2023-03-19 17:32:50,315 WARNING  [!] Average epoch time: 0.03s | Mean values over 3 folds:
+	AUC: 0.9981
+
+2023-03-19 17:32:50,467 WARNING  [!!!] Working on keys!
+2023-03-19 17:32:50,472 WARNING  [!] Reading and normalizing reports...
+2023-03-19 17:43:39,694 WARNING  [!] Tokenizing and encoding train data!
+2023-03-19 17:43:39,696 WARNING  [!] Size: 39180 | Class counts in test:
+Counter({1: 11557, 5: 10094, 4: 3881, 3: 3362, 6: 3337, 9: 2701, 8: 2088, 7: 1062, 0: 566, 2: 532})
+2023-03-19 17:43:39,698 WARNING  [*] Initializing tokenizer training...
+2023-03-19 17:44:16,179 WARNING Dumped vocab to out_avast_fields_1679237307\keys_vocab_30000_seqlen_512\tokenizer_30000_vocab.json
+2023-03-19 17:44:16,675 WARNING Dumped vocab counter to out_avast_fields_1679237307\keys_vocab_30000_seqlen_512\tokenizer_30000_counter.json
+2023-03-19 17:44:54,625 WARNING [!] Tokenizing and encoding test data!
+2023-03-19 17:44:54,636 WARNING  [!] Size: 9796 | Class counts in test:
+Counter({1: 11557, 5: 10094, 4: 3881, 3: 3362, 6: 3337, 9: 2701, 8: 2088, 7: 1062, 0: 566, 2: 532})
+2023-03-19 17:45:03,325 WARNING  [!!!] Starting CV over keys!
+2023-03-19 17:45:03,372 WARNING  [!] Training time budget: 300min
+2023-03-19 17:45:03,373 WARNING  [!] Model config: {'vocab_size': 30000, 'maxlen': 512, 'chunk_size': 64, 'dModel': 64, 'nHeads': 8, 'dHidden': 256, 'nLayers': 2, 'numClasses': 10, 'hiddenNeurons': [64], 'layerNorm': False, 'dropout': 0.3, 'mean_over_sequence': False, 'norm_first': True}
+2023-03-19 17:45:03,409 WARNING  [1/3] Train set size: 26120, Validation set size: 13060
+2023-03-19 17:45:04,457 WARNING  [!] Saved dataset splits to dataset_splits_1679244303.npz
+2023-03-19 17:45:04,853 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 4.1178e6
+2023-03-19 17:45:04,853 WARNING  [*] Training time budget set: 5.0 min
+2023-03-19 17:45:04,867 WARNING  [*] Started epoch: 1
+2023-03-19 17:45:05,335 WARNING  [*] 17:45:05: Train Epoch: 1 [  0  /26120 (0 %)] | Loss: 12.797764 | Elapsed: 0.47s
+2023-03-19 17:45:14,991 WARNING  [*] 17:45:14: Train Epoch: 1 [9600 /26120 (37%)] | Loss: 1.294914 | Elapsed: 9.66s
+2023-03-19 17:45:24,716 WARNING  [*] 17:45:24: Train Epoch: 1 [19200/26120 (73%)] | Loss: 0.921183 | Elapsed: 9.73s
+2023-03-19 17:45:31,757 WARNING  [*] Sun Mar 19 17:45:31 2023:    1    | Tr.loss: 1.367851 | Elapsed:   26.89  s
+2023-03-19 17:45:31,757 WARNING  [*] Started epoch: 2
+2023-03-19 17:45:31,856 WARNING  [*] 17:45:31: Train Epoch: 2 [  0  /26120 (0 %)] | Loss: 0.906569 | Elapsed: 0.10s
+2023-03-19 17:45:41,631 WARNING  [*] 17:45:41: Train Epoch: 2 [9600 /26120 (37%)] | Loss: 0.796791 | Elapsed: 9.78s
+2023-03-19 17:45:51,437 WARNING  [*] 17:45:51: Train Epoch: 2 [19200/26120 (73%)] | Loss: 0.475694 | Elapsed: 9.81s
+2023-03-19 17:45:58,499 WARNING  [*] Sun Mar 19 17:45:58 2023:    2    | Tr.loss: 0.741501 | Elapsed:   26.74  s
+2023-03-19 17:45:58,499 WARNING  [*] Started epoch: 3
+2023-03-19 17:45:58,599 WARNING  [*] 17:45:58: Train Epoch: 3 [  0  /26120 (0 %)] | Loss: 0.695149 | Elapsed: 0.10s
+2023-03-19 17:46:08,460 WARNING  [*] 17:46:08: Train Epoch: 3 [9600 /26120 (37%)] | Loss: 0.492477 | Elapsed: 9.86s
+2023-03-19 17:46:18,286 WARNING  [*] 17:46:18: Train Epoch: 3 [19200/26120 (73%)] | Loss: 0.412637 | Elapsed: 9.83s
+2023-03-19 17:46:25,350 WARNING  [*] Sun Mar 19 17:46:25 2023:    3    | Tr.loss: 0.501253 | Elapsed:   26.85  s
+2023-03-19 17:46:25,350 WARNING  [*] Started epoch: 4
+2023-03-19 17:46:25,463 WARNING  [*] 17:46:25: Train Epoch: 4 [  0  /26120 (0 %)] | Loss: 0.421582 | Elapsed: 0.11s
+2023-03-19 17:46:35,681 WARNING  [*] 17:46:35: Train Epoch: 4 [9600 /26120 (37%)] | Loss: 0.341292 | Elapsed: 10.22s
+2023-03-19 17:46:45,545 WARNING  [*] 17:46:45: Train Epoch: 4 [19200/26120 (73%)] | Loss: 0.456369 | Elapsed: 9.86s
+2023-03-19 17:46:52,664 WARNING  [*] Sun Mar 19 17:46:52 2023:    4    | Tr.loss: 0.354313 | Elapsed:   27.31  s
+2023-03-19 17:46:52,664 WARNING  [*] Started epoch: 5
+2023-03-19 17:46:52,767 WARNING  [*] 17:46:52: Train Epoch: 5 [  0  /26120 (0 %)] | Loss: 0.206253 | Elapsed: 0.10s
+2023-03-19 17:47:02,651 WARNING  [*] 17:47:02: Train Epoch: 5 [9600 /26120 (37%)] | Loss: 0.285376 | Elapsed: 9.88s
+2023-03-19 17:47:12,516 WARNING  [*] 17:47:12: Train Epoch: 5 [19200/26120 (73%)] | Loss: 0.176697 | Elapsed: 9.86s
+2023-03-19 17:47:19,596 WARNING  [*] Sun Mar 19 17:47:19 2023:    5    | Tr.loss: 0.258858 | Elapsed:   26.93  s
+2023-03-19 17:47:19,596 WARNING  [*] Started epoch: 6
+2023-03-19 17:47:19,711 WARNING  [*] 17:47:19: Train Epoch: 6 [  0  /26120 (0 %)] | Loss: 0.233702 | Elapsed: 0.11s
+2023-03-19 17:47:29,581 WARNING  [*] 17:47:29: Train Epoch: 6 [9600 /26120 (37%)] | Loss: 0.180894 | Elapsed: 9.87s
+2023-03-19 17:47:39,476 WARNING  [*] 17:47:39: Train Epoch: 6 [19200/26120 (73%)] | Loss: 0.170252 | Elapsed: 9.88s
+2023-03-19 17:47:46,572 WARNING  [*] Sun Mar 19 17:47:46 2023:    6    | Tr.loss: 0.202959 | Elapsed:   26.98  s
+2023-03-19 17:47:46,572 WARNING  [*] Started epoch: 7
+2023-03-19 17:47:46,674 WARNING  [*] 17:47:46: Train Epoch: 7 [  0  /26120 (0 %)] | Loss: 0.138127 | Elapsed: 0.10s
+2023-03-19 17:47:56,924 WARNING  [*] 17:47:56: Train Epoch: 7 [9600 /26120 (37%)] | Loss: 0.107410 | Elapsed: 10.25s
+2023-03-19 17:48:06,820 WARNING  [*] 17:48:06: Train Epoch: 7 [19200/26120 (73%)] | Loss: 0.064561 | Elapsed: 9.90s
+2023-03-19 17:48:13,895 WARNING  [*] Sun Mar 19 17:48:13 2023:    7    | Tr.loss: 0.172922 | Elapsed:   27.32  s
+2023-03-19 17:48:13,895 WARNING  [*] Started epoch: 8
+2023-03-19 17:48:14,008 WARNING  [*] 17:48:14: Train Epoch: 8 [  0  /26120 (0 %)] | Loss: 0.152107 | Elapsed: 0.11s
+2023-03-19 17:48:23,896 WARNING  [*] 17:48:23: Train Epoch: 8 [9600 /26120 (37%)] | Loss: 0.102842 | Elapsed: 9.89s
+2023-03-19 17:48:33,796 WARNING  [*] 17:48:33: Train Epoch: 8 [19200/26120 (73%)] | Loss: 0.144382 | Elapsed: 9.90s
+2023-03-19 17:48:40,914 WARNING  [*] Sun Mar 19 17:48:40 2023:    8    | Tr.loss: 0.146595 | Elapsed:   27.02  s
+2023-03-19 17:48:40,914 WARNING  [*] Started epoch: 9
+2023-03-19 17:48:41,016 WARNING  [*] 17:48:41: Train Epoch: 9 [  0  /26120 (0 %)] | Loss: 0.157523 | Elapsed: 0.10s
+2023-03-19 17:48:50,958 WARNING  [*] 17:48:50: Train Epoch: 9 [9600 /26120 (37%)] | Loss: 0.089817 | Elapsed: 9.94s
+2023-03-19 17:49:00,873 WARNING  [*] 17:49:00: Train Epoch: 9 [19200/26120 (73%)] | Loss: 0.126591 | Elapsed: 9.92s
+2023-03-19 17:49:07,981 WARNING  [*] Sun Mar 19 17:49:07 2023:    9    | Tr.loss: 0.132853 | Elapsed:   27.07  s
+2023-03-19 17:49:07,981 WARNING  [*] Started epoch: 10
+2023-03-19 17:49:08,078 WARNING  [*] 17:49:08: Train Epoch: 10 [  0  /26120 (0 %)] | Loss: 0.080036 | Elapsed: 0.10s
+2023-03-19 17:49:18,347 WARNING  [*] 17:49:18: Train Epoch: 10 [9600 /26120 (37%)] | Loss: 0.087847 | Elapsed: 10.27s
+2023-03-19 17:49:28,264 WARNING  [*] 17:49:28: Train Epoch: 10 [19200/26120 (73%)] | Loss: 0.043382 | Elapsed: 9.92s
+2023-03-19 17:49:35,367 WARNING  [*] Sun Mar 19 17:49:35 2023:   10    | Tr.loss: 0.125780 | Elapsed:   27.39  s
+2023-03-19 17:49:35,367 WARNING  [*] Started epoch: 11
+2023-03-19 17:49:35,467 WARNING  [*] 17:49:35: Train Epoch: 11 [  0  /26120 (0 %)] | Loss: 0.065449 | Elapsed: 0.10s
+2023-03-19 17:49:45,389 WARNING  [*] 17:49:45: Train Epoch: 11 [9600 /26120 (37%)] | Loss: 0.109232 | Elapsed: 9.92s
+2023-03-19 17:49:55,303 WARNING  [*] 17:49:55: Train Epoch: 11 [19200/26120 (73%)] | Loss: 0.101332 | Elapsed: 9.91s
+2023-03-19 17:50:02,418 WARNING  [*] Sun Mar 19 17:50:02 2023:   11    | Tr.loss: 0.116814 | Elapsed:   27.05  s
+2023-03-19 17:50:02,418 WARNING  [*] Started epoch: 12
+2023-03-19 17:50:02,522 WARNING  [*] 17:50:02: Train Epoch: 12 [  0  /26120 (0 %)] | Loss: 0.073727 | Elapsed: 0.10s
+2023-03-19 17:50:04,910 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-19 17:50:04,952 WARNING  [!] Sun Mar 19 17:50:04 2023: Dumped results:
+                model       : 1679244303-model.torch
+		train time  : 1679244303-trainTime.npy
+		train losses: 1679244303-trainLosses.npy
+		train AUC   : 1679244303-auc.npy
+		train F1s   : 1679244303-trainF1s.npy
+		train TPRs  : 1679244303-trainTPRs.npy
+2023-03-19 17:50:04,964 WARNING  [!] Evaluating model on training set...
+2023-03-19 17:50:11,988 WARNING  [!] This fold metrics on training set:
+2023-03-19 17:50:12,039 WARNING 	AUC: 0.9992
+2023-03-19 17:50:12,043 WARNING 	F1: 0.9603
+2023-03-19 17:50:12,043 WARNING  [!] Evaluating model on validation set...
+2023-03-19 17:50:15,566 WARNING  [!] This fold metrics on validation set:
+2023-03-19 17:50:15,584 WARNING 	AUC: 0.9986
+2023-03-19 17:50:15,593 WARNING 	F1: 0.9497
+2023-03-19 17:50:16,035 WARNING  [2/3] Train set size: 26120, Validation set size: 13060
+2023-03-19 17:50:17,043 WARNING  [!] Saved dataset splits to dataset_splits_1679244615.npz
+2023-03-19 17:50:17,100 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 4.1178e6
+2023-03-19 17:50:17,100 WARNING  [*] Training time budget set: 5.0 min
+2023-03-19 17:50:17,114 WARNING  [*] Started epoch: 1
+2023-03-19 17:50:17,241 WARNING  [*] 17:50:17: Train Epoch: 1 [  0  /26120 (0 %)] | Loss: 11.475525 | Elapsed: 0.13s
+2023-03-19 17:50:27,173 WARNING  [*] 17:50:27: Train Epoch: 1 [9600 /26120 (37%)] | Loss: 1.374090 | Elapsed: 9.93s
+2023-03-19 17:50:37,092 WARNING  [*] 17:50:37: Train Epoch: 1 [19200/26120 (73%)] | Loss: 0.973792 | Elapsed: 9.92s
+2023-03-19 17:50:44,209 WARNING  [*] Sun Mar 19 17:50:44 2023:    1    | Tr.loss: 1.350506 | Elapsed:   27.10  s
+2023-03-19 17:50:44,209 WARNING  [*] Started epoch: 2
+2023-03-19 17:50:44,312 WARNING  [*] 17:50:44: Train Epoch: 2 [  0  /26120 (0 %)] | Loss: 0.836303 | Elapsed: 0.10s
+2023-03-19 17:50:54,230 WARNING  [*] 17:50:54: Train Epoch: 2 [9600 /26120 (37%)] | Loss: 0.773854 | Elapsed: 9.92s
+2023-03-19 17:51:04,164 WARNING  [*] 17:51:04: Train Epoch: 2 [19200/26120 (73%)] | Loss: 0.757761 | Elapsed: 9.93s
+2023-03-19 17:51:11,275 WARNING  [*] Sun Mar 19 17:51:11 2023:    2    | Tr.loss: 0.714403 | Elapsed:   27.07  s
+2023-03-19 17:51:11,275 WARNING  [*] Started epoch: 3
+2023-03-19 17:51:11,373 WARNING  [*] 17:51:11: Train Epoch: 3 [  0  /26120 (0 %)] | Loss: 0.787243 | Elapsed: 0.10s
+2023-03-19 17:51:21,304 WARNING  [*] 17:51:21: Train Epoch: 3 [9600 /26120 (37%)] | Loss: 0.478278 | Elapsed: 9.93s
+2023-03-19 17:51:31,232 WARNING  [*] 17:51:31: Train Epoch: 3 [19200/26120 (73%)] | Loss: 0.402256 | Elapsed: 9.93s
+2023-03-19 17:51:38,745 WARNING  [*] Sun Mar 19 17:51:38 2023:    3    | Tr.loss: 0.495579 | Elapsed:   27.47  s
+2023-03-19 17:51:38,745 WARNING  [*] Started epoch: 4
+2023-03-19 17:51:38,852 WARNING  [*] 17:51:38: Train Epoch: 4 [  0  /26120 (0 %)] | Loss: 0.425789 | Elapsed: 0.11s
+2023-03-19 17:51:48,797 WARNING  [*] 17:51:48: Train Epoch: 4 [9600 /26120 (37%)] | Loss: 0.278814 | Elapsed: 9.94s
+2023-03-19 17:51:58,699 WARNING  [*] 17:51:58: Train Epoch: 4 [19200/26120 (73%)] | Loss: 0.351873 | Elapsed: 9.90s
+2023-03-19 17:52:05,833 WARNING  [*] Sun Mar 19 17:52:05 2023:    4    | Tr.loss: 0.365630 | Elapsed:   27.09  s
+2023-03-19 17:52:05,833 WARNING  [*] Started epoch: 5
+2023-03-19 17:52:05,935 WARNING  [*] 17:52:05: Train Epoch: 5 [  0  /26120 (0 %)] | Loss: 0.279055 | Elapsed: 0.10s
+2023-03-19 17:52:15,848 WARNING  [*] 17:52:15: Train Epoch: 5 [9600 /26120 (37%)] | Loss: 0.304552 | Elapsed: 9.91s
+2023-03-19 17:52:25,781 WARNING  [*] 17:52:25: Train Epoch: 5 [19200/26120 (73%)] | Loss: 0.124273 | Elapsed: 9.92s
+2023-03-19 17:52:32,902 WARNING  [*] Sun Mar 19 17:52:32 2023:    5    | Tr.loss: 0.275072 | Elapsed:   27.07  s
+2023-03-19 17:52:32,902 WARNING  [*] Started epoch: 6
+2023-03-19 17:52:33,003 WARNING  [*] 17:52:33: Train Epoch: 6 [  0  /26120 (0 %)] | Loss: 0.187356 | Elapsed: 0.10s
+2023-03-19 17:52:42,921 WARNING  [*] 17:52:42: Train Epoch: 6 [9600 /26120 (37%)] | Loss: 0.239096 | Elapsed: 9.92s
+2023-03-19 17:52:52,856 WARNING  [*] 17:52:52: Train Epoch: 6 [19200/26120 (73%)] | Loss: 0.298137 | Elapsed: 9.93s
+2023-03-19 17:52:59,959 WARNING  [*] Sun Mar 19 17:52:59 2023:    6    | Tr.loss: 0.222190 | Elapsed:   27.06  s
+2023-03-19 17:52:59,959 WARNING  [*] Started epoch: 7
+2023-03-19 17:53:00,074 WARNING  [*] 17:53:00: Train Epoch: 7 [  0  /26120 (0 %)] | Loss: 0.095130 | Elapsed: 0.11s
+2023-03-19 17:53:10,398 WARNING  [*] 17:53:10: Train Epoch: 7 [9600 /26120 (37%)] | Loss: 0.256979 | Elapsed: 10.32s
+2023-03-19 17:53:20,309 WARNING  [*] 17:53:20: Train Epoch: 7 [19200/26120 (73%)] | Loss: 0.078031 | Elapsed: 9.91s
+2023-03-19 17:53:27,438 WARNING  [*] Sun Mar 19 17:53:27 2023:    7    | Tr.loss: 0.177968 | Elapsed:   27.48  s
+2023-03-19 17:53:27,438 WARNING  [*] Started epoch: 8
+2023-03-19 17:53:27,538 WARNING  [*] 17:53:27: Train Epoch: 8 [  0  /26120 (0 %)] | Loss: 0.117627 | Elapsed: 0.10s
+2023-03-19 17:53:37,468 WARNING  [*] 17:53:37: Train Epoch: 8 [9600 /26120 (37%)] | Loss: 0.158046 | Elapsed: 9.93s
+2023-03-19 17:53:47,418 WARNING  [*] 17:53:47: Train Epoch: 8 [19200/26120 (73%)] | Loss: 0.273982 | Elapsed: 9.95s
+2023-03-19 17:53:54,552 WARNING  [*] Sun Mar 19 17:53:54 2023:    8    | Tr.loss: 0.163551 | Elapsed:   27.11  s
+2023-03-19 17:53:54,552 WARNING  [*] Started epoch: 9
+2023-03-19 17:53:54,655 WARNING  [*] 17:53:54: Train Epoch: 9 [  0  /26120 (0 %)] | Loss: 0.167637 | Elapsed: 0.10s
+2023-03-19 17:54:04,593 WARNING  [*] 17:54:04: Train Epoch: 9 [9600 /26120 (37%)] | Loss: 0.113687 | Elapsed: 9.94s
+2023-03-19 17:54:14,538 WARNING  [*] 17:54:14: Train Epoch: 9 [19200/26120 (73%)] | Loss: 0.132507 | Elapsed: 9.94s
+2023-03-19 17:54:21,669 WARNING  [*] Sun Mar 19 17:54:21 2023:    9    | Tr.loss: 0.151203 | Elapsed:   27.12  s
+2023-03-19 17:54:21,669 WARNING  [*] Started epoch: 10
+2023-03-19 17:54:21,774 WARNING  [*] 17:54:21: Train Epoch: 10 [  0  /26120 (0 %)] | Loss: 0.008638 | Elapsed: 0.10s
+2023-03-19 17:54:31,708 WARNING  [*] 17:54:31: Train Epoch: 10 [9600 /26120 (37%)] | Loss: 0.116034 | Elapsed: 9.93s
+2023-03-19 17:54:42,001 WARNING  [*] 17:54:42: Train Epoch: 10 [19200/26120 (73%)] | Loss: 0.072126 | Elapsed: 10.29s
+2023-03-19 17:54:49,139 WARNING  [*] Sun Mar 19 17:54:49 2023:   10    | Tr.loss: 0.135901 | Elapsed:   27.47  s
+2023-03-19 17:54:49,139 WARNING  [*] Started epoch: 11
+2023-03-19 17:54:49,242 WARNING  [*] 17:54:49: Train Epoch: 11 [  0  /26120 (0 %)] | Loss: 0.169257 | Elapsed: 0.10s
+2023-03-19 17:54:59,168 WARNING  [*] 17:54:59: Train Epoch: 11 [9600 /26120 (37%)] | Loss: 0.096901 | Elapsed: 9.93s
+2023-03-19 17:55:09,297 WARNING  [*] 17:55:09: Train Epoch: 11 [19200/26120 (73%)] | Loss: 0.088154 | Elapsed: 10.13s
+2023-03-19 17:55:16,482 WARNING  [*] Sun Mar 19 17:55:16 2023:   11    | Tr.loss: 0.118423 | Elapsed:   27.34  s
+2023-03-19 17:55:16,482 WARNING  [*] Started epoch: 12
+2023-03-19 17:55:16,587 WARNING  [*] 17:55:16: Train Epoch: 12 [  0  /26120 (0 %)] | Loss: 0.172383 | Elapsed: 0.10s
+2023-03-19 17:55:17,192 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-19 17:55:17,209 WARNING  [!] Sun Mar 19 17:55:17 2023: Dumped results:
+                model       : 1679244615-model.torch
+		train time  : 1679244615-trainTime.npy
+		train losses: 1679244615-trainLosses.npy
+		train AUC   : 1679244615-auc.npy
+		train F1s   : 1679244615-trainF1s.npy
+		train TPRs  : 1679244615-trainTPRs.npy
+2023-03-19 17:55:17,233 WARNING  [!] Evaluating model on training set...
+2023-03-19 17:55:24,270 WARNING  [!] This fold metrics on training set:
+2023-03-19 17:55:24,331 WARNING 	AUC: 0.9991
+2023-03-19 17:55:24,335 WARNING 	F1: 0.9505
+2023-03-19 17:55:24,335 WARNING  [!] Evaluating model on validation set...
+2023-03-19 17:55:27,856 WARNING  [!] This fold metrics on validation set:
+2023-03-19 17:55:27,890 WARNING 	AUC: 0.9982
+2023-03-19 17:55:27,895 WARNING 	F1: 0.9407
+2023-03-19 17:55:28,308 WARNING  [3/3] Train set size: 26120, Validation set size: 13060
+2023-03-19 17:55:29,324 WARNING  [!] Saved dataset splits to dataset_splits_1679244928.npz
+2023-03-19 17:55:29,414 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 4.1178e6
+2023-03-19 17:55:29,414 WARNING  [*] Training time budget set: 5.0 min
+2023-03-19 17:55:29,417 WARNING  [*] Started epoch: 1
+2023-03-19 17:55:29,546 WARNING  [*] 17:55:29: Train Epoch: 1 [  0  /26120 (0 %)] | Loss: 10.039410 | Elapsed: 0.13s
+2023-03-19 17:55:39,488 WARNING  [*] 17:55:39: Train Epoch: 1 [9600 /26120 (37%)] | Loss: 1.353200 | Elapsed: 9.94s
+2023-03-19 17:55:49,415 WARNING  [*] 17:55:49: Train Epoch: 1 [19200/26120 (73%)] | Loss: 1.011483 | Elapsed: 9.93s
+2023-03-19 17:55:56,540 WARNING  [*] Sun Mar 19 17:55:56 2023:    1    | Tr.loss: 1.307218 | Elapsed:   27.12  s
+2023-03-19 17:55:56,540 WARNING  [*] Started epoch: 2
+2023-03-19 17:55:56,640 WARNING  [*] 17:55:56: Train Epoch: 2 [  0  /26120 (0 %)] | Loss: 1.052620 | Elapsed: 0.10s
+2023-03-19 17:56:06,578 WARNING  [*] 17:56:06: Train Epoch: 2 [9600 /26120 (37%)] | Loss: 0.700597 | Elapsed: 9.94s
+2023-03-19 17:56:16,524 WARNING  [*] 17:56:16: Train Epoch: 2 [19200/26120 (73%)] | Loss: 0.726962 | Elapsed: 9.95s
+2023-03-19 17:56:23,650 WARNING  [*] Sun Mar 19 17:56:23 2023:    2    | Tr.loss: 0.681480 | Elapsed:   27.11  s
+2023-03-19 17:56:23,650 WARNING  [*] Started epoch: 3
+2023-03-19 17:56:23,766 WARNING  [*] 17:56:23: Train Epoch: 3 [  0  /26120 (0 %)] | Loss: 0.305504 | Elapsed: 0.12s
+2023-03-19 17:56:33,714 WARNING  [*] 17:56:33: Train Epoch: 3 [9600 /26120 (37%)] | Loss: 0.394072 | Elapsed: 9.95s
+2023-03-19 17:56:43,674 WARNING  [*] 17:56:43: Train Epoch: 3 [19200/26120 (73%)] | Loss: 0.499697 | Elapsed: 9.96s
+2023-03-19 17:56:51,234 WARNING  [*] Sun Mar 19 17:56:51 2023:    3    | Tr.loss: 0.459642 | Elapsed:   27.58  s
+2023-03-19 17:56:51,234 WARNING  [*] Started epoch: 4
+2023-03-19 17:56:51,335 WARNING  [*] 17:56:51: Train Epoch: 4 [  0  /26120 (0 %)] | Loss: 0.386604 | Elapsed: 0.10s
+2023-03-19 17:57:01,272 WARNING  [*] 17:57:01: Train Epoch: 4 [9600 /26120 (37%)] | Loss: 0.314844 | Elapsed: 9.94s
+2023-03-19 17:57:11,235 WARNING  [*] 17:57:11: Train Epoch: 4 [19200/26120 (73%)] | Loss: 0.233416 | Elapsed: 9.96s
+2023-03-19 17:57:18,354 WARNING  [*] Sun Mar 19 17:57:18 2023:    4    | Tr.loss: 0.307365 | Elapsed:   27.12  s
+2023-03-19 17:57:18,354 WARNING  [*] Started epoch: 5
+2023-03-19 17:57:18,454 WARNING  [*] 17:57:18: Train Epoch: 5 [  0  /26120 (0 %)] | Loss: 0.431228 | Elapsed: 0.10s
+2023-03-19 17:57:28,413 WARNING  [*] 17:57:28: Train Epoch: 5 [9600 /26120 (37%)] | Loss: 0.234395 | Elapsed: 9.96s
+2023-03-19 17:57:38,343 WARNING  [*] 17:57:38: Train Epoch: 5 [19200/26120 (73%)] | Loss: 0.213711 | Elapsed: 9.93s
+2023-03-19 17:57:45,498 WARNING  [*] Sun Mar 19 17:57:45 2023:    5    | Tr.loss: 0.216668 | Elapsed:   27.14  s
+2023-03-19 17:57:45,498 WARNING  [*] Started epoch: 6
+2023-03-19 17:57:45,615 WARNING  [*] 17:57:45: Train Epoch: 6 [  0  /26120 (0 %)] | Loss: 0.103755 | Elapsed: 0.10s
+2023-03-19 17:57:55,585 WARNING  [*] 17:57:55: Train Epoch: 6 [9600 /26120 (37%)] | Loss: 0.185505 | Elapsed: 9.97s
+2023-03-19 17:58:05,628 WARNING  [*] 17:58:05: Train Epoch: 6 [19200/26120 (73%)] | Loss: 0.174830 | Elapsed: 10.04s
+2023-03-19 17:58:12,747 WARNING  [*] Sun Mar 19 17:58:12 2023:    6    | Tr.loss: 0.170194 | Elapsed:   27.25  s
+2023-03-19 17:58:12,747 WARNING  [*] Started epoch: 7
+2023-03-19 17:58:12,849 WARNING  [*] 17:58:12: Train Epoch: 7 [  0  /26120 (0 %)] | Loss: 0.165498 | Elapsed: 0.10s
+2023-03-19 17:58:23,182 WARNING  [*] 17:58:23: Train Epoch: 7 [9600 /26120 (37%)] | Loss: 0.170181 | Elapsed: 10.33s
+2023-03-19 17:58:33,124 WARNING  [*] 17:58:33: Train Epoch: 7 [19200/26120 (73%)] | Loss: 0.072607 | Elapsed: 9.94s
+2023-03-19 17:58:40,270 WARNING  [*] Sun Mar 19 17:58:40 2023:    7    | Tr.loss: 0.146667 | Elapsed:   27.52  s
+2023-03-19 17:58:40,270 WARNING  [*] Started epoch: 8
+2023-03-19 17:58:40,370 WARNING  [*] 17:58:40: Train Epoch: 8 [  0  /26120 (0 %)] | Loss: 0.196312 | Elapsed: 0.10s
+2023-03-19 17:58:50,328 WARNING  [*] 17:58:50: Train Epoch: 8 [9600 /26120 (37%)] | Loss: 0.061762 | Elapsed: 9.96s
+2023-03-19 17:59:00,290 WARNING  [*] 17:59:00: Train Epoch: 8 [19200/26120 (73%)] | Loss: 0.083168 | Elapsed: 9.96s
+2023-03-19 17:59:07,426 WARNING  [*] Sun Mar 19 17:59:07 2023:    8    | Tr.loss: 0.134326 | Elapsed:   27.16  s
+2023-03-19 17:59:07,426 WARNING  [*] Started epoch: 9
+2023-03-19 17:59:07,525 WARNING  [*] 17:59:07: Train Epoch: 9 [  0  /26120 (0 %)] | Loss: 0.124205 | Elapsed: 0.10s
+2023-03-19 17:59:17,479 WARNING  [*] 17:59:17: Train Epoch: 9 [9600 /26120 (37%)] | Loss: 0.042267 | Elapsed: 9.95s
+2023-03-19 17:59:27,444 WARNING  [*] 17:59:27: Train Epoch: 9 [19200/26120 (73%)] | Loss: 0.026880 | Elapsed: 9.96s
+2023-03-19 17:59:34,563 WARNING  [*] Sun Mar 19 17:59:34 2023:    9    | Tr.loss: 0.123278 | Elapsed:   27.14  s
+2023-03-19 17:59:34,563 WARNING  [*] Started epoch: 10
+2023-03-19 17:59:34,661 WARNING  [*] 17:59:34: Train Epoch: 10 [  0  /26120 (0 %)] | Loss: 0.059355 | Elapsed: 0.10s
+2023-03-19 17:59:44,637 WARNING  [*] 17:59:44: Train Epoch: 10 [9600 /26120 (37%)] | Loss: 0.071286 | Elapsed: 9.98s
+2023-03-19 17:59:54,959 WARNING  [*] 17:59:54: Train Epoch: 10 [19200/26120 (73%)] | Loss: 0.135458 | Elapsed: 10.32s
+2023-03-19 18:00:02,085 WARNING  [*] Sun Mar 19 18:00:02 2023:   10    | Tr.loss: 0.113100 | Elapsed:   27.52  s
+2023-03-19 18:00:02,085 WARNING  [*] Started epoch: 11
+2023-03-19 18:00:02,185 WARNING  [*] 18:00:02: Train Epoch: 11 [  0  /26120 (0 %)] | Loss: 0.049868 | Elapsed: 0.10s
+2023-03-19 18:00:12,144 WARNING  [*] 18:00:12: Train Epoch: 11 [9600 /26120 (37%)] | Loss: 0.024634 | Elapsed: 9.96s
+2023-03-19 18:00:22,106 WARNING  [*] 18:00:22: Train Epoch: 11 [19200/26120 (73%)] | Loss: 0.198250 | Elapsed: 9.96s
+2023-03-19 18:00:29,252 WARNING  [*] Sun Mar 19 18:00:29 2023:   11    | Tr.loss: 0.106732 | Elapsed:   27.17  s
+2023-03-19 18:00:29,252 WARNING  [*] Started epoch: 12
+2023-03-19 18:00:29,353 WARNING  [*] 18:00:29: Train Epoch: 12 [  0  /26120 (0 %)] | Loss: 0.153292 | Elapsed: 0.10s
+2023-03-19 18:00:29,444 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-19 18:00:29,477 WARNING  [!] Sun Mar 19 18:00:29 2023: Dumped results:
+                model       : 1679244928-model.torch
+		train time  : 1679244928-trainTime.npy
+		train losses: 1679244928-trainLosses.npy
+		train AUC   : 1679244928-auc.npy
+		train F1s   : 1679244928-trainF1s.npy
+		train TPRs  : 1679244928-trainTPRs.npy
+2023-03-19 18:00:29,498 WARNING  [!] Evaluating model on training set...
+2023-03-19 18:00:36,537 WARNING  [!] This fold metrics on training set:
+2023-03-19 18:00:36,593 WARNING 	AUC: 0.9991
+2023-03-19 18:00:36,597 WARNING 	F1: 0.9570
+2023-03-19 18:00:36,597 WARNING  [!] Evaluating model on validation set...
+2023-03-19 18:00:40,122 WARNING  [!] This fold metrics on validation set:
+2023-03-19 18:00:40,153 WARNING 	AUC: 0.9984
+2023-03-19 18:00:40,160 WARNING 	F1: 0.9434
+2023-03-19 18:00:40,543 WARNING  [!] Metrics saved to out_avast_fields_1679237307\cv_keys_limNone_r1763_t5\keys_metrics_validation.json
+2023-03-19 18:00:40,543 WARNING  [!] Metrics saved to out_avast_fields_1679237307\cv_keys_limNone_r1763_t5\keys_metrics_training.json
+2023-03-19 18:00:40,556 WARNING  [!] Average epoch time: 0.03s | Mean values over 3 folds:
+	AUC: 0.9984
+
+2023-03-19 18:00:40,946 WARNING  [!!!] Working on all!
+2023-03-19 18:00:40,955 WARNING  [!] Reading and normalizing reports...
+2023-03-19 18:12:46,641 WARNING  [!] Tokenizing and encoding train data!
+2023-03-19 18:12:46,652 WARNING  [!] Size: 39180 | Class counts in test:
+Counter({1: 11557, 5: 10094, 4: 3881, 3: 3362, 6: 3337, 9: 2701, 8: 2088, 7: 1062, 0: 566, 2: 532})
+2023-03-19 18:12:46,656 WARNING  [*] Initializing tokenizer training...
+2023-03-19 18:13:42,923 WARNING Dumped vocab to out_avast_fields_1679237307\all_vocab_30000_seqlen_512\tokenizer_30000_vocab.json
+2023-03-19 18:13:44,285 WARNING Dumped vocab counter to out_avast_fields_1679237307\all_vocab_30000_seqlen_512\tokenizer_30000_counter.json
+2023-03-19 18:14:34,286 WARNING [!] Tokenizing and encoding test data!
+2023-03-19 18:14:34,287 WARNING  [!] Size: 9796 | Class counts in test:
+Counter({1: 11557, 5: 10094, 4: 3881, 3: 3362, 6: 3337, 9: 2701, 8: 2088, 7: 1062, 0: 566, 2: 532})
+2023-03-19 18:14:51,130 WARNING  [!!!] Starting CV over all!
+2023-03-19 18:14:51,186 WARNING  [!] Training time budget: 300min
+2023-03-19 18:14:51,187 WARNING  [!] Model config: {'vocab_size': 30000, 'maxlen': 512, 'chunk_size': 64, 'dModel': 64, 'nHeads': 8, 'dHidden': 256, 'nLayers': 2, 'numClasses': 10, 'hiddenNeurons': [64], 'layerNorm': False, 'dropout': 0.3, 'mean_over_sequence': False, 'norm_first': True}
+2023-03-19 18:14:51,234 WARNING  [1/3] Train set size: 26120, Validation set size: 13060
+2023-03-19 18:14:54,006 WARNING  [!] Saved dataset splits to dataset_splits_1679246091.npz
+2023-03-19 18:14:54,074 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 4.1178e6
+2023-03-19 18:14:54,074 WARNING  [*] Training time budget set: 5.0 min
+2023-03-19 18:14:54,089 WARNING  [*] Started epoch: 1
+2023-03-19 18:14:54,422 WARNING  [*] 18:14:54: Train Epoch: 1 [  0  /26120 (0 %)] | Loss: 13.464044 | Elapsed: 0.33s
+2023-03-19 18:15:04,709 WARNING  [*] 18:15:04: Train Epoch: 1 [9600 /26120 (37%)] | Loss: 1.381095 | Elapsed: 10.29s
+2023-03-19 18:15:14,574 WARNING  [*] 18:15:14: Train Epoch: 1 [19200/26120 (73%)] | Loss: 1.057422 | Elapsed: 9.86s
+2023-03-19 18:15:21,564 WARNING  [*] Sun Mar 19 18:15:21 2023:    1    | Tr.loss: 1.348376 | Elapsed:   27.48  s
+2023-03-19 18:15:21,564 WARNING  [*] Started epoch: 2
+2023-03-19 18:15:21,656 WARNING  [*] 18:15:21: Train Epoch: 2 [  0  /26120 (0 %)] | Loss: 0.825634 | Elapsed: 0.09s
+2023-03-19 18:15:31,427 WARNING  [*] 18:15:31: Train Epoch: 2 [9600 /26120 (37%)] | Loss: 0.614337 | Elapsed: 9.77s
+2023-03-19 18:15:41,341 WARNING  [*] 18:15:41: Train Epoch: 2 [19200/26120 (73%)] | Loss: 0.388186 | Elapsed: 9.91s
+2023-03-19 18:15:48,493 WARNING  [*] Sun Mar 19 18:15:48 2023:    2    | Tr.loss: 0.619135 | Elapsed:   26.93  s
+2023-03-19 18:15:48,493 WARNING  [*] Started epoch: 3
+2023-03-19 18:15:48,597 WARNING  [*] 18:15:48: Train Epoch: 3 [  0  /26120 (0 %)] | Loss: 0.523899 | Elapsed: 0.10s
+2023-03-19 18:15:58,564 WARNING  [*] 18:15:58: Train Epoch: 3 [9600 /26120 (37%)] | Loss: 0.518946 | Elapsed: 9.97s
+2023-03-19 18:16:08,537 WARNING  [*] 18:16:08: Train Epoch: 3 [19200/26120 (73%)] | Loss: 0.401697 | Elapsed: 9.97s
+2023-03-19 18:16:15,700 WARNING  [*] Sun Mar 19 18:16:15 2023:    3    | Tr.loss: 0.410198 | Elapsed:   27.21  s
+2023-03-19 18:16:15,700 WARNING  [*] Started epoch: 4
+2023-03-19 18:16:15,812 WARNING  [*] 18:16:15: Train Epoch: 4 [  0  /26120 (0 %)] | Loss: 0.450086 | Elapsed: 0.11s
+2023-03-19 18:16:25,746 WARNING  [*] 18:16:25: Train Epoch: 4 [9600 /26120 (37%)] | Loss: 0.337569 | Elapsed: 9.93s
+2023-03-19 18:16:35,708 WARNING  [*] 18:16:35: Train Epoch: 4 [19200/26120 (73%)] | Loss: 0.249468 | Elapsed: 9.96s
+2023-03-19 18:16:42,856 WARNING  [*] Sun Mar 19 18:16:42 2023:    4    | Tr.loss: 0.270905 | Elapsed:   27.16  s
+2023-03-19 18:16:42,856 WARNING  [*] Started epoch: 5
+2023-03-19 18:16:42,955 WARNING  [*] 18:16:42: Train Epoch: 5 [  0  /26120 (0 %)] | Loss: 0.112894 | Elapsed: 0.10s
+2023-03-19 18:16:52,977 WARNING  [*] 18:16:52: Train Epoch: 5 [9600 /26120 (37%)] | Loss: 0.293961 | Elapsed: 10.02s
+2023-03-19 18:17:02,954 WARNING  [*] 18:17:02: Train Epoch: 5 [19200/26120 (73%)] | Loss: 0.093229 | Elapsed: 9.96s
+2023-03-19 18:17:10,660 WARNING  [*] Sun Mar 19 18:17:10 2023:    5    | Tr.loss: 0.193509 | Elapsed:   27.80  s
+2023-03-19 18:17:10,660 WARNING  [*] Started epoch: 6
+2023-03-19 18:17:10,759 WARNING  [*] 18:17:10: Train Epoch: 6 [  0  /26120 (0 %)] | Loss: 0.174671 | Elapsed: 0.10s
+2023-03-19 18:17:20,643 WARNING  [*] 18:17:20: Train Epoch: 6 [9600 /26120 (37%)] | Loss: 0.086295 | Elapsed: 9.88s
+2023-03-19 18:17:30,511 WARNING  [*] 18:17:30: Train Epoch: 6 [19200/26120 (73%)] | Loss: 0.177028 | Elapsed: 9.87s
+2023-03-19 18:17:37,611 WARNING  [*] Sun Mar 19 18:17:37 2023:    6    | Tr.loss: 0.141925 | Elapsed:   26.95  s
+2023-03-19 18:17:37,611 WARNING  [*] Started epoch: 7
+2023-03-19 18:17:37,716 WARNING  [*] 18:17:37: Train Epoch: 7 [  0  /26120 (0 %)] | Loss: 0.060266 | Elapsed: 0.10s
+2023-03-19 18:17:47,600 WARNING  [*] 18:17:47: Train Epoch: 7 [9600 /26120 (37%)] | Loss: 0.089053 | Elapsed: 9.88s
+2023-03-19 18:17:57,490 WARNING  [*] 18:17:57: Train Epoch: 7 [19200/26120 (73%)] | Loss: 0.048848 | Elapsed: 9.89s
+2023-03-19 18:18:04,583 WARNING  [*] Sun Mar 19 18:18:04 2023:    7    | Tr.loss: 0.115503 | Elapsed:   26.97  s
+2023-03-19 18:18:04,583 WARNING  [*] Started epoch: 8
+2023-03-19 18:18:04,681 WARNING  [*] 18:18:04: Train Epoch: 8 [  0  /26120 (0 %)] | Loss: 0.039949 | Elapsed: 0.10s
+2023-03-19 18:18:14,590 WARNING  [*] 18:18:14: Train Epoch: 8 [9600 /26120 (37%)] | Loss: 0.098655 | Elapsed: 9.91s
+2023-03-19 18:18:24,484 WARNING  [*] 18:18:24: Train Epoch: 8 [19200/26120 (73%)] | Loss: 0.072747 | Elapsed: 9.89s
+2023-03-19 18:18:31,585 WARNING  [*] Sun Mar 19 18:18:31 2023:    8    | Tr.loss: 0.094954 | Elapsed:   27.00  s
+2023-03-19 18:18:31,585 WARNING  [*] Started epoch: 9
+2023-03-19 18:18:31,697 WARNING  [*] 18:18:31: Train Epoch: 9 [  0  /26120 (0 %)] | Loss: 0.086177 | Elapsed: 0.11s
+2023-03-19 18:18:41,598 WARNING  [*] 18:18:41: Train Epoch: 9 [9600 /26120 (37%)] | Loss: 0.133456 | Elapsed: 9.90s
+2023-03-19 18:18:51,513 WARNING  [*] 18:18:51: Train Epoch: 9 [19200/26120 (73%)] | Loss: 0.157142 | Elapsed: 9.92s
+2023-03-19 18:18:58,633 WARNING  [*] Sun Mar 19 18:18:58 2023:    9    | Tr.loss: 0.077999 | Elapsed:   27.05  s
+2023-03-19 18:18:58,633 WARNING  [*] Started epoch: 10
+2023-03-19 18:18:58,731 WARNING  [*] 18:18:58: Train Epoch: 10 [  0  /26120 (0 %)] | Loss: 0.048475 | Elapsed: 0.10s
+2023-03-19 18:19:08,634 WARNING  [*] 18:19:08: Train Epoch: 10 [9600 /26120 (37%)] | Loss: 0.027293 | Elapsed: 9.90s
+2023-03-19 18:19:18,551 WARNING  [*] 18:19:18: Train Epoch: 10 [19200/26120 (73%)] | Loss: 0.015368 | Elapsed: 9.92s
+2023-03-19 18:19:25,644 WARNING  [*] Sun Mar 19 18:19:25 2023:   10    | Tr.loss: 0.068791 | Elapsed:   27.01  s
+2023-03-19 18:19:25,644 WARNING  [*] Started epoch: 11
+2023-03-19 18:19:25,749 WARNING  [*] 18:19:25: Train Epoch: 11 [  0  /26120 (0 %)] | Loss: 0.053751 | Elapsed: 0.11s
+2023-03-19 18:19:36,299 WARNING  [*] 18:19:36: Train Epoch: 11 [9600 /26120 (37%)] | Loss: 0.108840 | Elapsed: 10.55s
+2023-03-19 18:19:46,209 WARNING  [*] 18:19:46: Train Epoch: 11 [19200/26120 (73%)] | Loss: 0.021638 | Elapsed: 9.91s
+2023-03-19 18:19:53,336 WARNING  [*] Sun Mar 19 18:19:53 2023:   11    | Tr.loss: 0.059493 | Elapsed:   27.69  s
+2023-03-19 18:19:53,336 WARNING  [*] Started epoch: 12
+2023-03-19 18:19:53,438 WARNING  [*] 18:19:53: Train Epoch: 12 [  0  /26120 (0 %)] | Loss: 0.036931 | Elapsed: 0.10s
+2023-03-19 18:19:54,132 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-19 18:19:54,166 WARNING  [!] Sun Mar 19 18:19:54 2023: Dumped results:
+                model       : 1679246091-model.torch
+		train time  : 1679246091-trainTime.npy
+		train losses: 1679246091-trainLosses.npy
+		train AUC   : 1679246091-auc.npy
+		train F1s   : 1679246091-trainF1s.npy
+		train TPRs  : 1679246091-trainTPRs.npy
+2023-03-19 18:19:54,176 WARNING  [!] Evaluating model on training set...
+2023-03-19 18:20:01,218 WARNING  [!] This fold metrics on training set:
+2023-03-19 18:20:01,274 WARNING 	AUC: 0.9999
+2023-03-19 18:20:01,285 WARNING 	F1: 0.9826
+2023-03-19 18:20:01,285 WARNING  [!] Evaluating model on validation set...
+2023-03-19 18:20:04,828 WARNING  [!] This fold metrics on validation set:
+2023-03-19 18:20:04,839 WARNING 	AUC: 0.9994
+2023-03-19 18:20:04,855 WARNING 	F1: 0.9710
+2023-03-19 18:20:05,535 WARNING  [2/3] Train set size: 26120, Validation set size: 13060
+2023-03-19 18:20:07,435 WARNING  [!] Saved dataset splits to dataset_splits_1679246405.npz
+2023-03-19 18:20:07,506 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 4.1178e6
+2023-03-19 18:20:07,506 WARNING  [*] Training time budget set: 5.0 min
+2023-03-19 18:20:07,512 WARNING  [*] Started epoch: 1
+2023-03-19 18:20:07,893 WARNING  [*] 18:20:07: Train Epoch: 1 [  0  /26120 (0 %)] | Loss: 10.990993 | Elapsed: 0.38s
+2023-03-19 18:20:17,831 WARNING  [*] 18:20:17: Train Epoch: 1 [9600 /26120 (37%)] | Loss: 1.305326 | Elapsed: 9.94s
+2023-03-19 18:20:27,767 WARNING  [*] 18:20:27: Train Epoch: 1 [19200/26120 (73%)] | Loss: 0.931647 | Elapsed: 9.94s
+2023-03-19 18:20:34,891 WARNING  [*] Sun Mar 19 18:20:34 2023:    1    | Tr.loss: 1.354270 | Elapsed:   27.38  s
+2023-03-19 18:20:34,891 WARNING  [*] Started epoch: 2
+2023-03-19 18:20:34,994 WARNING  [*] 18:20:34: Train Epoch: 2 [  0  /26120 (0 %)] | Loss: 0.719948 | Elapsed: 0.10s
+2023-03-19 18:20:44,897 WARNING  [*] 18:20:44: Train Epoch: 2 [9600 /26120 (37%)] | Loss: 0.759890 | Elapsed: 9.90s
+2023-03-19 18:20:54,833 WARNING  [*] 18:20:54: Train Epoch: 2 [19200/26120 (73%)] | Loss: 0.536585 | Elapsed: 9.94s
+2023-03-19 18:21:01,953 WARNING  [*] Sun Mar 19 18:21:01 2023:    2    | Tr.loss: 0.606792 | Elapsed:   27.06  s
+2023-03-19 18:21:01,953 WARNING  [*] Started epoch: 3
+2023-03-19 18:21:02,056 WARNING  [*] 18:21:02: Train Epoch: 3 [  0  /26120 (0 %)] | Loss: 0.596837 | Elapsed: 0.10s
+2023-03-19 18:21:12,030 WARNING  [*] 18:21:12: Train Epoch: 3 [9600 /26120 (37%)] | Loss: 0.381829 | Elapsed: 9.97s
+2023-03-19 18:21:21,951 WARNING  [*] 18:21:21: Train Epoch: 3 [19200/26120 (73%)] | Loss: 0.249159 | Elapsed: 9.92s
+2023-03-19 18:21:29,077 WARNING  [*] Sun Mar 19 18:21:29 2023:    3    | Tr.loss: 0.406552 | Elapsed:   27.12  s
+2023-03-19 18:21:29,077 WARNING  [*] Started epoch: 4
+2023-03-19 18:21:29,181 WARNING  [*] 18:21:29: Train Epoch: 4 [  0  /26120 (0 %)] | Loss: 0.395918 | Elapsed: 0.10s
+2023-03-19 18:21:39,116 WARNING  [*] 18:21:39: Train Epoch: 4 [9600 /26120 (37%)] | Loss: 0.259448 | Elapsed: 9.93s
+2023-03-19 18:21:49,062 WARNING  [*] 18:21:49: Train Epoch: 4 [19200/26120 (73%)] | Loss: 0.291059 | Elapsed: 9.95s
+2023-03-19 18:21:56,204 WARNING  [*] Sun Mar 19 18:21:56 2023:    4    | Tr.loss: 0.273691 | Elapsed:   27.13  s
+2023-03-19 18:21:56,204 WARNING  [*] Started epoch: 5
+2023-03-19 18:21:56,304 WARNING  [*] 18:21:56: Train Epoch: 5 [  0  /26120 (0 %)] | Loss: 0.276157 | Elapsed: 0.10s
+2023-03-19 18:22:06,237 WARNING  [*] 18:22:06: Train Epoch: 5 [9600 /26120 (37%)] | Loss: 0.132440 | Elapsed: 9.93s
+2023-03-19 18:22:16,953 WARNING  [*] 18:22:16: Train Epoch: 5 [19200/26120 (73%)] | Loss: 0.133099 | Elapsed: 10.72s
+2023-03-19 18:22:24,061 WARNING  [*] Sun Mar 19 18:22:24 2023:    5    | Tr.loss: 0.212027 | Elapsed:   27.86  s
+2023-03-19 18:22:24,061 WARNING  [*] Started epoch: 6
+2023-03-19 18:22:24,158 WARNING  [*] 18:22:24: Train Epoch: 6 [  0  /26120 (0 %)] | Loss: 0.213052 | Elapsed: 0.10s
+2023-03-19 18:22:34,085 WARNING  [*] 18:22:34: Train Epoch: 6 [9600 /26120 (37%)] | Loss: 0.097780 | Elapsed: 9.93s
+2023-03-19 18:22:44,015 WARNING  [*] 18:22:44: Train Epoch: 6 [19200/26120 (73%)] | Loss: 0.290469 | Elapsed: 9.93s
+2023-03-19 18:22:51,131 WARNING  [*] Sun Mar 19 18:22:51 2023:    6    | Tr.loss: 0.155158 | Elapsed:   27.07  s
+2023-03-19 18:22:51,131 WARNING  [*] Started epoch: 7
+2023-03-19 18:22:51,230 WARNING  [*] 18:22:51: Train Epoch: 7 [  0  /26120 (0 %)] | Loss: 0.097940 | Elapsed: 0.10s
+2023-03-19 18:23:01,167 WARNING  [*] 18:23:01: Train Epoch: 7 [9600 /26120 (37%)] | Loss: 0.216279 | Elapsed: 9.94s
+2023-03-19 18:23:11,120 WARNING  [*] 18:23:11: Train Epoch: 7 [19200/26120 (73%)] | Loss: 0.027575 | Elapsed: 9.95s
+2023-03-19 18:23:18,244 WARNING  [*] Sun Mar 19 18:23:18 2023:    7    | Tr.loss: 0.122797 | Elapsed:   27.11  s
+2023-03-19 18:23:18,244 WARNING  [*] Started epoch: 8
+2023-03-19 18:23:18,343 WARNING  [*] 18:23:18: Train Epoch: 8 [  0  /26120 (0 %)] | Loss: 0.059156 | Elapsed: 0.10s
+2023-03-19 18:23:28,271 WARNING  [*] 18:23:28: Train Epoch: 8 [9600 /26120 (37%)] | Loss: 0.074972 | Elapsed: 9.93s
+2023-03-19 18:23:38,200 WARNING  [*] 18:23:38: Train Epoch: 8 [19200/26120 (73%)] | Loss: 0.198772 | Elapsed: 9.93s
+2023-03-19 18:23:45,322 WARNING  [*] Sun Mar 19 18:23:45 2023:    8    | Tr.loss: 0.103591 | Elapsed:   27.08  s
+2023-03-19 18:23:45,322 WARNING  [*] Started epoch: 9
+2023-03-19 18:23:45,421 WARNING  [*] 18:23:45: Train Epoch: 9 [  0  /26120 (0 %)] | Loss: 0.026751 | Elapsed: 0.10s
+2023-03-19 18:23:55,374 WARNING  [*] 18:23:55: Train Epoch: 9 [9600 /26120 (37%)] | Loss: 0.034550 | Elapsed: 9.95s
+2023-03-19 18:24:05,314 WARNING  [*] 18:24:05: Train Epoch: 9 [19200/26120 (73%)] | Loss: 0.155863 | Elapsed: 9.94s
+2023-03-19 18:24:12,446 WARNING  [*] Sun Mar 19 18:24:12 2023:    9    | Tr.loss: 0.088493 | Elapsed:   27.12  s
+2023-03-19 18:24:12,446 WARNING  [*] Started epoch: 10
+2023-03-19 18:24:12,557 WARNING  [*] 18:24:12: Train Epoch: 10 [  0  /26120 (0 %)] | Loss: 0.017005 | Elapsed: 0.11s
+2023-03-19 18:24:22,490 WARNING  [*] 18:24:22: Train Epoch: 10 [9600 /26120 (37%)] | Loss: 0.115291 | Elapsed: 9.93s
+2023-03-19 18:24:32,418 WARNING  [*] 18:24:32: Train Epoch: 10 [19200/26120 (73%)] | Loss: 0.016824 | Elapsed: 9.93s
+2023-03-19 18:24:40,189 WARNING  [*] Sun Mar 19 18:24:40 2023:   10    | Tr.loss: 0.076114 | Elapsed:   27.74  s
+2023-03-19 18:24:40,189 WARNING  [*] Started epoch: 11
+2023-03-19 18:24:40,303 WARNING  [*] 18:24:40: Train Epoch: 11 [  0  /26120 (0 %)] | Loss: 0.067438 | Elapsed: 0.11s
+2023-03-19 18:24:50,234 WARNING  [*] 18:24:50: Train Epoch: 11 [9600 /26120 (37%)] | Loss: 0.027136 | Elapsed: 9.93s
+2023-03-19 18:25:00,181 WARNING  [*] 18:25:00: Train Epoch: 11 [19200/26120 (73%)] | Loss: 0.051166 | Elapsed: 9.95s
+2023-03-19 18:25:07,301 WARNING  [*] Sun Mar 19 18:25:07 2023:   11    | Tr.loss: 0.065700 | Elapsed:   27.11  s
+2023-03-19 18:25:07,301 WARNING  [*] Started epoch: 12
+2023-03-19 18:25:07,399 WARNING  [*] 18:25:07: Train Epoch: 12 [  0  /26120 (0 %)] | Loss: 0.107574 | Elapsed: 0.10s
+2023-03-19 18:25:07,588 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-19 18:25:07,631 WARNING  [!] Sun Mar 19 18:25:07 2023: Dumped results:
+                model       : 1679246405-model.torch
+		train time  : 1679246405-trainTime.npy
+		train losses: 1679246405-trainLosses.npy
+		train AUC   : 1679246405-auc.npy
+		train F1s   : 1679246405-trainF1s.npy
+		train TPRs  : 1679246405-trainTPRs.npy
+2023-03-19 18:25:07,641 WARNING  [!] Evaluating model on training set...
+2023-03-19 18:25:14,713 WARNING  [!] This fold metrics on training set:
+2023-03-19 18:25:14,762 WARNING 	AUC: 0.9999
+2023-03-19 18:25:14,768 WARNING 	F1: 0.9814
+2023-03-19 18:25:14,768 WARNING  [!] Evaluating model on validation set...
+2023-03-19 18:25:18,308 WARNING  [!] This fold metrics on validation set:
+2023-03-19 18:25:18,338 WARNING 	AUC: 0.9995
+2023-03-19 18:25:18,347 WARNING 	F1: 0.9684
+2023-03-19 18:25:19,013 WARNING  [3/3] Train set size: 26120, Validation set size: 13060
+2023-03-19 18:25:21,113 WARNING  [!] Saved dataset splits to dataset_splits_1679246718.npz
+2023-03-19 18:25:21,164 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 4.1178e6
+2023-03-19 18:25:21,180 WARNING  [*] Training time budget set: 5.0 min
+2023-03-19 18:25:21,182 WARNING  [*] Started epoch: 1
+2023-03-19 18:25:21,503 WARNING  [*] 18:25:21: Train Epoch: 1 [  0  /26120 (0 %)] | Loss: 8.619088 | Elapsed: 0.32s
+2023-03-19 18:25:31,543 WARNING  [*] 18:25:31: Train Epoch: 1 [9600 /26120 (37%)] | Loss: 1.238841 | Elapsed: 10.04s
+2023-03-19 18:25:41,474 WARNING  [*] 18:25:41: Train Epoch: 1 [19200/26120 (73%)] | Loss: 0.774572 | Elapsed: 9.93s
+2023-03-19 18:25:48,589 WARNING  [*] Sun Mar 19 18:25:48 2023:    1    | Tr.loss: 1.247149 | Elapsed:   27.41  s
+2023-03-19 18:25:48,589 WARNING  [*] Started epoch: 2
+2023-03-19 18:25:48,705 WARNING  [*] 18:25:48: Train Epoch: 2 [  0  /26120 (0 %)] | Loss: 0.621378 | Elapsed: 0.12s
+2023-03-19 18:25:58,623 WARNING  [*] 18:25:58: Train Epoch: 2 [9600 /26120 (37%)] | Loss: 0.604594 | Elapsed: 9.92s
+2023-03-19 18:26:08,561 WARNING  [*] 18:26:08: Train Epoch: 2 [19200/26120 (73%)] | Loss: 0.592416 | Elapsed: 9.94s
+2023-03-19 18:26:15,718 WARNING  [*] Sun Mar 19 18:26:15 2023:    2    | Tr.loss: 0.506836 | Elapsed:   27.13  s
+2023-03-19 18:26:15,718 WARNING  [*] Started epoch: 3
+2023-03-19 18:26:15,818 WARNING  [*] 18:26:15: Train Epoch: 3 [  0  /26120 (0 %)] | Loss: 0.244763 | Elapsed: 0.10s
+2023-03-19 18:26:25,758 WARNING  [*] 18:26:25: Train Epoch: 3 [9600 /26120 (37%)] | Loss: 0.449827 | Elapsed: 9.94s
+2023-03-19 18:26:35,703 WARNING  [*] 18:26:35: Train Epoch: 3 [19200/26120 (73%)] | Loss: 0.326523 | Elapsed: 9.94s
+2023-03-19 18:26:42,842 WARNING  [*] Sun Mar 19 18:26:42 2023:    3    | Tr.loss: 0.316674 | Elapsed:   27.12  s
+2023-03-19 18:26:42,842 WARNING  [*] Started epoch: 4
+2023-03-19 18:26:42,941 WARNING  [*] 18:26:42: Train Epoch: 4 [  0  /26120 (0 %)] | Loss: 0.353349 | Elapsed: 0.10s
+2023-03-19 18:26:52,923 WARNING  [*] 18:26:52: Train Epoch: 4 [9600 /26120 (37%)] | Loss: 0.181239 | Elapsed: 9.98s
+2023-03-19 18:27:02,900 WARNING  [*] 18:27:02: Train Epoch: 4 [19200/26120 (73%)] | Loss: 0.164114 | Elapsed: 9.96s
+2023-03-19 18:27:10,048 WARNING  [*] Sun Mar 19 18:27:10 2023:    4    | Tr.loss: 0.207283 | Elapsed:   27.21  s
+2023-03-19 18:27:10,048 WARNING  [*] Started epoch: 5
+2023-03-19 18:27:10,147 WARNING  [*] 18:27:10: Train Epoch: 5 [  0  /26120 (0 %)] | Loss: 0.424716 | Elapsed: 0.10s
+2023-03-19 18:27:20,111 WARNING  [*] 18:27:20: Train Epoch: 5 [9600 /26120 (37%)] | Loss: 0.165800 | Elapsed: 9.96s
+2023-03-19 18:27:30,670 WARNING  [*] 18:27:30: Train Epoch: 5 [19200/26120 (73%)] | Loss: 0.238691 | Elapsed: 10.56s
+2023-03-19 18:27:37,804 WARNING  [*] Sun Mar 19 18:27:37 2023:    5    | Tr.loss: 0.154114 | Elapsed:   27.76  s
+2023-03-19 18:27:37,804 WARNING  [*] Started epoch: 6
+2023-03-19 18:27:37,912 WARNING  [*] 18:27:37: Train Epoch: 6 [  0  /26120 (0 %)] | Loss: 0.074184 | Elapsed: 0.11s
+2023-03-19 18:27:47,858 WARNING  [*] 18:27:47: Train Epoch: 6 [9600 /26120 (37%)] | Loss: 0.096172 | Elapsed: 9.95s
+2023-03-19 18:27:57,851 WARNING  [*] 18:27:57: Train Epoch: 6 [19200/26120 (73%)] | Loss: 0.153459 | Elapsed: 9.99s
+2023-03-19 18:28:05,004 WARNING  [*] Sun Mar 19 18:28:05 2023:    6    | Tr.loss: 0.124685 | Elapsed:   27.20  s
+2023-03-19 18:28:05,004 WARNING  [*] Started epoch: 7
+2023-03-19 18:28:05,119 WARNING  [*] 18:28:05: Train Epoch: 7 [  0  /26120 (0 %)] | Loss: 0.231505 | Elapsed: 0.12s
+2023-03-19 18:28:15,089 WARNING  [*] 18:28:15: Train Epoch: 7 [9600 /26120 (37%)] | Loss: 0.103029 | Elapsed: 9.97s
+2023-03-19 18:28:25,013 WARNING  [*] 18:28:25: Train Epoch: 7 [19200/26120 (73%)] | Loss: 0.065356 | Elapsed: 9.92s
+2023-03-19 18:28:32,136 WARNING  [*] Sun Mar 19 18:28:32 2023:    7    | Tr.loss: 0.103837 | Elapsed:   27.13  s
+2023-03-19 18:28:32,136 WARNING  [*] Started epoch: 8
+2023-03-19 18:28:32,249 WARNING  [*] 18:28:32: Train Epoch: 8 [  0  /26120 (0 %)] | Loss: 0.137289 | Elapsed: 0.11s
+2023-03-19 18:28:42,198 WARNING  [*] 18:28:42: Train Epoch: 8 [9600 /26120 (37%)] | Loss: 0.036374 | Elapsed: 9.95s
+2023-03-19 18:28:52,141 WARNING  [*] 18:28:52: Train Epoch: 8 [19200/26120 (73%)] | Loss: 0.053028 | Elapsed: 9.94s
+2023-03-19 18:28:59,278 WARNING  [*] Sun Mar 19 18:28:59 2023:    8    | Tr.loss: 0.087430 | Elapsed:   27.14  s
+2023-03-19 18:28:59,278 WARNING  [*] Started epoch: 9
+2023-03-19 18:28:59,384 WARNING  [*] 18:28:59: Train Epoch: 9 [  0  /26120 (0 %)] | Loss: 0.039184 | Elapsed: 0.11s
+2023-03-19 18:29:09,294 WARNING  [*] 18:29:09: Train Epoch: 9 [9600 /26120 (37%)] | Loss: 0.053514 | Elapsed: 9.91s
+2023-03-19 18:29:19,215 WARNING  [*] 18:29:19: Train Epoch: 9 [19200/26120 (73%)] | Loss: 0.006126 | Elapsed: 9.92s
+2023-03-19 18:29:26,328 WARNING  [*] Sun Mar 19 18:29:26 2023:    9    | Tr.loss: 0.073080 | Elapsed:   27.05  s
+2023-03-19 18:29:26,328 WARNING  [*] Started epoch: 10
+2023-03-19 18:29:26,428 WARNING  [*] 18:29:26: Train Epoch: 10 [  0  /26120 (0 %)] | Loss: 0.047750 | Elapsed: 0.10s
+2023-03-19 18:29:36,346 WARNING  [*] 18:29:36: Train Epoch: 10 [9600 /26120 (37%)] | Loss: 0.066791 | Elapsed: 9.92s
+2023-03-19 18:29:46,332 WARNING  [*] 18:29:46: Train Epoch: 10 [19200/26120 (73%)] | Loss: 0.039435 | Elapsed: 9.99s
+2023-03-19 18:29:54,056 WARNING  [*] Sun Mar 19 18:29:54 2023:   10    | Tr.loss: 0.063424 | Elapsed:   27.73  s
+2023-03-19 18:29:54,056 WARNING  [*] Started epoch: 11
+2023-03-19 18:29:54,159 WARNING  [*] 18:29:54: Train Epoch: 11 [  0  /26120 (0 %)] | Loss: 0.049660 | Elapsed: 0.10s
+2023-03-19 18:30:04,069 WARNING  [*] 18:30:04: Train Epoch: 11 [9600 /26120 (37%)] | Loss: 0.064123 | Elapsed: 9.91s
+2023-03-19 18:30:13,989 WARNING  [*] 18:30:13: Train Epoch: 11 [19200/26120 (73%)] | Loss: 0.065322 | Elapsed: 9.92s
+2023-03-19 18:30:21,094 WARNING  [*] Sun Mar 19 18:30:21 2023:   11    | Tr.loss: 0.059399 | Elapsed:   27.04  s
+2023-03-19 18:30:21,094 WARNING  [*] Started epoch: 12
+2023-03-19 18:30:21,204 WARNING  [*] 18:30:21: Train Epoch: 12 [  0  /26120 (0 %)] | Loss: 0.069050 | Elapsed: 0.09s
+2023-03-19 18:30:21,204 WARNING  [!] Time budget exceeded, training stopped.
+2023-03-19 18:30:21,231 WARNING  [!] Sun Mar 19 18:30:21 2023: Dumped results:
+                model       : 1679246718-model.torch
+		train time  : 1679246718-trainTime.npy
+		train losses: 1679246718-trainLosses.npy
+		train AUC   : 1679246718-auc.npy
+		train F1s   : 1679246718-trainF1s.npy
+		train TPRs  : 1679246718-trainTPRs.npy
+2023-03-19 18:30:21,246 WARNING  [!] Evaluating model on training set...
+2023-03-19 18:30:28,334 WARNING  [!] This fold metrics on training set:
+2023-03-19 18:30:28,385 WARNING 	AUC: 0.9998
+2023-03-19 18:30:28,394 WARNING 	F1: 0.9822
+2023-03-19 18:30:28,394 WARNING  [!] Evaluating model on validation set...
+2023-03-19 18:30:31,939 WARNING  [!] This fold metrics on validation set:
+2023-03-19 18:30:31,974 WARNING 	AUC: 0.9995
+2023-03-19 18:30:31,978 WARNING 	F1: 0.9752
+2023-03-19 18:30:32,594 WARNING  [!] Metrics saved to out_avast_fields_1679237307\cv_all_limNone_r1763_t5\all_metrics_validation.json
+2023-03-19 18:30:32,594 WARNING  [!] Metrics saved to out_avast_fields_1679237307\cv_all_limNone_r1763_t5\all_metrics_training.json
+2023-03-19 18:30:32,604 WARNING  [!] Average epoch time: 0.03s | Mean values over 3 folds:
+	AUC: 0.9995
+

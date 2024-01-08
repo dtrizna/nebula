@@ -1,0 +1,450 @@
+2023-06-06 18:17:36,613 WARNING  [*] Parsing malicious reports...
+2023-06-06 18:27:40,726 WARNING  [*] Parsing benign reports...
+2023-06-06 18:32:29,368 WARNING  [*] Preprocessing reports Nebula style...
+2023-06-06 18:32:49,068 WARNING  [!] Skipping since exists: out_cruparamer_5_folds\nebula_vocab_50000_seqlen_512\x_train_full.npy
+2023-06-06 18:32:54,926 WARNING  [*] Preprocessing reports Nebula Whitespace style...
+2023-06-06 18:33:15,061 WARNING  [*] Initializing tokenizer training...
+2023-06-06 18:38:52,727 WARNING Dumped vocab to out_cruparamer_5_folds\nebula_wht_vocab_50000_seqlen_512\tokenizer_50000_vocab.json
+2023-06-06 18:38:52,728 WARNING  [*] Encoding and padding...
+2023-06-06 18:47:06,730 WARNING  [!] Saved X as out_cruparamer_5_folds\nebula_wht_vocab_50000_seqlen_512\x_train_full.npy | Shape: (30000, 512)
+2023-06-06 18:47:06,746 WARNING  [!] Saved Y as out_cruparamer_5_folds\nebula_wht_vocab_50000_seqlen_512\y_train_full.npy | Shape: (30000,)
+2023-06-06 18:47:24,346 WARNING  [!] Skipping since exists: out_cruparamer_5_folds\neurlux_vocab_10000_seqlen_512\x_train_full.npy
+2023-06-06 18:47:24,366 WARNING  [!] Skipping since exists: out_cruparamer_5_folds\quovadis_vocab_600_seqlen_512\x_train_full.npy
+2023-06-06 18:47:24,459 WARNING  [!] Skipping... CV output folder for run neurlux already exists: out_cruparamer_5_folds\cv_neurlux_limNone_r1763_t5
+2023-06-06 18:47:24,460 WARNING  [!] Skipping... CV output folder for run quovadis already exists: out_cruparamer_5_folds\cv_quovadis_limNone_r1763_t5
+2023-06-06 18:47:24,460 WARNING  [!] Skipping... CV output folder for run nebula already exists: out_cruparamer_5_folds\cv_nebula_limNone_r1763_t5
+2023-06-06 18:47:24,461 WARNING  [!!!] Starting CV over nebula_wht!
+2023-06-06 18:47:24,540 WARNING  [!] Training time budget: 300min
+2023-06-06 18:47:24,541 WARNING  [!] Model config: {'vocab_size': 50000, 'maxlen': 512, 'chunk_size': 64, 'dModel': 64, 'nHeads': 8, 'dHidden': 256, 'nLayers': 2, 'numClasses': 1, 'hiddenNeurons': [64], 'layerNorm': False, 'dropout': 0.3, 'mean_over_sequence': False, 'norm_first': True}
+2023-06-06 18:47:24,581 WARNING  [1/5] Train set size: 24000, Validation set size: 6000
+2023-06-06 18:47:25,604 WARNING  [!] Saved dataset splits to dataset_splits_1686070044.npz
+2023-06-06 18:47:25,895 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 5.3972e6
+2023-06-06 18:47:25,895 WARNING  [*] Training time budget set: 5.0 min
+2023-06-06 18:47:25,915 WARNING  [*] Started epoch: 1
+2023-06-06 18:47:28,143 WARNING  [*] 18:47:28: Train Epoch: 1 [  0  / 250  (0 %)] | Loss: 2.616981 | Elapsed: 2.20s | FPR 0.0003 -> TPR: 0.00 & F1: 0.00 | AUC: 0.4907
+2023-06-06 18:47:38,419 WARNING  [*] 18:47:38: Train Epoch: 1 [ 100 / 250  (40%)] | Loss: 0.303975 | Elapsed: 10.28s | FPR 0.0003 -> TPR: 0.33 & F1: 0.50 | AUC: 0.9156
+2023-06-06 18:47:56,796 WARNING  [*] 18:47:56: Train Epoch: 1 [ 200 / 250  (80%)] | Loss: 0.213639 | Elapsed: 18.37s | FPR 0.0003 -> TPR: 0.59 & F1: 0.75 | AUC: 0.9683
+2023-06-06 18:48:03,769 WARNING  [*] Tue Jun  6 18:48:03 2023:    1    | Tr.loss: 0.395621 | Elapsed:   37.85  s | FPR 0.0003 -> TPR: 0.07 & F1: 0.14 | AUC: 0.8987
+2023-06-06 18:48:03,769 WARNING  [*] Started epoch: 2
+2023-06-06 18:48:03,969 WARNING  [*] 18:48:03: Train Epoch: 2 [  0  / 250  (0 %)] | Loss: 0.240602 | Elapsed: 0.19s | FPR 0.0003 -> TPR: 0.48 & F1: 0.65 | AUC: 0.9617
+2023-06-06 18:48:14,309 WARNING  [*] 18:48:14: Train Epoch: 2 [ 100 / 250  (40%)] | Loss: 0.261428 | Elapsed: 10.34s | FPR 0.0003 -> TPR: 0.45 & F1: 0.62 | AUC: 0.9556
+2023-06-06 18:48:24,836 WARNING  [*] 18:48:24: Train Epoch: 2 [ 200 / 250  (80%)] | Loss: 0.126370 | Elapsed: 10.52s | FPR 0.0003 -> TPR: 0.88 & F1: 0.93 | AUC: 0.9899
+2023-06-06 18:48:31,681 WARNING  [*] Tue Jun  6 18:48:31 2023:    2    | Tr.loss: 0.173860 | Elapsed:   27.91  s | FPR 0.0003 -> TPR: 0.59 & F1: 0.74 | AUC: 0.9753
+2023-06-06 18:48:31,682 WARNING  [*] Started epoch: 3
+2023-06-06 18:48:31,780 WARNING  [*] 18:48:31: Train Epoch: 3 [  0  / 250  (0 %)] | Loss: 0.140499 | Elapsed: 0.10s | FPR 0.0003 -> TPR: 0.90 & F1: 0.95 | AUC: 0.9885
+2023-06-06 18:48:42,317 WARNING  [*] 18:48:42: Train Epoch: 3 [ 100 / 250  (40%)] | Loss: 0.148099 | Elapsed: 10.53s | FPR 0.0003 -> TPR: 0.87 & F1: 0.93 | AUC: 0.9874
+2023-06-06 18:48:52,936 WARNING  [*] 18:48:52: Train Epoch: 3 [ 200 / 250  (80%)] | Loss: 0.067385 | Elapsed: 10.61s | FPR 0.0003 -> TPR: 0.96 & F1: 0.98 | AUC: 0.9960
+2023-06-06 18:49:00,485 WARNING  [*] Tue Jun  6 18:49:00 2023:    3    | Tr.loss: 0.127896 | Elapsed:   28.80  s | FPR 0.0003 -> TPR: 0.68 & F1: 0.81 | AUC: 0.9857
+2023-06-06 18:49:00,485 WARNING  [*] Started epoch: 4
+2023-06-06 18:49:00,749 WARNING  [*] 18:49:00: Train Epoch: 4 [  0  / 250  (0 %)] | Loss: 0.117210 | Elapsed: 0.25s | FPR 0.0003 -> TPR: 0.81 & F1: 0.90 | AUC: 0.9887
+2023-06-06 18:49:11,415 WARNING  [*] 18:49:11: Train Epoch: 4 [ 100 / 250  (40%)] | Loss: 0.146187 | Elapsed: 10.66s | FPR 0.0003 -> TPR: 0.71 & F1: 0.83 | AUC: 0.9880
+2023-06-06 18:49:22,149 WARNING  [*] 18:49:22: Train Epoch: 4 [ 200 / 250  (80%)] | Loss: 0.181659 | Elapsed: 10.72s | FPR 0.0003 -> TPR: 0.90 & F1: 0.95 | AUC: 0.9760
+2023-06-06 18:49:30,710 WARNING  [*] Tue Jun  6 18:49:30 2023:    4    | Tr.loss: 0.100603 | Elapsed:   30.22  s | FPR 0.0003 -> TPR: 0.76 & F1: 0.86 | AUC: 0.9903
+2023-06-06 18:49:30,710 WARNING  [*] Started epoch: 5
+2023-06-06 18:49:30,904 WARNING  [*] 18:49:30: Train Epoch: 5 [  0  / 250  (0 %)] | Loss: 0.015662 | Elapsed: 0.19s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 18:49:41,433 WARNING  [*] 18:49:41: Train Epoch: 5 [ 100 / 250  (40%)] | Loss: 0.031314 | Elapsed: 10.52s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 18:49:52,117 WARNING  [*] 18:49:52: Train Epoch: 5 [ 200 / 250  (80%)] | Loss: 0.065560 | Elapsed: 10.68s | FPR 0.0003 -> TPR: 0.97 & F1: 0.98 | AUC: 0.9981
+2023-06-06 18:49:59,032 WARNING  [*] Tue Jun  6 18:49:59 2023:    5    | Tr.loss: 0.089198 | Elapsed:   28.32  s | FPR 0.0003 -> TPR: 0.82 & F1: 0.90 | AUC: 0.9921
+2023-06-06 18:49:59,032 WARNING  [*] Started epoch: 6
+2023-06-06 18:49:59,145 WARNING  [*] 18:49:59: Train Epoch: 6 [  0  / 250  (0 %)] | Loss: 0.028819 | Elapsed: 0.11s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 18:50:09,768 WARNING  [*] 18:50:09: Train Epoch: 6 [ 100 / 250  (40%)] | Loss: 0.098638 | Elapsed: 10.62s | FPR 0.0003 -> TPR: 0.92 & F1: 0.96 | AUC: 0.9890
+2023-06-06 18:50:20,448 WARNING  [*] 18:50:20: Train Epoch: 6 [ 200 / 250  (80%)] | Loss: 0.052925 | Elapsed: 10.68s | FPR 0.0003 -> TPR: 0.96 & F1: 0.98 | AUC: 0.9990
+2023-06-06 18:50:27,367 WARNING  [*] Tue Jun  6 18:50:27 2023:    6    | Tr.loss: 0.075343 | Elapsed:   28.33  s | FPR 0.0003 -> TPR: 0.84 & F1: 0.91 | AUC: 0.9940
+2023-06-06 18:50:27,367 WARNING  [*] Started epoch: 7
+2023-06-06 18:50:27,481 WARNING  [*] 18:50:27: Train Epoch: 7 [  0  / 250  (0 %)] | Loss: 0.111866 | Elapsed: 0.11s | FPR 0.0003 -> TPR: 0.97 & F1: 0.98 | AUC: 0.9772
+2023-06-06 18:50:38,151 WARNING  [*] 18:50:38: Train Epoch: 7 [ 100 / 250  (40%)] | Loss: 0.075458 | Elapsed: 10.66s | FPR 0.0003 -> TPR: 0.92 & F1: 0.96 | AUC: 0.9956
+2023-06-06 18:50:48,885 WARNING  [*] 18:50:48: Train Epoch: 7 [ 200 / 250  (80%)] | Loss: 0.036747 | Elapsed: 10.73s | FPR 0.0003 -> TPR: 0.97 & F1: 0.98 | AUC: 0.9995
+2023-06-06 18:50:55,782 WARNING  [*] Tue Jun  6 18:50:55 2023:    7    | Tr.loss: 0.063019 | Elapsed:   28.42  s | FPR 0.0003 -> TPR: 0.86 & F1: 0.93 | AUC: 0.9957
+2023-06-06 18:50:55,782 WARNING  [*] Started epoch: 8
+2023-06-06 18:50:55,902 WARNING  [*] 18:50:55: Train Epoch: 8 [  0  / 250  (0 %)] | Loss: 0.061432 | Elapsed: 0.11s | FPR 0.0003 -> TPR: 0.97 & F1: 0.99 | AUC: 0.9958
+2023-06-06 18:51:08,172 WARNING  [*] 18:51:08: Train Epoch: 8 [ 100 / 250  (40%)] | Loss: 0.042039 | Elapsed: 12.26s | FPR 0.0003 -> TPR: 0.97 & F1: 0.98 | AUC: 0.9995
+2023-06-06 18:51:18,851 WARNING  [*] 18:51:18: Train Epoch: 8 [ 200 / 250  (80%)] | Loss: 0.015203 | Elapsed: 10.67s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 18:51:26,644 WARNING  [*] Tue Jun  6 18:51:26 2023:    8    | Tr.loss: 0.055244 | Elapsed:   30.86  s | FPR 0.0003 -> TPR: 0.90 & F1: 0.95 | AUC: 0.9966
+2023-06-06 18:51:26,645 WARNING  [*] Started epoch: 9
+2023-06-06 18:51:26,868 WARNING  [*] 18:51:26: Train Epoch: 9 [  0  / 250  (0 %)] | Loss: 0.026719 | Elapsed: 0.21s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 18:51:37,782 WARNING  [*] 18:51:37: Train Epoch: 9 [ 100 / 250  (40%)] | Loss: 0.036431 | Elapsed: 10.90s | FPR 0.0003 -> TPR: 0.97 & F1: 0.99 | AUC: 0.9996
+2023-06-06 18:51:48,744 WARNING  [*] 18:51:48: Train Epoch: 9 [ 200 / 250  (80%)] | Loss: 0.081000 | Elapsed: 10.96s | FPR 0.0003 -> TPR: 0.94 & F1: 0.97 | AUC: 0.9986
+2023-06-06 18:51:56,474 WARNING  [*] Tue Jun  6 18:51:56 2023:    9    | Tr.loss: 0.051247 | Elapsed:   29.83  s | FPR 0.0003 -> TPR: 0.91 & F1: 0.95 | AUC: 0.9969
+2023-06-06 18:51:56,474 WARNING  [*] Started epoch: 10
+2023-06-06 18:51:56,813 WARNING  [*] 18:51:56: Train Epoch: 10 [  0  / 250  (0 %)] | Loss: 0.101258 | Elapsed: 0.34s | FPR 0.0003 -> TPR: 0.95 & F1: 0.97 | AUC: 0.9963
+2023-06-06 18:52:07,656 WARNING  [*] 18:52:07: Train Epoch: 10 [ 100 / 250  (40%)] | Loss: 0.025558 | Elapsed: 10.83s | FPR 0.0003 -> TPR: 0.97 & F1: 0.99 | AUC: 0.9996
+2023-06-06 18:52:18,282 WARNING  [*] 18:52:18: Train Epoch: 10 [ 200 / 250  (80%)] | Loss: 0.081726 | Elapsed: 10.62s | FPR 0.0003 -> TPR: 0.95 & F1: 0.97 | AUC: 0.9988
+2023-06-06 18:52:25,144 WARNING  [*] Tue Jun  6 18:52:25 2023:   10    | Tr.loss: 0.044113 | Elapsed:   28.67  s | FPR 0.0003 -> TPR: 0.93 & F1: 0.96 | AUC: 0.9978
+2023-06-06 18:52:25,144 WARNING  [*] Started epoch: 11
+2023-06-06 18:52:25,250 WARNING  [*] 18:52:25: Train Epoch: 11 [  0  / 250  (0 %)] | Loss: 0.054669 | Elapsed: 0.10s | FPR 0.0003 -> TPR: 0.97 & F1: 0.98 | AUC: 0.9990
+2023-06-06 18:52:25,957 WARNING  [!] Time budget exceeded, training stopped.
+2023-06-06 18:52:26,012 WARNING  [!] Tue Jun  6 18:52:26 2023: Dumped results:
+                model       : 1686070044-model.torch
+		train time  : 1686070044-trainTime.npy
+		train losses: 1686070044-trainLosses.npy
+		train AUC   : 1686070044-auc.npy
+		train F1s   : 1686070044-trainF1s.npy
+		train TPRs  : 1686070044-trainTPRs.npy
+2023-06-06 18:52:26,025 WARNING  [!] Evaluating model on training set...
+2023-06-06 18:52:33,055 WARNING  [!] This fold metrics on training set:
+2023-06-06 18:52:33,061 WARNING 	AUC: 0.9991
+2023-06-06 18:52:33,080 WARNING 	FPR: 0.0001 | TPR: 0.9285 | F1: 0.9628
+2023-06-06 18:52:33,088 WARNING 	FPR: 0.0003 | TPR: 0.9399 | F1: 0.9687
+2023-06-06 18:52:33,096 WARNING 	FPR: 0.001 | TPR: 0.9565 | F1: 0.9768
+2023-06-06 18:52:33,104 WARNING 	FPR: 0.003 | TPR: 0.9782 | F1: 0.9860
+2023-06-06 18:52:33,112 WARNING 	FPR: 0.01 | TPR: 0.9870 | F1: 0.9842
+2023-06-06 18:52:33,121 WARNING 	FPR: 0.03 | TPR: 0.9926 | F1: 0.9675
+2023-06-06 18:52:33,130 WARNING 	FPR: 0.1 | TPR: 0.9979 | F1: 0.9085
+2023-06-06 18:52:33,131 WARNING  [!] Evaluating model on validation set...
+2023-06-06 18:52:34,863 WARNING  [!] This fold metrics on validation set:
+2023-06-06 18:52:34,879 WARNING 	AUC: 0.9938
+2023-06-06 18:52:34,882 WARNING 	FPR: 0.0001 | TPR: 0.0000 | F1: 0.0000
+2023-06-06 18:52:34,885 WARNING 	FPR: 0.0003 | TPR: 0.0000 | F1: 0.0000
+2023-06-06 18:52:34,888 WARNING 	FPR: 0.001 | TPR: 0.8278 | F1: 0.9050
+2023-06-06 18:52:34,891 WARNING 	FPR: 0.003 | TPR: 0.8977 | F1: 0.9433
+2023-06-06 18:52:34,894 WARNING 	FPR: 0.01 | TPR: 0.9386 | F1: 0.9587
+2023-06-06 18:52:34,897 WARNING 	FPR: 0.03 | TPR: 0.9680 | F1: 0.9556
+2023-06-06 18:52:34,900 WARNING 	FPR: 0.1 | TPR: 0.9845 | F1: 0.9046
+2023-06-06 18:52:36,062 WARNING  [2/5] Train set size: 24000, Validation set size: 6000
+2023-06-06 18:52:37,000 WARNING  [!] Saved dataset splits to dataset_splits_1686070356.npz
+2023-06-06 18:52:37,085 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 5.3972e6
+2023-06-06 18:52:37,085 WARNING  [*] Training time budget set: 5.0 min
+2023-06-06 18:52:37,102 WARNING  [*] Started epoch: 1
+2023-06-06 18:52:37,370 WARNING  [*] 18:52:37: Train Epoch: 1 [  0  / 250  (0 %)] | Loss: 2.876833 | Elapsed: 0.27s | FPR 0.0003 -> TPR: 0.00 & F1: 0.00 | AUC: 0.5359
+2023-06-06 18:52:48,164 WARNING  [*] 18:52:48: Train Epoch: 1 [ 100 / 250  (40%)] | Loss: 0.358418 | Elapsed: 10.79s | FPR 0.0003 -> TPR: 0.47 & F1: 0.64 | AUC: 0.9086
+2023-06-06 18:52:58,997 WARNING  [*] 18:52:58: Train Epoch: 1 [ 200 / 250  (80%)] | Loss: 0.340803 | Elapsed: 10.83s | FPR 0.0003 -> TPR: 0.38 & F1: 0.55 | AUC: 0.9288
+2023-06-06 18:53:06,678 WARNING  [*] Tue Jun  6 18:53:06 2023:    1    | Tr.loss: 0.420472 | Elapsed:   29.58  s | FPR 0.0003 -> TPR: 0.03 & F1: 0.05 | AUC: 0.8921
+2023-06-06 18:53:06,678 WARNING  [*] Started epoch: 2
+2023-06-06 18:53:06,856 WARNING  [*] 18:53:06: Train Epoch: 2 [  0  / 250  (0 %)] | Loss: 0.299300 | Elapsed: 0.17s | FPR 0.0003 -> TPR: 0.39 & F1: 0.56 | AUC: 0.9459
+2023-06-06 18:53:17,850 WARNING  [*] 18:53:17: Train Epoch: 2 [ 100 / 250  (40%)] | Loss: 0.145264 | Elapsed: 10.97s | FPR 0.0003 -> TPR: 0.78 & F1: 0.88 | AUC: 0.9838
+2023-06-06 18:53:28,795 WARNING  [*] 18:53:28: Train Epoch: 2 [ 200 / 250  (80%)] | Loss: 0.182796 | Elapsed: 10.94s | FPR 0.0003 -> TPR: 0.94 & F1: 0.97 | AUC: 0.9653
+2023-06-06 18:53:36,066 WARNING  [*] Tue Jun  6 18:53:36 2023:    2    | Tr.loss: 0.185387 | Elapsed:   29.39  s | FPR 0.0003 -> TPR: 0.51 & F1: 0.68 | AUC: 0.9733
+2023-06-06 18:53:36,067 WARNING  [*] Started epoch: 3
+2023-06-06 18:53:36,273 WARNING  [*] 18:53:36: Train Epoch: 3 [  0  / 250  (0 %)] | Loss: 0.143493 | Elapsed: 0.20s | FPR 0.0003 -> TPR: 0.80 & F1: 0.89 | AUC: 0.9884
+2023-06-06 18:53:47,125 WARNING  [*] 18:53:47: Train Epoch: 3 [ 100 / 250  (40%)] | Loss: 0.283013 | Elapsed: 10.84s | FPR 0.0003 -> TPR: 0.63 & F1: 0.77 | AUC: 0.9690
+2023-06-06 18:53:57,759 WARNING  [*] 18:53:57: Train Epoch: 3 [ 200 / 250  (80%)] | Loss: 0.089604 | Elapsed: 10.63s | FPR 0.0003 -> TPR: 0.91 & F1: 0.95 | AUC: 0.9973
+2023-06-06 18:54:04,474 WARNING  [*] Tue Jun  6 18:54:04 2023:    3    | Tr.loss: 0.129682 | Elapsed:   28.41  s | FPR 0.0003 -> TPR: 0.65 & F1: 0.79 | AUC: 0.9851
+2023-06-06 18:54:04,474 WARNING  [*] Started epoch: 4
+2023-06-06 18:54:04,588 WARNING  [*] 18:54:04: Train Epoch: 4 [  0  / 250  (0 %)] | Loss: 0.105867 | Elapsed: 0.11s | FPR 0.0003 -> TPR: 0.91 & F1: 0.95 | AUC: 0.9904
+2023-06-06 18:54:16,219 WARNING  [*] 18:54:16: Train Epoch: 4 [ 100 / 250  (40%)] | Loss: 0.076279 | Elapsed: 11.63s | FPR 0.0003 -> TPR: 0.95 & F1: 0.97 | AUC: 0.9871
+2023-06-06 18:54:27,022 WARNING  [*] 18:54:27: Train Epoch: 4 [ 200 / 250  (80%)] | Loss: 0.104281 | Elapsed: 10.80s | FPR 0.0003 -> TPR: 0.86 & F1: 0.93 | AUC: 0.9937
+2023-06-06 18:54:33,867 WARNING  [*] Tue Jun  6 18:54:33 2023:    4    | Tr.loss: 0.101616 | Elapsed:   29.39  s | FPR 0.0003 -> TPR: 0.77 & F1: 0.87 | AUC: 0.9901
+2023-06-06 18:54:33,867 WARNING  [*] Started epoch: 5
+2023-06-06 18:54:33,984 WARNING  [*] 18:54:33: Train Epoch: 5 [  0  / 250  (0 %)] | Loss: 0.060376 | Elapsed: 0.11s | FPR 0.0003 -> TPR: 0.97 & F1: 0.98 | AUC: 0.9970
+2023-06-06 18:54:44,690 WARNING  [*] 18:54:44: Train Epoch: 5 [ 100 / 250  (40%)] | Loss: 0.150418 | Elapsed: 10.71s | FPR 0.0003 -> TPR: 0.88 & F1: 0.94 | AUC: 0.9939
+2023-06-06 18:54:55,389 WARNING  [*] 18:54:55: Train Epoch: 5 [ 200 / 250  (80%)] | Loss: 0.126596 | Elapsed: 10.67s | FPR 0.0003 -> TPR: 0.91 & F1: 0.95 | AUC: 0.9667
+2023-06-06 18:55:02,289 WARNING  [*] Tue Jun  6 18:55:02 2023:    5    | Tr.loss: 0.085905 | Elapsed:   28.42  s | FPR 0.0003 -> TPR: 0.79 & F1: 0.88 | AUC: 0.9928
+2023-06-06 18:55:02,289 WARNING  [*] Started epoch: 6
+2023-06-06 18:55:02,411 WARNING  [*] 18:55:02: Train Epoch: 6 [  0  / 250  (0 %)] | Loss: 0.079240 | Elapsed: 0.12s | FPR 0.0003 -> TPR: 0.88 & F1: 0.94 | AUC: 0.9910
+2023-06-06 18:55:12,996 WARNING  [*] 18:55:12: Train Epoch: 6 [ 100 / 250  (40%)] | Loss: 0.040796 | Elapsed: 10.59s | FPR 0.0003 -> TPR: 0.97 & F1: 0.99 | AUC: 0.9992
+2023-06-06 18:55:23,684 WARNING  [*] 18:55:23: Train Epoch: 6 [ 200 / 250  (80%)] | Loss: 0.111042 | Elapsed: 10.67s | FPR 0.0003 -> TPR: 0.97 & F1: 0.98 | AUC: 0.9829
+2023-06-06 18:55:30,522 WARNING  [*] Tue Jun  6 18:55:30 2023:    6    | Tr.loss: 0.072949 | Elapsed:   28.23  s | FPR 0.0003 -> TPR: 0.88 & F1: 0.93 | AUC: 0.9942
+2023-06-06 18:55:30,522 WARNING  [*] Started epoch: 7
+2023-06-06 18:55:30,641 WARNING  [*] 18:55:30: Train Epoch: 7 [  0  / 250  (0 %)] | Loss: 0.064357 | Elapsed: 0.11s | FPR 0.0003 -> TPR: 0.90 & F1: 0.95 | AUC: 0.9982
+2023-06-06 18:55:41,208 WARNING  [*] 18:55:41: Train Epoch: 7 [ 100 / 250  (40%)] | Loss: 0.023043 | Elapsed: 10.55s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 18:55:51,917 WARNING  [*] 18:55:51: Train Epoch: 7 [ 200 / 250  (80%)] | Loss: 0.031659 | Elapsed: 10.71s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 18:55:59,930 WARNING  [*] Tue Jun  6 18:55:59 2023:    7    | Tr.loss: 0.060870 | Elapsed:   29.41  s | FPR 0.0003 -> TPR: 0.89 & F1: 0.94 | AUC: 0.9959
+2023-06-06 18:55:59,930 WARNING  [*] Started epoch: 8
+2023-06-06 18:56:00,054 WARNING  [*] 18:56:00: Train Epoch: 8 [  0  / 250  (0 %)] | Loss: 0.035247 | Elapsed: 0.12s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 18:56:10,652 WARNING  [*] 18:56:10: Train Epoch: 8 [ 100 / 250  (40%)] | Loss: 0.042518 | Elapsed: 10.60s | FPR 0.0003 -> TPR: 0.93 & F1: 0.96 | AUC: 0.9938
+2023-06-06 18:56:21,305 WARNING  [*] 18:56:21: Train Epoch: 8 [ 200 / 250  (80%)] | Loss: 0.094756 | Elapsed: 10.65s | FPR 0.0003 -> TPR: 0.91 & F1: 0.96 | AUC: 0.9925
+2023-06-06 18:56:28,096 WARNING  [*] Tue Jun  6 18:56:28 2023:    8    | Tr.loss: 0.052309 | Elapsed:   28.17  s | FPR 0.0003 -> TPR: 0.91 & F1: 0.95 | AUC: 0.9969
+2023-06-06 18:56:28,096 WARNING  [*] Started epoch: 9
+2023-06-06 18:56:28,213 WARNING  [*] 18:56:28: Train Epoch: 9 [  0  / 250  (0 %)] | Loss: 0.027523 | Elapsed: 0.11s | FPR 0.0003 -> TPR: 0.97 & F1: 0.98 | AUC: 0.9995
+2023-06-06 18:56:38,625 WARNING  [*] 18:56:38: Train Epoch: 9 [ 100 / 250  (40%)] | Loss: 0.060510 | Elapsed: 10.41s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 18:56:49,300 WARNING  [*] 18:56:49: Train Epoch: 9 [ 200 / 250  (80%)] | Loss: 0.084800 | Elapsed: 10.67s | FPR 0.0003 -> TPR: 0.97 & F1: 0.98 | AUC: 0.9954
+2023-06-06 18:56:56,214 WARNING  [*] Tue Jun  6 18:56:56 2023:    9    | Tr.loss: 0.048849 | Elapsed:   28.12  s | FPR 0.0003 -> TPR: 0.91 & F1: 0.95 | AUC: 0.9974
+2023-06-06 18:56:56,229 WARNING  [*] Started epoch: 10
+2023-06-06 18:56:56,340 WARNING  [*] 18:56:56: Train Epoch: 10 [  0  / 250  (0 %)] | Loss: 0.002311 | Elapsed: 0.10s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 18:57:07,119 WARNING  [*] 18:57:07: Train Epoch: 10 [ 100 / 250  (40%)] | Loss: 0.009128 | Elapsed: 10.77s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 18:57:18,235 WARNING  [*] 18:57:18: Train Epoch: 10 [ 200 / 250  (80%)] | Loss: 0.023633 | Elapsed: 11.12s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 18:57:25,270 WARNING  [*] Tue Jun  6 18:57:25 2023:   10    | Tr.loss: 0.046679 | Elapsed:   29.04  s | FPR 0.0003 -> TPR: 0.90 & F1: 0.95 | AUC: 0.9976
+2023-06-06 18:57:25,270 WARNING  [*] Started epoch: 11
+2023-06-06 18:57:25,389 WARNING  [*] 18:57:25: Train Epoch: 11 [  0  / 250  (0 %)] | Loss: 0.010477 | Elapsed: 0.11s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 18:57:37,180 WARNING  [!] Time budget exceeded, training stopped.
+2023-06-06 18:57:37,243 WARNING  [!] Tue Jun  6 18:57:37 2023: Dumped results:
+                model       : 1686070356-model.torch
+		train time  : 1686070356-trainTime.npy
+		train losses: 1686070356-trainLosses.npy
+		train AUC   : 1686070356-auc.npy
+		train F1s   : 1686070356-trainF1s.npy
+		train TPRs  : 1686070356-trainTPRs.npy
+2023-06-06 18:57:37,270 WARNING  [!] Evaluating model on training set...
+2023-06-06 18:57:44,380 WARNING  [!] This fold metrics on training set:
+2023-06-06 18:57:44,385 WARNING 	AUC: 0.9990
+2023-06-06 18:57:44,393 WARNING 	FPR: 0.0001 | TPR: 0.9175 | F1: 0.9569
+2023-06-06 18:57:44,401 WARNING 	FPR: 0.0003 | TPR: 0.9472 | F1: 0.9726
+2023-06-06 18:57:44,409 WARNING 	FPR: 0.001 | TPR: 0.9626 | F1: 0.9800
+2023-06-06 18:57:44,417 WARNING 	FPR: 0.003 | TPR: 0.9745 | F1: 0.9842
+2023-06-06 18:57:44,424 WARNING 	FPR: 0.01 | TPR: 0.9839 | F1: 0.9822
+2023-06-06 18:57:44,432 WARNING 	FPR: 0.03 | TPR: 0.9919 | F1: 0.9669
+2023-06-06 18:57:44,440 WARNING 	FPR: 0.1 | TPR: 0.9974 | F1: 0.9081
+2023-06-06 18:57:44,441 WARNING  [!] Evaluating model on validation set...
+2023-06-06 18:57:46,202 WARNING  [!] This fold metrics on validation set:
+2023-06-06 18:57:46,204 WARNING 	AUC: 0.9915
+2023-06-06 18:57:46,206 WARNING 	FPR: 0.0001 | TPR: 0.0000 | F1: 0.0000
+2023-06-06 18:57:46,209 WARNING 	FPR: 0.0003 | TPR: 0.0000 | F1: 0.0000
+2023-06-06 18:57:46,211 WARNING 	FPR: 0.001 | TPR: 0.0000 | F1: 0.0000
+2023-06-06 18:57:46,214 WARNING 	FPR: 0.003 | TPR: 0.8557 | F1: 0.9193
+2023-06-06 18:57:46,216 WARNING 	FPR: 0.01 | TPR: 0.9296 | F1: 0.9536
+2023-06-06 18:57:46,219 WARNING 	FPR: 0.03 | TPR: 0.9563 | F1: 0.9484
+2023-06-06 18:57:46,222 WARNING 	FPR: 0.1 | TPR: 0.9759 | F1: 0.8965
+2023-06-06 18:57:47,657 WARNING  [3/5] Train set size: 24000, Validation set size: 6000
+2023-06-06 18:57:48,629 WARNING  [!] Saved dataset splits to dataset_splits_1686070667.npz
+2023-06-06 18:57:48,721 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 5.3972e6
+2023-06-06 18:57:48,722 WARNING  [*] Training time budget set: 5.0 min
+2023-06-06 18:57:48,741 WARNING  [*] Started epoch: 1
+2023-06-06 18:57:48,998 WARNING  [*] 18:57:48: Train Epoch: 1 [  0  / 250  (0 %)] | Loss: 4.209855 | Elapsed: 0.25s | FPR 0.0003 -> TPR: 0.00 & F1: 0.00 | AUC: 0.3623
+2023-06-06 18:57:59,930 WARNING  [*] 18:57:59: Train Epoch: 1 [ 100 / 250  (40%)] | Loss: 0.290248 | Elapsed: 10.93s | FPR 0.0003 -> TPR: 0.54 & F1: 0.70 | AUC: 0.9196
+2023-06-06 18:58:10,887 WARNING  [*] 18:58:10: Train Epoch: 1 [ 200 / 250  (80%)] | Loss: 0.199427 | Elapsed: 10.95s | FPR 0.0003 -> TPR: 0.73 & F1: 0.85 | AUC: 0.9738
+2023-06-06 18:58:18,126 WARNING  [*] Tue Jun  6 18:58:18 2023:    1    | Tr.loss: 0.418182 | Elapsed:   29.38  s | FPR 0.0003 -> TPR: 0.01 & F1: 0.03 | AUC: 0.8926
+2023-06-06 18:58:18,127 WARNING  [*] Started epoch: 2
+2023-06-06 18:58:18,242 WARNING  [*] 18:58:18: Train Epoch: 2 [  0  / 250  (0 %)] | Loss: 0.232169 | Elapsed: 0.11s | FPR 0.0003 -> TPR: 0.43 & F1: 0.60 | AUC: 0.9689
+2023-06-06 18:58:29,480 WARNING  [*] 18:58:29: Train Epoch: 2 [ 100 / 250  (40%)] | Loss: 0.364899 | Elapsed: 11.23s | FPR 0.0003 -> TPR: 0.62 & F1: 0.77 | AUC: 0.9382
+2023-06-06 18:58:40,109 WARNING  [*] 18:58:40: Train Epoch: 2 [ 200 / 250  (80%)] | Loss: 0.257839 | Elapsed: 10.62s | FPR 0.0003 -> TPR: 0.76 & F1: 0.86 | AUC: 0.9721
+2023-06-06 18:58:47,041 WARNING  [*] Tue Jun  6 18:58:47 2023:    2    | Tr.loss: 0.183484 | Elapsed:   28.91  s | FPR 0.0003 -> TPR: 0.52 & F1: 0.68 | AUC: 0.9738
+2023-06-06 18:58:47,042 WARNING  [*] Started epoch: 3
+2023-06-06 18:58:47,156 WARNING  [*] 18:58:47: Train Epoch: 3 [  0  / 250  (0 %)] | Loss: 0.104259 | Elapsed: 0.11s | FPR 0.0003 -> TPR: 0.93 & F1: 0.96 | AUC: 0.9942
+2023-06-06 18:58:58,038 WARNING  [*] 18:58:58: Train Epoch: 3 [ 100 / 250  (40%)] | Loss: 0.090608 | Elapsed: 10.87s | FPR 0.0003 -> TPR: 0.91 & F1: 0.95 | AUC: 0.9964
+2023-06-06 18:59:08,930 WARNING  [*] 18:59:08: Train Epoch: 3 [ 200 / 250  (80%)] | Loss: 0.182214 | Elapsed: 10.88s | FPR 0.0003 -> TPR: 0.90 & F1: 0.95 | AUC: 0.9645
+2023-06-06 18:59:15,903 WARNING  [*] Tue Jun  6 18:59:15 2023:    3    | Tr.loss: 0.134007 | Elapsed:   28.86  s | FPR 0.0003 -> TPR: 0.62 & F1: 0.76 | AUC: 0.9845
+2023-06-06 18:59:15,903 WARNING  [*] Started epoch: 4
+2023-06-06 18:59:16,016 WARNING  [*] 18:59:16: Train Epoch: 4 [  0  / 250  (0 %)] | Loss: 0.044441 | Elapsed: 0.10s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 18:59:27,802 WARNING  [*] 18:59:27: Train Epoch: 4 [ 100 / 250  (40%)] | Loss: 0.079230 | Elapsed: 11.78s | FPR 0.0003 -> TPR: 0.94 & F1: 0.97 | AUC: 0.9932
+2023-06-06 18:59:38,547 WARNING  [*] 18:59:38: Train Epoch: 4 [ 200 / 250  (80%)] | Loss: 0.108025 | Elapsed: 10.74s | FPR 0.0003 -> TPR: 0.93 & F1: 0.97 | AUC: 0.9960
+2023-06-06 18:59:45,458 WARNING  [*] Tue Jun  6 18:59:45 2023:    4    | Tr.loss: 0.104518 | Elapsed:   29.55  s | FPR 0.0003 -> TPR: 0.70 & F1: 0.82 | AUC: 0.9900
+2023-06-06 18:59:45,458 WARNING  [*] Started epoch: 5
+2023-06-06 18:59:45,568 WARNING  [*] 18:59:45: Train Epoch: 5 [  0  / 250  (0 %)] | Loss: 0.140317 | Elapsed: 0.10s | FPR 0.0003 -> TPR: 0.88 & F1: 0.94 | AUC: 0.9806
+2023-06-06 18:59:56,347 WARNING  [*] 18:59:56: Train Epoch: 5 [ 100 / 250  (40%)] | Loss: 0.073870 | Elapsed: 10.77s | FPR 0.0003 -> TPR: 0.91 & F1: 0.96 | AUC: 0.9960
+2023-06-06 19:00:07,228 WARNING  [*] 19:00:07: Train Epoch: 5 [ 200 / 250  (80%)] | Loss: 0.173921 | Elapsed: 10.87s | FPR 0.0003 -> TPR: 0.88 & F1: 0.93 | AUC: 0.9874
+2023-06-06 19:00:14,051 WARNING  [*] Tue Jun  6 19:00:14 2023:    5    | Tr.loss: 0.090159 | Elapsed:   28.59  s | FPR 0.0003 -> TPR: 0.78 & F1: 0.87 | AUC: 0.9922
+2023-06-06 19:00:14,052 WARNING  [*] Started epoch: 6
+2023-06-06 19:00:14,162 WARNING  [*] 19:00:14: Train Epoch: 6 [  0  / 250  (0 %)] | Loss: 0.135737 | Elapsed: 0.10s | FPR 0.0003 -> TPR: 0.89 & F1: 0.94 | AUC: 0.9842
+2023-06-06 19:00:24,943 WARNING  [*] 19:00:24: Train Epoch: 6 [ 100 / 250  (40%)] | Loss: 0.062400 | Elapsed: 10.77s | FPR 0.0003 -> TPR: 0.92 & F1: 0.96 | AUC: 0.9984
+2023-06-06 19:00:35,741 WARNING  [*] 19:00:35: Train Epoch: 6 [ 200 / 250  (80%)] | Loss: 0.026269 | Elapsed: 10.79s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 19:00:42,681 WARNING  [*] Tue Jun  6 19:00:42 2023:    6    | Tr.loss: 0.075752 | Elapsed:   28.63  s | FPR 0.0003 -> TPR: 0.81 & F1: 0.90 | AUC: 0.9944
+2023-06-06 19:00:42,682 WARNING  [*] Started epoch: 7
+2023-06-06 19:00:42,798 WARNING  [*] 19:00:42: Train Epoch: 7 [  0  / 250  (0 %)] | Loss: 0.015409 | Elapsed: 0.11s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 19:00:53,680 WARNING  [*] 19:00:53: Train Epoch: 7 [ 100 / 250  (40%)] | Loss: 0.040881 | Elapsed: 10.88s | FPR 0.0003 -> TPR: 0.96 & F1: 0.98 | AUC: 0.9995
+2023-06-06 19:01:04,249 WARNING  [*] 19:01:04: Train Epoch: 7 [ 200 / 250  (80%)] | Loss: 0.074033 | Elapsed: 10.56s | FPR 0.0003 -> TPR: 0.96 & F1: 0.98 | AUC: 0.9984
+2023-06-06 19:01:12,501 WARNING  [*] Tue Jun  6 19:01:12 2023:    7    | Tr.loss: 0.066699 | Elapsed:   29.82  s | FPR 0.0003 -> TPR: 0.80 & F1: 0.89 | AUC: 0.9954
+2023-06-06 19:01:12,502 WARNING  [*] Started epoch: 8
+2023-06-06 19:01:12,618 WARNING  [*] 19:01:12: Train Epoch: 8 [  0  / 250  (0 %)] | Loss: 0.015257 | Elapsed: 0.11s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 19:01:23,398 WARNING  [*] 19:01:23: Train Epoch: 8 [ 100 / 250  (40%)] | Loss: 0.102853 | Elapsed: 10.77s | FPR 0.0003 -> TPR: 0.89 & F1: 0.94 | AUC: 0.9965
+2023-06-06 19:01:33,939 WARNING  [*] 19:01:33: Train Epoch: 8 [ 200 / 250  (80%)] | Loss: 0.067068 | Elapsed: 10.53s | FPR 0.0003 -> TPR: 0.97 & F1: 0.99 | AUC: 0.9974
+2023-06-06 19:01:40,822 WARNING  [*] Tue Jun  6 19:01:40 2023:    8    | Tr.loss: 0.055705 | Elapsed:   28.32  s | FPR 0.0003 -> TPR: 0.87 & F1: 0.93 | AUC: 0.9969
+2023-06-06 19:01:40,823 WARNING  [*] Started epoch: 9
+2023-06-06 19:01:40,933 WARNING  [*] 19:01:40: Train Epoch: 9 [  0  / 250  (0 %)] | Loss: 0.037181 | Elapsed: 0.10s | FPR 0.0003 -> TPR: 0.97 & F1: 0.99 | AUC: 0.9991
+2023-06-06 19:01:51,709 WARNING  [*] 19:01:51: Train Epoch: 9 [ 100 / 250  (40%)] | Loss: 0.055276 | Elapsed: 10.77s | FPR 0.0003 -> TPR: 0.93 & F1: 0.96 | AUC: 0.9981
+2023-06-06 19:02:02,568 WARNING  [*] 19:02:02: Train Epoch: 9 [ 200 / 250  (80%)] | Loss: 0.009226 | Elapsed: 10.85s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 19:02:09,496 WARNING  [*] Tue Jun  6 19:02:09 2023:    9    | Tr.loss: 0.052385 | Elapsed:   28.67  s | FPR 0.0003 -> TPR: 0.90 & F1: 0.95 | AUC: 0.9971
+2023-06-06 19:02:09,496 WARNING  [*] Started epoch: 10
+2023-06-06 19:02:09,607 WARNING  [*] 19:02:09: Train Epoch: 10 [  0  / 250  (0 %)] | Loss: 0.012340 | Elapsed: 0.10s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 19:02:20,496 WARNING  [*] 19:02:20: Train Epoch: 10 [ 100 / 250  (40%)] | Loss: 0.027563 | Elapsed: 10.88s | FPR 0.0003 -> TPR: 0.97 & F1: 0.99 | AUC: 0.9996
+2023-06-06 19:02:31,230 WARNING  [*] 19:02:31: Train Epoch: 10 [ 200 / 250  (80%)] | Loss: 0.035958 | Elapsed: 10.73s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 19:02:38,213 WARNING  [*] Tue Jun  6 19:02:38 2023:   10    | Tr.loss: 0.046361 | Elapsed:   28.72  s | FPR 0.0003 -> TPR: 0.91 & F1: 0.96 | AUC: 0.9976
+2023-06-06 19:02:38,214 WARNING  [*] Started epoch: 11
+2023-06-06 19:02:38,417 WARNING  [*] 19:02:38: Train Epoch: 11 [  0  / 250  (0 %)] | Loss: 0.029339 | Elapsed: 0.20s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 19:02:48,799 WARNING  [!] Time budget exceeded, training stopped.
+2023-06-06 19:02:48,851 WARNING  [!] Tue Jun  6 19:02:48 2023: Dumped results:
+                model       : 1686070667-model.torch
+		train time  : 1686070667-trainTime.npy
+		train losses: 1686070667-trainLosses.npy
+		train AUC   : 1686070667-auc.npy
+		train F1s   : 1686070667-trainF1s.npy
+		train TPRs  : 1686070667-trainTPRs.npy
+2023-06-06 19:02:48,867 WARNING  [!] Evaluating model on training set...
+2023-06-06 19:02:55,964 WARNING  [!] This fold metrics on training set:
+2023-06-06 19:02:55,969 WARNING 	AUC: 0.9992
+2023-06-06 19:02:55,976 WARNING 	FPR: 0.0001 | TPR: 0.8988 | F1: 0.9466
+2023-06-06 19:02:55,984 WARNING 	FPR: 0.0003 | TPR: 0.9418 | F1: 0.9698
+2023-06-06 19:02:55,992 WARNING 	FPR: 0.001 | TPR: 0.9644 | F1: 0.9809
+2023-06-06 19:02:56,001 WARNING 	FPR: 0.003 | TPR: 0.9724 | F1: 0.9831
+2023-06-06 19:02:56,008 WARNING 	FPR: 0.01 | TPR: 0.9868 | F1: 0.9837
+2023-06-06 19:02:56,016 WARNING 	FPR: 0.03 | TPR: 0.9933 | F1: 0.9676
+2023-06-06 19:02:56,023 WARNING 	FPR: 0.1 | TPR: 0.9980 | F1: 0.9089
+2023-06-06 19:02:56,024 WARNING  [!] Evaluating model on validation set...
+2023-06-06 19:02:57,798 WARNING  [!] This fold metrics on validation set:
+2023-06-06 19:02:57,800 WARNING 	AUC: 0.9937
+2023-06-06 19:02:57,803 WARNING 	FPR: 0.0001 | TPR: 0.0000 | F1: 0.0000
+2023-06-06 19:02:57,806 WARNING 	FPR: 0.0003 | TPR: 0.8118 | F1: 0.8959
+2023-06-06 19:02:57,808 WARNING 	FPR: 0.001 | TPR: 0.8413 | F1: 0.9128
+2023-06-06 19:02:57,811 WARNING 	FPR: 0.003 | TPR: 0.9064 | F1: 0.9479
+2023-06-06 19:02:57,814 WARNING 	FPR: 0.01 | TPR: 0.9424 | F1: 0.9605
+2023-06-06 19:02:57,817 WARNING 	FPR: 0.03 | TPR: 0.9620 | F1: 0.9548
+2023-06-06 19:02:57,820 WARNING 	FPR: 0.1 | TPR: 0.9785 | F1: 0.8989
+2023-06-06 19:02:58,987 WARNING  [4/5] Train set size: 24000, Validation set size: 6000
+2023-06-06 19:02:59,957 WARNING  [!] Saved dataset splits to dataset_splits_1686070978.npz
+2023-06-06 19:03:00,061 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 5.3972e6
+2023-06-06 19:03:00,062 WARNING  [*] Training time budget set: 5.0 min
+2023-06-06 19:03:00,076 WARNING  [*] Started epoch: 1
+2023-06-06 19:03:00,284 WARNING  [*] 19:03:00: Train Epoch: 1 [  0  / 250  (0 %)] | Loss: 1.957440 | Elapsed: 0.20s | FPR 0.0003 -> TPR: 0.00 & F1: 0.00 | AUC: 0.4979
+2023-06-06 19:03:11,190 WARNING  [*] 19:03:11: Train Epoch: 1 [ 100 / 250  (40%)] | Loss: 0.211503 | Elapsed: 10.90s | FPR 0.0003 -> TPR: 0.68 & F1: 0.81 | AUC: 0.9684
+2023-06-06 19:03:22,147 WARNING  [*] 19:03:22: Train Epoch: 1 [ 200 / 250  (80%)] | Loss: 0.303932 | Elapsed: 10.95s | FPR 0.0003 -> TPR: 0.57 & F1: 0.73 | AUC: 0.9286
+2023-06-06 19:03:29,207 WARNING  [*] Tue Jun  6 19:03:29 2023:    1    | Tr.loss: 0.392565 | Elapsed:   29.13  s | FPR 0.0003 -> TPR: 0.10 & F1: 0.18 | AUC: 0.8962
+2023-06-06 19:03:29,207 WARNING  [*] Started epoch: 2
+2023-06-06 19:03:29,320 WARNING  [*] 19:03:29: Train Epoch: 2 [  0  / 250  (0 %)] | Loss: 0.167109 | Elapsed: 0.10s | FPR 0.0003 -> TPR: 0.62 & F1: 0.77 | AUC: 0.9876
+2023-06-06 19:03:40,346 WARNING  [*] 19:03:40: Train Epoch: 2 [ 100 / 250  (40%)] | Loss: 0.167377 | Elapsed: 11.02s | FPR 0.0003 -> TPR: 0.91 & F1: 0.95 | AUC: 0.9715
+2023-06-06 19:03:51,191 WARNING  [*] 19:03:51: Train Epoch: 2 [ 200 / 250  (80%)] | Loss: 0.162521 | Elapsed: 10.84s | FPR 0.0003 -> TPR: 0.81 & F1: 0.90 | AUC: 0.9841
+2023-06-06 19:03:58,178 WARNING  [*] Tue Jun  6 19:03:58 2023:    2    | Tr.loss: 0.178830 | Elapsed:   28.97  s | FPR 0.0003 -> TPR: 0.56 & F1: 0.72 | AUC: 0.9749
+2023-06-06 19:03:58,179 WARNING  [*] Started epoch: 3
+2023-06-06 19:03:58,294 WARNING  [*] 19:03:58: Train Epoch: 3 [  0  / 250  (0 %)] | Loss: 0.153371 | Elapsed: 0.11s | FPR 0.0003 -> TPR: 0.74 & F1: 0.85 | AUC: 0.9826
+2023-06-06 19:04:08,990 WARNING  [*] 19:04:08: Train Epoch: 3 [ 100 / 250  (40%)] | Loss: 0.132966 | Elapsed: 10.68s | FPR 0.0003 -> TPR: 0.91 & F1: 0.95 | AUC: 0.9858
+2023-06-06 19:04:19,630 WARNING  [*] 19:04:19: Train Epoch: 3 [ 200 / 250  (80%)] | Loss: 0.052253 | Elapsed: 10.63s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 19:04:26,709 WARNING  [*] Tue Jun  6 19:04:26 2023:    3    | Tr.loss: 0.128601 | Elapsed:   28.53  s | FPR 0.0003 -> TPR: 0.60 & F1: 0.75 | AUC: 0.9858
+2023-06-06 19:04:26,709 WARNING  [*] Started epoch: 4
+2023-06-06 19:04:26,898 WARNING  [*] 19:04:26: Train Epoch: 4 [  0  / 250  (0 %)] | Loss: 0.164361 | Elapsed: 0.18s | FPR 0.0003 -> TPR: 0.91 & F1: 0.95 | AUC: 0.9957
+2023-06-06 19:04:39,473 WARNING  [*] 19:04:39: Train Epoch: 4 [ 100 / 250  (40%)] | Loss: 0.109533 | Elapsed: 12.57s | FPR 0.0003 -> TPR: 0.95 & F1: 0.98 | AUC: 0.9893
+2023-06-06 19:04:50,452 WARNING  [*] 19:04:50: Train Epoch: 4 [ 200 / 250  (80%)] | Loss: 0.061324 | Elapsed: 10.98s | FPR 0.0003 -> TPR: 0.89 & F1: 0.94 | AUC: 0.9938
+2023-06-06 19:04:57,425 WARNING  [*] Tue Jun  6 19:04:57 2023:    4    | Tr.loss: 0.101090 | Elapsed:   30.72  s | FPR 0.0003 -> TPR: 0.79 & F1: 0.89 | AUC: 0.9901
+2023-06-06 19:04:57,439 WARNING  [*] Started epoch: 5
+2023-06-06 19:04:57,541 WARNING  [*] 19:04:57: Train Epoch: 5 [  0  / 250  (0 %)] | Loss: 0.214703 | Elapsed: 0.10s | FPR 0.0003 -> TPR: 0.85 & F1: 0.92 | AUC: 0.9668
+2023-06-06 19:05:08,328 WARNING  [*] 19:05:08: Train Epoch: 5 [ 100 / 250  (40%)] | Loss: 0.066043 | Elapsed: 10.77s | FPR 0.0003 -> TPR: 0.90 & F1: 0.95 | AUC: 0.9983
+2023-06-06 19:05:19,202 WARNING  [*] 19:05:19: Train Epoch: 5 [ 200 / 250  (80%)] | Loss: 0.044515 | Elapsed: 10.87s | FPR 0.0003 -> TPR: 0.97 & F1: 0.99 | AUC: 0.9983
+2023-06-06 19:05:26,338 WARNING  [*] Tue Jun  6 19:05:26 2023:    5    | Tr.loss: 0.085845 | Elapsed:   28.90  s | FPR 0.0003 -> TPR: 0.81 & F1: 0.89 | AUC: 0.9929
+2023-06-06 19:05:26,338 WARNING  [*] Started epoch: 6
+2023-06-06 19:05:26,538 WARNING  [*] 19:05:26: Train Epoch: 6 [  0  / 250  (0 %)] | Loss: 0.075409 | Elapsed: 0.18s | FPR 0.0003 -> TPR: 0.94 & F1: 0.97 | AUC: 0.9911
+2023-06-06 19:05:37,489 WARNING  [*] 19:05:37: Train Epoch: 6 [ 100 / 250  (40%)] | Loss: 0.080120 | Elapsed: 10.94s | FPR 0.0003 -> TPR: 0.93 & F1: 0.96 | AUC: 0.9959
+2023-06-06 19:05:48,331 WARNING  [*] 19:05:48: Train Epoch: 6 [ 200 / 250  (80%)] | Loss: 0.040405 | Elapsed: 10.84s | FPR 0.0003 -> TPR: 0.97 & F1: 0.98 | AUC: 0.9981
+2023-06-06 19:05:55,348 WARNING  [*] Tue Jun  6 19:05:55 2023:    6    | Tr.loss: 0.068616 | Elapsed:   29.01  s | FPR 0.0003 -> TPR: 0.86 & F1: 0.93 | AUC: 0.9952
+2023-06-06 19:05:55,348 WARNING  [*] Started epoch: 7
+2023-06-06 19:05:55,458 WARNING  [*] 19:05:55: Train Epoch: 7 [  0  / 250  (0 %)] | Loss: 0.069220 | Elapsed: 0.11s | FPR 0.0003 -> TPR: 0.93 & F1: 0.96 | AUC: 0.9968
+2023-06-06 19:06:06,339 WARNING  [*] 19:06:06: Train Epoch: 7 [ 100 / 250  (40%)] | Loss: 0.042451 | Elapsed: 10.87s | FPR 0.0003 -> TPR: 0.98 & F1: 0.99 | AUC: 0.9996
+2023-06-06 19:06:17,143 WARNING  [*] 19:06:17: Train Epoch: 7 [ 200 / 250  (80%)] | Loss: 0.042699 | Elapsed: 10.79s | FPR 0.0003 -> TPR: 0.95 & F1: 0.97 | AUC: 0.9992
+2023-06-06 19:06:25,339 WARNING  [*] Tue Jun  6 19:06:25 2023:    7    | Tr.loss: 0.061857 | Elapsed:   29.99  s | FPR 0.0003 -> TPR: 0.84 & F1: 0.91 | AUC: 0.9959
+2023-06-06 19:06:25,345 WARNING  [*] Started epoch: 8
+2023-06-06 19:06:25,444 WARNING  [*] 19:06:25: Train Epoch: 8 [  0  / 250  (0 %)] | Loss: 0.230432 | Elapsed: 0.10s | FPR 0.0003 -> TPR: 0.82 & F1: 0.90 | AUC: 0.9711
+2023-06-06 19:06:36,226 WARNING  [*] 19:06:36: Train Epoch: 8 [ 100 / 250  (40%)] | Loss: 0.058510 | Elapsed: 10.78s | FPR 0.0003 -> TPR: 0.97 & F1: 0.99 | AUC: 0.9966
+2023-06-06 19:06:47,094 WARNING  [*] 19:06:47: Train Epoch: 8 [ 200 / 250  (80%)] | Loss: 0.114346 | Elapsed: 10.87s | FPR 0.0003 -> TPR: 0.97 & F1: 0.98 | AUC: 0.9911
+2023-06-06 19:06:54,079 WARNING  [*] Tue Jun  6 19:06:54 2023:    8    | Tr.loss: 0.052112 | Elapsed:   28.73  s | FPR 0.0003 -> TPR: 0.89 & F1: 0.94 | AUC: 0.9970
+2023-06-06 19:06:54,079 WARNING  [*] Started epoch: 9
+2023-06-06 19:06:54,204 WARNING  [*] 19:06:54: Train Epoch: 9 [  0  / 250  (0 %)] | Loss: 0.010644 | Elapsed: 0.13s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 19:07:04,981 WARNING  [*] 19:07:04: Train Epoch: 9 [ 100 / 250  (40%)] | Loss: 0.015300 | Elapsed: 10.76s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 19:07:15,848 WARNING  [*] 19:07:15: Train Epoch: 9 [ 200 / 250  (80%)] | Loss: 0.028180 | Elapsed: 10.85s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 19:07:22,803 WARNING  [*] Tue Jun  6 19:07:22 2023:    9    | Tr.loss: 0.046197 | Elapsed:   28.71  s | FPR 0.0003 -> TPR: 0.90 & F1: 0.95 | AUC: 0.9977
+2023-06-06 19:07:22,803 WARNING  [*] Started epoch: 10
+2023-06-06 19:07:22,915 WARNING  [*] 19:07:22: Train Epoch: 10 [  0  / 250  (0 %)] | Loss: 0.066771 | Elapsed: 0.11s | FPR 0.0003 -> TPR: 0.94 & F1: 0.97 | AUC: 0.9972
+2023-06-06 19:07:33,804 WARNING  [*] 19:07:33: Train Epoch: 10 [ 100 / 250  (40%)] | Loss: 0.011901 | Elapsed: 10.88s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 19:07:44,943 WARNING  [*] 19:07:44: Train Epoch: 10 [ 200 / 250  (80%)] | Loss: 0.016993 | Elapsed: 11.14s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 19:07:52,177 WARNING  [*] Tue Jun  6 19:07:52 2023:   10    | Tr.loss: 0.039674 | Elapsed:   29.37  s | FPR 0.0003 -> TPR: 0.94 & F1: 0.97 | AUC: 0.9982
+2023-06-06 19:07:52,177 WARNING  [*] Started epoch: 11
+2023-06-06 19:07:52,408 WARNING  [*] 19:07:52: Train Epoch: 11 [  0  / 250  (0 %)] | Loss: 0.017662 | Elapsed: 0.22s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 19:08:00,135 WARNING  [!] Time budget exceeded, training stopped.
+2023-06-06 19:08:00,199 WARNING  [!] Tue Jun  6 19:08:00 2023: Dumped results:
+                model       : 1686070978-model.torch
+		train time  : 1686070978-trainTime.npy
+		train losses: 1686070978-trainLosses.npy
+		train AUC   : 1686070978-auc.npy
+		train F1s   : 1686070978-trainF1s.npy
+		train TPRs  : 1686070978-trainTPRs.npy
+2023-06-06 19:08:00,220 WARNING  [!] Evaluating model on training set...
+2023-06-06 19:08:07,477 WARNING  [!] This fold metrics on training set:
+2023-06-06 19:08:07,483 WARNING 	AUC: 0.9992
+2023-06-06 19:08:07,491 WARNING 	FPR: 0.0001 | TPR: 0.9352 | F1: 0.9665
+2023-06-06 19:08:07,500 WARNING 	FPR: 0.0003 | TPR: 0.9430 | F1: 0.9704
+2023-06-06 19:08:07,509 WARNING 	FPR: 0.001 | TPR: 0.9690 | F1: 0.9832
+2023-06-06 19:08:07,518 WARNING 	FPR: 0.003 | TPR: 0.9776 | F1: 0.9860
+2023-06-06 19:08:07,528 WARNING 	FPR: 0.01 | TPR: 0.9867 | F1: 0.9834
+2023-06-06 19:08:07,537 WARNING 	FPR: 0.03 | TPR: 0.9926 | F1: 0.9677
+2023-06-06 19:08:07,546 WARNING 	FPR: 0.1 | TPR: 0.9981 | F1: 0.9090
+2023-06-06 19:08:07,547 WARNING  [!] Evaluating model on validation set...
+2023-06-06 19:08:09,381 WARNING  [!] This fold metrics on validation set:
+2023-06-06 19:08:09,384 WARNING 	AUC: 0.9943
+2023-06-06 19:08:09,388 WARNING 	FPR: 0.0001 | TPR: 0.0000 | F1: 0.0000
+2023-06-06 19:08:09,391 WARNING 	FPR: 0.0003 | TPR: 0.0000 | F1: 0.0000
+2023-06-06 19:08:09,396 WARNING 	FPR: 0.001 | TPR: 0.8823 | F1: 0.9367
+2023-06-06 19:08:09,400 WARNING 	FPR: 0.003 | TPR: 0.9257 | F1: 0.9587
+2023-06-06 19:08:09,404 WARNING 	FPR: 0.01 | TPR: 0.9426 | F1: 0.9609
+2023-06-06 19:08:09,408 WARNING 	FPR: 0.03 | TPR: 0.9696 | F1: 0.9567
+2023-06-06 19:08:09,412 WARNING 	FPR: 0.1 | TPR: 0.9830 | F1: 0.9014
+2023-06-06 19:08:11,067 WARNING  [5/5] Train set size: 24000, Validation set size: 6000
+2023-06-06 19:08:12,328 WARNING  [!] Saved dataset splits to dataset_splits_1686071291.npz
+2023-06-06 19:08:12,473 WARNING  [!] Iniatialized TransformerEncoderChunks. Total trainable parameters: 5.3972e6
+2023-06-06 19:08:12,473 WARNING  [*] Training time budget set: 5.0 min
+2023-06-06 19:08:12,493 WARNING  [*] Started epoch: 1
+2023-06-06 19:08:12,878 WARNING  [*] 19:08:12: Train Epoch: 1 [  0  / 250  (0 %)] | Loss: 5.100368 | Elapsed: 0.37s | FPR 0.0003 -> TPR: 0.00 & F1: 0.00 | AUC: 0.5087
+2023-06-06 19:08:23,747 WARNING  [*] 19:08:23: Train Epoch: 1 [ 100 / 250  (40%)] | Loss: 0.396113 | Elapsed: 10.86s | FPR 0.0003 -> TPR: 0.41 & F1: 0.58 | AUC: 0.9002
+2023-06-06 19:08:34,525 WARNING  [*] 19:08:34: Train Epoch: 1 [ 200 / 250  (80%)] | Loss: 0.211960 | Elapsed: 10.77s | FPR 0.0003 -> TPR: 0.59 & F1: 0.74 | AUC: 0.9689
+2023-06-06 19:08:41,582 WARNING  [*] Tue Jun  6 19:08:41 2023:    1    | Tr.loss: 0.421629 | Elapsed:   29.09  s | FPR 0.0003 -> TPR: 0.00 & F1: 0.00 | AUC: 0.8887
+2023-06-06 19:08:41,583 WARNING  [*] Started epoch: 2
+2023-06-06 19:08:41,781 WARNING  [*] 19:08:41: Train Epoch: 2 [  0  / 250  (0 %)] | Loss: 0.223547 | Elapsed: 0.19s | FPR 0.0003 -> TPR: 0.72 & F1: 0.84 | AUC: 0.9703
+2023-06-06 19:08:52,584 WARNING  [*] 19:08:52: Train Epoch: 2 [ 100 / 250  (40%)] | Loss: 0.244713 | Elapsed: 10.79s | FPR 0.0003 -> TPR: 0.63 & F1: 0.77 | AUC: 0.9697
+2023-06-06 19:09:03,396 WARNING  [*] 19:09:03: Train Epoch: 2 [ 200 / 250  (80%)] | Loss: 0.176088 | Elapsed: 10.80s | FPR 0.0003 -> TPR: 0.84 & F1: 0.91 | AUC: 0.9515
+2023-06-06 19:09:10,450 WARNING  [*] Tue Jun  6 19:09:10 2023:    2    | Tr.loss: 0.181864 | Elapsed:   28.87  s | FPR 0.0003 -> TPR: 0.55 & F1: 0.71 | AUC: 0.9740
+2023-06-06 19:09:10,450 WARNING  [*] Started epoch: 3
+2023-06-06 19:09:10,557 WARNING  [*] 19:09:10: Train Epoch: 3 [  0  / 250  (0 %)] | Loss: 0.113428 | Elapsed: 0.11s | FPR 0.0003 -> TPR: 0.88 & F1: 0.93 | AUC: 0.9902
+2023-06-06 19:09:21,413 WARNING  [*] 19:09:21: Train Epoch: 3 [ 100 / 250  (40%)] | Loss: 0.134237 | Elapsed: 10.84s | FPR 0.0003 -> TPR: 0.88 & F1: 0.94 | AUC: 0.9837
+2023-06-06 19:09:32,154 WARNING  [*] 19:09:32: Train Epoch: 3 [ 200 / 250  (80%)] | Loss: 0.095317 | Elapsed: 10.74s | FPR 0.0003 -> TPR: 0.96 & F1: 0.98 | AUC: 0.9969
+2023-06-06 19:09:39,056 WARNING  [*] Tue Jun  6 19:09:39 2023:    3    | Tr.loss: 0.130149 | Elapsed:   28.61  s | FPR 0.0003 -> TPR: 0.64 & F1: 0.78 | AUC: 0.9851
+2023-06-06 19:09:39,056 WARNING  [*] Started epoch: 4
+2023-06-06 19:09:39,166 WARNING  [*] 19:09:39: Train Epoch: 4 [  0  / 250  (0 %)] | Loss: 0.159729 | Elapsed: 0.09s | FPR 0.0003 -> TPR: 0.89 & F1: 0.94 | AUC: 0.9895
+2023-06-06 19:09:51,283 WARNING  [*] 19:09:51: Train Epoch: 4 [ 100 / 250  (40%)] | Loss: 0.184839 | Elapsed: 12.11s | FPR 0.0003 -> TPR: 0.89 & F1: 0.94 | AUC: 0.9779
+2023-06-06 19:10:02,339 WARNING  [*] 19:10:02: Train Epoch: 4 [ 200 / 250  (80%)] | Loss: 0.036781 | Elapsed: 11.05s | FPR 0.0003 -> TPR: 0.96 & F1: 0.98 | AUC: 0.9995
+2023-06-06 19:10:09,587 WARNING  [*] Tue Jun  6 19:10:09 2023:    4    | Tr.loss: 0.102667 | Elapsed:   30.53  s | FPR 0.0003 -> TPR: 0.76 & F1: 0.86 | AUC: 0.9899
+2023-06-06 19:10:09,587 WARNING  [*] Started epoch: 5
+2023-06-06 19:10:09,801 WARNING  [*] 19:10:09: Train Epoch: 5 [  0  / 250  (0 %)] | Loss: 0.095277 | Elapsed: 0.21s | FPR 0.0003 -> TPR: 0.94 & F1: 0.97 | AUC: 0.9904
+2023-06-06 19:10:20,846 WARNING  [*] 19:10:20: Train Epoch: 5 [ 100 / 250  (40%)] | Loss: 0.046018 | Elapsed: 11.03s | FPR 0.0003 -> TPR: 0.96 & F1: 0.98 | AUC: 0.9995
+2023-06-06 19:10:31,725 WARNING  [*] 19:10:31: Train Epoch: 5 [ 200 / 250  (80%)] | Loss: 0.048841 | Elapsed: 10.87s | FPR 0.0003 -> TPR: 0.97 & F1: 0.98 | AUC: 0.9995
+2023-06-06 19:10:38,840 WARNING  [*] Tue Jun  6 19:10:38 2023:    5    | Tr.loss: 0.083475 | Elapsed:   29.25  s | FPR 0.0003 -> TPR: 0.75 & F1: 0.85 | AUC: 0.9932
+2023-06-06 19:10:38,847 WARNING  [*] Started epoch: 6
+2023-06-06 19:10:39,029 WARNING  [*] 19:10:39: Train Epoch: 6 [  0  / 250  (0 %)] | Loss: 0.043619 | Elapsed: 0.17s | FPR 0.0003 -> TPR: 0.97 & F1: 0.98 | AUC: 0.9990
+2023-06-06 19:10:50,036 WARNING  [*] 19:10:50: Train Epoch: 6 [ 100 / 250  (40%)] | Loss: 0.090565 | Elapsed: 11.00s | FPR 0.0003 -> TPR: 0.95 & F1: 0.98 | AUC: 0.9802
+2023-06-06 19:11:01,029 WARNING  [*] 19:11:01: Train Epoch: 6 [ 200 / 250  (80%)] | Loss: 0.069956 | Elapsed: 10.99s | FPR 0.0003 -> TPR: 0.97 & F1: 0.99 | AUC: 0.9929
+2023-06-06 19:11:08,389 WARNING  [*] Tue Jun  6 19:11:08 2023:    6    | Tr.loss: 0.073413 | Elapsed:   29.54  s | FPR 0.0003 -> TPR: 0.84 & F1: 0.91 | AUC: 0.9945
+2023-06-06 19:11:08,389 WARNING  [*] Started epoch: 7
+2023-06-06 19:11:08,579 WARNING  [*] 19:11:08: Train Epoch: 7 [  0  / 250  (0 %)] | Loss: 0.178097 | Elapsed: 0.18s | FPR 0.0003 -> TPR: 0.91 & F1: 0.95 | AUC: 0.9753
+2023-06-06 19:11:19,222 WARNING  [*] 19:11:19: Train Epoch: 7 [ 100 / 250  (40%)] | Loss: 0.028895 | Elapsed: 10.63s | FPR 0.0003 -> TPR: 0.92 & F1: 0.96 | AUC: 0.9906
+2023-06-06 19:11:30,046 WARNING  [*] 19:11:30: Train Epoch: 7 [ 200 / 250  (80%)] | Loss: 0.027026 | Elapsed: 10.82s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 19:11:38,588 WARNING  [*] Tue Jun  6 19:11:38 2023:    7    | Tr.loss: 0.063737 | Elapsed:   30.20  s | FPR 0.0003 -> TPR: 0.85 & F1: 0.92 | AUC: 0.9956
+2023-06-06 19:11:38,588 WARNING  [*] Started epoch: 8
+2023-06-06 19:11:38,698 WARNING  [*] 19:11:38: Train Epoch: 8 [  0  / 250  (0 %)] | Loss: 0.026872 | Elapsed: 0.11s | FPR 0.0003 -> TPR: 0.96 & F1: 0.98 | AUC: 0.9988
+2023-06-06 19:11:49,444 WARNING  [*] 19:11:49: Train Epoch: 8 [ 100 / 250  (40%)] | Loss: 0.042930 | Elapsed: 10.73s | FPR 0.0003 -> TPR: 0.94 & F1: 0.97 | AUC: 0.9986
+2023-06-06 19:12:00,077 WARNING  [*] 19:12:00: Train Epoch: 8 [ 200 / 250  (80%)] | Loss: 0.053990 | Elapsed: 10.63s | FPR 0.0003 -> TPR: 0.97 & F1: 0.98 | AUC: 0.9968
+2023-06-06 19:12:08,357 WARNING  [*] Tue Jun  6 19:12:08 2023:    8    | Tr.loss: 0.056797 | Elapsed:   29.77  s | FPR 0.0003 -> TPR: 0.90 & F1: 0.95 | AUC: 0.9965
+2023-06-06 19:12:08,357 WARNING  [*] Started epoch: 9
+2023-06-06 19:12:08,611 WARNING  [*] 19:12:08: Train Epoch: 9 [  0  / 250  (0 %)] | Loss: 0.045248 | Elapsed: 0.25s | FPR 0.0003 -> TPR: 0.97 & F1: 0.98 | AUC: 0.9985
+2023-06-06 19:12:19,481 WARNING  [*] 19:12:19: Train Epoch: 9 [ 100 / 250  (40%)] | Loss: 0.077358 | Elapsed: 10.86s | FPR 0.0003 -> TPR: 0.94 & F1: 0.97 | AUC: 0.9963
+2023-06-06 19:12:30,523 WARNING  [*] 19:12:30: Train Epoch: 9 [ 200 / 250  (80%)] | Loss: 0.020580 | Elapsed: 11.04s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 19:12:37,370 WARNING  [*] Tue Jun  6 19:12:37 2023:    9    | Tr.loss: 0.049840 | Elapsed:   29.01  s | FPR 0.0003 -> TPR: 0.90 & F1: 0.95 | AUC: 0.9973
+2023-06-06 19:12:37,370 WARNING  [*] Started epoch: 10
+2023-06-06 19:12:37,486 WARNING  [*] 19:12:37: Train Epoch: 10 [  0  / 250  (0 %)] | Loss: 0.011428 | Elapsed: 0.11s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 19:12:48,237 WARNING  [*] 19:12:48: Train Epoch: 10 [ 100 / 250  (40%)] | Loss: 0.030767 | Elapsed: 10.75s | FPR 0.0003 -> TPR: 1.00 & F1: 1.00 | AUC: 1.0000
+2023-06-06 19:12:59,450 WARNING  [*] 19:12:59: Train Epoch: 10 [ 200 / 250  (80%)] | Loss: 0.085076 | Elapsed: 11.20s | FPR 0.0003 -> TPR: 0.93 & F1: 0.96 | AUC: 0.9971
+2023-06-06 19:13:06,417 WARNING  [*] Tue Jun  6 19:13:06 2023:   10    | Tr.loss: 0.043700 | Elapsed:   29.05  s | FPR 0.0003 -> TPR: 0.92 & F1: 0.96 | AUC: 0.9979
+2023-06-06 19:13:06,417 WARNING  [*] Started epoch: 11
+2023-06-06 19:13:06,568 WARNING  [*] 19:13:06: Train Epoch: 11 [  0  / 250  (0 %)] | Loss: 0.093776 | Elapsed: 0.14s | FPR 0.0003 -> TPR: 0.94 & F1: 0.97 | AUC: 0.9911
+2023-06-06 19:13:12,491 WARNING  [!] Time budget exceeded, training stopped.
+2023-06-06 19:13:12,532 WARNING  [!] Tue Jun  6 19:13:12 2023: Dumped results:
+                model       : 1686071291-model.torch
+		train time  : 1686071291-trainTime.npy
+		train losses: 1686071291-trainLosses.npy
+		train AUC   : 1686071291-auc.npy
+		train F1s   : 1686071291-trainF1s.npy
+		train TPRs  : 1686071291-trainTPRs.npy
+2023-06-06 19:13:12,546 WARNING  [!] Evaluating model on training set...
+2023-06-06 19:13:19,776 WARNING  [!] This fold metrics on training set:
+2023-06-06 19:13:19,792 WARNING 	AUC: 0.9991
+2023-06-06 19:13:19,792 WARNING 	FPR: 0.0001 | TPR: 0.9183 | F1: 0.9574
+2023-06-06 19:13:19,792 WARNING 	FPR: 0.0003 | TPR: 0.9410 | F1: 0.9693
+2023-06-06 19:13:19,807 WARNING 	FPR: 0.001 | TPR: 0.9701 | F1: 0.9838
+2023-06-06 19:13:19,807 WARNING 	FPR: 0.003 | TPR: 0.9791 | F1: 0.9865
+2023-06-06 19:13:19,823 WARNING 	FPR: 0.01 | TPR: 0.9865 | F1: 0.9834
+2023-06-06 19:13:19,823 WARNING 	FPR: 0.03 | TPR: 0.9927 | F1: 0.9676
+2023-06-06 19:13:19,839 WARNING 	FPR: 0.1 | TPR: 0.9969 | F1: 0.9076
+2023-06-06 19:13:19,839 WARNING  [!] Evaluating model on validation set...
+2023-06-06 19:13:21,614 WARNING  [!] This fold metrics on validation set:
+2023-06-06 19:13:21,616 WARNING 	AUC: 0.9922
+2023-06-06 19:13:21,619 WARNING 	FPR: 0.0001 | TPR: 0.0000 | F1: 0.0000
+2023-06-06 19:13:21,622 WARNING 	FPR: 0.0003 | TPR: 0.0000 | F1: 0.0000
+2023-06-06 19:13:21,625 WARNING 	FPR: 0.001 | TPR: 0.0000 | F1: 0.0000
+2023-06-06 19:13:21,629 WARNING 	FPR: 0.003 | TPR: 0.8628 | F1: 0.9237
+2023-06-06 19:13:21,632 WARNING 	FPR: 0.01 | TPR: 0.9287 | F1: 0.9534
+2023-06-06 19:13:21,635 WARNING 	FPR: 0.03 | TPR: 0.9621 | F1: 0.9519
+2023-06-06 19:13:21,639 WARNING 	FPR: 0.1 | TPR: 0.9776 | F1: 0.9014
+2023-06-06 19:13:22,853 WARNING  [!] Metrics saved to out_cruparamer_5_folds\cv_nebula_wht_limNone_r1763_t5\nebula_wht_metrics_validation.json
+2023-06-06 19:13:22,853 WARNING  [!] Metrics saved to out_cruparamer_5_folds\cv_nebula_wht_limNone_r1763_t5\nebula_wht_metrics_training.json
+2023-06-06 19:13:22,858 WARNING  [!] Average epoch time: 0.03s | Mean values over 5 folds:
+	AUC: 0.9931
+	FPR: 0.0001 -- TPR: 0.0000 -- F1: 0.0000
+	FPR: 0.0003 -- TPR: 0.1624 -- F1: 0.1792
+	FPR:  0.001 -- TPR: 0.5103 -- F1: 0.5509
+	FPR:  0.003 -- TPR: 0.8897 -- F1: 0.9386
+	FPR:   0.01 -- TPR: 0.9364 -- F1: 0.9574
+	FPR:   0.03 -- TPR: 0.9636 -- F1: 0.9535
+	FPR:    0.1 -- TPR: 0.9799 -- F1: 0.9006
+
