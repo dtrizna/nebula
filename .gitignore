@@ -9,7 +9,7 @@ build/*
 .markdownlint.json
 
 # research files
-evaluation/*
+z_out*
 
 # Data
 data/*
@@ -17,7 +17,11 @@ data/*
 *zip
 *npy
 *npz
+events.out.tfevents.*
 
-# models
+# models and objects
 *.ckpt
 *.torch
+*.pickle
+*.pkl
+*.model
