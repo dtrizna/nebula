@@ -73,8 +73,6 @@ x_train = np.load(xTrainFile)
 yTrainFile = os.path.join(REPO_ROOT, "data", "data_filtered", "speakeasy_trainset_BPE_50k", "speakeasy_y.npy")
 y_train = np.load(yTrainFile)
 
-# TODO: add ember and neurlux data
-
 if run_config['train_limit']:
     x_train, y_train = shuffle(x_train, y_train, random_state=random_state)
     x_train = x_train[:run_config['train_limit']]
@@ -89,8 +87,6 @@ logging.warning(f" [!] Loaded data and vocab. X train size: {x_train.shape}, voc
 
 # =============== MODEL CONFIG
 models = []
-
-# TODO: add ember, neurlux and hybrid models
 
 modelClass = Cnn1DLinear
 modelArch = {

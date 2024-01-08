@@ -20,18 +20,18 @@ from nebula.models.attention import TransformerEncoderChunks, TransformerEncoder
 VOCABS = {'8k': 8192}#, '16k': 16384, '32k': 32768}
 
 # if clean training
-LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"autoregressive_no_ffnn_{int(time())}")
+LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"out_autoregressive_no_ffnn_{int(time())}")
 TIMESTAMPS = None
 
 # if previously trained
-# LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"autoregressive_1704652486")
+# LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"out_autoregressive_1704652486")
 # TIMESTAMPS = ["1704652487"]
 
 VERBOSE = True
 LIMIT = None
 
 CONTEXT_LEN = 256
-PRETRAINING_EPOCHS = 3
+PRETRAINING_EPOCHS = 5
 PRETRAIN_BATCH_SIZE = 64
 
 DOWNSTREAM_EPOCHS = 5
@@ -109,6 +109,10 @@ def main(vocab_size_str, random_state=33):
         "pretrain_layers": [1024],
         "causal_attention": True,
         "pooling": None
+        # TODO: RuntimeError: Error(s) in loading state_dict for TransformerEncoderModel:
+        # size mismatch for ffnn.0.0.weight: copying a param with shape torch.Size([64, 64]) 
+        # from checkpoint, the shape in current model is torch.Size([64, 16384]).
+        # when using autoregressively pre-trained model with "pooling": None
     }
     # NOTE: for pretraining 0 is good, for finetuning try 0.1+
     model_config['dropout'] = 0.0
