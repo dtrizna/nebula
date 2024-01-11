@@ -28,8 +28,10 @@ class TransformerEncoderModel(nn.Module):
     ):
         super().__init__()
         self.__name__ = 'TransformerEncoderModel'
+        
         assert dModel % nHeads == 0, "nheads must divide evenly into d_model"
-        assert pooling in ["mean", "cls", None]
+        assert pooling in ["mean", "flatten", "cls", None]
+
         self.vocab_size = vocab_size
         self.maxlen = maxlen
         self.skip_embedding = skip_embedding
@@ -47,45 +49,49 @@ class TransformerEncoderModel(nn.Module):
         self.d_model = dModel
         self.layerNorm = layerNorm
         self.dropout = dropout
-        self.ffnn_layers_in = classifier_head
         
-        # TODO: RuntimeError: Error(s) in loading state_dict for TransformerEncoderModel:
-        # size mismatch for ffnn.0.0.weight: copying a param with shape torch.Size([64, 64]) 
-        # from checkpoint, the shape in current model is torch.Size([64, 16384]).
-        # when using autoregressively pre-trained model with "pooling": None
         self.pooling_type = pooling
-        if pooling == None:
-            input_neurons = int(self.maxlen * dModel)
-        if pooling == "mean":
+        if pooling == "mean" or pooling is None:
             input_neurons = self.d_model
+        elif pooling == "flatten":
+            input_neurons = int(self.maxlen * dModel)
+        elif pooling == "cls":
+            raise NotImplementedError
         
         self.causal_attention = causal_attention
         if self.causal_attention: # override pooling settings if causal
             input_neurons = self.d_model
             self.pooling_type = None
         
+        self.classifier_head = None
         if classifier_head is not None:
             # model is initiated as a downstream model -- setup classifier head
-            self.ffnn_layers = self._build_ffnn_layers(self.ffnn_layers_in, input_neurons)
-            self.ffnn_out_size = classifier_head[-1] if classifier_head is not None else self.d_model
-            if numClasses == 2: # binary classification
-                self.final_layer = nn.Linear(self.ffnn_out_size, 1)
-            else:
-                self.final_layer = nn.Linear(self.ffnn_out_size, numClasses)
-            self.classifier_head = nn.Sequential(*self.ffnn_layers, self.final_layer)
-        else:
-            self.classifier_head = None
-
-        # NOTE: bias in last layer removed the same as in https://github.com/karpathy/nanoGPT/blob/master/model.py#L133
+            self.classifier_head_layers = []
+            if len(classifier_head) > 0:
+                self.classifier_head_layers = self._build_ffnn_layers(
+                    start_neurons=input_neurons,
+                    hidden_layers=classifier_head
+                )
+            # if numClasses is None, then classifier outputs last value from classified_head
+            if numClasses is not None:
+                self.final_layer_in = classifier_head[-1] if len(classifier_head) > 0 else input_neurons
+                self.final_layer_out =  1 if numClasses == 2 else numClasses
+                self.classifier_head_layers.append(nn.Linear(self.final_layer_in, self.final_layer_out))
+            # join in a single classifier head
+            self.classifier_head = nn.Sequential(*self.classifier_head_layers)
+            
+        self.pretrain_layers = None
         if pretrain_layers is not None:
+            self.pretrain_layers = []
             if len(pretrain_layers) > 0:
-                self.pretrain_layers = self._build_ffnn_layers(pretrain_layers, self.ffnn_out_size)
-                self.pretrain_layers.append(nn.Linear(pretrain_layers[-1], self.vocab_size, bias=False))
-            else:
-                self.pretrain_layers = [nn.Linear(self.ffnn_out_size, self.vocab_size, bias=False)]
+                self.pretrain_layers = self._build_ffnn_layers(
+                    start_neurons=input_neurons,
+                    hidden_layers=pretrain_layers
+                )
+            final_layer_in = pretrain_layers[-1] if len(pretrain_layers) > 0 else input_neurons
+            # NOTE: bias removed in last layer as in https://github.com/karpathy/nanoGPT/blob/master/model.py#L133
+            self.pretrain_layers.append(nn.Linear(final_layer_in, self.vocab_size, bias=False))
             self.pretrain_layers = nn.Sequential(*self.pretrain_layers)
-        else:
-            self.pretrain_layers = None
 
         self.apply(self._init_weights)
 
@@ -98,19 +104,19 @@ class TransformerEncoderModel(nn.Module):
         elif isinstance(module, nn.Embedding):
             torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
 
-    def _build_ffnn_layers(self, layers: list, start_neurons: int) -> nn.Sequential:
+    def _build_ffnn_layers(self, start_neurons: int, hidden_layers: list) -> nn.Sequential:
         ffnn = []
-        if layers is None:
+        if hidden_layers is None:
             return ffnn
-        for i, h in enumerate(layers):
+        for i, h in enumerate(hidden_layers):
             ffnnBlock = []
             if i == 0:
                 ffnnBlock.append(nn.Linear(start_neurons, h))
             else:
-                ffnnBlock.append(nn.Linear(layers[i - 1], h))
+                ffnnBlock.append(nn.Linear(hidden_layers[i - 1], h))
 
             # add LayerNorm to every layer except last
-            if self.layerNorm and i < len(layers) - 1:
+            if self.layerNorm and i < len(hidden_layers) - 1:
                 ffnnBlock.append(nn.LayerNorm(h))
 
             ffnnBlock.append(nn.ReLU())
@@ -118,7 +124,7 @@ class TransformerEncoderModel(nn.Module):
 
             ffnn.append(nn.Sequential(*ffnnBlock))
         return ffnn
-
+    
     @staticmethod
     def _generate_square_subsequent_mask(sz: int) -> Tensor:
         mask = (torch.triu(torch.ones(sz, sz)) == 1).transpose(0, 1)
@@ -131,9 +137,9 @@ class TransformerEncoderModel(nn.Module):
         return encoded
 
     def pooling(self, x: Tensor) -> Tensor:
-        if self.causal_attention:
+        if self.causal_attention or self.pooling_type is None:
             return x
-        if self.pooling_type == None:
+        if self.pooling_type == "flatten":
             x = x.view(x.size(0), -1)
         if self.pooling_type == "mean":
             x = torch.mean(x, dim=1)
