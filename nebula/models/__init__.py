@@ -18,7 +18,7 @@ class Cnn1DLinear(nn.Module):
                 batchNormConv = False,
                 convPadding = 0, # default
                 # ffnn params
-                hiddenNeurons = [256, 128],
+                classifier_head = [256, 128],
                 batchNormFFNN = False,
                 dropout = 0.5,
                 numClasses = 1): # binary classification
@@ -50,15 +50,15 @@ class Cnn1DLinear(nn.Module):
         convOut = np.sum(numFilters)
         
         self.ffnn = []
-        for i,h in enumerate(hiddenNeurons):
+        for i,h in enumerate(classifier_head):
             self.ffnnBlock = []
             if i == 0:
                 self.ffnnBlock.append(nn.Linear(convOut, h))
             else:
-                self.ffnnBlock.append(nn.Linear(hiddenNeurons[i-1], h))
+                self.ffnnBlock.append(nn.Linear(classifier_head[i-1], h))
 
             # add BatchNorm to every layer except last
-            if batchNormFFNN and i < len(hiddenNeurons)-1:
+            if batchNormFFNN and i < len(classifier_head)-1:
                 self.ffnnBlock.append(nn.BatchNorm1d(h))
 
             self.ffnnBlock.append(nn.ReLU())
@@ -69,7 +69,7 @@ class Cnn1DLinear(nn.Module):
             self.ffnn.append(nn.Sequential(*self.ffnnBlock))
         self.ffnn = nn.Sequential(*self.ffnn)
         
-        self.fcOutput = nn.Linear(hiddenNeurons[-1], numClasses)
+        self.fcOutput = nn.Linear(classifier_head[-1], numClasses)
         self.relu = nn.ReLU()
 
     @staticmethod
@@ -102,7 +102,7 @@ class Cnn1DLinearLM(nn.Module):
                 batchNormConv = False,
                 convPadding = 0, # default
                 # ffnn params
-                hiddenNeurons = [512, 256],
+                classifier_head = [512, 256],
                 batchNormFFNN = False,
                 dropout = 0.5,
                 # pretrain layers
@@ -137,15 +137,15 @@ class Cnn1DLinearLM(nn.Module):
         
         # core ffnn
         self.ffnn = []
-        for i,h in enumerate(hiddenNeurons):
+        for i,h in enumerate(classifier_head):
             self.ffnnBlock = []
             if i == 0:
                 self.ffnnBlock.append(nn.Linear(convOut, h))
             else:
-                self.ffnnBlock.append(nn.Linear(hiddenNeurons[i-1], h))
+                self.ffnnBlock.append(nn.Linear(classifier_head[i-1], h))
 
             # add BatchNorm to every layer except last
-            if batchNormFFNN and i < len(hiddenNeurons)-1:
+            if batchNormFFNN and i < len(classifier_head)-1:
                 self.ffnnBlock.append(nn.BatchNorm1d(h))
 
             self.ffnnBlock.append(nn.ReLU())
@@ -157,14 +157,14 @@ class Cnn1DLinearLM(nn.Module):
         self.ffnn = nn.Sequential(*self.ffnn)
         
         # classification output
-        self.fcOutput = nn.Linear(hiddenNeurons[-1], numClasses)
+        self.fcOutput = nn.Linear(classifier_head[-1], numClasses)
 
         # pretrain layers
         self.pretrain_layers = []
         for i, h in enumerate(pretrain_layers):
             self.preTrainBlock = []
             if i == 0:
-                self.preTrainBlock.append(nn.Linear(hiddenNeurons[-1], h))                
+                self.preTrainBlock.append(nn.Linear(classifier_head[-1], h))                
             else:
                 self.preTrainBlock.append(nn.Linear(pretrain_layers[i-1], h))
             self.preTrainBlock.append(nn.ReLU())
@@ -221,7 +221,7 @@ class Cnn1DLSTM(nn.Module):
                 lstmDropout = 0,
                 lstmBidirectional = False,
                 # ffnn params
-                hiddenNeurons = [256, 128],
+                classifier_head = [256, 128],
                 batchNormFFNN = False,
                 dropout = 0.5,
                 numClasses = 1): # binary classification
@@ -260,26 +260,26 @@ class Cnn1DLSTM(nn.Module):
                             bidirectional=lstmBidirectional)
         
         self.ffnn = []
-        for i,h in enumerate(hiddenNeurons):
+        for i,h in enumerate(classifier_head):
             self.ffnnBlock = nn.Sequential()
             if i == 0:
                 self.ffnnBlock.append(nn.Linear(lstmHidden * 2 if lstmBidirectional else lstmHidden, h))
             else:
-                self.ffnnBlock.append(nn.Linear(hiddenNeurons[i-1], h))
+                self.ffnnBlock.append(nn.Linear(classifier_head[i-1], h))
 
             # add BatchNorm to every layer except last
-            if batchNormFFNN and i < len(hiddenNeurons)-1:
+            if batchNormFFNN and i < len(classifier_head)-1:
                 self.ffnnBlock.append(nn.BatchNorm1d(h))
             # add dropout to every layer except last
 
             self.ffnnBlock.append(nn.ReLU())
 
-            if dropout > 0 and i < len(hiddenNeurons)-1:
+            if dropout > 0 and i < len(classifier_head)-1:
                 self.ffnnBlock.append(nn.Dropout(dropout))
             
             self.ffnn.append(self.ffnnBlock)
         self.ffnn = nn.Sequential(*self.ffnn)
-        self.output = nn.Linear(hiddenNeurons[-1], numClasses)
+        self.output = nn.Linear(classifier_head[-1], numClasses)
 
     def forward(self, x):
         # x.shape = (batchSize, seqLen)
@@ -305,7 +305,7 @@ class Cnn1DLSTM(nn.Module):
         lstmOut = lstmOut.squeeze(1)
         # lstmOut.shape = (batchSize, lstmHidden)
         ffnnOut = self.ffnn(lstmOut)
-        # ffnnOut.shape = (batchSize, hiddenNeurons[-1])
+        # ffnnOut.shape = (batchSize, classifier_head[-1])
         out = self.output(ffnnOut)
         # out.shape = (batchSize, numClasses)
         return out
@@ -319,7 +319,7 @@ class LSTM(nn.Module):
                     lstmLayers = 1,
                     lstmDropout=0.1,
                     lstmBidirectional = True,
-                    hiddenNeurons = [256, 64],
+                    classifier_head = [256, 64],
                     batchNormFFNN = False,
                     dropout=0.5,
                     numClasses = 1):
@@ -329,26 +329,26 @@ class LSTM(nn.Module):
         self.lstm = nn.LSTM(embeddingDim, lstmHidden, lstmLayers, bidirectional=lstmBidirectional, dropout=lstmDropout)
         #self.linear = nn.Linear(hiddenDim * 2 if bidirectionalLSTM else hiddenDim, outputDim)
         self.ffnn = []
-        for i,h in enumerate(hiddenNeurons):
+        for i,h in enumerate(classifier_head):
             self.ffnnBlock = nn.Sequential()
             if i == 0:
                 self.ffnnBlock.append(nn.Linear(lstmHidden * 2 if lstmBidirectional else lstmHidden, h))
             else:
-                self.ffnnBlock.append(nn.Linear(hiddenNeurons[i-1], h))
+                self.ffnnBlock.append(nn.Linear(classifier_head[i-1], h))
 
             # add BatchNorm to every layer except last
-            if batchNormFFNN and i < len(hiddenNeurons)-1:
+            if batchNormFFNN and i < len(classifier_head)-1:
                 self.ffnnBlock.append(nn.BatchNorm1d(h))
             # add dropout to every layer except last
 
             self.ffnnBlock.append(nn.ReLU())
 
-            if dropout > 0 and i < len(hiddenNeurons)-1:
+            if dropout > 0 and i < len(classifier_head)-1:
                 self.ffnnBlock.append(nn.Dropout(dropout))
             
             self.ffnn.append(self.ffnnBlock)
         self.ffnn = nn.Sequential(*self.ffnn)
-        self.output = nn.Linear(hiddenNeurons[-1], numClasses)
+        self.output = nn.Linear(classifier_head[-1], numClasses)
         
     def forward(self, input, hidden=None):
         # input is of shape (batch_size, sequence_length)

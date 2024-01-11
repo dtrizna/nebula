@@ -110,7 +110,7 @@ model_config = {
     "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
     "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
     "numClasses": 1, # binary classification
-    "hiddenNeurons": [64],
+    "classifier_head": [64],
     "layerNorm": False,
     "dropout": 0.3,
     "mean_over_sequence": False,
