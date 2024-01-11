@@ -514,7 +514,8 @@ class LitTrainerWrapper:
         accumulate_grad_batches = 1 if self.accumulate_grad_batches is None else self.accumulate_grad_batches
         total_batches = 0
         if max_epochs is not None:
-            total_batches = int(np.ceil(max_epochs * len(self.train_loader) / accumulate_grad_batches))
+            steps_per_epoch = np.ceil(len(self.train_loader) / accumulate_grad_batches)
+            total_batches = int(max_epochs * steps_per_epoch)
         if max_time is not None:
             # TODO: Implement logic for max_time if needed
             raise NotImplementedError("calculate_scheduler_step_budget for max_time is not implemented yet")

@@ -28,22 +28,23 @@ TIMESTAMPS = None
 # TIMESTAMPS = ["1704652487"]
 
 VERBOSE = True
-LIMIT = None
+LIMIT = 10000
 
-CONTEXT_LEN = 256
-PRETRAINING_EPOCHS = 5
+PRETRAINING_EPOCHS = 2
 PRETRAIN_BATCH_SIZE = 64
+CONTEXT_LEN = 256
 
-DOWNSTREAM_EPOCHS = 5
+DOWNSTREAM_EPOCHS = 3
 DOWNSTREAM_BATCH_SIZE = 16
+MAX_SEQ_LEN = 512
 
 DEVICE = "gpu"
 DATALOADER_WORKERS = 4
-LOG_EVERY_N_STEPS = 1
+LOG_EVERY_N_STEPS = 10
 SSL_EVAL_SPLITS = 1
 # efficient training methods
 GRAD_CLIP_VALUE = 1.0
-ACCUMULATE_GRAD_BATCHES = 4 # default, batch_sizes are big enough
+ACCUMULATE_GRAD_BATCHES = 4
 
 # NOTE: scheduler is incompatible with REMASK_EVERY_N_EPOCHS 
 # and DUMP_MODEL_EVERY_EPOCH because of lighning nuances
@@ -95,35 +96,33 @@ def main(vocab_size_str, random_state=33):
     print(f"[*] Loading model...")
     model_config = {
         "vocab_size": vocab_size,
-        "maxlen": CONTEXT_LEN,
         # "chunk_size": 64, # input splitting to chunks
         "dModel": 64,  # embedding & transformer dimension
         "nHeads": 8,  # number of heads in nn.MultiheadAttention
         "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
         "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
         "numClasses": 1, # binary classification
-        "classifier_head": None, # classifier ffnn dims
-        "layerNorm": False,
-        "dropout": None,
-        "norm_first": True,
-        "pretrain_layers": [1024],
+        # pre-training settings
+        "maxlen": CONTEXT_LEN, # pretraining uses sampled contexts
+        # NOTE: for pretraining 0 is good, for finetuning try 0.1+
+        "dropout": 0.0,
+        "pooling": None,
         "causal_attention": True,
-        "pooling": None
-        # TODO: RuntimeError: Error(s) in loading state_dict for TransformerEncoderModel:
-        # size mismatch for ffnn.0.0.weight: copying a param with shape torch.Size([64, 64]) 
-        # from checkpoint, the shape in current model is torch.Size([64, 16384]).
-        # when using autoregressively pre-trained model with "pooling": None
+        "pretrain_layers": [1024],
+        "classifier_head": None, # classifier ffnn dims
     }
-    # NOTE: for pretraining 0 is good, for finetuning try 0.1+
-    model_config['dropout'] = 0.0
     lm_model = TransformerEncoderModel(**model_config)
 
+    # rewriting settings for downstream model
+    model_config['maxlen'] = MAX_SEQ_LEN # uses full sequences
     model_config['dropout'] = 0.3
     model_config['pretrain_layers'] = None
     model_config['causal_attention'] = False
+    model_config['classifier_head'] = [64]
     # NOTE: downstream model requires pooling to aggregate Transformer output
-    model_config['pooling'] = "mean"
+    model_config['pooling'] = "flatten"
     downstream_model = TransformerEncoderModel(**model_config)
+    
     print(f"[!] Models ready.")
     
     # ===================
@@ -134,7 +133,7 @@ def main(vocab_size_str, random_state=33):
     trainer_config = {
         "log_every_n_steps": LOG_EVERY_N_STEPS,
         "device": DEVICE,
-        "accumulate_grad_batches": ACCUMULATE_GRAD_BATCHES,
+        "accumulate_grad_batches": None,
         "gradient_clip_val": GRAD_CLIP_VALUE,
         "scheduler": SCHEDULER,
         "dataloader_workers": DATALOADER_WORKERS,
@@ -157,8 +156,8 @@ def main(vocab_size_str, random_state=33):
         precision=16,
         **trainer_config
     )
-    # lit_mlm.pretrain(x_train)
 
+    trainer_config["accumulate_grad_batches"] = ACCUMULATE_GRAD_BATCHES
     downstream_trainer = LitTrainerWrapper(
         # trainer config
         epochs=DOWNSTREAM_EPOCHS,
@@ -169,6 +168,7 @@ def main(vocab_size_str, random_state=33):
         batch_size=DOWNSTREAM_BATCH_SIZE,
         **trainer_config
     )
+    
     eval_run = SelfSupervisedLearningEvalFramework(
         pretrainer=lit_mlm,
         downstream_trainer=downstream_trainer,
@@ -176,7 +176,8 @@ def main(vocab_size_str, random_state=33):
         log_folder=LOG_ROOT_FOLDER,
         dump_data_splits=True,
         random_state=random_state,
-        n_splits=SSL_EVAL_SPLITS
+        n_splits=SSL_EVAL_SPLITS,
+        training_types = ['full_data'],
     )
     eval_run.run_splits(x_train, y_train, x_test, y_test, previous_run_idxs=TIMESTAMPS)
 
