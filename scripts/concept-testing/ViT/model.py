@@ -40,7 +40,7 @@ class CharTransformer(nn.Module):
                 dHidden = 256,
                 transformer_layers = 2,
                 numClasses: int = 1,  # 1 ==> binary classification
-                hiddenNeurons: list = [64],  # decoder's classifier FFNN complexity
+                classifier_head: list = [64],  # decoder's classifier FFNN complexity
                 layerNorm: bool = False,
                 dropout: float = 0.3
                 ):
@@ -63,15 +63,15 @@ class CharTransformer(nn.Module):
             num_layers=transformer_layers
         )
         self.ffnn = []
-        for i, h in enumerate(hiddenNeurons):
+        for i, h in enumerate(classifier_head):
             self.ffnnBlock = []
             if i == 0:
                 self.ffnnBlock.append(nn.Linear(embed_dim, h))
             else:
-                self.ffnnBlock.append(nn.Linear(hiddenNeurons[i - 1], h))
+                self.ffnnBlock.append(nn.Linear(classifier_head[i - 1], h))
 
             # add BatchNorm to every layer except last
-            if layerNorm and i < len(hiddenNeurons) - 1:
+            if layerNorm and i < len(classifier_head) - 1:
                 self.ffnnBlock.append(nn.LayerNorm(h))
 
             self.ffnnBlock.append(nn.ReLU())
@@ -82,7 +82,7 @@ class CharTransformer(nn.Module):
             self.ffnn.append(nn.Sequential(*self.ffnnBlock))
         self.ffnn = nn.Sequential(*self.ffnn)
 
-        self.fcOutput = nn.Linear(hiddenNeurons[-1], numClasses)
+        self.fcOutput = nn.Linear(classifier_head[-1], numClasses)
 
         self.init_weights()
 
@@ -131,7 +131,7 @@ class TransformerEncoderModelCls(nn.Module):
                  dHidden: int = 200,  # dimension of the feedforward network model in nn.TransformerEncoder
                  nLayers: int = 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
                  numClasses: int = 1,  # 1 ==> binary classification
-                 hiddenNeurons: list = [64],  # decoder's classifier FFNN complexity
+                 classifier_head: list = [64],  # decoder's classifier FFNN complexity
                  layerNorm: bool = False,  # whether to normalize decoder's FFNN layers
                  norm_first: bool = True,  # whether to normalize before or after FFNN layers
                  dropout: float = 0.3):
@@ -149,15 +149,15 @@ class TransformerEncoderModelCls(nn.Module):
         self.d_model = dModel
 
         self.ffnn = []
-        for i, h in enumerate(hiddenNeurons):
+        for i, h in enumerate(classifier_head):
             self.ffnnBlock = []
             if i == 0:
                 self.ffnnBlock.append(nn.Linear(self.d_model, h))
             else:
-                self.ffnnBlock.append(nn.Linear(hiddenNeurons[i - 1], h))
+                self.ffnnBlock.append(nn.Linear(classifier_head[i - 1], h))
 
             # add BatchNorm to every layer except last
-            if layerNorm and i < len(hiddenNeurons) - 1:
+            if layerNorm and i < len(classifier_head) - 1:
                 self.ffnnBlock.append(nn.LayerNorm(h))
 
             self.ffnnBlock.append(nn.ReLU())
@@ -168,7 +168,7 @@ class TransformerEncoderModelCls(nn.Module):
             self.ffnn.append(nn.Sequential(*self.ffnnBlock))
         self.ffnn = nn.Sequential(*self.ffnn)
 
-        self.fcOutput = nn.Linear(hiddenNeurons[-1], numClasses)
+        self.fcOutput = nn.Linear(classifier_head[-1], numClasses)
 
         self.init_weights()
 

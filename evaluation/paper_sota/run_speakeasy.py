@@ -172,7 +172,7 @@ if __name__ == "__main__":
         "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
         "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
         "numClasses": 1, # binary classification
-        "hiddenNeurons": [64],
+        "classifier_head": [64],
         "layerNorm": False,
         "dropout": 0.3,
         "mean_over_sequence": False,
@@ -188,7 +188,7 @@ if __name__ == "__main__":
         "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
         "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
         "numClasses": 1, # binary classification
-        "hiddenNeurons": [64],
+        "classifier_head": [64],
         "layerNorm": False,
         "dropout": 0.3,
         "norm_first": True
@@ -199,7 +199,7 @@ if __name__ == "__main__":
         "vocab_size": len(nebula_vocab),
         "maxlen": SEQ_LEN,
         "embeddingDim": 96,
-        "hiddenNeurons": [512, 256, 128],
+        "classifier_head": [512, 256, 128],
         "batchNormConv": False,
         "batchNormFFNN": False,
         "filterSizes": [2, 3, 4, 5],

@@ -17,13 +17,13 @@ class TransformerEncoderModel(nn.Module):
             dHidden: int = 200,  # dimension of the feedforward network model in nn.TransformerEncoder
             nLayers: int = 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
             numClasses: int = 1,  # 1 ==> binary classification
-            hiddenNeurons: Optional[list] = [64],  # decoder's classifier FFNN complexity
+            classifier_head: Optional[list] = [64],  # decoder's classifier FFNN complexity
+            pretrain_layers: Optional[List] = None,
             layerNorm: bool = False,  # whether to normalize decoder's FFNN layers
             norm_first: bool = True,  # whether to normalize before or after FFNN layers
             dropout: float = 0.3,
             pooling: str = "mean",
             skip_embedding: bool = False,
-            pretrain_layers: Optional[List] = None,
             causal_attention: bool = False
     ):
         super().__init__()
@@ -47,7 +47,7 @@ class TransformerEncoderModel(nn.Module):
         self.d_model = dModel
         self.layerNorm = layerNorm
         self.dropout = dropout
-        self.ffnn_layers_in = hiddenNeurons
+        self.ffnn_layers_in = classifier_head
         
         # TODO: RuntimeError: Error(s) in loading state_dict for TransformerEncoderModel:
         # size mismatch for ffnn.0.0.weight: copying a param with shape torch.Size([64, 64]) 
@@ -64,15 +64,17 @@ class TransformerEncoderModel(nn.Module):
             input_neurons = self.d_model
             self.pooling_type = None
         
-        self.ffnn_layers = self._build_ffnn_layers(self.ffnn_layers_in, input_neurons)
-        self.ffnn = nn.Sequential(*self.ffnn_layers)
-        self.ffnn_out_size = hiddenNeurons[-1] if hiddenNeurons is not None else self.d_model
-        if numClasses == 2: # binary classification
-            self.classifier_head = nn.Linear(self.ffnn_out_size, 1)
+        if classifier_head is not None:
+            # model is initiated as a downstream model -- setup classifier head
+            self.ffnn_layers = self._build_ffnn_layers(self.ffnn_layers_in, input_neurons)
+            self.ffnn_out_size = classifier_head[-1] if classifier_head is not None else self.d_model
+            if numClasses == 2: # binary classification
+                self.final_layer = nn.Linear(self.ffnn_out_size, 1)
+            else:
+                self.final_layer = nn.Linear(self.ffnn_out_size, numClasses)
+            self.classifier_head = nn.Sequential(*self.ffnn_layers, self.final_layer)
         else:
-            self.classifier_head = nn.Linear(self.ffnn_out_size, numClasses)
-
-        self.apply(self._init_weights)
+            self.classifier_head = None
 
         # NOTE: bias in last layer removed the same as in https://github.com/karpathy/nanoGPT/blob/master/model.py#L133
         if pretrain_layers is not None:
@@ -84,6 +86,8 @@ class TransformerEncoderModel(nn.Module):
             self.pretrain_layers = nn.Sequential(*self.pretrain_layers)
         else:
             self.pretrain_layers = None
+
+        self.apply(self._init_weights)
 
     def _init_weights(self, module):
         # NOTE: from: https://github.com/karpathy/nanoGPT/blob/master/model.py#L162
@@ -141,7 +145,6 @@ class TransformerEncoderModel(nn.Module):
             src_mask = self._generate_square_subsequent_mask(x.shape[1]).to(x.device)
         x = self.transformer_encoder(x, src_mask, is_causal=self.causal_attention)
         x = self.pooling(x)
-        x = self.ffnn(x)
         return x
 
     def forward(self, x: Tensor, src_mask: Optional[Tensor] = None) -> Tensor:

@@ -134,7 +134,7 @@ if __name__ == "__main__":
             "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
             "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
             "numClasses": n_unique_y, # binary classification
-            "hiddenNeurons": [64],
+            "classifier_head": [64],
             "layerNorm": False,
             "dropout": 0.3,
             "mean_over_sequence": False,

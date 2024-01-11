@@ -2,13 +2,13 @@ import torch
 
 import sys
 sys.path.extend(['.', '..\\..'])
-from nebula.attention import TransformerEncoderModel
+from nebula.models.attention import TransformerEncoderModel
 from nebula.models.reformer import ReformerLM
 
 model = TransformerEncoderModel(
     vocabSize=10000,
     maxLen=2048,
-    hiddenNeurons=[1024, 64]
+    classifier_head=[1024, 64]
 ).cuda()
 
 x = torch.randint(0, 10000, (1, 2048)).cuda()

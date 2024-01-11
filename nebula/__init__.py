@@ -114,7 +114,7 @@ class Nebula:
                 "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
                 "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
                 "numClasses": 1, # binary classification
-                "hiddenNeurons": [64], # classifier head depth
+                "classifier_head": [64], # classifier head depth
                 "layerNorm": False,
                 "dropout": 0.3,
                 "norm_first": True,
@@ -609,7 +609,7 @@ class PEHybridClassifier(nn.Module):
         )
         self.dynamicModel = Cnn1DLinearLM(
             vocabSize=len(self.tokenizer.vocab),
-            hiddenNeurons=[512, representationSize],
+            classifier_head=[512, representationSize],
             dropout=dropout,
         )
 
