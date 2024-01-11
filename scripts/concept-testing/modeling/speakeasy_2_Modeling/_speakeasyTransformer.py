@@ -5,7 +5,7 @@ import os
 import pickle
 import sys
 sys.path.extend(['..', '.'])
-from nebula.attention import TransformerEncoderModel
+from nebula.models.attention import TransformerEncoderModel
 from nebula import ModelTrainer
 from sklearn.utils import shuffle
 
