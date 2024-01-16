@@ -10,7 +10,11 @@ All Nebula and alternative dynamic malware analysis models are under `nebula/mod
 
 Examples of usage are under `scripts/` directory.
 
+Dataset used for experiments and pretraining downloadable from [kaggle.com/datasets/dmitrijstrizna/quo-vadis-malware-emulation](https://www.kaggle.com/datasets/dmitrijstrizna/quo-vadis-malware-emulation).
+
 ### Installation
+
+Model code and Nebula pretrained objects are available as `pip` package:
 
 ```bash
 pip install git+https://github.com/dtrizna/nebula
@@ -54,10 +58,14 @@ INFO:root: [!] Model ready!
 [!] Probability of being malicious: 0.001
 ```
 
-## Pre-training with self-supervised techniques
+## Pre-training with Self-Supervised Learning (SSL)
+
+Nebula is capable of learning from unlabeled data using self-supervised learning (SSL) techniques. Extensive evaluation of SSL efficiency and API level interface is a subject of future work.
 
 ### Masked Language Model
 
-Implementation is under `nebula.pretraining.MaskedLanguageModel` class.
+Implementation is under `nebula.lit_pretraining.MaskedLanguageModelTrainer` class.
 
-Evaluation done using `nebula.evaluation.SelfSupervisedPretraining` class that implements Cybersecurity Evaluation Framework for semisupervised learning (CEF-SSL) framework, introduced by Apruzzese et al. in <https://arxiv.org/pdf/2205.08944.pdf>. It suggests to perform data splits $N$ times, where $\mathbb{U}$ is used for pre-training, $\mathbb{L}$ for downstream task, and $\mathbb{F}$ for final evaluation.
+### Auto-Regressive Language Model
+
+Implementation is under `nebula.lit_pretraining.AutoRegressiveModelTrainer` class.
