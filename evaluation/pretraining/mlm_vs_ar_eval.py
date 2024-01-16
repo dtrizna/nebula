@@ -24,12 +24,12 @@ from nebula.models.attention import TransformerEncoderModel
 VOCABS = {'8k': 8192} # also: {'16k': 16384, '32k': 32768}
 
 # if clean training
-LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"out_mlm_vs_ar_{int(time())}")
-TIMESTAMPS = None
+# LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"out_mlm_vs_ar_{int(time())}")
+# TIMESTAMPS = None
 
 # if previously trained
-# LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"out_autoregressive_1704652486")
-# TIMESTAMPS = ["1704652487"]
+LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"out_mlm_vs_ar")
+TIMESTAMPS = ["1704971666"]
 
 # TEST
 # LIMIT = 5000
@@ -108,7 +108,6 @@ def main(vocab_size_str, random_state=33):
 
     model_config = {
         "vocab_size": vocab_size,
-        # "chunk_size": 64, # input splitting to chunks
         "dModel": 64,  # embedding & transformer dimension
         "nHeads": 8,  # number of heads in nn.MultiheadAttention
         "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder

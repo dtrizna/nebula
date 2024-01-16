@@ -11,6 +11,7 @@ from torch import load
 from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
 from .lit_utils import LitTrainerWrapper, PyTorchLightningModelLM
+from .misc import clear_cuda_cache
 
 
 class LanguageModelTrainer(LitTrainerWrapper):
@@ -348,6 +349,7 @@ class SelfSupervisedLearningEvalFramework:
             self.downstream_trainer.setup_lit_model()
             self.downstream_trainer.train_lit_model(self.train_loader, self.val_loader)
         self.downstream_trainer.save_torch_model(final_model_file)
+        clear_cuda_cache()
 
 
     def run_one_split(
@@ -396,6 +398,7 @@ class SelfSupervisedLearningEvalFramework:
             self.pretrainer.pytorch_model.load_state_dict(self.init_pretrain_model_weights)
             self.pretrainer.pretrain(self.unlabeled_data)
             pretrained_model_state_dict = deepcopy(self.pretrainer.pytorch_model.state_dict())
+            clear_cuda_cache()
 
         self.pretrained_weights = self._transfer_pretrained_weights(
             pretrained_model_state_dict,
