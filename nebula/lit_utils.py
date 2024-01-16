@@ -249,7 +249,7 @@ class LitTrainerWrapper:
         lit_sanity_steps: int = 1,
         monitor_metric: str = "val_tpr",
         monitor_mode: str = "max",
-        early_stop_patience: Union[None, int] = 5,
+        early_stop_patience: Union[None, int] = None,
         early_stop_min_delta: float = 0.0001,
         # efficient training strategies
         scheduler: Union[None, str] = None,
