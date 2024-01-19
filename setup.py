@@ -17,7 +17,7 @@ for root, dirs, files in os.walk(os.path.join("nebula", "objects")):
     for file in files:
         package_data.setdefault('objects', []).append(os.path.join('objects', file))
 
-version = "0.0.5"
+version = "0.0.6"
 setup(
     name="nebula",
     author="Dmitrijs Trizna",
