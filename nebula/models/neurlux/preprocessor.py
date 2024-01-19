@@ -77,10 +77,13 @@ class NeurLuxPreprocessor:
         """Encodes tokenized text."""
         return [self.vocab[token] for token in tokenized]
 
-    def preprocess(self, text):
+    def preprocess(self, text, pad=True, tokenize=True):
         """Preprocesses text for NeurLux."""
-        tokenized = self.tokenize(text)
-        encoded = self.encode(tokenized)
+        if tokenize:
+            text = self.tokenize(text)
+        encoded = self.encode(text)
+        if pad:
+            encoded = self.pad(encoded)
         return encoded
 
     def preprocess_sequence(self, sequence):
