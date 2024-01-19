@@ -431,7 +431,7 @@ class LitTrainerWrapper:
             dump_logits: Union[bool, str] = False
     ) -> np.ndarray:
         assert self.lit_model is not None,\
-            "[-] lightning_model isn't instantiated: either .train_lit_model() or .load_list_model()"
+            "[-] lightning_model isn't instantiated: either .train_lit_model() or .load_lit_model()"
         """Get scores out of a loader."""
         y_pred_logits = self.trainer.predict(model=self.lit_model, dataloaders=loader)
         y_pred = torch.sigmoid(torch.cat(y_pred_logits, dim=0)).numpy()
