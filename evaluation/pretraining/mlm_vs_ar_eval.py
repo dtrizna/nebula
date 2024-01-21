@@ -24,12 +24,12 @@ from nebula.models.attention import TransformerEncoderModel
 VOCABS = {'8k': 8192} # also: {'16k': 16384, '32k': 32768}
 
 # if clean training
-# LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"out_mlm_vs_ar_{int(time())}")
-# TIMESTAMPS = None
+LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"out_mlm_vs_ar_{int(time())}")
+TIMESTAMPS = None
 
 # if previously trained
-LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"out_mlm_vs_ar")
-TIMESTAMPS = ["1704971666"]
+# LOG_ROOT_FOLDER = os.path.join(REPOSITORY_ROOT, "evaluation", "pretraining", f"out_mlm_vs_ar")
+# TIMESTAMPS = ["1704971666"]
 
 # TEST
 # LIMIT = 5000
@@ -57,7 +57,7 @@ GRAD_CLIP_VALUE = 1.0
 VERBOSE = True
 
 # NOTE: scheduler is incompatible with REMASK_EVERY_N_EPOCHS 
-# and DUMP_MODEL_EVERY_EPOCH because of lighning nuances
+# and DUMP_MODEL_EVERY_EPOCH because of lightning nuances
 # USE:
 SCHEDULER = "onecycle"
 DUMP_MODEL_EVERY_EPOCH = False
@@ -105,7 +105,6 @@ def main(vocab_size_str, random_state=33):
     # ===================
     
     # ============= MODEL OBJECTS ===============
-
     model_config = {
         "vocab_size": vocab_size,
         "dModel": 64,  # embedding & transformer dimension
@@ -130,9 +129,6 @@ def main(vocab_size_str, random_state=33):
     model_config['maxlen'] = MAX_SEQ_LEN # lengths of the masked sequences
     model_config['causal_attention'] = False
     model_config['pooling'] = "flatten"
-    # TODO: model ouptuts shape: 
-    # torch.Size([32768, 8193]) == torch.Size([64, 512, 8193])
-    # but should: torch.Size([64, 8193])
     mlm_model = TransformerEncoderModel(**model_config)
     
     # ============= TRAINER OBJECT CONFIGS ===============

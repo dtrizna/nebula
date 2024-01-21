@@ -9,7 +9,6 @@ build/*
 .markdownlint.json
 
 # research files
-evaluation/*
 z_out*
 
 # Data

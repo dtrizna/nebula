@@ -40,7 +40,7 @@ GRAD_CLIP_VALUE = 1.0
 ACCUMULATE_GRAD_BATCHES = None # default, batch_sizes are big enough
 
 # NOTE: scheduler is incompatible with REMASK_EVERY_N_EPOCHS 
-# and DUMP_MODEL_EVERY_EPOCH because of lighning nuances
+# and DUMP_MODEL_EVERY_EPOCH because of lightning nuances
 # USE:
 # SCHEDULER = "onecycle"
 REMASK_EVERY_N_EPOCHS = False
