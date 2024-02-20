@@ -182,20 +182,21 @@ def main(vocab_size_str, random_state=33):
     # ===================
     # config update for downstream trainers
     # ===================
+
     trainer_config["accumulate_grad_batches"] = DOWNSTREAM_ACCUMULATE_GRAD_BATCHES
     trainer_config["precision"] = 32
 
     model_config['dropout'] = 0.3
     model_config['pretrain_layers'] = None
     model_config['classifier_head'] = [64]
-    
+
     # ===================
     # EVAL LOOP
     # ===================
 
     runs = [
-        mlm_lit_trainer,
         ar_lit_trainer,
+        mlm_lit_trainer,
     ]
     for pretrainer in runs:
         downstream_model = TransformerEncoderModel(**model_config)
