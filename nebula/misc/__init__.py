@@ -28,17 +28,6 @@ def get_tpr_at_fpr(true_labels, predicted_probs, fprNeeded):
             threshold_at_fpr = thresholds[fpr <= fprNeeded][-1]
             return tpr_at_fpr, threshold_at_fpr
 
-def set_random_seed(seed_value):
-    random.seed(seed_value) # Python
-    np.random.seed(seed_value) # cpu vars
-    torch.manual_seed(seed_value) # cpu  vars
-    
-    if torch.cuda.is_available(): 
-        torch.cuda.manual_seed(seed_value)
-        torch.cuda.manual_seed_all(seed_value) # gpu vars
-        torch.backends.cudnn.deterministic = True  #needed
-        torch.backends.cudnn.benchmark = False
-
 def get_path(type="script"):
     idx = 1 if type == "notebook" else 0
     return os.path.dirname(os.path.realpath(sys.argv[idx]))
@@ -71,6 +60,17 @@ def fix_random_seed(seed_value=1763):
     np.random.seed(seed_value)
     torch.manual_seed(seed_value)
     torch.cuda.manual_seed_all(seed_value)
+
+def set_random_seed(seed_value):
+    random.seed(seed_value) # Python
+    np.random.seed(seed_value) # cpu vars
+    torch.manual_seed(seed_value) # cpu  vars
+    
+    if torch.cuda.is_available(): 
+        torch.cuda.manual_seed(seed_value)
+        torch.cuda.manual_seed_all(seed_value) # gpu vars
+        torch.backends.cudnn.deterministic = True  # needed
+        torch.backends.cudnn.benchmark = False
 
 def splitDataFrameTimeStampToChunks(df, timeFieldName='TimeStamp', chunkSize='5min'):
     df[timeFieldName] = to_datetime(df[timeFieldName])
