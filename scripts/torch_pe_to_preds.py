@@ -103,15 +103,17 @@ model_config = {
     "layerNorm": False,
     "dropout": 0.3,
     "norm_first": True,
-    "pooling": None
+    "pooling": "flatten"
 }
 model = TransformerEncoderChunks(**model_config)
 if TOKENIZER == "bpe":
     model_path = os.path.join(REPOSITORY_ROOT, r"nebula\objects\bpe_50000_torch.model")
 if TOKENIZER == "whitespace":
     model_path = os.path.join(REPOSITORY_ROOT, r"nebula\objects\whitespace_50000_torch.model")
+
 from torch import load
-model.load_state_dict(load(model_path))
+model_dict = load(model_path)
+model.load_state_dict(model_dict)
 logging.info(f" [!] Model ready.")
 
 logit = model(x)

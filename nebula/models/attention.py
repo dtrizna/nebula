@@ -63,19 +63,21 @@ class TransformerEncoderModel(nn.Module):
             input_neurons = self.d_model
             self.pooling_type = None
         
+        self.classifier_head_nr_list = classifier_head
+        self.num_classes_out = numClasses
         self.classifier_head = None
-        if classifier_head is not None:
+        if self.classifier_head_nr_list is not None:
             # model is initiated as a downstream model -- setup classifier head
             self.classifier_head_layers = []
-            if len(classifier_head) > 0:
+            if len(self.classifier_head_nr_list) > 0:
                 self.classifier_head_layers = self._build_ffnn_layers(
                     start_neurons=input_neurons,
-                    hidden_layers=classifier_head
+                    hidden_layers=self.classifier_head_nr_list
                 )
             # if numClasses is None, then classifier outputs last value from classified_head
-            if numClasses is not None:
+            if self.num_classes_out is not None:
                 self.final_layer_in = classifier_head[-1] if len(classifier_head) > 0 else input_neurons
-                self.final_layer_out =  1 if numClasses == 2 else numClasses
+                self.final_layer_out =  1 if self.num_classes_out == 2 else self.num_classes_out
                 self.classifier_head_layers.append(nn.Linear(self.final_layer_in, self.final_layer_out))
             # join in a single classifier head
             self.classifier_head = nn.Sequential(*self.classifier_head_layers)
@@ -155,12 +157,14 @@ class TransformerEncoderModel(nn.Module):
 
     def forward(self, x: Tensor, src_mask: Optional[Tensor] = None) -> Tensor:
         x = self.core(x, src_mask)
-        out = self.classifier_head(x)
-        return out
+        if self.classifier_head is not None:
+            x = self.classifier_head(x)
+        return x
 
     def pretrain(self, x: Tensor) -> Tensor:
         x = self.core(x)
-        x = self.pretrain_layers(x)
+        if self.pretrain_layers is not None:
+            x = self.pretrain_layers(x)
         return x
 
 
@@ -181,11 +185,6 @@ class TransformerEncoderChunks(TransformerEncoderModel):
         if self.nr_of_chunks != int(self.nr_of_chunks):
             self.nr_of_chunks = int(self.nr_of_chunks) + 1
         
-        if self.pooling_type == None: # rebuild FFNN for case when pooling == None
-            input_neurons = int(self.chunk_size * self.nr_of_chunks * self.d_model)
-            self.ffnn_layers = self._build_ffnn_layers(self.ffnn_layers_in, input_neurons)
-            self.ffnn = nn.Sequential(*self.ffnn_layers)
-
     def split(self, src: Tensor) -> List[Tensor]:
         chunks = []
         for chunk in torch.split(src, split_size_or_sections=self.chunk_size, dim=1):
@@ -218,7 +217,6 @@ class TransformerEncoderChunks(TransformerEncoderModel):
         # NOTE: after .cat() shape is: (batch_size, nr_of_chunks * chunk_size, d_model)
         # where nr_of_chunks = int(maxlen / self.chunk_size) + 1
         x = self.pooling(x)
-        x = self.ffnn(x)
         return x
 
 
