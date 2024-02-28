@@ -1,6 +1,7 @@
 # https://arxiv.org/pdf/1910.11376.pdf
 # https://github.com/ucsb-seclab/Neurlux/blob/main/attention_train_all.py#L129
 
+from torch import Tensor
 import torch.nn as nn
 import torch.nn.functional as F
 from .preprocessor import NeurLuxPreprocessor
@@ -23,7 +24,7 @@ class Attention(nn.Module):
         x, _ = self.attention(x, x, x)
         x = x.reshape(x.shape[0], -1)
         return x
-    
+
 
 class NeurLuxModel(nn.Module):
     def __init__(self,
@@ -44,7 +45,7 @@ class NeurLuxModel(nn.Module):
         self.dropout = nn.Dropout(0.25)
         self.fc2 = nn.Linear(10, num_classes)
 
-    def forward(self, x):
+    def forward(self, x: Tensor):
         x = self.embedding(x)
         x = x.permute(0, 2, 1)
         x = self.conv(x)
