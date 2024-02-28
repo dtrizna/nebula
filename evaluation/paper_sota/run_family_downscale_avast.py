@@ -8,50 +8,63 @@ import time
 import json
 import logging
 import numpy as np
+from tqdm import tqdm
+from pandas import read_csv, to_datetime
 from collections import defaultdict
 from sklearn.utils import shuffle
 
 from nebula.preprocessing.wrappers import (
-    preprocess_nebula_speakeasy,
-    preprocess_quovadis_speakeasy,
-    preprocess_neurlux,
-    preprocess_dmds_speakeasy
+    preprocess_nebula_avast,
+    preprocess_neurlux
 )
 
 from nebula.models.neurlux import NeurLuxModel
-from nebula.models.quovadis import QuoVadisModel
 from nebula.models import TransformerEncoderChunks
-from nebula.models.dmds import DMDSGatedCNN
 from nebula.misc import set_random_seed, clear_cuda_cache
-from nebula.constants import SPEAKEASY_LABELMAP
+
+from nebula.lit_utils import LitTrainerWrapper
+from nebula.misc import fix_random_seed
 
 from torch import cuda
 from torch.nn import CrossEntropyLoss
-from nebula.lit_utils import LitTrainerWrapper
-from nebula.misc import fix_random_seed
-from sklearn.metrics import f1_score
 
+# TEST
+# LIMIT = 1000
+# INFOLDER = None # if data is processed already
+# NEBULA_VOCAB = 500
+# NEURLUX_VOCAB = 500
+
+# PROD
 LIMIT = None
-INFOLDER = "out_family_downscale_speakeasy_PROD" # if data is processed already
-
+INFOLDER = os.path.join(REPO_ROOT, "evaluation\paper_sota\out_family_downscale_avast_PROD")
 NEBULA_VOCAB = 50000
 NEURLUX_VOCAB = 10000
-QUO_VADIS_TOP_API = 600
 
 RANDOM_SEED = 1763
 SEQ_LEN = 512
-SPEAKEASY_TRAINSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_trainset")
-SPEAKEASY_TESTSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_testset")
-SPEAKEASY_LABEL_IDX_TO_FAMILY = {v: k for k, v in SPEAKEASY_LABELMAP.items()}
+TRAIN_TEST_SPLIT_DATE = '2019-08-01'
+
+# x
+folder = os.path.join(REPO_ROOT, r"..\..\Data\Avast-CTU\Public_Avast_CTU_CAPEv2_Dataset_Small\public_small_reports")
+EXAMPLE_PATHS = [os.path.join(folder, x) for x in os.listdir(folder)[:LIMIT]]
+# y
+label_file = os.path.join(REPO_ROOT, r"..\..\Data\Avast-CTU\Public_Avast_CTU_CAPEv2_Dataset_Small\public_labels.csv")
+LABEL_FIELD = 'classification_family'
+LABEL_TABLE = read_csv(label_file)
+LABEL_MAP = dict(zip(
+    sorted(LABEL_TABLE[LABEL_FIELD].unique()),
+    list(range(LABEL_TABLE[LABEL_FIELD].nunique()))
+))
+AVAST_LABEL_IDX_TO_FAMILY = {v: k for k, v in LABEL_MAP.items()}
 
 if __name__ == "__main__":
-    
+
     fix_random_seed(RANDOM_SEED)
 
     if INFOLDER:
         out_folder_root = INFOLDER
     else:
-        out_folder_root = f"out_family_downscale_speakeasy_{int(time.time())}"
+        out_folder_root = f"out_family_downscale_avast_{int(time.time())}"
         os.makedirs(out_folder_root, exist_ok=True)
 
     # =========== set out logging to both file and stdout
@@ -65,109 +78,106 @@ if __name__ == "__main__":
     )
 
     datafolders = {}
-    datafolders['nebulabpe'] = os.path.join(out_folder_root, f"data_nebula_speakeasy_vocab_{NEBULA_VOCAB}_seqlen_{SEQ_LEN}")
-    datafolders['nebulawht'] = os.path.join(out_folder_root, f"data_nebulawht_speakeasy_vocab_{NEBULA_VOCAB}_seqlen_{SEQ_LEN}")
-    datafolders['neurlux'] = os.path.join(out_folder_root, f"data_neurlux_speakeasy_vocab_{NEURLUX_VOCAB}_seqlen_{SEQ_LEN}")
-    datafolders['quovadis'] = os.path.join(out_folder_root, f"data_quovadis_speakeasy_vocab_{QUO_VADIS_TOP_API}_seqlen_{SEQ_LEN}")
-    datafolders['dmds'] = os.path.join(out_folder_root, f"data_dmds_speakeasy_vocab_seqlen_{SEQ_LEN}")
+    datafolders['nebulabpe'] = os.path.join(out_folder_root, f"data_nebulabpe_avast_vocab_{NEBULA_VOCAB}_seqlen_{SEQ_LEN}")
+    datafolders['nebulawht'] = os.path.join(out_folder_root, f"data_nebulawht_avast_vocab_{NEBULA_VOCAB}_seqlen_{SEQ_LEN}")
+    datafolders['neurlux'] = os.path.join(out_folder_root, f"data_neurlux_avast_vocab_{NEURLUX_VOCAB}_seqlen_{SEQ_LEN}")
     
-    # =========== 'nebula' & 'speakeasy' preprocessing
-    logging.warning("Preprocessing 'nebula' & 'speakeasy'...")
-    _, y_train, y_paths_train, = preprocess_nebula_speakeasy(
-        folder=SPEAKEASY_TRAINSET_PATH,
-        limit=LIMIT,
-        vocab_size=NEBULA_VOCAB,
-        seq_len=SEQ_LEN,
-        outfolder=datafolders['nebulabpe'],
-        multiclass=True
-    )
-    _, y_test, y_paths_test = preprocess_nebula_speakeasy(
-        folder=SPEAKEASY_TESTSET_PATH,
-        limit=LIMIT,
-        vocab_size=NEBULA_VOCAB,
-        seq_len=SEQ_LEN,
-        outfolder=datafolders['nebulabpe'],
-        tokenizer_model=os.path.join(datafolders['nebulabpe'], f"tokenizer_{NEBULA_VOCAB}.model"),
-        multiclass=True
-    )
-    
-    # =========== 'nebula' & 'speakeasy' preprocessing
-    _, y_train, y_paths_train, = preprocess_nebula_speakeasy(
-        folder=SPEAKEASY_TRAINSET_PATH,
-        limit=LIMIT,
-        vocab_size=NEBULA_VOCAB,
-        seq_len=SEQ_LEN,
-        outfolder=datafolders['nebulawht'],
-        multiclass=True,
-        tokenizer_type="whitespace"
-    )
-    _, y_test, y_paths_test = preprocess_nebula_speakeasy(
-        folder=SPEAKEASY_TESTSET_PATH,
-        limit=LIMIT,
-        vocab_size=NEBULA_VOCAB,
-        seq_len=SEQ_LEN,
-        outfolder=datafolders['nebulawht'],
-        tokenizer_model=os.path.join(datafolders['nebulawht'], f"tokenizer_{NEBULA_VOCAB}_vocab.json"),
-        multiclass=True,
-        tokenizer_type="whitespace"
-    )
+    # =========== reading data
+    if os.path.exists(datafolders['nebulabpe']) and os.path.exists(datafolders['nebulawht']) and os.path.exists(datafolders['neurlux']):
+        logging.warning(f" [!] Data already exists in {datafolders['nebulabpe']}, {datafolders['nebulawht']}, {datafolders['neurlux']}. Skipping data preprocessing...")
+        y_train = np.load(os.path.join(datafolders['nebulabpe'], "y_train_full.npy"))
+        y_test = np.load(os.path.join(datafolders['nebulabpe'], "y_test_full.npy"))
+    else:
+        capa_normalizer = {
+            "resolved_apis": lambda x: x.lower(),
+            "mutexes": lambda x: x.lower()
+        }
 
-    # ============= 'dmds' & 'speakeasy' preprocessing
-    preprocess_dmds_speakeasy(
-        y_paths_train,
-        y=y_train,
-        seq_len=SEQ_LEN,
-        outfolder=datafolders['dmds'],
-        suffix="train",
-        limit=LIMIT,
-    )
-    preprocess_dmds_speakeasy(
-        y_paths_test,
-        y=y_test,
-        seq_len=SEQ_LEN,
-        outfolder=datafolders['dmds'],
-        suffix="test",
-        limit=LIMIT,
-    )
+        X_raw_train = []
+        X_raw_test = []
+        y_train = []
+        y_test = []
+        logging.warning(f" [*] Reading data from {len(EXAMPLE_PATHS)} samples...")
+        for example in tqdm(EXAMPLE_PATHS):
+            hhash = os.path.basename(example).replace(".json", "")
+            sample_data = LABEL_TABLE[LABEL_TABLE['sha256'] == hhash].iloc[0]
+            family = sample_data[LABEL_FIELD]
+            
+            with open(example, encoding='utf-8') as f:
+                sample = json.load(f)
+            sample = sample["behavior"]['summary']
+            normalized_sample = {field: [capa_normalizer[field](x) for x in sample[field]] for field in capa_normalizer}
+            if to_datetime(sample_data['date']) < to_datetime(TRAIN_TEST_SPLIT_DATE):
+                X_raw_train.append(normalized_sample)
+                y_train.append(LABEL_MAP[family])
+            else:
+                X_raw_test.append(normalized_sample)
+                y_test.append(LABEL_MAP[family])
+        
+        y_train = np.array(y_train, dtype=np.int8)
+        y_test = np.array(y_test, dtype=np.int8)
 
-    # =========== 'neurlux' & 'speakeasy' preprocessing
-    _, neurlux_vocab_file = preprocess_neurlux(
-        y_paths_train,
-        y=y_train,
-        outfolder=datafolders['neurlux'],
-        limit=LIMIT,
-        vocab_size=NEURLUX_VOCAB,
-        seq_len=SEQ_LEN
+        # =========== 'nebula' bpe preprocessing
+        preprocess_nebula_avast(
+            X_raw_train,
+            y_train,
+            limit=LIMIT,
+            vocab_size=NEBULA_VOCAB,
+            seq_len=SEQ_LEN,
+            outfolder=datafolders['nebulabpe'],
+            tokenizer_type='bpe'
+        )
+        preprocess_nebula_avast(
+            X_raw_test,
+            y_test,
+            limit=LIMIT,
+            vocab_size=NEBULA_VOCAB,
+            seq_len=SEQ_LEN,
+            outfolder=datafolders['nebulabpe'],
+            tokenizer_type='bpe',
+            tokenizer_model=os.path.join(datafolders['nebulabpe'], f"tokenizer_{NEBULA_VOCAB}.model"),
+        )
+        # =========== 'nebula' whitespace preprocessing
+        preprocess_nebula_avast(
+            X_raw_train,
+            y_train,
+            limit=LIMIT,
+            vocab_size=NEBULA_VOCAB,
+            seq_len=SEQ_LEN,
+            outfolder=datafolders['nebulawht'],
+            tokenizer_type='whitespace'
+        )
+        preprocess_nebula_avast(
+            X_raw_test,
+            y_test,
+            limit=LIMIT,
+            vocab_size=NEBULA_VOCAB,
+            seq_len=SEQ_LEN,
+            outfolder=datafolders['nebulawht'],
+            tokenizer_type='whitespace',
+            tokenizer_model=os.path.join(datafolders['nebulawht'], f"tokenizer_{NEBULA_VOCAB}_vocab.json"),
+        )
 
-    )
-    _ = preprocess_neurlux(
-        y_paths_test,
-        y=y_test,
-        vocab_file=neurlux_vocab_file,
-        outfolder=datafolders['neurlux'],
-        limit=LIMIT,
-        vocab_size=NEURLUX_VOCAB,
-        seq_len=SEQ_LEN
-    )
-
-    # ============ 'quo vadis' & 'speakeasy' preprocessing
-    _, quovadis_vocab_file = preprocess_quovadis_speakeasy(
-        y_paths_train,
-        y=y_train,
-        seq_len=SEQ_LEN,
-        top_api=QUO_VADIS_TOP_API,
-        outfolder=datafolders['quovadis'],
-        limit=LIMIT,
-    )
-    _ = preprocess_quovadis_speakeasy(
-        y_paths_test,
-        y=y_test,
-        vocab_file=quovadis_vocab_file,
-        seq_len=SEQ_LEN,
-        top_api=QUO_VADIS_TOP_API,
-        outfolder=datafolders['quovadis'],
-        limit=LIMIT,
-    )
+        # =========== 'neurlux' & 'avast' preprocessing
+        _, neurlux_vocab_file = preprocess_neurlux(
+            X_raw_train,
+            y=y_train,
+            outfolder=datafolders['neurlux'],
+            limit=LIMIT,
+            vocab_size=NEURLUX_VOCAB,
+            seq_len=SEQ_LEN,
+            in_memory=True
+        )
+        _ = preprocess_neurlux(
+            X_raw_test,
+            y=y_test,
+            vocab_file=neurlux_vocab_file,
+            outfolder=datafolders['neurlux'],
+            limit=LIMIT,
+            vocab_size=NEURLUX_VOCAB,
+            seq_len=SEQ_LEN,
+            in_memory=True
+        )
 
     device = "cuda" if cuda.is_available() else "cpu"
     n_unique_y = len(set(y_train))
@@ -179,7 +189,7 @@ if __name__ == "__main__":
         set_random_seed(RANDOM_SEED)
         # subsample random number_of_families labels from y_train and
         subsampled_labels = np.random.choice(np.unique(y_train), size=nr_of_families, replace=False)
-        subsampled_families = [SPEAKEASY_LABEL_IDX_TO_FAMILY[x] for x in subsampled_labels]
+        subsampled_families = [AVAST_LABEL_IDX_TO_FAMILY[x] for x in subsampled_labels]
         logging.warning(f" [!] Sampled labels: {subsampled_labels} | Families: {subsampled_families}")
 
         # use this to map y_subsampled to range(0, nr_of_families)
@@ -188,28 +198,15 @@ if __name__ == "__main__":
         # ============= DEFINE MODELS =============
         models = defaultdict(dict)
 
-        with open(neurlux_vocab_file) as f:
-            neurlux_vocab = json.load(f)
-        models['neurlux']['class'] = NeurLuxModel
-        models['neurlux']['config'] = {
-            "vocab_size": len(neurlux_vocab),
-            "seq_len": SEQ_LEN,
-            "num_classes": nr_of_families
-        }
+        # with open(os.path.join(datafolders['neurlux'], f"vocab_{NEURLUX_VOCAB}.json")) as f:
+        #     neurlux_vocab = json.load(f)
+        # models['neurlux']['class'] = NeurLuxModel
+        # models['neurlux']['config'] = {
+        #     "vocab_size": len(neurlux_vocab),
+        #     "seq_len": SEQ_LEN,
+        #     "num_classes": nr_of_families
+        # }
 
-        models['quovadis']['class'] = QuoVadisModel
-        models['quovadis']['config'] = {
-            "vocab": quovadis_vocab_file,
-            "seq_len": SEQ_LEN,
-            "num_classes": nr_of_families
-        }
-
-        models['dmds']['class'] = DMDSGatedCNN
-        models['dmds']['config'] = {
-            "seq_len": SEQ_LEN,
-            "num_classes": nr_of_families,
-        }
-        
         with open(os.path.join(datafolders['nebulabpe'], f"tokenizer_{NEBULA_VOCAB}_vocab.json")) as f:
             nebula_vocab = json.load(f)
         models['nebulabpe']['class'] = TransformerEncoderChunks
@@ -224,7 +221,7 @@ if __name__ == "__main__":
             "numClasses": nr_of_families,
             "classifier_head": [64],
             "layerNorm": False,
-            "dropout": 0.3,
+            "dropout": 0.5,
             "pooling": "mean",
             "norm_first": True
         }
@@ -243,16 +240,16 @@ if __name__ == "__main__":
             "numClasses": nr_of_families,
             "classifier_head": [64],
             "layerNorm": False,
-            "dropout": 0.3,
+            "dropout": 0.5,
             "pooling": "mean",
             "norm_first": True
         }
-        
+
         # ============= TRAINING LOOP =============
         for run_name in models.keys():
             set_random_seed(RANDOM_SEED)
 
-            out_folder = os.path.join(out_folder_root, f"training_{run_name}")
+            out_folder = os.path.join(out_folder_root, f"training_dropout0.5_{run_name}")
             family_folder = os.path.join(out_folder, f"{run_name}_nr_families_{nr_of_families}_csv")
             if os.path.exists(family_folder):
                 logging.warning(f" [!] Skipping... Output folder for run {run_name} already exists: {family_folder}")
@@ -297,7 +294,7 @@ if __name__ == "__main__":
                 pytorch_model=model,
                 name=f"{run_name}_nr_families_{nr_of_families}",
                 log_folder=out_folder,
-                epochs=10,
+                epochs=20,
                 device=device,
                 log_every_n_steps=10,
                 scheduler="onecycle",
@@ -310,15 +307,6 @@ if __name__ == "__main__":
             train_loader = lit_trainer.create_dataloader(x_train_subsample, y_train_subsample_mapped)
             test_loader = lit_trainer.create_dataloader(x_test_subsample, y_test_subsample_mapped, shuffle=False)
             lit_trainer.train_lit_model(train_loader=train_loader, val_loader=test_loader)
-
-            # get f1 scores
-            # y_train_pred = lit_trainer.predict_lit_model(train_loader)
-            # f1_train = f1_score(y_train_subsample_mapped, y_train_pred, average='macro')
-            # logging.warning(f"[!] Train F1: {f1_train*100:.2f}%")
-
-            # y_test_pred = lit_trainer.predict_lit_model(test_loader)
-            # f1_test = f1_score(y_test_subsample_mapped, y_test_pred, average='macro')
-            # logging.warning(f"[!] Test F1: {f1_test*100:.2f}%")
 
             del x_train_subsample, y_train_subsample, x_test_subsample, y_test_subsample
             del y_train_subsample_mapped, y_test_subsample_mapped

@@ -1,0 +1,35 @@
+2024-02-25 17:36:38,403 WARNING  [!] Data already exists in C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\data_nebulabpe_avast_vocab_50000_seqlen_512, C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\data_nebulawht_avast_vocab_50000_seqlen_512, C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\data_neurlux_avast_vocab_10000_seqlen_512. Skipping data preprocessing...
+2024-02-25 17:36:38,423 WARNING  [*] Multiclass classification with 3 classes...
+2024-02-25 17:36:38,426 WARNING  [!] Sampled labels: [4 8 5] | Families: ['Qakbot', 'Zeus', 'Swisyn']
+2024-02-25 17:36:38,487 WARNING  [!] Skipping... Output folder for run nebulabpe already exists: C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\training_dropout0.5_nebulabpe\nebulabpe_nr_families_3_csv
+2024-02-25 17:36:38,487 WARNING  [!] Skipping... Output folder for run nebulawht already exists: C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\training_dropout0.5_nebulawht\nebulawht_nr_families_3_csv
+2024-02-25 17:36:38,488 WARNING  [*] Multiclass classification with 4 classes...
+2024-02-25 17:36:38,490 WARNING  [!] Sampled labels: [4 8 5 1] | Families: ['Qakbot', 'Zeus', 'Swisyn', 'Emotet']
+2024-02-25 17:36:38,528 WARNING  [!] Skipping... Output folder for run nebulabpe already exists: C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\training_dropout0.5_nebulabpe\nebulabpe_nr_families_4_csv
+2024-02-25 17:36:38,529 WARNING  [!] Skipping... Output folder for run nebulawht already exists: C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\training_dropout0.5_nebulawht\nebulawht_nr_families_4_csv
+2024-02-25 17:36:38,530 WARNING  [*] Multiclass classification with 5 classes...
+2024-02-25 17:36:38,531 WARNING  [!] Sampled labels: [4 8 5 1 9] | Families: ['Qakbot', 'Zeus', 'Swisyn', 'Emotet', 'njRAT']
+2024-02-25 17:36:38,568 WARNING  [!] Skipping... Output folder for run nebulabpe already exists: C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\training_dropout0.5_nebulabpe\nebulabpe_nr_families_5_csv
+2024-02-25 17:36:38,569 WARNING  [!] Skipping... Output folder for run nebulawht already exists: C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\training_dropout0.5_nebulawht\nebulawht_nr_families_5_csv
+2024-02-25 17:36:38,570 WARNING  [*] Multiclass classification with 6 classes...
+2024-02-25 17:36:38,571 WARNING  [!] Sampled labels: [4 8 5 1 9 6] | Families: ['Qakbot', 'Zeus', 'Swisyn', 'Emotet', 'njRAT', 'Trickbot']
+2024-02-25 17:36:38,606 WARNING  [!] Skipping... Output folder for run nebulabpe already exists: C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\training_dropout0.5_nebulabpe\nebulabpe_nr_families_6_csv
+2024-02-25 17:36:38,607 WARNING  [!] Skipping... Output folder for run nebulawht already exists: C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\training_dropout0.5_nebulawht\nebulawht_nr_families_6_csv
+2024-02-25 17:36:38,608 WARNING  [*] Multiclass classification with 7 classes...
+2024-02-25 17:36:38,609 WARNING  [!] Sampled labels: [4 8 5 1 9 6 7] | Families: ['Qakbot', 'Zeus', 'Swisyn', 'Emotet', 'njRAT', 'Trickbot', 'Ursnif']
+2024-02-25 17:36:38,643 WARNING  [!] Skipping... Output folder for run nebulabpe already exists: C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\training_dropout0.5_nebulabpe\nebulabpe_nr_families_7_csv
+2024-02-25 17:36:38,645 WARNING  [!] Skipping... Output folder for run nebulawht already exists: C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\training_dropout0.5_nebulawht\nebulawht_nr_families_7_csv
+2024-02-25 17:36:38,645 WARNING  [*] Multiclass classification with 8 classes...
+2024-02-25 17:36:38,648 WARNING  [!] Sampled labels: [4 8 5 1 9 6 7 2] | Families: ['Qakbot', 'Zeus', 'Swisyn', 'Emotet', 'njRAT', 'Trickbot', 'Ursnif', 'HarHar']
+2024-02-25 17:36:38,683 WARNING  [!] Skipping... Output folder for run nebulabpe already exists: C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\training_dropout0.5_nebulabpe\nebulabpe_nr_families_8_csv
+2024-02-25 17:36:38,684 WARNING  [!] Skipping... Output folder for run nebulawht already exists: C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\training_dropout0.5_nebulawht\nebulawht_nr_families_8_csv
+2024-02-25 17:36:38,684 WARNING  [*] Multiclass classification with 9 classes...
+2024-02-25 17:36:38,686 WARNING  [!] Sampled labels: [4 8 5 1 9 6 7 2 3] | Families: ['Qakbot', 'Zeus', 'Swisyn', 'Emotet', 'njRAT', 'Trickbot', 'Ursnif', 'HarHar', 'Lokibot']
+2024-02-25 17:36:38,721 WARNING  [!] Skipping... Output folder for run nebulabpe already exists: C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\training_dropout0.5_nebulabpe\nebulabpe_nr_families_9_csv
+2024-02-25 17:36:38,722 WARNING  [!] Skipping... Output folder for run nebulawht already exists: C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\training_dropout0.5_nebulawht\nebulawht_nr_families_9_csv
+2024-02-25 17:36:38,722 WARNING  [*] Multiclass classification with 10 classes...
+2024-02-25 17:36:38,724 WARNING  [!] Sampled labels: [4 8 5 1 9 6 7 2 3 0] | Families: ['Qakbot', 'Zeus', 'Swisyn', 'Emotet', 'njRAT', 'Trickbot', 'Ursnif', 'HarHar', 'Lokibot', 'Adload']
+2024-02-25 17:36:38,759 WARNING  [!] Skipping... Output folder for run nebulabpe already exists: C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\training_dropout0.5_nebulabpe\nebulabpe_nr_families_10_csv
+2024-02-25 17:36:38,911 WARNING  [!] Sizes of full sets: train -- (37512, 512), test -- (11464, 512)
+2024-02-25 17:36:38,912 WARNING  [!] Sizes of subsampled sets: train -- (37512, 512), test -- (11464, 512)
+2024-02-25 17:36:38,912 WARNING  [!!!] Starting training: nebulawht!
