@@ -61,6 +61,7 @@ class PyTorchLightningModelBase(L.LightningModule):
         if task == 'multiclass' and out_classes == 1:
             layers = [x for x in self.model.children() if isinstance(x, Linear) or isinstance(x, Sequential)]
             out_classes = layers[-1].out_features if isinstance(layers[-1], Linear) else layers[-1][-1].out_features
+        self.out_classes = out_classes
 
         self.train_acc = torchmetrics.Accuracy(task=task, num_classes=out_classes)
         self.train_f1 = torchmetrics.F1Score(task=task, num_classes=out_classes, average='macro')
@@ -132,9 +133,13 @@ class PyTorchLightningModelBase(L.LightningModule):
             fpr, tpr, thresholds = roc_curve(true_labels, predicted_probs)
         except ValueError: 
             # when multi-label 'ValueError: multilabel-indicator format is not supported'
-            return (torch.nan, torch.nan) if return_thresholds else torch.nan
+            # return (torch.nan, torch.nan) if return_thresholds else torch.nan
+            # avoid using nan since throws WARNING NaN or Inf found in input tensor.
+            return (0, 0) if return_thresholds else 0
         if all(np.isnan(fpr)):
-            return (torch.nan, torch.nan) if return_thresholds else torch.nan
+            # return (torch.nan, torch.nan) if return_thresholds else torch.nan
+            # avoid using nan since throws WARNING NaN or Inf found in input tensor.
+            return (0, 0) if return_thresholds else 0
         else:
             tpr_at_fpr = tpr[fpr <= fprNeeded][-1]
             threshold_at_fpr = thresholds[fpr <= fprNeeded][-1]
@@ -150,10 +155,9 @@ class PyTorchLightningModelBase(L.LightningModule):
 
         if y.ndim == 2 and logits.ndim == 3: # e.g. autoregressive pre-training
             logits, y = logits.view(-1, logits.size(-1)), y.view(-1)
-        # multi-class classification w/o pretraining
-        elif isinstance(self.loss, CrossEntropyLoss) and self.model.pretrain_layers is None:
+        elif logits.ndim == 2 and self.out_classes != 1: # multiclass, logits.shape: (batch_size, num_classes)
             y = y.squeeze().to(torch.int64)
-        elif y.ndim == 1: # binary classification: (batch_size,) => (batch_size, 1)
+        elif y.ndim == 1: # binary classification: (batch_size, ) => (batch_size, 1)
             y = y.unsqueeze(-1)
         
         loss = self.loss(logits, y)
@@ -360,7 +364,7 @@ class LitTrainerWrapper:
         callbacks = self.setup_callbacks()
 
         if self.log_folder is None:
-            self.log_folder = f"./out_{self.name}_{int(time())}"
+            self.log_folder = f"./out_{self.name}"
         try:
             os.makedirs(self.log_folder, exist_ok=True)
         except ValueError as ex:
@@ -404,7 +408,7 @@ class LitTrainerWrapper:
         assert model_file is not None, "Please provide a model file"
         self.pytorch_model = torch.load(model_file)
         # NOTE: you have to reset self.lit_model after this
-        #  if lit_model is already initialized, then load state dict directly:
+        # if lit_model is already initialized, then load state dict directly:
         # self.lit_model.model.load_state_dict(state_dict)
 
 
@@ -445,18 +449,22 @@ class LitTrainerWrapper:
     def predict_lit_model(
             self,
             loader: DataLoader, 
-            decision_threshold: int = 0.5, 
+            decision_threshold: int = 0.5,
+            return_logits: bool = False,
             dump_logits: Union[bool, str] = False
     ) -> np.ndarray:
         assert self.lit_model is not None,\
-            "[-] lightning_model isn't instantiated: either .train_lit_model() or .load_list_model()"
+            "[-] lightning_model isn't instantiated: either .train_lit_model() or .load_lit_model()"
         """Get scores out of a loader."""
         y_pred_logits = self.trainer.predict(model=self.lit_model, dataloaders=loader)
+        y_pred_logits = torch.cat(y_pred_logits, dim=0)
         if dump_logits:
             assert isinstance(dump_logits, str), "Please provide a path to dump logits: dump_logits='path/to/logits.pkl'"
             pickle.dump(y_pred_logits, open(dump_logits, "wb"))
+        if return_logits:
+            return y_pred_logits
         
-        y_pred = torch.sigmoid(torch.cat(y_pred_logits, dim=0)).numpy()
+        y_pred = torch.sigmoid(y_pred_logits).numpy()
         try:
             y_pred = np.array([1 if x > decision_threshold else 0 for x in y_pred])
         except ValueError: # multiclass
