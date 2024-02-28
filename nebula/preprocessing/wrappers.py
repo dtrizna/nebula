@@ -222,6 +222,7 @@ def preprocess_nebula_speakeasy(
         y = np.load(os.path.join(outfolder, f"y_{suffix}_{limit}.npy"))
         return None, y, y_filepaths
 
+    logging.warning(f" [*] Preprocessing nebula with {tokenizer_type} tokenizer...")
     # filter and normalize reports
     if record_fields:
         extractor = PEDynamicFeatureExtractor(
