@@ -32,7 +32,7 @@ from nebula.misc import fix_random_seed
 from sklearn.metrics import f1_score
 
 LIMIT = None
-INFOLDER = None # "out_family_downscale_speakeasy_1708346406" # if data is processed already
+INFOLDER = "out_family_downscale_speakeasy_PROD" # if data is processed already
 
 NEBULA_VOCAB = 50000
 NEURLUX_VOCAB = 10000
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     )
 
     datafolders = {}
-    datafolders['nebula'] = os.path.join(out_folder_root, f"data_nebula_speakeasy_vocab_{NEBULA_VOCAB}_seqlen_{SEQ_LEN}")
+    datafolders['nebulabpe'] = os.path.join(out_folder_root, f"data_nebula_speakeasy_vocab_{NEBULA_VOCAB}_seqlen_{SEQ_LEN}")
     datafolders['nebulawht'] = os.path.join(out_folder_root, f"data_nebulawht_speakeasy_vocab_{NEBULA_VOCAB}_seqlen_{SEQ_LEN}")
     datafolders['neurlux'] = os.path.join(out_folder_root, f"data_neurlux_speakeasy_vocab_{NEURLUX_VOCAB}_seqlen_{SEQ_LEN}")
     datafolders['quovadis'] = os.path.join(out_folder_root, f"data_quovadis_speakeasy_vocab_{QUO_VADIS_TOP_API}_seqlen_{SEQ_LEN}")
@@ -78,7 +78,7 @@ if __name__ == "__main__":
         limit=LIMIT,
         vocab_size=NEBULA_VOCAB,
         seq_len=SEQ_LEN,
-        outfolder=datafolders['nebula'],
+        outfolder=datafolders['nebulabpe'],
         multiclass=True
     )
     _, y_test, y_paths_test = preprocess_nebula_speakeasy(
@@ -86,13 +86,12 @@ if __name__ == "__main__":
         limit=LIMIT,
         vocab_size=NEBULA_VOCAB,
         seq_len=SEQ_LEN,
-        outfolder=datafolders['nebula'],
-        tokenizer_model=os.path.join(datafolders['nebula'], f"tokenizer_{NEBULA_VOCAB}.model"),
+        outfolder=datafolders['nebulabpe'],
+        tokenizer_model=os.path.join(datafolders['nebulabpe'], f"tokenizer_{NEBULA_VOCAB}.model"),
         multiclass=True
     )
     
     # =========== 'nebula' & 'speakeasy' preprocessing
-    logging.warning("Preprocessing 'nebula wht' & 'speakeasy'...")
     _, y_train, y_paths_train, = preprocess_nebula_speakeasy(
         folder=SPEAKEASY_TRAINSET_PATH,
         limit=LIMIT,
@@ -170,84 +169,86 @@ if __name__ == "__main__":
         limit=LIMIT,
     )
 
-    # ============= DEFINE MODELS =============
-    models = defaultdict(dict)
-    # count unique elements in y
-    n_unique_y = len(set(y_train))
-    logging.warning(f" [!] Multiclass classification with {n_unique_y} classes")
-
-    with open(neurlux_vocab_file) as f:
-        neurlux_vocab = json.load(f)
-    models['neurlux']['class'] = NeurLuxModel
-    models['neurlux']['config'] = {
-        "embedding_dim": 256,
-        "vocab_size": len(neurlux_vocab),
-        "seq_len": SEQ_LEN,
-        "num_classes": n_unique_y
-    }
-
-    models['quovadis']['class'] = QuoVadisModel
-    models['quovadis']['config'] = {
-        "vocab": quovadis_vocab_file,
-        "seq_len": SEQ_LEN,
-        "num_classes": n_unique_y
-    }
-    
-    with open(os.path.join(datafolders['nebula'], f"tokenizer_{NEBULA_VOCAB}_vocab.json")) as f:
-        nebula_vocab = json.load(f)
-    models['nebula']['class'] = TransformerEncoderChunks
-    models['nebula']['config'] = {
-        "vocab_size": len(nebula_vocab),
-        "maxlen": SEQ_LEN,
-        "chunk_size": 64,
-        "dModel": 64,  # embedding & transformer dimension
-        "nHeads": 8,  # number of heads in nn.MultiheadAttention
-        "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
-        "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
-        "numClasses": n_unique_y,
-        "classifier_head": [64],
-        "layerNorm": False,
-        "dropout": 0.3,
-        "pooling": "mean",
-        "norm_first": True
-    }
-    with open(os.path.join(datafolders['nebulawht'], f"tokenizer_{NEBULA_VOCAB}_vocab.json")) as f:
-        nebula_vocab = json.load(f)
-    models['nebulawht']['class'] = TransformerEncoderChunks
-    models['nebulawht']['config'] = {
-        "vocab_size": len(nebula_vocab),
-        "maxlen": SEQ_LEN,
-        "chunk_size": 64,
-        "dModel": 64,  # embedding & transformer dimension
-        "nHeads": 8,  # number of heads in nn.MultiheadAttention
-        "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
-        "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
-        "numClasses": n_unique_y,
-        "classifier_head": [64],
-        "layerNorm": False,
-        "dropout": 0.3,
-        "pooling": "mean",
-        "norm_first": True
-    }
-
-    models['dmds']['class'] = DMDSGatedCNN
-    models['dmds']['config'] = {
-        "ndim": 98,
-        "seq_len": SEQ_LEN,
-        "num_classes": n_unique_y,
-    }
-
     device = "cuda" if cuda.is_available() else "cpu"
-        
-    # ============= TRAINING LOOP =============
-    for nr_of_families in range(3, n_unique_y+1):
-        set_random_seed(RANDOM_SEED)
+    n_unique_y = len(set(y_train))
 
+    # =============== SUBSAMPLED FAMILY LOOP =======================
+    for nr_of_families in range(3, n_unique_y+1):
+        logging.warning(f" [*] Multiclass classification with {nr_of_families} classes...")
+
+        set_random_seed(RANDOM_SEED)
         # subsample random number_of_families labels from y_train and
         subsampled_labels = np.random.choice(np.unique(y_train), size=nr_of_families, replace=False)
         subsampled_families = [SPEAKEASY_LABEL_IDX_TO_FAMILY[x] for x in subsampled_labels]
         logging.warning(f" [!] Sampled labels: {subsampled_labels} | Families: {subsampled_families}")
+
+        # use this to map y_subsampled to range(0, nr_of_families)
+        label_mapping = {label: index for index, label in enumerate(subsampled_labels)}
+
+        # ============= DEFINE MODELS =============
+        models = defaultdict(dict)
+
+        with open(neurlux_vocab_file) as f:
+            neurlux_vocab = json.load(f)
+        models['neurlux']['class'] = NeurLuxModel
+        models['neurlux']['config'] = {
+            "vocab_size": len(neurlux_vocab),
+            "seq_len": SEQ_LEN,
+            "num_classes": nr_of_families
+        }
+
+        models['quovadis']['class'] = QuoVadisModel
+        models['quovadis']['config'] = {
+            "vocab": quovadis_vocab_file,
+            "seq_len": SEQ_LEN,
+            "num_classes": nr_of_families
+        }
+
+        models['dmds']['class'] = DMDSGatedCNN
+        models['dmds']['config'] = {
+            "seq_len": SEQ_LEN,
+            "num_classes": nr_of_families,
+        }
         
+        with open(os.path.join(datafolders['nebulabpe'], f"tokenizer_{NEBULA_VOCAB}_vocab.json")) as f:
+            nebula_vocab = json.load(f)
+        models['nebulabpe']['class'] = TransformerEncoderChunks
+        models['nebulabpe']['config'] = {
+            "vocab_size": len(nebula_vocab),
+            "maxlen": SEQ_LEN,
+            "chunk_size": 64,
+            "dModel": 64,  # embedding & transformer dimension
+            "nHeads": 8,  # number of heads in nn.MultiheadAttention
+            "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
+            "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+            "numClasses": nr_of_families,
+            "classifier_head": [64],
+            "layerNorm": False,
+            "dropout": 0.3,
+            "pooling": "mean",
+            "norm_first": True
+        }
+
+        with open(os.path.join(datafolders['nebulawht'], f"tokenizer_{NEBULA_VOCAB}_vocab.json")) as f:
+            nebula_vocab = json.load(f)
+        models['nebulawht']['class'] = TransformerEncoderChunks
+        models['nebulawht']['config'] = {
+            "vocab_size": len(nebula_vocab),
+            "maxlen": SEQ_LEN,
+            "chunk_size": 64,
+            "dModel": 64,  # embedding & transformer dimension
+            "nHeads": 8,  # number of heads in nn.MultiheadAttention
+            "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
+            "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+            "numClasses": nr_of_families,
+            "classifier_head": [64],
+            "layerNorm": False,
+            "dropout": 0.3,
+            "pooling": "mean",
+            "norm_first": True
+        }
+        
+        # ============= TRAINING LOOP =============
         for run_name in models.keys():
             set_random_seed(RANDOM_SEED)
 
@@ -276,14 +277,16 @@ if __name__ == "__main__":
             x_train_indices = np.isin(y_train, subsampled_labels)
             x_train_subsample = x_train[x_train_indices]
             y_train_subsample = y_train[x_train_indices]
+            y_train_subsample_mapped = np.array([label_mapping[label] for label in y_train_subsample])
 
             x_test_indices = np.isin(y_test, subsampled_labels)
             x_test_subsample = x_test[x_test_indices]
             y_test_subsample = y_test[x_test_indices]
+            y_test_subsample_mapped = np.array([label_mapping[label] for label in y_test_subsample])
 
-            logging.warning(f" [!] Sizes of subsampled train set: {x_train_subsample.shape}, {x_test_subsample.shape}")
-            logging.warning(f" [!] Sizes of subsampled test set: {y_train_subsample.shape}, {y_test_subsample.shape}")
-
+            logging.warning(f" [!] Sizes of full sets: train -- {x_train.shape}, test -- {x_test.shape}")
+            logging.warning(f" [!] Sizes of subsampled sets: train -- {x_train_subsample.shape}, test -- {x_test_subsample.shape}")
+            
             # ============= TRAINING =============
             logging.warning(f" [!!!] Starting training: {run_name}!")
             model_class = models[run_name]['class']
@@ -296,26 +299,30 @@ if __name__ == "__main__":
                 log_folder=out_folder,
                 epochs=10,
                 device=device,
-                log_every_n_steps=1,
+                log_every_n_steps=10,
                 scheduler="onecycle",
                 batch_size=128,
                 dataloader_workers=4,
                 gradient_clip_val=1.0,
-                loss=CrossEntropyLoss()
+                loss=CrossEntropyLoss(),
+                out_classes=nr_of_families
             )
-            train_loader = lit_trainer.create_dataloader(x_train_subsample, y_train_subsample)
-            test_loader = lit_trainer.create_dataloader(x_test_subsample, y_test_subsample, shuffle=False)
+            train_loader = lit_trainer.create_dataloader(x_train_subsample, y_train_subsample_mapped)
+            test_loader = lit_trainer.create_dataloader(x_test_subsample, y_test_subsample_mapped, shuffle=False)
             lit_trainer.train_lit_model(train_loader=train_loader, val_loader=test_loader)
 
             # get f1 scores
-            y_train_pred = lit_trainer.predict_lit_model(train_loader)
-            f1_train = f1_score(y_train_subsample, y_train_pred, average='macro')
-            logging.warning(f"[!] Train F1: {f1_train*100:.2f}%")
+            # y_train_pred = lit_trainer.predict_lit_model(train_loader)
+            # f1_train = f1_score(y_train_subsample_mapped, y_train_pred, average='macro')
+            # logging.warning(f"[!] Train F1: {f1_train*100:.2f}%")
 
-            y_test_pred = lit_trainer.predict_lit_model(test_loader)
-            f1_test = f1_score(y_test_subsample, y_test_pred, average='macro')
-            logging.warning(f"[!] Test F1: {f1_test*100:.2f}%")
+            # y_test_pred = lit_trainer.predict_lit_model(test_loader)
+            # f1_test = f1_score(y_test_subsample_mapped, y_test_pred, average='macro')
+            # logging.warning(f"[!] Test F1: {f1_test*100:.2f}%")
 
             del x_train_subsample, y_train_subsample, x_test_subsample, y_test_subsample
+            del y_train_subsample_mapped, y_test_subsample_mapped
             del x_train, x_test
             clear_cuda_cache()
+        
+        del models, subsampled_labels, subsampled_families

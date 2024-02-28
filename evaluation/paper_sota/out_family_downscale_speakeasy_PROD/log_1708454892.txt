@@ -1,0 +1,199 @@
+2024-02-20 19:48:12,869 WARNING Preprocessing 'nebula' & 'speakeasy'...
+2024-02-20 19:48:12,869 WARNING  [!] Skipping since exists: out_family_downscale_speakeasy_PROD\data_nebula_speakeasy_vocab_50000_seqlen_512\x_train_full.npy
+2024-02-20 19:48:13,025 WARNING  [!] Skipping since exists: out_family_downscale_speakeasy_PROD\data_nebula_speakeasy_vocab_50000_seqlen_512\x_test_full.npy
+2024-02-20 19:48:13,082 WARNING  [!] Skipping since exists: out_family_downscale_speakeasy_PROD\data_nebulawht_speakeasy_vocab_50000_seqlen_512\x_train_full.npy
+2024-02-20 19:48:13,213 WARNING  [!] Skipping since exists: out_family_downscale_speakeasy_PROD\data_nebulawht_speakeasy_vocab_50000_seqlen_512\x_test_full.npy
+2024-02-20 19:48:13,255 WARNING  [!] Skipping since exists: out_family_downscale_speakeasy_PROD\data_dmds_speakeasy_vocab_seqlen_512\x_train_full.npy
+2024-02-20 19:48:13,255 WARNING  [!] Skipping since exists: out_family_downscale_speakeasy_PROD\data_dmds_speakeasy_vocab_seqlen_512\x_test_full.npy
+2024-02-20 19:48:13,255 WARNING  [!] Skipping since exists: out_family_downscale_speakeasy_PROD\data_neurlux_speakeasy_vocab_10000_seqlen_512\x_train_full.npy
+2024-02-20 19:48:13,255 WARNING  [!] Skipping since exists: out_family_downscale_speakeasy_PROD\data_neurlux_speakeasy_vocab_10000_seqlen_512\x_test_full.npy
+2024-02-20 19:48:13,255 WARNING  [!] Skipping since exists: out_family_downscale_speakeasy_PROD\data_quovadis_speakeasy_vocab_600_seqlen_512\x_train_full.npy
+2024-02-20 19:48:13,259 WARNING  [!] Skipping since exists: out_family_downscale_speakeasy_PROD\data_quovadis_speakeasy_vocab_600_seqlen_512\x_test_full.npy
+2024-02-20 19:48:13,259 WARNING  [*] Multiclass classification with 3 classes...
+2024-02-20 19:48:13,265 WARNING  [!] Sampled labels: [6 1 7] | Families: ['rat', 'backdoor', 'trojan']
+2024-02-20 19:48:13,373 WARNING  [!] Skipping... Output folder for run neurlux already exists: out_family_downscale_speakeasy_PROD\training_neurlux\neurlux_nr_families_3_csv
+2024-02-20 19:48:13,373 WARNING  [!] Skipping... Output folder for run quovadis already exists: out_family_downscale_speakeasy_PROD\training_quovadis\quovadis_nr_families_3_csv
+2024-02-20 19:48:13,377 WARNING  [!] Skipping... Output folder for run dmds already exists: out_family_downscale_speakeasy_PROD\training_dmds\dmds_nr_families_3_csv
+2024-02-20 19:48:13,377 WARNING  [!] Skipping... Output folder for run nebulabpe already exists: out_family_downscale_speakeasy_PROD\training_nebulabpe\nebulabpe_nr_families_3_csv
+2024-02-20 19:48:13,377 WARNING  [!] Skipping... Output folder for run nebulawht already exists: out_family_downscale_speakeasy_PROD\training_nebulawht\nebulawht_nr_families_3_csv
+2024-02-20 19:48:13,377 WARNING  [*] Multiclass classification with 4 classes...
+2024-02-20 19:48:13,382 WARNING  [!] Sampled labels: [6 1 7 4] | Families: ['rat', 'backdoor', 'trojan', 'keylogger']
+2024-02-20 19:48:13,511 WARNING  [!] Skipping... Output folder for run neurlux already exists: out_family_downscale_speakeasy_PROD\training_neurlux\neurlux_nr_families_4_csv
+2024-02-20 19:48:13,513 WARNING  [!] Skipping... Output folder for run quovadis already exists: out_family_downscale_speakeasy_PROD\training_quovadis\quovadis_nr_families_4_csv
+2024-02-20 19:48:13,515 WARNING  [!] Skipping... Output folder for run dmds already exists: out_family_downscale_speakeasy_PROD\training_dmds\dmds_nr_families_4_csv
+2024-02-20 19:48:13,517 WARNING  [!] Skipping... Output folder for run nebulabpe already exists: out_family_downscale_speakeasy_PROD\training_nebulabpe\nebulabpe_nr_families_4_csv
+2024-02-20 19:48:13,520 WARNING  [!] Skipping... Output folder for run nebulawht already exists: out_family_downscale_speakeasy_PROD\training_nebulawht\nebulawht_nr_families_4_csv
+2024-02-20 19:48:13,521 WARNING  [*] Multiclass classification with 5 classes...
+2024-02-20 19:48:13,523 WARNING  [!] Sampled labels: [6 1 7 4 5] | Families: ['rat', 'backdoor', 'trojan', 'keylogger', 'ransomware']
+2024-02-20 19:48:13,606 WARNING  [!] Skipping... Output folder for run neurlux already exists: out_family_downscale_speakeasy_PROD\training_neurlux\neurlux_nr_families_5_csv
+2024-02-20 19:48:13,610 WARNING  [!] Skipping... Output folder for run quovadis already exists: out_family_downscale_speakeasy_PROD\training_quovadis\quovadis_nr_families_5_csv
+2024-02-20 19:48:34,229 WARNING  [!] Sizes of full sets: train -- (76126, 512, 98), test -- (17407, 512, 98)
+2024-02-20 19:48:34,229 WARNING  [!] Sizes of subsampled sets: train -- (36318, 512, 98), test -- (7467, 512, 98)
+2024-02-20 19:48:34,234 WARNING  [!!!] Starting training: dmds!
+2024-02-20 19:51:49,521 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:52:23,543 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:52:23,613 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:52:57,575 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:53:31,351 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:53:31,410 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:54:06,096 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:54:40,236 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:54:40,297 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:55:15,060 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:55:48,794 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:55:48,868 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:56:23,580 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:56:58,512 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:56:58,580 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:57:32,817 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:58:06,795 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:58:06,861 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:58:40,632 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:59:13,970 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:59:14,025 WARNING NaN or Inf found in input tensor.
+2024-02-20 19:59:47,837 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:00:21,459 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:00:21,516 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:00:55,410 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:01:29,183 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:01:29,238 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:02:02,980 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:02:36,809 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:02:36,872 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:02:42,123 WARNING  [!] Sizes of full sets: train -- (76126, 512), test -- (17407, 512)
+2024-02-20 20:02:42,123 WARNING  [!] Sizes of subsampled sets: train -- (36318, 512), test -- (7467, 512)
+2024-02-20 20:02:42,123 WARNING  [!!!] Starting training: nebulabpe!
+2024-02-20 20:04:27,626 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:04:51,363 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:04:51,557 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:05:15,014 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:05:38,551 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:05:38,740 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:06:02,240 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:06:25,893 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:06:26,089 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:06:49,489 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:07:13,193 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:07:13,401 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:07:36,957 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:08:00,698 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:08:00,919 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:08:24,498 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:08:48,165 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:08:48,367 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:09:12,054 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:09:35,995 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:09:36,193 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:09:59,888 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:10:23,711 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:10:23,922 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:10:47,504 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:11:11,288 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:11:11,485 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:11:35,046 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:11:58,741 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:11:58,941 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:12:02,675 WARNING  [!] Sizes of full sets: train -- (75298, 512), test -- (17402, 512)
+2024-02-20 20:12:02,675 WARNING  [!] Sizes of subsampled sets: train -- (35496, 512), test -- (7463, 512)
+2024-02-20 20:12:02,675 WARNING  [!!!] Starting training: nebulawht!
+2024-02-20 20:14:09,966 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:14:32,833 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:14:33,028 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:14:56,013 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:15:19,140 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:15:19,337 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:15:42,311 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:16:05,466 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:16:05,660 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:16:28,847 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:16:52,013 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:16:52,201 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:17:15,182 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:17:38,330 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:17:38,517 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:18:01,551 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:18:24,731 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:18:24,919 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:18:47,949 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:19:11,050 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:19:11,256 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:19:34,294 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:19:57,479 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:19:57,676 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:20:20,702 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:20:43,871 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:20:44,071 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:21:07,066 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:21:30,513 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:21:30,728 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:21:33,349 WARNING  [*] Multiclass classification with 6 classes...
+2024-02-20 20:21:33,351 WARNING  [!] Sampled labels: [6 1 7 4 5 2] | Families: ['rat', 'backdoor', 'trojan', 'keylogger', 'ransomware', 'coinminer']
+2024-02-20 20:21:33,703 WARNING  [!] Sizes of full sets: train -- (76126, 512), test -- (17407, 512)
+2024-02-20 20:21:33,703 WARNING  [!] Sizes of subsampled sets: train -- (43209, 512), test -- (9151, 512)
+2024-02-20 20:21:33,703 WARNING  [!!!] Starting training: neurlux!
+2024-02-20 20:23:22,747 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:23:36,828 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:23:36,994 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:23:51,147 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:24:05,185 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:24:05,349 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:24:18,797 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:24:32,458 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:24:32,614 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:24:46,036 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:24:59,595 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:24:59,749 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:25:13,208 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:25:26,890 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:25:27,054 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:25:40,567 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:25:54,163 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:25:54,321 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:26:07,850 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:26:21,551 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:26:21,719 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:26:35,207 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:26:48,848 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:26:49,014 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:27:02,422 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:27:16,032 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:27:16,190 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:27:29,710 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:27:43,662 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:27:43,824 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:27:46,607 WARNING  [!] Sizes of full sets: train -- (76126, 512), test -- (17407, 512)
+2024-02-20 20:27:46,607 WARNING  [!] Sizes of subsampled sets: train -- (43209, 512), test -- (9151, 512)
+2024-02-20 20:27:46,607 WARNING  [!!!] Starting training: quovadis!
+2024-02-20 20:28:37,501 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:28:52,835 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:28:52,945 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:29:08,196 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:29:23,403 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:29:23,511 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:29:38,730 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:29:53,989 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:29:54,102 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:30:09,369 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:30:24,642 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:30:24,752 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:30:39,918 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:30:55,142 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:30:55,253 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:31:10,484 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:31:26,331 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:31:26,451 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:31:42,130 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:31:57,794 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:31:57,905 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:32:13,332 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:32:28,678 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:32:28,792 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:32:44,052 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:33:01,279 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:33:01,395 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:33:17,913 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:33:33,676 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:33:33,792 WARNING NaN or Inf found in input tensor.
+2024-02-20 20:34:00,640 WARNING  [!] Sizes of full sets: train -- (76126, 512, 98), test -- (17407, 512, 98)
+2024-02-20 20:34:00,640 WARNING  [!] Sizes of subsampled sets: train -- (43209, 512, 98), test -- (9151, 512, 98)
+2024-02-20 20:34:00,640 WARNING  [!!!] Starting training: dmds!

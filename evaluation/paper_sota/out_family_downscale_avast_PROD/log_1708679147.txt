@@ -1,0 +1,30 @@
+2024-02-23 10:05:47,936 WARNING  [!] Data already exists in C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\data_nebulabpe_avast_vocab_50000_seqlen_512, C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\data_nebulawht_avast_vocab_50000_seqlen_512, C:\Users\dtrizna\Code\nebula\evaluation\paper_sota\..\..\evaluation\paper_sota\out_family_downscale_avast_PROD\data_neurlux_avast_vocab_10000_seqlen_512. Skipping data preprocessing...
+2024-02-23 10:05:47,954 WARNING  [*] Multiclass classification with 3 classes...
+2024-02-23 10:05:47,958 WARNING  [!] Sampled labels: [4 8 5] | Families: ['Qakbot', 'Zeus', 'Swisyn']
+2024-02-23 10:05:48,134 WARNING  [!] Sizes of full sets: train -- (37512, 512), test -- (11464, 512)
+2024-02-23 10:05:48,134 WARNING  [!] Sizes of subsampled sets: train -- (15285, 512), test -- (4795, 512)
+2024-02-23 10:05:48,135 WARNING  [!!!] Starting training: nebulabpe!
+2024-02-23 10:10:10,950 WARNING  [!] Sizes of full sets: train -- (37512, 512), test -- (11464, 512)
+2024-02-23 10:10:10,951 WARNING  [!] Sizes of subsampled sets: train -- (15285, 512), test -- (4795, 512)
+2024-02-23 10:10:10,951 WARNING  [!!!] Starting training: nebulawht!
+2024-02-23 10:14:31,616 WARNING  [*] Multiclass classification with 4 classes...
+2024-02-23 10:14:31,618 WARNING  [!] Sampled labels: [4 8 5 1] | Families: ['Qakbot', 'Zeus', 'Swisyn', 'Emotet']
+2024-02-23 10:14:31,746 WARNING  [!] Sizes of full sets: train -- (37512, 512), test -- (11464, 512)
+2024-02-23 10:14:31,747 WARNING  [!] Sizes of subsampled sets: train -- (26185, 512), test -- (8324, 512)
+2024-02-23 10:14:31,747 WARNING  [!!!] Starting training: nebulabpe!
+2024-02-23 10:21:37,284 WARNING  [!] Sizes of full sets: train -- (37512, 512), test -- (11464, 512)
+2024-02-23 10:21:37,284 WARNING  [!] Sizes of subsampled sets: train -- (26185, 512), test -- (8324, 512)
+2024-02-23 10:21:37,284 WARNING  [!!!] Starting training: nebulawht!
+2024-02-23 10:28:43,545 WARNING  [*] Multiclass classification with 5 classes...
+2024-02-23 10:28:43,547 WARNING  [!] Sampled labels: [4 8 5 1 9] | Families: ['Qakbot', 'Zeus', 'Swisyn', 'Emotet', 'njRAT']
+2024-02-23 10:28:43,708 WARNING  [!] Sizes of full sets: train -- (37512, 512), test -- (11464, 512)
+2024-02-23 10:28:43,709 WARNING  [!] Sizes of subsampled sets: train -- (29014, 512), test -- (8867, 512)
+2024-02-23 10:28:43,709 WARNING  [!!!] Starting training: nebulabpe!
+2024-02-23 10:37:39,073 WARNING  [!] Sizes of full sets: train -- (37512, 512), test -- (11464, 512)
+2024-02-23 10:37:39,073 WARNING  [!] Sizes of subsampled sets: train -- (29014, 512), test -- (8867, 512)
+2024-02-23 10:37:39,074 WARNING  [!!!] Starting training: nebulawht!
+2024-02-23 11:27:20,870 WARNING  [*] Multiclass classification with 6 classes...
+2024-02-23 11:27:20,871 WARNING  [!] Sampled labels: [4 8 5 1 9 6] | Families: ['Qakbot', 'Zeus', 'Swisyn', 'Emotet', 'njRAT', 'Trickbot']
+2024-02-23 11:27:21,041 WARNING  [!] Sizes of full sets: train -- (37512, 512), test -- (11464, 512)
+2024-02-23 11:27:21,042 WARNING  [!] Sizes of subsampled sets: train -- (31880, 512), test -- (10203, 512)
+2024-02-23 11:27:21,043 WARNING  [!!!] Starting training: nebulabpe!
