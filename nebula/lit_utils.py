@@ -5,6 +5,9 @@ from time import time
 from shutil import copyfile
 from typing import Union, Any, Callable, Optional
 
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
+
 from sklearn.metrics import roc_curve
 
 import lightning as L
@@ -13,7 +16,7 @@ from lightning.pytorch.callbacks import TQDMProgressBar, ModelCheckpoint, EarlyS
 from lightning.pytorch.loggers import CSVLogger, TensorBoardLogger
 
 import torch
-from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss
+from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss, Linear, Sequential
 from torch.utils.data import DataLoader
 import torchmetrics
 
@@ -37,6 +40,7 @@ class PyTorchLightningModelBase(L.LightningModule):
             scheduler_step_budget: Union[None, int] = None,
             # NOTE: scheduler_step_budget = epochs * len(train_loader)
             loss: Callable = BCEWithLogitsLoss(),
+            out_classes = 1
     ):
         super().__init__()
 
@@ -52,28 +56,34 @@ class PyTorchLightningModelBase(L.LightningModule):
             print(f"[!] Scheduler: {scheduler} | Scheduler step budget: {scheduler_step_budget}")
         self.scheduler = scheduler
         self.scheduler_step_budget = scheduler_step_budget
+        
+        task = 'multiclass' if isinstance(loss, CrossEntropyLoss) else 'binary'
+        if task == 'multiclass' and out_classes == 1:
+            layers = [x for x in self.model.children() if isinstance(x, Linear) or isinstance(x, Sequential)]
+            out_classes = layers[-1].out_features if isinstance(layers[-1], Linear) else layers[-1][-1].out_features
+        self.out_classes = out_classes
 
-        self.train_acc = torchmetrics.Accuracy(task='binary')
-        self.train_f1 = torchmetrics.F1Score(task='binary', average='macro')
-        self.train_auc = torchmetrics.AUROC(task='binary')
+        self.train_acc = torchmetrics.Accuracy(task=task, num_classes=out_classes)
+        self.train_f1 = torchmetrics.F1Score(task=task, num_classes=out_classes, average='macro')
+        self.train_auc = torchmetrics.AUROC(task=task, num_classes=out_classes)
         self.train_tpr = self.get_tpr_at_fpr
-        self.train_recall = torchmetrics.Recall(task='binary')
-        self.train_precision = torchmetrics.Precision(task='binary')
+        self.train_recall = torchmetrics.Recall(task=task, num_classes=out_classes)
+        self.train_precision = torchmetrics.Precision(task=task, num_classes=out_classes)
 
-        self.val_acc = torchmetrics.Accuracy(task='binary')
-        self.val_f1 = torchmetrics.F1Score(task='binary', average='macro')
-        self.val_auc = torchmetrics.AUROC(task='binary')
+        self.val_acc = torchmetrics.Accuracy(task=task, num_classes=out_classes)
+        self.val_f1 = torchmetrics.F1Score(task=task, num_classes=out_classes, average='macro')
+        self.val_auc = torchmetrics.AUROC(task=task, num_classes=out_classes)
         self.val_tpr = self.get_tpr_at_fpr
-        self.val_recall = torchmetrics.Recall(task='binary')
-        self.val_precision = torchmetrics.Precision(task='binary')
+        self.val_recall = torchmetrics.Recall(task=task, num_classes=out_classes)
+        self.val_precision = torchmetrics.Precision(task=task, num_classes=out_classes)
 
         # NOTE: not using .test(), don't want to have these rudimentary metrics to drag over
-        # self.test_acc = torchmetrics.Accuracy(task='binary')
-        # self.test_f1 = torchmetrics.F1Score(task='binary', average='macro')
-        # self.test_auc = torchmetrics.AUROC(task='binary')
+        # self.test_acc = torchmetrics.Accuracy(task=task, num_classes=out_classes)
+        # self.test_f1 = torchmetrics.F1Score(task=task, num_classes=out_classes, average='macro')
+        # self.test_auc = torchmetrics.AUROC(task=task, num_classes=out_classes)
         # self.test_tpr = self.get_tpr_at_fpr
-        # self.test_recall = torchmetrics.Recall(task='binary')
-        # self.test_precision = torchmetrics.Precision(task='binary')
+        # self.test_recall = torchmetrics.Recall(task=task, num_classes=out_classes)
+        # self.test_precision = torchmetrics.Precision(task=task, num_classes=out_classes)
 
         # self.save_hyperparameters(ignore=["model"])
     
@@ -123,9 +133,13 @@ class PyTorchLightningModelBase(L.LightningModule):
             fpr, tpr, thresholds = roc_curve(true_labels, predicted_probs)
         except ValueError: 
             # when multi-label 'ValueError: multilabel-indicator format is not supported'
-            return (torch.nan, torch.nan) if return_thresholds else torch.nan
+            # return (torch.nan, torch.nan) if return_thresholds else torch.nan
+            # avoid using nan since throws WARNING NaN or Inf found in input tensor.
+            return (0, 0) if return_thresholds else 0
         if all(np.isnan(fpr)):
-            return (torch.nan, torch.nan) if return_thresholds else torch.nan
+            # return (torch.nan, torch.nan) if return_thresholds else torch.nan
+            # avoid using nan since throws WARNING NaN or Inf found in input tensor.
+            return (0, 0) if return_thresholds else 0
         else:
             tpr_at_fpr = tpr[fpr <= fprNeeded][-1]
             threshold_at_fpr = thresholds[fpr <= fprNeeded][-1]
@@ -141,13 +155,15 @@ class PyTorchLightningModelBase(L.LightningModule):
 
         if y.ndim == 2 and logits.ndim == 3: # e.g. autoregressive pre-training
             logits, y = logits.view(-1, logits.size(-1)), y.view(-1)
-        elif y.ndim == 1: # binary classification: (batch_size,) => (batch_size, 1)
+        elif logits.ndim == 2 and self.out_classes != 1: # multiclass, logits.shape: (batch_size, num_classes)
+            y = y.squeeze().to(torch.int64)
+        elif y.ndim == 1: # binary classification: (batch_size, ) => (batch_size, 1)
             y = y.unsqueeze(-1)
-
+        
         loss = self.loss(logits, y)
         # NOTE: by returning only loss here we avoid memory leaks
-        self.logits = logits.detach().cpu()
-        self.y = y.detach().cpu()
+        self.logits = logits.detach()#.cpu()
+        self.y = y.detach()#.cpu()
         return loss
     
     def training_step(self, batch: torch.Tensor, batch_idx):
@@ -198,7 +214,7 @@ class PyTorchLightningModel(PyTorchLightningModelBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
     
-    def validation_step(self, batch: (torch.Tensor, torch.Tensor), batch_idx):
+    def validation_step(self, batch: tuple[torch.Tensor, torch.Tensor], batch_idx):
         # NOTE: keep batch_idx -- lightning needs it
         # loss, y, logits = self._shared_step(batch)
         loss = self._shared_step(batch)
@@ -249,7 +265,7 @@ class LitTrainerWrapper:
         lit_sanity_steps: int = 1,
         monitor_metric: str = "val_tpr",
         monitor_mode: str = "max",
-        early_stop_patience: Union[None, int] = 5,
+        early_stop_patience: Union[None, int] = None,
         early_stop_min_delta: float = 0.0001,
         # efficient training strategies
         scheduler: Union[None, str] = None,
@@ -261,9 +277,11 @@ class LitTrainerWrapper:
         # data config
         batch_size: int = 1024,
         dataloader_workers: int = 4,
+        loss: Callable = BCEWithLogitsLoss(),
+        out_classes: int = 1,
         random_state: int = 42,
         verbose: bool = False,
-        skip_trainer_init: Optional[bool] = False
+        skip_trainer_init: Optional[bool] = False,
     ):
         self.pytorch_model = pytorch_model
         self.lit_model = None
@@ -293,6 +311,8 @@ class LitTrainerWrapper:
 
         self.batch_size = batch_size
         self.dataloader_workers = dataloader_workers
+        self.loss = loss
+        self.out_classes = out_classes
 
         self.verbose = verbose
         self.random_state = random_state
@@ -344,7 +364,7 @@ class LitTrainerWrapper:
         callbacks = self.setup_callbacks()
 
         if self.log_folder is None:
-            self.log_folder = f"./out_{self.name}_{int(time())}"
+            self.log_folder = f"./out_{self.name}"
         try:
             os.makedirs(self.log_folder, exist_ok=True)
         except ValueError as ex:
@@ -388,7 +408,7 @@ class LitTrainerWrapper:
         assert model_file is not None, "Please provide a model file"
         self.pytorch_model = torch.load(model_file)
         # NOTE: you have to reset self.lit_model after this
-        #  if lit_model is already initialized, then load state dict directly:
+        # if lit_model is already initialized, then load state dict directly:
         # self.lit_model.model.load_state_dict(state_dict)
 
 
@@ -400,6 +420,8 @@ class LitTrainerWrapper:
                 learning_rate=self.learning_rate,
                 scheduler=self.scheduler,
                 scheduler_step_budget=self.scheduler_budget,
+                loss=self.loss,
+                out_classes=self.out_classes
             )
 
 
@@ -427,19 +449,27 @@ class LitTrainerWrapper:
     def predict_lit_model(
             self,
             loader: DataLoader, 
-            decision_threshold: int = 0.5, 
+            decision_threshold: int = 0.5,
+            return_logits: bool = False,
             dump_logits: Union[bool, str] = False
     ) -> np.ndarray:
         assert self.lit_model is not None,\
             "[-] lightning_model isn't instantiated: either .train_lit_model() or .load_lit_model()"
         """Get scores out of a loader."""
         y_pred_logits = self.trainer.predict(model=self.lit_model, dataloaders=loader)
-        y_pred = torch.sigmoid(torch.cat(y_pred_logits, dim=0)).numpy()
-        y_pred = np.array([1 if x > decision_threshold else 0 for x in y_pred])
+        y_pred_logits = torch.cat(y_pred_logits, dim=0)
         if dump_logits:
             assert isinstance(dump_logits, str), "Please provide a path to dump logits: dump_logits='path/to/logits.pkl'"
             pickle.dump(y_pred_logits, open(dump_logits, "wb"))
-        return y_pred     
+        if return_logits:
+            return y_pred_logits
+        
+        y_pred = torch.sigmoid(y_pred_logits).numpy()
+        try:
+            y_pred = np.array([1 if x > decision_threshold else 0 for x in y_pred])
+        except ValueError: # multiclass
+            y_pred = np.argmax(y_pred, axis=1)
+        return y_pred
 
 
     def save_lit_model(self, model_file: str = None, how="best"):
@@ -514,7 +544,8 @@ class LitTrainerWrapper:
         accumulate_grad_batches = 1 if self.accumulate_grad_batches is None else self.accumulate_grad_batches
         total_batches = 0
         if max_epochs is not None:
-            total_batches = int(np.ceil(max_epochs * len(self.train_loader) / accumulate_grad_batches))
+            steps_per_epoch = np.ceil(len(self.train_loader) / accumulate_grad_batches)
+            total_batches = int(max_epochs * steps_per_epoch)
         if max_time is not None:
             # TODO: Implement logic for max_time if needed
             raise NotImplementedError("calculate_scheduler_step_budget for max_time is not implemented yet")

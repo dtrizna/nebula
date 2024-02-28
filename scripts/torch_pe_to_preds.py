@@ -99,19 +99,21 @@ model_config = {
     "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
     "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
     "numClasses": 1, # binary classification
-    "hiddenNeurons": [64], # classifier ffnn dims
+    "classifier_head": [64], # classifier ffnn dims
     "layerNorm": False,
     "dropout": 0.3,
     "norm_first": True,
-    "pooling": None
+    "pooling": "flatten"
 }
 model = TransformerEncoderChunks(**model_config)
 if TOKENIZER == "bpe":
     model_path = os.path.join(REPOSITORY_ROOT, r"nebula\objects\bpe_50000_torch.model")
 if TOKENIZER == "whitespace":
     model_path = os.path.join(REPOSITORY_ROOT, r"nebula\objects\whitespace_50000_torch.model")
+
 from torch import load
-model.load_state_dict(load(model_path))
+model_dict = load(model_path)
+model.load_state_dict(model_dict)
 logging.info(f" [!] Model ready.")
 
 logit = model(x)

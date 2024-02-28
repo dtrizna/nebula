@@ -100,7 +100,7 @@ modelArch = {
     "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
     "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
     "numClasses": 1, # binary classification
-    "hiddenNeurons": [64],
+    "classifier_head": [64],
     "layerNorm": False,
     "dropout": 0.3,
     "norm_first": True
@@ -114,7 +114,7 @@ modelArch = {
     "embed_dim": 128,
     "nHeads": 8,  # number of heads in nn.MultiheadAttention
     "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
-    "hiddenNeurons": [512, 256, 128],
+    "classifier_head": [512, 256, 128],
     "transformer_layers": 4,
 }
 models.append((modelClass, modelArch))
@@ -124,7 +124,7 @@ modelArch = {
     "vocab_size": vocab_size,
     "maxlen": maxlen,
     "embeddingDim": 96,
-    "hiddenNeurons": [512, 256, 128],
+    "classifier_head": [512, 256, 128],
     "batchNormConv": False,
     "batchNormFFNN": False,
     "filterSizes": [2, 3, 4, 5],
@@ -140,7 +140,7 @@ models.append((modelClass, modelArch))
 #     "lstmLayers": 1,
 #     "lstmDropout": 0.1, # if > 0, need lstmLayers > 1
 #     "lstmBidirectional": True,
-#     "hiddenNeurons": [512, 256, 128],
+#     "classifier_head": [512, 256, 128],
 #     "batchNormFFNN": False,
 # }
 # models.append((modelClass, modelArch))
@@ -154,7 +154,7 @@ modelArch = {
     "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
     "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
     "numClasses": 1, # binary classification
-    "hiddenNeurons": [64],
+    "classifier_head": [64],
     "layerNorm": False,
     "dropout": 0.3
 }

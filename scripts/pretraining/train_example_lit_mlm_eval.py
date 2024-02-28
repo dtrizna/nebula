@@ -64,7 +64,7 @@ if __name__ == "__main__":
         "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
         "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
         "numClasses": 1, # binary classification
-        "hiddenNeurons": [64], # classifier ffnn dims
+        "classifier_head": [64], # classifier ffnn dims
         "layerNorm": False,
         "dropout": None,
         "norm_first": True,
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     ACCUMULATE_GRAD_BATCHES = None
 
     # NOTE: scheduler is incompatible with REMASK_EVERY_N_EPOCHS 
-    # and DUMP_MODEL_EVERY_EPOCH because of lighning nuances
+    # and DUMP_MODEL_EVERY_EPOCH because of lightning nuances
     # USE:
     # SCHEDULER = "onecycle"
     REMASK_EVERY_N_EPOCHS = False

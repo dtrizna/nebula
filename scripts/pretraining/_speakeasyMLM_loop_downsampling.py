@@ -97,7 +97,7 @@ for downsample_unlabeled_data in [0.9]:# [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9
         "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
         "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
         "numClasses": 1, # binary classification
-        "hiddenNeurons": [64],
+        "classifier_head": [64],
         "dropout": 0.3,
         "pretrain_layers": [1024]
     }

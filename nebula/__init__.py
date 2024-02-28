@@ -114,11 +114,11 @@ class Nebula:
                 "dHidden": 256,  # dimension of the feedforward network model in nn.TransformerEncoder
                 "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
                 "numClasses": 1, # binary classification
-                "hiddenNeurons": [64], # classifier head depth
+                "classifier_head": [64], # classifier head depth
                 "layerNorm": False,
                 "dropout": 0.3,
                 "norm_first": True,
-                "pooling": None
+                "pooling": "flatten"
             }
         self.model = TransformerEncoderChunks(**torch_model_config)
 
@@ -181,7 +181,13 @@ class ModelTrainer(object):
         if n_output_classes is not None:
             self.n_output_classes = n_output_classes
         else:
-            self.n_output_classes = [x for x in self.model.children() if isinstance(x, Linear)][-1].out_features
+            layers = [x for x in self.model.children() if isinstance(x, nn.Linear) or isinstance(x, nn.Sequential)]
+            if isinstance(layers[-1], nn.Sequential):
+                self.n_output_classes = layers[-1][-1].out_features
+            elif isinstance(layers[-1], nn.Linear):
+                self.n_output_classes = layers[-1].out_features
+            else:
+                raise ValueError("An error occurred during identification of the number of class.")
 
         # lr scheduling setup, for visulaizations see:
         # https://towardsdatascience.com/a-visual-guide-to-learning-rate-schedulers-in-pytorch-24bbb262c863
@@ -609,7 +615,7 @@ class PEHybridClassifier(nn.Module):
         )
         self.dynamicModel = Cnn1DLinearLM(
             vocabSize=len(self.tokenizer.vocab),
-            hiddenNeurons=[512, representationSize],
+            classifier_head=[512, representationSize],
             dropout=dropout,
         )
 

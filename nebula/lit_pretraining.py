@@ -4,12 +4,14 @@ import logging
 import numpy as np
 from tqdm import tqdm
 from time import time
-from typing import List, Optional
+from typing import List, Optional, Union
+from collections import OrderedDict
 from copy import deepcopy
 from torch import load
 from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
 from .lit_utils import LitTrainerWrapper, PyTorchLightningModelLM
+from .misc import clear_cuda_cache
 
 
 class LanguageModelTrainer(LitTrainerWrapper):
@@ -74,7 +76,7 @@ class LanguageModelTrainer(LitTrainerWrapper):
             # need to stop training in between to peform extra logic: saving or remasking
             # TODO: this doesn't work with 'scheduler', since L.Trainer
             # calls configure_optimizers() with every .fit()
-            # need to write custom configure_optimizers() for LM model ???
+            # need to rewrite on_epoch_end() in Trainer or something
             # for now avoiding using remask_every_n_epochs and dump_model_every_epoch w/ scheduler    
             loop_length = self.rebuild_dataloader_every_n_epochs
             total_loops = self.pretrain_epochs // loop_length
@@ -245,8 +247,7 @@ class AutoRegressiveModelTrainer(LanguageModelTrainer):
 class SelfSupervisedLearningEvalFramework:
     def __init__(
             self,
-            # pretrainer: Union[MaskedLanguageModelTrainer, AutoRegressiveModelTrainer],
-            pretrainer: MaskedLanguageModelTrainer,
+            pretrainer: Union[MaskedLanguageModelTrainer, AutoRegressiveModelTrainer],
             downstream_trainer: LitTrainerWrapper,
             training_types: List[str] = ['pretrained', 'non_pretrained', 'full_data'],
             # eval details
@@ -301,7 +302,25 @@ class SelfSupervisedLearningEvalFramework:
         print(f"[!] Saved dataset splits to {split_data_file}")
 
 
-    def _train_downstream_model(self, training_type, pretrained_weights=None):
+    @staticmethod
+    def _transfer_pretrained_weights(
+        pretrained_state_dict: OrderedDict,
+        downstream_state_dict: OrderedDict
+    ) -> OrderedDict:
+        """
+        Transfer pretrained weights from a pretrained state dict to a downstream dict.
+        """
+
+        new_state_dict = deepcopy(downstream_state_dict)
+        for name in downstream_state_dict:
+            if name in pretrained_state_dict:
+                new_state_dict[name] = deepcopy(pretrained_state_dict[name])
+
+        return new_state_dict
+
+
+    def _train_downstream_model(self, training_type: str) -> None:
+
         self.downstream_trainer.log_folder = self.init_downstream_log_folder + "_" + training_type + "_" + str(self.timestamp)
         final_model_file = os.path.join(self.downstream_trainer.log_folder, f"{training_type}_final.torch")
         if os.path.exists(final_model_file):
@@ -314,7 +333,7 @@ class SelfSupervisedLearningEvalFramework:
         self.downstream_trainer.name = training_type
         
         if training_type == "pretrained":
-            self.downstream_trainer.pytorch_model.load_state_dict(pretrained_weights)
+            self.downstream_trainer.pytorch_model.load_state_dict(self.pretrained_weights)
         else:
             self.downstream_trainer.pytorch_model.load_state_dict(self.init_downstream_model_weights)
         
@@ -329,6 +348,7 @@ class SelfSupervisedLearningEvalFramework:
             self.downstream_trainer.setup_lit_model()
             self.downstream_trainer.train_lit_model(self.train_loader, self.val_loader)
         self.downstream_trainer.save_torch_model(final_model_file)
+        clear_cuda_cache()
 
 
     def run_one_split(
@@ -370,18 +390,19 @@ class SelfSupervisedLearningEvalFramework:
         if os.path.exists(self.pretrained_model_path):
             print(f"[!] Loading pretrained model from: '{self.pretrained_model_path}'")
             pretrained_model = load(self.pretrained_model_path)
-            pretrained_weights = pretrained_model.state_dict()
+            pretrained_model_state_dict = pretrained_model.state_dict()
         else:
-            print("[!] Pre-training model...")
+            print(f"[!] Pre-training '{self.pretrainer.name}' model...")
             # reset model weights -- needed for multiple splits
             self.pretrainer.pytorch_model.load_state_dict(self.init_pretrain_model_weights)
             self.pretrainer.pretrain(self.unlabeled_data)
-            pretrained_weights = deepcopy(self.pretrainer.pytorch_model.state_dict())
+            pretrained_model_state_dict = deepcopy(self.pretrainer.pytorch_model.state_dict())
+            clear_cuda_cache()
 
-        # remove pre-train head
-        to_remove = [k for k in pretrained_weights.keys() if k.startswith('pretrain_layers')]
-        for k in to_remove:
-            del pretrained_weights[k]
+        self.pretrained_weights = self._transfer_pretrained_weights(
+            pretrained_model_state_dict,
+            self.init_downstream_model_weights
+        )
         
         self.train_loader = self.downstream_trainer.create_dataloader(self.labeled_x, self.labeled_y, shuffle=True)
         if "full_data" in self.training_types:
@@ -394,7 +415,7 @@ class SelfSupervisedLearningEvalFramework:
         
         for training_type in self.training_types:
             print(f"[!] Fine-tuning of '{training_type}' model on downstream task...")
-            self._train_downstream_model(training_type, pretrained_weights)
+            self._train_downstream_model(training_type)
 
 
     def run_splits(self, x_train, y_train, x_val, y_val, previous_run_idxs: Optional[List] = None):
@@ -407,5 +428,5 @@ class SelfSupervisedLearningEvalFramework:
             self.random_state += i # to get different splits
             self.pretrainer.random_state = self.random_state
             self.downstream_trainer.random_state = self.random_state
-            print(f'[!] Running pre-training split {i+1}/{self.n_splits}')
+            print(f"[!] Running '{self.pretrainer.name}' pre-training split {i+1}/{self.n_splits}")
             self.run_one_split(x_train, y_train, x_val, y_val,)

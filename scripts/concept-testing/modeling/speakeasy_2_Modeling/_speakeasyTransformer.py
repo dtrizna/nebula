@@ -5,7 +5,7 @@ import os
 import pickle
 import sys
 sys.path.extend(['..', '.'])
-from nebula.attention import TransformerEncoderModel
+from nebula.models.attention import TransformerEncoderModel
 from nebula import ModelTrainer
 from sklearn.utils import shuffle
 
@@ -46,7 +46,7 @@ transformerEncoderModelConfig = {
     "dHidden": 200,  # dimension of the feedforward network model in nn.TransformerEncoder
     "nLayers": 2,  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
     "numClasses": 1, # binary classification
-    "hiddenNeurons": [64],
+    "classifier_head": [64],
     "layerNorm": False,
     "dropout": 0.5
 }
