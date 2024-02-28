@@ -4,7 +4,7 @@ import logging
 import numpy as np
 from tqdm import tqdm
 from time import time
-from typing import List, Optional
+from typing import List, Optional, Union
 from collections import OrderedDict
 from copy import deepcopy
 from torch import load
@@ -247,8 +247,7 @@ class AutoRegressiveModelTrainer(LanguageModelTrainer):
 class SelfSupervisedLearningEvalFramework:
     def __init__(
             self,
-            # pretrainer: Union[MaskedLanguageModelTrainer, AutoRegressiveModelTrainer],
-            pretrainer: MaskedLanguageModelTrainer,
+            pretrainer: Union[MaskedLanguageModelTrainer, AutoRegressiveModelTrainer],
             downstream_trainer: LitTrainerWrapper,
             training_types: List[str] = ['pretrained', 'non_pretrained', 'full_data'],
             # eval details
