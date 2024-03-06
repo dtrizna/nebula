@@ -29,8 +29,11 @@ def get_tpr_at_fpr(true_labels, predicted_probs, fprNeeded):
             return tpr_at_fpr, threshold_at_fpr
 
 def get_path(type="script"):
-    idx = 1 if type == "notebook" else 0
-    return os.path.dirname(os.path.realpath(sys.argv[idx]))
+    if type == "notebook":
+        return os.path.dirname(os.path.realpath(sys.argv[1]).split("--f")[0])
+    else:
+        return os.path.dirname(os.path.realpath(sys.argv[0]))
+
 
 def get_alphanum_chars(s):
     return ''.join(filter(lambda x: x in string.ascii_letters + string.digits + string.punctuation, s))

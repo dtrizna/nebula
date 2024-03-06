@@ -40,6 +40,7 @@ class PyTorchLightningModelBase(L.LightningModule):
             scheduler_step_budget: Union[None, int] = None,
             # NOTE: scheduler_step_budget = epochs * len(train_loader)
             loss: Callable = BCEWithLogitsLoss(),
+            optimizer: str = "adamw",
             out_classes = 1
     ):
         super().__init__()
@@ -62,6 +63,9 @@ class PyTorchLightningModelBase(L.LightningModule):
             layers = [x for x in self.model.children() if isinstance(x, Linear) or isinstance(x, Sequential)]
             out_classes = layers[-1].out_features if isinstance(layers[-1], Linear) else layers[-1][-1].out_features
         self.out_classes = out_classes
+
+        assert optimizer in ["adam", "adamw"], "Optimizer must be adam or adamw"
+        self.optimizer = optimizer
 
         self.train_acc = torchmetrics.Accuracy(task=task, num_classes=out_classes)
         self.train_f1 = torchmetrics.F1Score(task=task, num_classes=out_classes, average='macro')
@@ -92,7 +96,11 @@ class PyTorchLightningModelBase(L.LightningModule):
         optimizer.zero_grad(set_to_none=True)
 
     def configure_optimizers(self):
-        optimizer = torch.optim.AdamW(self.parameters(), lr=self.learning_rate)
+        if self.optimizer == "adamw":
+            optimizer = torch.optim.AdamW(self.parameters(), lr=self.learning_rate)
+        elif self.optimizer == "adam":
+            optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
+        
         if self.scheduler is None:
             return optimizer
 
@@ -278,6 +286,7 @@ class LitTrainerWrapper:
         batch_size: int = 1024,
         dataloader_workers: int = 4,
         loss: Callable = BCEWithLogitsLoss(),
+        optimizer: str = "adamw",
         out_classes: int = 1,
         random_state: int = 42,
         verbose: bool = False,
@@ -312,6 +321,7 @@ class LitTrainerWrapper:
         self.batch_size = batch_size
         self.dataloader_workers = dataloader_workers
         self.loss = loss
+        self.optimizer = optimizer
         self.out_classes = out_classes
 
         self.verbose = verbose
@@ -421,7 +431,8 @@ class LitTrainerWrapper:
                 scheduler=self.scheduler,
                 scheduler_step_budget=self.scheduler_budget,
                 loss=self.loss,
-                out_classes=self.out_classes
+                optimizer=self.optimizer,
+                out_classes=self.out_classes,
             )
 
 

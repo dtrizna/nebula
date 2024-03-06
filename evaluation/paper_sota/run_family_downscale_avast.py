@@ -37,6 +37,7 @@ from torch.nn import CrossEntropyLoss
 # PROD
 LIMIT = None
 INFOLDER = os.path.join(REPO_ROOT, "evaluation\paper_sota\out_family_downscale_avast_PROD")
+RUN_PREFIX = "dropout0.3_"
 NEBULA_VOCAB = 50000
 NEURLUX_VOCAB = 10000
 
@@ -65,7 +66,7 @@ if __name__ == "__main__":
         out_folder_root = INFOLDER
     else:
         out_folder_root = f"out_family_downscale_avast_{int(time.time())}"
-        os.makedirs(out_folder_root, exist_ok=True)
+    os.makedirs(out_folder_root, exist_ok=True)
 
     # =========== set out logging to both file and stdout
     logging.basicConfig(
@@ -221,7 +222,7 @@ if __name__ == "__main__":
             "numClasses": nr_of_families,
             "classifier_head": [64],
             "layerNorm": False,
-            "dropout": 0.5,
+            "dropout": 0.3,
             "pooling": "mean",
             "norm_first": True
         }
@@ -249,7 +250,7 @@ if __name__ == "__main__":
         for run_name in models.keys():
             set_random_seed(RANDOM_SEED)
 
-            out_folder = os.path.join(out_folder_root, f"training_dropout0.5_{run_name}")
+            out_folder = os.path.join(out_folder_root, f"training_{RUN_PREFIX}{run_name}")
             family_folder = os.path.join(out_folder, f"{run_name}_nr_families_{nr_of_families}_csv")
             if os.path.exists(family_folder):
                 logging.warning(f" [!] Skipping... Output folder for run {run_name} already exists: {family_folder}")

@@ -29,7 +29,10 @@ from torch import cuda
 from torch.nn import CrossEntropyLoss
 from nebula.lit_utils import LitTrainerWrapper
 from nebula.misc import fix_random_seed
-from sklearn.metrics import f1_score
+
+LABEL_SAMPLING_ORDER = ["clean", "backdoor", "ransomware", "trojan", "coinminer", "rat", "dropper", "keylogger"]
+EPOCHS = 20
+RUN_PREFIX = f"ordered_ep{EPOCHS}_"
 
 LIMIT = None
 INFOLDER = "out_family_downscale_speakeasy_PROD" # if data is processed already
@@ -177,9 +180,15 @@ if __name__ == "__main__":
         logging.warning(f" [*] Multiclass classification with {nr_of_families} classes...")
 
         set_random_seed(RANDOM_SEED)
+        
         # subsample random number_of_families labels from y_train and
-        subsampled_labels = np.random.choice(np.unique(y_train), size=nr_of_families, replace=False)
-        subsampled_families = [SPEAKEASY_LABEL_IDX_TO_FAMILY[x] for x in subsampled_labels]
+        # subsampled_labels = np.random.choice(np.unique(y_train), size=nr_of_families, replace=False)
+        # subsampled_families = [SPEAKEASY_LABEL_IDX_TO_FAMILY[x] for x in subsampled_labels]
+
+        # try with predefined order
+        subsampled_families = LABEL_SAMPLING_ORDER[:nr_of_families]
+        subsampled_labels = [SPEAKEASY_LABELMAP[family] for family in subsampled_families]
+
         logging.warning(f" [!] Sampled labels: {subsampled_labels} | Families: {subsampled_families}")
 
         # use this to map y_subsampled to range(0, nr_of_families)
@@ -197,18 +206,18 @@ if __name__ == "__main__":
             "num_classes": nr_of_families
         }
 
-        models['quovadis']['class'] = QuoVadisModel
-        models['quovadis']['config'] = {
-            "vocab": quovadis_vocab_file,
-            "seq_len": SEQ_LEN,
-            "num_classes": nr_of_families
-        }
+        # models['quovadis']['class'] = QuoVadisModel
+        # models['quovadis']['config'] = {
+        #     "vocab": quovadis_vocab_file,
+        #     "seq_len": SEQ_LEN,
+        #     "num_classes": nr_of_families
+        # }
 
-        models['dmds']['class'] = DMDSGatedCNN
-        models['dmds']['config'] = {
-            "seq_len": SEQ_LEN,
-            "num_classes": nr_of_families,
-        }
+        # models['dmds']['class'] = DMDSGatedCNN
+        # models['dmds']['config'] = {
+        #     "seq_len": SEQ_LEN,
+        #     "num_classes": nr_of_families,
+        # }
         
         with open(os.path.join(datafolders['nebulabpe'], f"tokenizer_{NEBULA_VOCAB}_vocab.json")) as f:
             nebula_vocab = json.load(f)
@@ -252,7 +261,7 @@ if __name__ == "__main__":
         for run_name in models.keys():
             set_random_seed(RANDOM_SEED)
 
-            out_folder = os.path.join(out_folder_root, f"training_{run_name}")
+            out_folder = os.path.join(out_folder_root, f"{RUN_PREFIX}{run_name}")
             family_folder = os.path.join(out_folder, f"{run_name}_nr_families_{nr_of_families}_csv")
             if os.path.exists(family_folder):
                 logging.warning(f" [!] Skipping... Output folder for run {run_name} already exists: {family_folder}")
@@ -297,7 +306,7 @@ if __name__ == "__main__":
                 pytorch_model=model,
                 name=f"{run_name}_nr_families_{nr_of_families}",
                 log_folder=out_folder,
-                epochs=10,
+                epochs=EPOCHS,
                 device=device,
                 log_every_n_steps=10,
                 scheduler="onecycle",
