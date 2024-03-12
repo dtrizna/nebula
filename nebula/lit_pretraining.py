@@ -60,7 +60,7 @@ class LanguageModelTrainer(LitTrainerWrapper):
         if epochs is not None:
             self.pretrain_epochs = epochs
         # DATA SETUP
-        logging.warning(' [*] Building language model dataloader...')
+        logging.warning('[*] Building language model dataloader...')
         self.train_loader = self.create_lm_dataloader(x_unlabeled)
 
         # MODEL SETUP
@@ -87,7 +87,7 @@ class LanguageModelTrainer(LitTrainerWrapper):
             self.setup_trainer()
             for loop in range(total_loops):
                 if loop > 0 and (not self.dump_model_every_epoch or loop % self.rebuild_dataloader_every_n_epochs == 0):
-                    logging.warning(f' [*] Re-building language model dataloader...')
+                    logging.warning(f'[*] Re-building language model dataloader...')
                     self.train_loader = self.create_lm_dataloader(x_unlabeled)
 
                 self.trainer.fit(self.lit_model, self.train_loader)
@@ -252,11 +252,11 @@ class SelfSupervisedLearningEvalFramework:
             training_types: List[str] = ['pretrained', 'non_pretrained', 'full_data'],
             # eval details
             unlabeled_data_ratio: float = 0.8,
+            supervised_data_ratio: float = None,
             n_splits: int = 5,
+            dump_data_splits: bool = True,
             # logging details
             log_folder: str = None,
-            dump_data_splits: bool = True,
-            downsample_unlabeled_data: bool = False,
             false_positive_rates: List[float] = [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1],
             random_state: int = None,
             pretrained_model_path: str = None,
@@ -264,9 +264,26 @@ class SelfSupervisedLearningEvalFramework:
         self.pretrainer = pretrainer
         self.downstream_trainer = downstream_trainer
 
+        assert all(training_type in ['pretrained', 'non_pretrained', 'full_data'] for training_type in training_types), \
+            "training_types should contain only 'pretrained', 'non_pretrained', or 'full_data' elements."
         self.training_types = training_types
+
+        # supervised and unsupervised ratio checks
+        if supervised_data_ratio is not None and unlabeled_data_ratio is not None:
+            assert 0 < supervised_data_ratio + unlabeled_data_ratio <= 1,\
+                "The sum of supervised_data_ratio and unlabeled_data_ratio cannot be greater than 1"
+        elif supervised_data_ratio is None and unlabeled_data_ratio is not None:
+            assert 0 <= unlabeled_data_ratio <= 1, "unlabeled_data_ratio should be between 0 and 1"
+            supervised_data_ratio = 1 - unlabeled_data_ratio
+        else:
+            assert 0 <= supervised_data_ratio <= 1, "supervised_data_ratio should be between 0 and 1"
+            unlabeled_data_ratio = 1 - supervised_data_ratio
+        
+        self.supervised_data_ratio = supervised_data_ratio
         self.unlabeled_data_ratio = unlabeled_data_ratio
+
         self.n_splits = n_splits
+        self.dump_data_splits = dump_data_splits
 
         tempfolder = os.path.join(os.getcwd(), f"out_self_supervised_eval_{int(time())}")
         self.log_folder = log_folder if log_folder is not None else tempfolder
@@ -282,10 +299,6 @@ class SelfSupervisedLearningEvalFramework:
         self.init_pretrain_model_weights = deepcopy(self.pretrainer.pytorch_model.state_dict())
         self.init_downstream_model_weights = deepcopy(self.downstream_trainer.pytorch_model.state_dict())
 
-        self.dump_data_splits = dump_data_splits
-        self.downsample_unlabeled_data = downsample_unlabeled_data
-        if self.downsample_unlabeled_data:
-            assert isinstance(downsample_unlabeled_data, float) and 0 < downsample_unlabeled_data < 1
         self.false_positive_rates = false_positive_rates
         self.random_state = random_state
         self.pretrained_model_path = pretrained_model_path
@@ -299,7 +312,7 @@ class SelfSupervisedLearningEvalFramework:
             labeled_x=self.labeled_x,
             labeled_y=self.labeled_y
         )
-        print(f"[!] Saved dataset splits to {split_data_file}")
+        logging.warning(f"[!] Saved dataset splits to {split_data_file}")
 
 
     @staticmethod
@@ -324,7 +337,7 @@ class SelfSupervisedLearningEvalFramework:
         self.downstream_trainer.log_folder = self.init_downstream_log_folder + "_" + training_type + "_" + str(self.timestamp)
         final_model_file = os.path.join(self.downstream_trainer.log_folder, f"{training_type}_final.torch")
         if os.path.exists(final_model_file):
-            print(f"[!] Downstream model already exists at '{final_model_file}'")
+            logging.warning(f"[!] Downstream model already exists at '{final_model_file}'")
             return
         
         # reset params that should be re-initialized
@@ -363,22 +376,32 @@ class SelfSupervisedLearningEvalFramework:
 
         # split x and y into train and validation sets
         if os.path.exists(os.path.join(self.log_folder, f"dataset_splits_{self.timestamp}.npz")):
-            print(f"[!] Loading dataset splits from 'dataset_splits_{self.timestamp}.npz'")
+            logging.warning(f"[!] Loading dataset splits from 'dataset_splits_{self.timestamp}.npz'")
             splits = np.load(os.path.join(self.log_folder, f"dataset_splits_{self.timestamp}.npz"), allow_pickle=True)
             self.unlabeled_data = splits["unlabeled_data"]
             self.labeled_x = splits["labeled_x"]
             self.labeled_y = splits["labeled_y"]
         else:
             self.unlabeled_data, self.labeled_x, _, self.labeled_y = train_test_split(
-                x_train, y_train, train_size=self.unlabeled_data_ratio, random_state=self.random_state
+                x_train, y_train,
+                test_size=self.supervised_data_ratio,
+                random_state=self.random_state
             )
         
-        # TODO: not sure this is proper strategy -- update
-        if self.downsample_unlabeled_data:
-            # sample N random samples from unlabeled data which is numpy array
+        if self.supervised_data_ratio + self.unlabeled_data_ratio < 1:
+            msg = f"[*] supervised ratio ({self.supervised_data_ratio}) + unlabeled ratio ({self.unlabeled_data_ratio}) < 1: downsampling unlabeled data..."
+            logging.warning(msg)
+
+            # sample a portion of unlabeled data which is numpy array
+            size_of_dataset = x_train.shape[0]
             unlabeled_size = self.unlabeled_data.shape[0]
-            indices = np.random.choice(unlabeled_size, int(self.downsample_unlabeled_data*unlabeled_size), replace=False)
+            nr_to_subsample = int(self.unlabeled_data_ratio*size_of_dataset)
+
+            np.random.seed(self.random_state)
+            indices = np.random.choice(unlabeled_size, nr_to_subsample)
+
             self.unlabeled_data = self.unlabeled_data[indices].copy()
+            logging.warning(f"[!] Downsampled from {unlabeled_size} to {nr_to_subsample} unlabeled entries!")
         
         if self.dump_data_splits:
             self._dump_data_splits()
@@ -388,11 +411,11 @@ class SelfSupervisedLearningEvalFramework:
         if self.pretrained_model_path is None:
             self.pretrained_model_path = os.path.join(self.pretrainer.log_folder, "pretrained_final.torch")
         if os.path.exists(self.pretrained_model_path):
-            print(f"[!] Loading pretrained model from: '{self.pretrained_model_path}'")
+            logging.warning(f"[!] Loading pretrained model from: '{self.pretrained_model_path}'")
             pretrained_model = load(self.pretrained_model_path)
             pretrained_model_state_dict = pretrained_model.state_dict()
         else:
-            print(f"[!] Pre-training '{self.pretrainer.name}' model...")
+            logging.warning(f"[!] Pre-training '{self.pretrainer.name}' model...")
             # reset model weights -- needed for multiple splits
             self.pretrainer.pytorch_model.load_state_dict(self.init_pretrain_model_weights)
             self.pretrainer.pretrain(self.unlabeled_data)
@@ -414,7 +437,7 @@ class SelfSupervisedLearningEvalFramework:
             self.val_loader = None
         
         for training_type in self.training_types:
-            print(f"[!] Fine-tuning of '{training_type}' model on downstream task...")
+            logging.warning(f"[!] Fine-tuning of '{training_type}' model on downstream task...")
             self._train_downstream_model(training_type)
 
 
@@ -428,5 +451,5 @@ class SelfSupervisedLearningEvalFramework:
             self.random_state += i # to get different splits
             self.pretrainer.random_state = self.random_state
             self.downstream_trainer.random_state = self.random_state
-            print(f"[!] Running '{self.pretrainer.name}' pre-training split {i+1}/{self.n_splits}")
-            self.run_one_split(x_train, y_train, x_val, y_val,)
+            logging.warning(f"[!] Running '{self.pretrainer.name}' pre-training split {i+1}/{self.n_splits}")
+            self.run_one_split(x_train, y_train, x_val, y_val, idx=None)

@@ -1,0 +1,18 @@
+2024-03-06 14:55:52,058 WARNING [*] Loading data...
+2024-03-06 14:55:52,485 WARNING [!] Data ready.
+2024-03-06 14:55:52,486 WARNING [!] Skipping ratio 0.2 - already trained.
+2024-03-06 14:55:52,487 WARNING [!] Skipping ratio 0.5 - already trained.
+2024-03-06 14:55:52,742 WARNING [!] Running 'pretraining' pre-training split 1/1
+2024-03-06 14:55:56,341 WARNING [!] Saved dataset splits to dataset_splits_1709733352.npz
+2024-03-06 14:55:56,342 WARNING [!] Pre-training 'pretraining' model...
+2024-03-06 14:55:56,349 WARNING [*] Building language model dataloader...
+2024-03-06 14:56:00,228 WARNING [!] Scheduler: onecycle | Scheduler step budget: 2826
+2024-03-06 14:56:00,240 WARNING [!] Logging to C:\Users\dtrizna\Code\nebula\evaluation\pretraining\..\..\evaluation\pretraining\out_autoregressive_unlabeled_ratio_loop_1709722547\unlabeled_ratio_0.8_pretraining_1709733352
+2024-03-06 14:56:01,139 WARNING [!] Setting up onecycle scheduler with step budget 2826
+2024-03-06 17:44:46,353 WARNING [!] Saved PyTorch model to C:\Users\dtrizna\Code\nebula\evaluation\pretraining\..\..\evaluation\pretraining\out_autoregressive_unlabeled_ratio_loop_1709722547\unlabeled_ratio_0.8_pretraining_1709733352\pretrained_final.torch
+2024-03-06 17:44:46,546 WARNING [!] Fine-tuning of 'pretrained' model on downstream task...
+2024-03-06 17:44:46,551 WARNING [!] Logging to C:\Users\dtrizna\Code\nebula\evaluation\pretraining\..\..\evaluation\pretraining\out_autoregressive_unlabeled_ratio_loop_1709722547\unlabeled_ratio_0.8_downstream_pretrained_1709733352
+2024-03-06 17:44:47,204 WARNING [!] Scheduler: onecycle | Scheduler step budget: 1180
+2024-03-06 17:44:47,209 WARNING [*] Training 'pretrained' model...
+2024-03-06 17:44:47,219 WARNING [!] Setting up onecycle scheduler with step budget 1180
+2024-03-06 17:55:35,433 WARNING [!] Saved PyTorch model to C:\Users\dtrizna\Code\nebula\evaluation\pretraining\..\..\evaluation\pretraining\out_autoregressive_unlabeled_ratio_loop_1709722547\unlabeled_ratio_0.8_downstream_pretrained_1709733352\pretrained_final.torch

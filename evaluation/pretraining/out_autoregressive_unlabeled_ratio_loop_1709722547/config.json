@@ -1,0 +1,25 @@
+{
+    "REPOSITORY_ROOT": "C:\\Users\\dtrizna\\Code\\nebula\\evaluation\\pretraining\\..\\..",
+    "VOCABS": {
+        "8k": 8192
+    },
+    "TIMESTAMPS": null,
+    "LOG_ROOT_FOLDER": "C:\\Users\\dtrizna\\Code\\nebula\\evaluation\\pretraining\\..\\..\\evaluation\\pretraining\\out_autoregressive_unlabeled_ratio_loop_1709722547",
+    "LIMIT": null,
+    "PRETRAINING_EPOCHS": 3,
+    "DOWNSTREAM_EPOCHS": 5,
+    "AR_PRETRAIN_BATCH_SIZE": 64,
+    "AR_CONTEXT_LEN": 256,
+    "DOWNSTREAM_BATCH_SIZE": 16,
+    "DOWNSTREAM_ACCUMULATE_GRAD_BATCHES": 4,
+    "MAX_SEQ_LEN": 512,
+    "DEVICE": "gpu",
+    "DATALOADER_WORKERS": 4,
+    "LOG_EVERY_N_STEPS": 10,
+    "SSL_EVAL_SPLITS": 1,
+    "GRAD_CLIP_VALUE": 1.0,
+    "VERBOSE": true,
+    "SCHEDULER": "onecycle",
+    "DUMP_MODEL_EVERY_EPOCH": false,
+    "REBUILD_DL_EVERY_N_EPOCHS": false
+}

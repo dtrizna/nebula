@@ -5,6 +5,7 @@ from time import time
 from shutil import copyfile
 from typing import Union, Any, Callable, Optional
 
+import logging
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -54,7 +55,7 @@ class PyTorchLightningModelBase(L.LightningModule):
         assert scheduler in [None, "onecycle", "cosine"], "Scheduler must be onecycle or cosine"
         if scheduler is not None:
             assert isinstance(scheduler_step_budget, int), "Scheduler step budget must be provided"
-            print(f"[!] Scheduler: {scheduler} | Scheduler step budget: {scheduler_step_budget}")
+            logging.warning(f"[!] Scheduler: {scheduler} | Scheduler step budget: {scheduler_step_budget}")
         self.scheduler = scheduler
         self.scheduler_step_budget = scheduler_step_budget
         
@@ -117,7 +118,7 @@ class PyTorchLightningModelBase(L.LightningModule):
                 # NOTE: minimum learning rate, should be ~= learning_rate/10 per Chinchilla
                 eta_min=self.learning_rate/10
             )
-        print(f"[!] Setting up {self.scheduler} scheduler with step budget {self.scheduler_step_budget}")
+        logging.warning(f"[!] Setting up {self.scheduler} scheduler with step budget {self.scheduler_step_budget}")
         return {
             "optimizer": optimizer,
             "lr_scheduler": {
@@ -378,10 +379,10 @@ class LitTrainerWrapper:
         try:
             os.makedirs(self.log_folder, exist_ok=True)
         except ValueError as ex:
-            print(self.log_folder)
+            logging.error(f"[-] Cannot create log folder: {self.log_folder}")
             raise ex
             
-        print(f"[!] Logging to {self.log_folder}")
+        logging.warning(f"[!] Logging to {self.log_folder}")
 
         self.trainer = L.Trainer(
             max_epochs=self.epochs,
@@ -453,7 +454,7 @@ class LitTrainerWrapper:
         if self.lit_model is None:
             self.setup_lit_model()
 
-        print(f"[*] Training '{self.name}' model...")
+        logging.warning(f"[*] Training '{self.name}' model...")
         self.trainer.fit(self.lit_model, self.train_loader, self.val_loader)
 
 
@@ -500,9 +501,9 @@ class LitTrainerWrapper:
         
         if os.path.exists(checkpoint_path): 
             copyfile(checkpoint_path, model_file)
-            print(f"[!] Saved Ligthining model to {model_file}")
+            logging.warning(f"[!] Saved Ligthining model to {model_file}")
         else:
-            print(f"[-] Cannot locate lit model checkpoint...")
+            logging.warning(f"[-] Cannot locate lit model checkpoint...")
 
 
     def save_torch_model(self, model_file: str = None):
@@ -514,7 +515,7 @@ class LitTrainerWrapper:
             model_file = os.path.join(self.log_folder, basename)
         
         torch.save(self.pytorch_model, model_file)
-        print(f"[!] Saved PyTorch model to {model_file}")
+        logging.warning(f"[!] Saved PyTorch model to {model_file}")
     
 
     def create_dataloader(
