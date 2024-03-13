@@ -36,20 +36,20 @@ from torch.nn import CrossEntropyLoss
 
 # PROD
 LIMIT = None
-INFOLDER = os.path.join(REPO_ROOT, "evaluation\paper_sota\out_family_downscale_avast_PROD")
-RUN_PREFIX = "dropout0.3_"
+INFOLDER = os.path.join(REPO_ROOT, "evaluation", "paper_sota", "out_family_downscale_avast_PROD")
 NEBULA_VOCAB = 50000
 NEURLUX_VOCAB = 10000
 
-RANDOM_SEED = 1763
+RANDOM_SEED = 33
+RUN_PREFIX = f"r{RANDOM_SEED}_"
 SEQ_LEN = 512
 TRAIN_TEST_SPLIT_DATE = '2019-08-01'
 
 # x
-folder = os.path.join(REPO_ROOT, r"..\..\Data\Avast-CTU\Public_Avast_CTU_CAPEv2_Dataset_Small\public_small_reports")
+folder = os.path.join(REPO_ROOT, r"..", "avast-ctu", "public_small_reports")
 EXAMPLE_PATHS = [os.path.join(folder, x) for x in os.listdir(folder)[:LIMIT]]
 # y
-label_file = os.path.join(REPO_ROOT, r"..\..\Data\Avast-CTU\Public_Avast_CTU_CAPEv2_Dataset_Small\public_labels.csv")
+label_file = os.path.join(REPO_ROOT, r"..", "avast-ctu", "public_labels.csv")
 LABEL_FIELD = 'classification_family'
 LABEL_TABLE = read_csv(label_file)
 LABEL_MAP = dict(zip(
@@ -199,14 +199,14 @@ if __name__ == "__main__":
         # ============= DEFINE MODELS =============
         models = defaultdict(dict)
 
-        # with open(os.path.join(datafolders['neurlux'], f"vocab_{NEURLUX_VOCAB}.json")) as f:
-        #     neurlux_vocab = json.load(f)
-        # models['neurlux']['class'] = NeurLuxModel
-        # models['neurlux']['config'] = {
-        #     "vocab_size": len(neurlux_vocab),
-        #     "seq_len": SEQ_LEN,
-        #     "num_classes": nr_of_families
-        # }
+        with open(os.path.join(datafolders['neurlux'], f"vocab_{NEURLUX_VOCAB}.json")) as f:
+            neurlux_vocab = json.load(f)
+        models['neurlux']['class'] = NeurLuxModel
+        models['neurlux']['config'] = {
+            "vocab_size": len(neurlux_vocab),
+            "seq_len": SEQ_LEN,
+            "num_classes": nr_of_families
+        }
 
         with open(os.path.join(datafolders['nebulabpe'], f"tokenizer_{NEBULA_VOCAB}_vocab.json")) as f:
             nebula_vocab = json.load(f)
@@ -297,9 +297,10 @@ if __name__ == "__main__":
                 log_folder=out_folder,
                 epochs=20,
                 device=device,
+                nr_of_devices=1,
                 log_every_n_steps=10,
                 scheduler="onecycle",
-                batch_size=128,
+                batch_size=512,
                 dataloader_workers=4,
                 gradient_clip_val=1.0,
                 loss=CrossEntropyLoss(),
