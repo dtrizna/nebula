@@ -6,6 +6,7 @@ __pycache__/
 .vscode
 *egg-info
 build/*
+create/*
 .markdownlint.json
 
 # research files
