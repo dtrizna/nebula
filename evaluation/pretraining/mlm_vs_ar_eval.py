@@ -4,7 +4,7 @@ import json
 import numpy as np
 from time import time
 from sklearn.utils import shuffle
-from lightning.lite.utilities.seed import seed_everything
+from lightning.pytorch import seed_everything
 
 # correct path to repository root
 if os.path.basename(os.getcwd()) == "pretraining":
