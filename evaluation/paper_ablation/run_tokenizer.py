@@ -15,31 +15,28 @@ from nebula.preprocessing.wrappers import (
     preprocess_nebula_speakeasy,
 )
 
-from nebula import ModelTrainer
 from nebula.models import TransformerEncoderChunks
-from nebula.evaluation import CrossValidation
+from nebula.evaluation.lit_cv import LitCrossValidation
+from nebula.lit_utils import LitTrainerWrapper
+
 from nebula.misc import set_random_seed, clear_cuda_cache
 
-from torch import cuda
-from torch.nn import BCEWithLogitsLoss
-from torch.optim import AdamW
-
 LIMIT = None
-RANDOM_SEED = 1763
-TIME_BUDGET = 5 # minutes
-INFOLDER = "out_tokenizer" # r"evaluation\dynamic_sota\out_50" # if data is processed already
+RANDOM_SEED = 33
+INFOLDER = "out_tokenizer_1710259149" # r"evaluation\dynamic_sota\out_50" # if data is processed already
+BYTE_FALLBACK = True
 
 VOCAB = 50000
 SEQ_LEN = 512
-SPEAKEASY_TRAINSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_trainset")
-SPEAKEASY_TESTSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_testset")
+SPEAKEASY_TRAINSET_PATH = os.path.join(REPO_ROOT, "..", "speakeasy", "windows_emulation_trainset")
+SPEAKEASY_TESTSET_PATH = os.path.join(REPO_ROOT, "..", "speakeasy", "windows_emulation_testset")
 
 if __name__ == "__main__":
     if INFOLDER:
         out_folder_root = INFOLDER
     else:
         out_folder_root = f"out_tokenizer_{int(time.time())}"
-        os.makedirs(out_folder_root, exist_ok=True)
+    os.makedirs(out_folder_root, exist_ok=True)
 
     # =========== set out logging to both file and stdout
     logging.basicConfig(
@@ -53,21 +50,28 @@ if __name__ == "__main__":
 
     datafolders = {}
     models = defaultdict(dict)
-    for run_name in ['whitespace', 'bpe', 'wordpunct']:
+    for run_name in ['bpe_wo_bytes', 'bpe', 'whitespace']:
         datafolders[run_name] = os.path.join(out_folder_root, f"nebula_{run_name}_vocab_{VOCAB}_seqlen_{SEQ_LEN}")
+        
         # =========== 'nebula' & 'speakeasy' preprocessing
+        byte_fallback = False if "wo_bytes" in run_name else True
+        tokenizer_type = "bpe" if "bpe" in run_name else run_name
+        
         _, y_train, y_paths_train, = preprocess_nebula_speakeasy(
             folder=SPEAKEASY_TRAINSET_PATH,
             limit=LIMIT,
             vocab_size=VOCAB,
             seq_len=SEQ_LEN,
             outfolder=datafolders[run_name],
-            tokenizer_type=run_name
+            tokenizer_type=tokenizer_type,
+            byte_fallback=byte_fallback
         )
-        if run_name == "bpe":
+
+        if "bpe" in run_name:
             tokenizer_model = os.path.join(datafolders[run_name], f"tokenizer_{VOCAB}.model")
         else:
             tokenizer_model = os.path.join(datafolders[run_name], f"tokenizer_{VOCAB}_vocab.json")
+        
         _, y_test, y_paths_test = preprocess_nebula_speakeasy(
             folder=SPEAKEASY_TESTSET_PATH,
             limit=LIMIT,
@@ -75,7 +79,8 @@ if __name__ == "__main__":
             seq_len=SEQ_LEN,
             outfolder=datafolders[run_name],
             tokenizer_model=tokenizer_model,
-            tokenizer_type=run_name
+            tokenizer_type=tokenizer_type,
+            byte_fallback=byte_fallback
         )
 
         # ============= DEFINE MODEL =============
@@ -93,66 +98,51 @@ if __name__ == "__main__":
             "numClasses": 1, # binary classification
             "classifier_head": [64],
             "layerNorm": False,
-            "dropout": 0.3,
-            "mean_over_sequence": False,
+            "dropout": 0.5,
+            # "mean_over_sequence": False,
             "norm_first": True
         }
 
-        device = "cuda" if cuda.is_available() else "cpu"
-        model_trainer_class = ModelTrainer
-        model_trainer_config = {
-            "device": device,
-            "model": None, # will be set later within CrossValidation class
-            "loss_function": BCEWithLogitsLoss(),
-            "optimizer_class": AdamW,
-            "optimizer_config": {"lr": 3e-4},
-            "optim_scheduler": None,
-            "optim_step_budget": None,
-            "outputFolder": None, # will be set later within CrossValidation class
-            "batchSize": 96,
-            "verbosity_n_batches": 100,
-            "clip_grad_norm": 1.0,
-            "n_batches_grad_update": 1,
-            "time_budget": int(TIME_BUDGET*60) if TIME_BUDGET else None,
-        }
-
         # ============= TRAINING LOOP ============= 
-        cv_outfolder = os.path.join(out_folder_root, f"cv_{run_name}_lim{LIMIT}_r{RANDOM_SEED}_t{TIME_BUDGET}")
-        if os.path.exists(cv_outfolder):
-            logging.warning(f" [!] CV output folder {cv_outfolder} already exists, skipping!")
-            continue
+        cv_outfolder = os.path.join(out_folder_root, f"training_{run_name}_lim{LIMIT}_r{RANDOM_SEED}")
+        # if os.path.exists(cv_outfolder):
+        #     logging.warning(f" [!] CV output folder {cv_outfolder} already exists, skipping!")
+        #     continue
 
-        logging.warning(f" [!!!] Starting CV over {run_name}!")
+        logging.warning(f" [!!!] Starting {run_name} training!")
         
         suffix = LIMIT if LIMIT else "full"
         x_train = np.load(os.path.join(datafolders[run_name], f"x_train_{suffix}.npy"))
         y_train = np.load(os.path.join(datafolders[run_name], f"y_train_{suffix}.npy"))
+        x_test = np.load(os.path.join(datafolders[run_name], f"x_test_{suffix}.npy"))
+        y_test = np.load(os.path.join(datafolders[run_name], f"y_test_{suffix}.npy"))
         
         model_class = models[run_name]['class']
         model_config = models[run_name]['config']
-        
-        if LIMIT:
-            x_train, y_train = shuffle(x_train, y_train, random_state=RANDOM_SEED)
-            x_train = x_train[:LIMIT]
-            y_train = y_train[:LIMIT]
-            
-        set_random_seed(RANDOM_SEED)
-        cv = CrossValidation(
-            model_trainer_class,
-            model_trainer_config,
-            model_class,
-            model_config,
-            output_folder_root=cv_outfolder
-        )
-        cv.run_folds(
-            x_train, 
-            y_train, 
-            epochs=None, # time budget specified
-            folds=3, 
-            random_state=RANDOM_SEED
-        )
-        cv.dump_metrics(prefix=f"{run_name}")
-        cv.log_avg_metrics()
+        model = model_class(**model_config)
 
-        del cv, x_train, y_train
+        set_random_seed(RANDOM_SEED)
+        lit_trainer = LitTrainerWrapper(
+            pytorch_model=model,
+            name=run_name,
+            log_folder=cv_outfolder,
+            epochs=30,
+            scheduler="onecycle",
+            device="gpu",
+            nr_of_devices=1,
+            # data config
+            batch_size=512,
+            dataloader_workers=4,
+            # misc
+            random_state=RANDOM_SEED,
+            verbose=True
+        )
+        train_dataloader = lit_trainer.create_dataloader(x_train, y_train)
+        test_dataloader = lit_trainer.create_dataloader(x_test, y_test, shuffle=False)
+        lit_trainer.train_lit_model(
+            train_loader=train_dataloader,
+            val_loader=test_dataloader
+        )
+
+        del lit_trainer, x_train, y_train
         clear_cuda_cache()

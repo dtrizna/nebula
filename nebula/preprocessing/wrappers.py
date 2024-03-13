@@ -203,6 +203,7 @@ def preprocess_nebula_speakeasy(
         vocab_size = 50000,
         seq_len = 512,
         tokenizer_type="bpe",
+        byte_fallback=False,
         multiclass=False
 ):
     suffix = "test" if tokenizer_model else "train"
@@ -251,6 +252,11 @@ def preprocess_nebula_speakeasy(
 
     # train tokenizer
     if not tokenizer_model:
+        train_options = dict(
+            jsonData=events,
+            vocab_size=vocab_size,
+            model_prefix=os.path.join(outfolder, f"tokenizer_{vocab_size}")
+        )
         if tokenizer_type == "bpe":
             tokenizer = JSONTokenizerBPE(
                 vocab_size=vocab_size,
@@ -258,6 +264,7 @@ def preprocess_nebula_speakeasy(
                 cleanup_symbols=json_cleanup_symbols,
                 stopwords=stopwords,
             )
+            train_options["byte_fallback"] = byte_fallback
         else:
             if tokenizer_type == "whitespace":
                 ttype = "whitespace"
@@ -275,11 +282,7 @@ def preprocess_nebula_speakeasy(
             )
 
         logging.warning(" [*] Initializing tokenizer training...")
-        tokenizer.train(
-            events,
-            vocab_size=vocab_size,
-            model_prefix=os.path.join(outfolder, f"tokenizer_{vocab_size}")
-        )
+        tokenizer.train(**train_options)
     else:
         if tokenizer_type == "bpe":
             tokenizer = JSONTokenizerBPE(

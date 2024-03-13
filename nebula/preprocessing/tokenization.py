@@ -104,7 +104,7 @@ class JSONTokenizer:
                  vocab_size,
                  cleanup_symbols=JSON_CLEANUP_SYMBOLS,
                  stopwords=SPEAKEASY_TOKEN_STOPWORDS,
-                 special_tokens = ["<pad>", "<unk>", "<mask>"]
+                 special_tokens = ["<pad>", "<unk>"]#, "<mask>"]
         ):
         assert isinstance(seq_len, int), "seq_len must be integer!"
         self.seq_len = seq_len
@@ -115,14 +115,16 @@ class JSONTokenizer:
         assert isinstance(stopwords, (list, tuple, None)), "stopwords must be list or tuple!"
         self.stopwords = stopwords
         
+        # NOTE: this is ugly, should be improved
         self.special_tokens = dict(zip(special_tokens, range(len(special_tokens))))
-        assert len(self.special_tokens) >= 3, "special_tokens must contain at least 3 tokens for pad, unk, and mask!"
+        assert len(self.special_tokens) >= 2, "special_tokens must contain at least 2 tokens for pad, unk!"
         self.pad_token = special_tokens[0]
         self.unk_token = special_tokens[1]
-        self.mask_token = special_tokens[2]
         self.pad_token_id = self.special_tokens[self.pad_token]
         self.unk_token_id = self.special_tokens[self.unk_token]
-        self.mask_token_id = self.special_tokens[self.mask_token]
+        if "<mask>" in special_tokens:
+            self.mask_token = special_tokens[2]
+            self.mask_token_id = self.special_tokens[self.mask_token]
 
         self.vocab = None
         self.reverse_vocab = None
@@ -238,8 +240,8 @@ class JSONTokenizerNaive(JSONTokenizer):
         if counter_dump or self.counter_dump:
             self.dump_counter(model_prefix)
     
-    def train(self, tokenizedListSequence, vocab_size=None, model_prefix="", counter_dump=False):
-        self.build_vocab(tokenizedListSequence, vocab_size, model_prefix, counter_dump)
+    def train(self, jsonData, vocab_size=None, model_prefix="", counter_dump=False):
+        self.build_vocab(jsonData, vocab_size, model_prefix, counter_dump)
 
     def dump_vocab(self, vocab_prefix="whitespace"):
         with open(vocab_prefix+f"_vocab.json", "w") as f:
@@ -402,10 +404,10 @@ class JSONTokenizerBPE(JSONTokenizer):
         jsonData,
         vocab_size=None,
         model_prefix="bpe",
-        model_type="bpe",
-        split_by_number=False,
         spLength=4192,
-        removeTrainFiles=True
+        split_by_number=True,
+        byte_fallback=False,
+        removeTrainFiles=True,
     ):
         """
         Trains the tokenizer on the given json data.
@@ -423,17 +425,27 @@ class JSONTokenizerBPE(JSONTokenizer):
         if vocab_size:
             self.vocab_size = vocab_size
         
-        trainCmd = " ".join([
-            f"--input={trainFile}",
-            f"--model_prefix={model_prefix}",
-            f"--vocab_size={self.vocab_size}",
-            f"--model_type={model_type}",
-            f"--split_by_number={split_by_number}",
-            f"--max_sentence_length={spLength}",
-            f"--max_sentencepiece_length=64"
-        ])
-        logging.warning(f" [!] Training tokenizer with command: {trainCmd}")
-        self.tokenizer.Train(trainCmd)
+        trainOptions = dict(
+            input=trainFile,
+            model_prefix=model_prefix,
+            vocab_size=self.vocab_size,
+            model_type="bpe",
+            max_sentence_length=spLength,
+            max_sentencepiece_length=64,
+            # updated
+            byte_fallback=byte_fallback,
+            normalization_rule_name="identity", # no normalization
+            remove_extra_whitespaces=False,
+            split_digits=True,
+            split_by_number=split_by_number,
+            bos_id=-1,
+            eos_id=-1,
+            unk_id=1,
+            pad_id=0,
+            num_threads=os.cpu_count()
+        )
+        logging.warning(f" [!] Training tokenizer with the following options: {trainOptions}")
+        self.tokenizer.Train(**trainOptions)
         self.tokenizer = spm.SentencePieceProcessor(model_file=f"{model_prefix}.model")
         
         self.model_path = model_prefix

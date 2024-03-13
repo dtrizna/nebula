@@ -1,0 +1,71 @@
+2024-03-13 14:04:45,341 WARNING  [*] Preprocessing nebula with bpe tokenizer...
+2024-03-13 14:04:45,342 WARNING Filtering and normalizing /data/dtrizna/nebula/evaluation/paper_ablation/../../../speakeasy/windows_emulation_trainset/report_keylogger
+2024-03-13 14:05:33,242 WARNING Finished... Took: 47.90s
+2024-03-13 14:05:33,243 WARNING Filtering and normalizing /data/dtrizna/nebula/evaluation/paper_ablation/../../../speakeasy/windows_emulation_trainset/report_windows_syswow64
+2024-03-13 14:05:33,968 WARNING Finished... Took: 0.73s
+2024-03-13 14:05:33,968 WARNING Filtering and normalizing /data/dtrizna/nebula/evaluation/paper_ablation/../../../speakeasy/windows_emulation_trainset/report_dropper
+2024-03-13 14:06:29,648 WARNING Finished... Took: 55.68s
+2024-03-13 14:06:29,648 WARNING Filtering and normalizing /data/dtrizna/nebula/evaluation/paper_ablation/../../../speakeasy/windows_emulation_trainset/report_clean
+2024-03-13 14:09:56,000 WARNING Finished... Took: 206.35s
+2024-03-13 14:09:56,000 WARNING Filtering and normalizing /data/dtrizna/nebula/evaluation/paper_ablation/../../../speakeasy/windows_emulation_trainset/report_rat
+2024-03-13 14:10:12,766 WARNING Finished... Took: 16.77s
+2024-03-13 14:10:12,766 WARNING Filtering and normalizing /data/dtrizna/nebula/evaluation/paper_ablation/../../../speakeasy/windows_emulation_trainset/report_backdoor
+2024-03-13 14:13:16,331 WARNING Finished... Took: 183.57s
+2024-03-13 14:13:16,332 WARNING Filtering and normalizing /data/dtrizna/nebula/evaluation/paper_ablation/../../../speakeasy/windows_emulation_trainset/report_coinminer
+2024-03-13 14:14:28,923 WARNING Finished... Took: 72.59s
+2024-03-13 14:14:28,924 WARNING Filtering and normalizing /data/dtrizna/nebula/evaluation/paper_ablation/../../../speakeasy/windows_emulation_trainset/report_trojan
+2024-03-13 14:15:49,000 WARNING Finished... Took: 80.08s
+2024-03-13 14:15:49,000 WARNING Filtering and normalizing /data/dtrizna/nebula/evaluation/paper_ablation/../../../speakeasy/windows_emulation_trainset/report_ransomware
+2024-03-13 14:18:04,764 WARNING Finished... Took: 135.76s
+2024-03-13 14:18:04,767 WARNING  [!] Saved Y as out_tokenizer_1710259149/nebula_bpe_wo_bytes_vocab_50000_seqlen_512/y_train_full.npy
+2024-03-13 14:18:04,824 WARNING  [!] Saved Y names as out_tokenizer_1710259149/nebula_bpe_wo_bytes_vocab_50000_seqlen_512/y_names_train_full.json | Shape: (75298,)
+2024-03-13 14:18:04,825 WARNING  [!] Initialized tokenizer without pre-trained model.
+	You need to train tokenizer with .train() or specify 'model_path=' during initialization!
+2024-03-13 14:18:04,825 WARNING  [*] Initializing tokenizer training...
+2024-03-13 14:18:04,825 WARNING  [*] Data preparation for SentencePiece tokenizer...
+2024-03-13 14:21:36,710 WARNING  [*] Saving to disk...
+2024-03-13 14:21:40,128 WARNING  [!] Training tokenizer with the following options: {'input': 'out_tokenizer_1710259149/nebula_bpe_wo_bytes_vocab_50000_seqlen_512/tokenizer_50000_trainset_1710339696.txt', 'model_prefix': 'out_tokenizer_1710259149/nebula_bpe_wo_bytes_vocab_50000_seqlen_512/tokenizer_50000', 'vocab_size': 50000, 'model_type': 'bpe', 'max_sentence_length': 4192, 'max_sentencepiece_length': 64, 'byte_fallback': False, 'normalization_rule_name': 'identity', 'remove_extra_whitespaces': False, 'split_digits': True, 'split_by_number': True, 'bos_id': -1, 'eos_id': -1, 'unk_id': 1, 'pad_id': 0, 'num_threads': 112}
+2024-03-13 14:22:57,585 WARNING  [*] Encoding and padding...
+2024-03-13 14:36:55,360 WARNING  [!] Saved X as out_tokenizer_1710259149/nebula_bpe_wo_bytes_vocab_50000_seqlen_512/x_train_full.npy | Shape: (75298, 512)
+2024-03-13 14:36:58,592 WARNING  [*] Preprocessing nebula with bpe tokenizer...
+2024-03-13 14:36:58,600 WARNING Filtering and normalizing /data/dtrizna/nebula/evaluation/paper_ablation/../../../speakeasy/windows_emulation_testset/report_keylogger
+2024-03-13 14:37:04,393 WARNING Finished... Took: 5.79s
+2024-03-13 14:37:04,393 WARNING Filtering and normalizing /data/dtrizna/nebula/evaluation/paper_ablation/../../../speakeasy/windows_emulation_testset/report_windows_syswow64
+2024-03-13 14:37:04,602 WARNING Finished... Took: 0.21s
+2024-03-13 14:37:04,602 WARNING Filtering and normalizing /data/dtrizna/nebula/evaluation/paper_ablation/../../../speakeasy/windows_emulation_testset/report_dropper
+2024-03-13 14:37:06,032 WARNING Finished... Took: 1.43s
+2024-03-13 14:37:06,032 WARNING Filtering and normalizing /data/dtrizna/nebula/evaluation/paper_ablation/../../../speakeasy/windows_emulation_testset/report_clean
+2024-03-13 14:38:06,266 WARNING Finished... Took: 60.23s
+2024-03-13 14:38:06,266 WARNING Filtering and normalizing /data/dtrizna/nebula/evaluation/paper_ablation/../../../speakeasy/windows_emulation_testset/report_rat
+2024-03-13 14:38:17,465 WARNING Finished... Took: 11.20s
+2024-03-13 14:38:17,465 WARNING Filtering and normalizing /data/dtrizna/nebula/evaluation/paper_ablation/../../../speakeasy/windows_emulation_testset/report_backdoor
+2024-03-13 14:38:46,502 WARNING Finished... Took: 29.04s
+2024-03-13 14:38:46,503 WARNING Filtering and normalizing /data/dtrizna/nebula/evaluation/paper_ablation/../../../speakeasy/windows_emulation_testset/report_coinminer
+2024-03-13 14:39:04,699 WARNING Finished... Took: 18.20s
+2024-03-13 14:39:04,700 WARNING Filtering and normalizing /data/dtrizna/nebula/evaluation/paper_ablation/../../../speakeasy/windows_emulation_testset/report_trojan
+2024-03-13 14:39:10,944 WARNING Finished... Took: 6.24s
+2024-03-13 14:39:10,944 WARNING Filtering and normalizing /data/dtrizna/nebula/evaluation/paper_ablation/../../../speakeasy/windows_emulation_testset/report_ransomware
+2024-03-13 14:41:04,419 WARNING Finished... Took: 113.48s
+2024-03-13 14:41:04,421 WARNING  [!] Saved Y as out_tokenizer_1710259149/nebula_bpe_wo_bytes_vocab_50000_seqlen_512/y_test_full.npy
+2024-03-13 14:41:04,435 WARNING  [!] Saved Y names as out_tokenizer_1710259149/nebula_bpe_wo_bytes_vocab_50000_seqlen_512/y_names_test_full.json | Shape: (17402,)
+2024-03-13 14:41:04,494 WARNING  [*] Encoding and padding...
+2024-03-13 14:43:32,396 WARNING  [!] Saved X as out_tokenizer_1710259149/nebula_bpe_wo_bytes_vocab_50000_seqlen_512/x_test_full.npy | Shape: (17402, 512)
+2024-03-13 14:43:33,312 WARNING  [!!!] Starting bpe_wo_bytes training!
+2024-03-13 14:43:34,045 WARNING [!] Logging to out_tokenizer_1710259149/training_bpe_wo_bytes_limNone_r33
+2024-03-13 14:43:34,400 WARNING [!] Scheduler: onecycle | Scheduler step budget: 4440
+2024-03-13 14:43:34,406 WARNING [*] Training 'bpe_wo_bytes' model...
+2024-03-13 14:43:35,185 WARNING [!] Setting up onecycle scheduler with step budget 4440
+2024-03-13 14:48:32,416 WARNING  [!] Skipping since exists: out_tokenizer_1710259149/nebula_bpe_vocab_50000_seqlen_512/x_train_full.npy
+2024-03-13 14:48:32,469 WARNING  [!] Skipping since exists: out_tokenizer_1710259149/nebula_bpe_vocab_50000_seqlen_512/x_test_full.npy
+2024-03-13 14:48:32,523 WARNING  [!!!] Starting bpe training!
+2024-03-13 14:48:32,753 WARNING [!] Logging to out_tokenizer_1710259149/training_bpe_limNone_r33
+2024-03-13 14:48:32,812 WARNING [!] Scheduler: onecycle | Scheduler step budget: 4440
+2024-03-13 14:48:32,816 WARNING [*] Training 'bpe' model...
+2024-03-13 14:48:32,825 WARNING [!] Setting up onecycle scheduler with step budget 4440
+2024-03-13 14:53:27,892 WARNING  [!] Skipping since exists: out_tokenizer_1710259149/nebula_whitespace_vocab_50000_seqlen_512/x_train_full.npy
+2024-03-13 14:53:27,921 WARNING  [!] Skipping since exists: out_tokenizer_1710259149/nebula_whitespace_vocab_50000_seqlen_512/x_test_full.npy
+2024-03-13 14:53:27,952 WARNING  [!!!] Starting whitespace training!
+2024-03-13 14:53:28,207 WARNING [!] Logging to out_tokenizer_1710259149/training_whitespace_limNone_r33
+2024-03-13 14:53:28,264 WARNING [!] Scheduler: onecycle | Scheduler step budget: 4440
+2024-03-13 14:53:28,268 WARNING [*] Training 'whitespace' model...
+2024-03-13 14:53:28,276 WARNING [!] Setting up onecycle scheduler with step budget 4440

@@ -31,8 +31,8 @@ INFOLDER = None # if data is processed already
 
 SEQ_LEN = 512
 TOKENIZER_TYPE = "bpe"
-SPEAKEASY_TRAINSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_trainset")
-SPEAKEASY_TESTSET_PATH = os.path.join(REPO_ROOT, "data", "data_raw", "windows_emulation_testset")
+SPEAKEASY_TRAINSET_PATH = os.path.join(REPO_ROOT, "..", "speakeasy", "windows_emulation_trainset")
+SPEAKEASY_TESTSET_PATH = os.path.join(REPO_ROOT, "..", "speakeasy", "windows_emulation_testset")
 
 if __name__ == "__main__":
     if INFOLDER:

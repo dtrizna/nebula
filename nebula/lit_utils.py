@@ -12,7 +12,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 from sklearn.metrics import roc_curve
 
 import lightning as L
-from lightning.lite.utilities.seed import seed_everything
+from lightning.pytorch import seed_everything
 from lightning.pytorch.callbacks import TQDMProgressBar, ModelCheckpoint, EarlyStopping, ModelSummary
 from lightning.pytorch.loggers import CSVLogger, TensorBoardLogger
 
@@ -92,9 +92,10 @@ class PyTorchLightningModelBase(L.LightningModule):
 
         # self.save_hyperparameters(ignore=["model"])
     
-    def optimizer_zero_grad(self, epoch: int, batch_idx: int, optimizer: Callable, optimizer_idx: int):
-        # https://pytorch-lightning.readthedocs.io/en/1.3.8/benchmarking/performance.html#zero-grad-set-to-none-true
-        optimizer.zero_grad(set_to_none=True)
+    # def optimizer_zero_grad(self, epoch: int, batch_idx: int, optimizer: Callable, optimizer_idx: int):
+    #     # https://pytorch-lightning.readthedocs.io/en/1.3.8/benchmarking/performance.html#zero-grad-set-to-none-true
+    #     optimizer.zero_grad(set_to_none=True)
+    # Getting TypeError: PyTorchLightningModelBase.optimizer_zero_grad() missing 1 required positional argument: 'optimizer_idx'
 
     def configure_optimizers(self):
         if self.optimizer == "adamw":
@@ -133,7 +134,7 @@ class PyTorchLightningModelBase(L.LightningModule):
             self,
             predicted_logits: torch.Tensor,
             true_labels: torch.Tensor,
-            fprNeeded: float = 1e-4,
+            fprNeeded: float = 1e-3,
             return_thresholds: bool = False
     ):
         predicted_probs = torch.sigmoid(predicted_logits).cpu().detach()
@@ -269,16 +270,17 @@ class LitTrainerWrapper:
         epochs: int = None,
         learning_rate: float = 1e-3,
         device: str = "cpu",
+        nr_of_devices: int = 1,
         val_check_times: int = 2,
         log_every_n_steps: int = 10,
         lit_sanity_steps: int = 1,
-        monitor_metric: str = "val_tpr",
+        monitor_metric: str = "val_f1",
         monitor_mode: str = "max",
         early_stop_patience: Union[None, int] = None,
         early_stop_min_delta: float = 0.0001,
         # efficient training strategies
         scheduler: Union[None, str] = None,
-        accumulate_grad_batches: Optional[int] = None,
+        accumulate_grad_batches: Optional[int] = 1,
         gradient_clip_val: Optional[float] = None,
         # https://lightning.ai/docs/pytorch/stable/advanced/speed.html#mixed-precision-16-bit-training
         # lit: Double precision (64), full precision (32), half precision (16) or bfloat16 precision (bf16) for TPUS
@@ -305,6 +307,7 @@ class LitTrainerWrapper:
         self.epochs = epochs
         self.learning_rate = learning_rate
         self.device = device
+        self.nr_of_devices = nr_of_devices
         self.val_check_times = val_check_times
         self.log_every_n_steps = log_every_n_steps
         self.lit_sanity_steps = lit_sanity_steps
@@ -387,7 +390,7 @@ class LitTrainerWrapper:
         self.trainer = L.Trainer(
             max_epochs=self.epochs,
             accelerator=self.device,
-            devices=1,
+            devices=self.nr_of_devices,
             callbacks=callbacks,
             val_check_interval=1/self.val_check_times,
             log_every_n_steps=self.log_every_n_steps,
@@ -553,10 +556,9 @@ class LitTrainerWrapper:
         assert (max_time is None) or (max_epochs is None), "only either 'max_time' or 'max_epochs' can be set"
         assert (max_time is not None) or (max_epochs is not None), "at least one of 'max_time' or 'max_epochs' should be set"
 
-        accumulate_grad_batches = 1 if self.accumulate_grad_batches is None else self.accumulate_grad_batches
         total_batches = 0
         if max_epochs is not None:
-            steps_per_epoch = np.ceil(len(self.train_loader) / accumulate_grad_batches)
+            steps_per_epoch = np.ceil(len(self.train_loader) / self.accumulate_grad_batches)
             total_batches = int(max_epochs * steps_per_epoch)
         if max_time is not None:
             # TODO: Implement logic for max_time if needed
