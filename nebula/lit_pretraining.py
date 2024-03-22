@@ -29,7 +29,6 @@ class LanguageModelTrainer(LitTrainerWrapper):
         self.__name__ = "LanguageModelTrainer"
         
         assert "<pad>" in vocab, "Vocabulary must contain '<pad>' token"
-        assert "<mask>" in vocab, "Vocabulary must contain '<mask>' token"
         self.vocab = vocab
         self.pretrain_epochs = pretrain_epochs
         self.dump_model_every_epoch = dump_model_every_epoch
@@ -118,6 +117,7 @@ class MaskedLanguageModelTrainer(LanguageModelTrainer):
             **kwargs
     ):
         super().__init__(*args, **kwargs)
+        assert "<mask>" in self.vocab, "Vocabulary must contain '<mask>' token"
         self.__name__ = "MaskedLanguageModelTrainer"
         
         assert len(mask_distribution) == 2, "mask_distribution must be a list of length 2"

@@ -98,19 +98,6 @@ class StaticBytesTokenizer:
 
 
     def read_bytez(self, file_path, seqlen=None):
-        # with open(file_path, 'r', encoding='utf-8', errors='replace') as file:
-            # bytez = file.read()
-        # NOTE: errors='replace' produces '\ufffd' at the place of bad bytes
-        # this results in BPE vocab as follows: 
-        # "<0xFE>": 256,
-        # "<0xFF>": 257,
-        # "\ufffd\ufffd": 258,
-        # "\ufffd\ufffd\ufffd\ufffd": 259,
-        # "\ufffd\ufffd\ufffd": 260,
-        # decided to ignore bad bytes instead to reduce empty information to the model
-        # with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
-            # bytez = file.read()
-        # NOTE: above we did not read bytes, but strings
         with open(file_path, 'rb') as file:
             bytez = file.read()
 
