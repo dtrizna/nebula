@@ -1,6 +1,7 @@
 import os
 import io
 import py7zr
+import zipfile
 import requests
 import numpy as np
 
@@ -14,7 +15,6 @@ def get_encrypted_archive(
         password: str = 'infected',
         remove_archive: bool = None
 ) -> bytes:
-    assert link.endswith(".7z"), "link must end with .7z"
     if link.startswith("http://") or link.startswith("https://"):
         archive_name = link.split("/")[-1]
         with requests.get(link, headers={"User-Agent": user_agent}) as response:
@@ -30,10 +30,23 @@ def get_encrypted_archive(
         if remove_archive is None:
             remove_archive = False
     
-    file_hash = os.path.basename(archive_name).replace(".7z", "")
-    with py7zr.SevenZipFile(archive_name, "r", password=password) as archive:
-        content = archive.read(targets=file_hash)[file_hash].read()
-    
+    if archive_name.endswith(".7z"):
+        # vx-underground, single file <hash>.7z with <hash> inside
+        file_hash = os.path.basename(archive_name).replace(".7z", "")
+        with py7zr.SevenZipFile(archive_name, "r", password=password) as archive:
+            try:
+                content = archive.read(targets=file_hash)[file_hash].read()
+            except KeyError: # NOTE: not tested
+                content = {file: archive.read(file) for file in archive.getnames()}
+
+    elif archive_name.endswith(".zip"):
+        # other sources, multiple files
+        with zipfile.ZipFile(archive_name, "r") as archive:
+            archive.setpassword(password.encode())
+            content = {file: archive.read(file) for file in archive.namelist()}
+    else:
+        raise ValueError(f"[-] archive must be .7z or .zip, got: {archive_name}")
+
     if remove_archive:
         os.remove(archive_name)
 
