@@ -7,8 +7,8 @@
     "emu_version": "1.5.11",
     "os_run": "windows.6_1",
     "report_version": "1.1.0",
-    "emulation_total_runtime": 0.295,
-    "timestamp": 1718182714,
+    "emulation_total_runtime": 0.318,
+    "timestamp": 1719843511,
     "strings": {
         "static": {
             "ansi": [
@@ -3049,7 +3049,7 @@
                     "pc": "0x4068d1",
                     "api_name": "kernel32.GetCurrentThreadId",
                     "args": [],
-                    "ret_val": "0x584"
+                    "ret_val": "0x50c"
                 },
                 {
                     "pc": "0x405b8f",
@@ -4888,7 +4888,7 @@
                         "0x0",
                         ""
                     ],
-                    "ret_val": "0x238"
+                    "ret_val": "0x22c"
                 },
                 {
                     "pc": "0x40d1f7",
@@ -4899,7 +4899,7 @@
                         "0xffffffff",
                         "0x0"
                     ],
-                    "ret_val": "0x23c"
+                    "ret_val": "0x230"
                 },
                 {
                     "pc": "0x40d207",
@@ -4910,7 +4910,7 @@
                         "0x0",
                         "0x0"
                     ],
-                    "ret_val": "0x240"
+                    "ret_val": "0x234"
                 },
                 {
                     "pc": "0x4062a9",
@@ -4967,13 +4967,13 @@
                     "args": [
                         "0x0"
                     ],
-                    "ret_val": "0x2dc"
+                    "ret_val": "0x25c"
                 },
                 {
                     "pc": "0x429ade",
                     "api_name": "gdi32.GetDeviceCaps",
                     "args": [
-                        "0x2dc",
+                        "0x25c",
                         "0x5a"
                     ],
                     "ret_val": "0x10"
@@ -4983,7 +4983,7 @@
                     "api_name": "user32.ReleaseDC",
                     "args": [
                         "0x0",
-                        "0x2dc"
+                        "0x25c"
                     ],
                     "ret_val": "0x0"
                 },
@@ -4993,19 +4993,19 @@
                     "args": [
                         "0x0"
                     ],
-                    "ret_val": "0x2dc"
+                    "ret_val": "0x25c"
                 },
                 {
                     "pc": "0x426d03",
                     "api_name": "gdi32.GetDeviceCaps",
                     "args": [
-                        "0x2dc",
+                        "0x25c",
                         "0x68"
                     ],
                     "ret_val": "0x10"
                 }
             ],
-            "ret_val": "0x2dc",
+            "ret_val": "0x25c",
             "error": {
                 "type": "unsupported_api",
                 "pc": "0xfeedf294",
@@ -5017,21 +5017,21 @@
                     "eip": "0xfeedf294",
                     "esi": "0x00000034",
                     "edi": "0x00437638",
-                    "eax": "0x000002dc",
+                    "eax": "0x0000025c",
                     "ebx": "0x00000010",
                     "ecx": "0x00000000",
                     "edx": "0x01211b68"
                 },
                 "stack": [
                     "sp+0x00: 0x00426d22 -> emu.module.0d219aa54b1d417da61bd4aed5eeb53d6cba91b3287d53186b21fed450248215.0x400000",
-                    "sp+0x04: 0x000002dc",
+                    "sp+0x04: 0x0000025c",
                     "sp+0x08: 0x00000000",
                     "sp+0x0c: 0x00000008",
                     "sp+0x10: 0x01211b68 -> emu.stack.0x1200000",
                     "sp+0x14: 0x01211f80 -> emu.stack.0x1200000",
                     "sp+0x18: 0x00426db1 -> emu.module.0d219aa54b1d417da61bd4aed5eeb53d6cba91b3287d53186b21fed450248215.0x400000",
                     "sp+0x1c: 0x01211f6c -> emu.stack.0x1200000",
-                    "sp+0x20: 0x000002dc",
+                    "sp+0x20: 0x0000025c",
                     "sp+0x24: 0x00100300 -> api.VirtualAlloc.0x50000",
                     "sp+0x28: 0x00000000",
                     "sp+0x2c: 0x00000080",

@@ -1,5 +1,6 @@
 import os
 import io
+import yara
 import py7zr
 import zipfile
 import requests
@@ -37,6 +38,7 @@ def get_encrypted_archive(
             try:
                 content = archive.read(targets=file_hash)[file_hash].read()
             except KeyError: # NOTE: not tested
+                print(f"[-] File {file_hash} not found in archive {archive_name}, providing all files")
                 content = {file: archive.read(file) for file in archive.getnames()}
 
     elif archive_name.endswith(".zip"):
@@ -135,3 +137,35 @@ class MalConvModel(object):
     def is_evasive(self, input_data, threshold = 0.5):
         score = self.get_score(input_data)
         return score < threshold
+
+class YaraWrapper(object):
+    def __init__(self) -> None:
+        pass
+        
+    def check_sample(self, sample_bytes, rules) -> yara.Match:
+        rules = yara.compile(source=rules)
+        self.matches = rules.match(data=sample_bytes)
+        if self.matches:
+            print(f"[+] Match found: {self.matches}")
+        else:
+            print("[-] No matches found.")
+        return self.matches
+
+    def pretty_print(self, print_limit=10):
+        for match in self.matches:
+            print(f"[!] Rule: {match.rule}")
+            for i, string in enumerate(match.strings):
+                for j, instance in enumerate(string.instances):
+                    if j >= print_limit:
+                        print(f"    [*] ... {len(string.instances) - print_limit} more\n")
+                        break
+
+                    print(f"    [+] Matched data: {instance.matched_data} | Offset: 0x{instance.offset:x}")
+                    if string.is_xor():
+                        print(f"\t[!] XOR key: {instance.xor_key}")
+                        print(f"\t[!] Decoded: {instance.plaintext()}")
+                
+                if i >= print_limit:
+                    print(f"\n  [*] ... {len(match.strings) - print_limit} more")
+                    break
+        
