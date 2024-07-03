@@ -11,6 +11,7 @@ create/*
 
 # research files
 z_out*
+scripts/training_labs
 
 # Data
 data/*
