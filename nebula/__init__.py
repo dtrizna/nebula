@@ -147,6 +147,11 @@ class Nebula:
         with torch.no_grad():
             logits = self.model(dynamic_features)
         return torch.sigmoid(logits).item()
+    
+    def predict_sample(self, pe_file: Union[str, bytes]) -> float:
+        dynamic_features_json = self.dynamic_analysis_pe_file(pe_file)
+        dynamic_features = self.preprocess(dynamic_features_json)
+        return self.predict_proba(dynamic_features)
 
 
 class ModelTrainer(object):
