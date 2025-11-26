@@ -4,13 +4,56 @@
 
 ## Description
 
-This repository is part of the [Nebula: Self-Attention for Dynamic Malware Analysis](https://arxiv.org/abs/2310.10664) project.
+This repository is part of the [Nebula: Self-Attention for Dynamic Malware Analysis](https://ieeexplore.ieee.org/document/10551436) publication. Pre-pring available on [arxiv](https://arxiv.org/abs/2310.10664).
 
-All Nebula and alternative dynamic malware analysis models are under `nebula/models` directory.
+### Repository Structure
 
-Examples of usage are under `scripts/` directory.
+- All Nebula and alternative dynamic malware analysis models are under `nebula/models` directory.
+- Examples of usage are under `scripts/` directory.
+- Code related to extracting emualtion traces from raw PE samples is under `emulation/`.
 
-Dataset used for experiments and pretraining downloadable from [kaggle.com/datasets/dmitrijstrizna/quo-vadis-malware-emulation](https://www.kaggle.com/datasets/dmitrijstrizna/quo-vadis-malware-emulation).
+### Datasets
+
+Dataset used for experiments and pretraining downloadable from [huggingface.co/datasets/dtrizna/quovadis-speakeasy](https://huggingface.co/datasets/dtrizna/quovadis-speakeasy).
+
+Additionally, while not used in this project directly, EMBER feature vectors for the same malware samples are available on huggingface as well: [huggingface.co/datasets/dtrizna/quovadis-ember](https://huggingface.co/datasets/dtrizna/quovadis-ember).
+
+This should allow to perform research on static and dynamic detection methodology cross-analyses.
+
+### Citation
+
+If you find this code or data valuable, please cite us:
+
+```
+@ARTICLE{10551436,
+  author={Trizna, Dmitrijs and Demetrio, Luca and Biggio, Battista and Roli, Fabio},
+  journal={IEEE Transactions on Information Forensics and Security}, 
+  title={Nebula: Self-Attention for Dynamic Malware Analysis}, 
+  year={2024},
+  volume={19},
+  number={},
+  pages={6155-6167},
+  keywords={Malware;Feature extraction;Data models;Analytical models;Long short term memory;Task analysis;Encoding;Malware;transformers;dynamic analysis;convolutional neural networks},
+  doi={10.1109/TIFS.2024.3409083}}
+
+
+@inproceedings{10.1145/3560830.3563726,
+author = {Trizna, Dmitrijs},
+title = {Quo Vadis: Hybrid Machine Learning Meta-Model Based on Contextual and Behavioral Malware Representations},
+year = {2022},
+isbn = {9781450398800},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3560830.3563726},
+doi = {10.1145/3560830.3563726},
+booktitle = {Proceedings of the 15th ACM Workshop on Artificial Intelligence and Security},
+pages = {127–136},
+numpages = {10},
+keywords = {reverse engineering, neural networks, malware, emulation, convolutions},
+location = {Los Angeles, CA, USA},
+series = {AISec'22}
+}
+```
 
 ### Installation
 
