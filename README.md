@@ -1,5 +1,11 @@
 # Project Nebula
 
+![License](https://img.shields.io/github/license/dtrizna/slp)
+![GitHub last commit](https://img.shields.io/github/last-commit/dtrizna/slp)
+
+<a href="https://x.com/intent/follow?screen_name=ditrizna"><img src="https://img.shields.io/badge/X-000000?style=for-the-badge&logo=x&logoColor=white" alt="follow on X"></a>
+<a href="https://www.linkedin.com/in/ditrizna/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="follow on LinkedIn"></a>
+
 <center><img src="img/eso1205ec.jpg" width="400"></center>
 
 ## Description
