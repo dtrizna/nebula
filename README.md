@@ -4,7 +4,8 @@
 
 ## Description
 
-This repository is part of the [Nebula: Self-Attention for Dynamic Malware Analysis](https://ieeexplore.ieee.org/document/10551436) publication. Pre-pring available on [arxiv](https://arxiv.org/abs/2310.10664).
+This repository is part of the [Nebula: Self-Attention for Dynamic Malware Analysis](https://ieeexplore.ieee.org/document/10551436) publication.  
+Pre-print available on [arxiv](https://arxiv.org/abs/2310.10664).
 
 ### Repository Structure
 
