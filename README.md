@@ -27,6 +27,35 @@ Additionally, while not used in this project directly, EMBER feature vectors for
 
 This should allow to perform research on static and dynamic detection methodology cross-analyses.
 
+#### Important: Dataset Structure and Entry Points
+
+The Speakeasy emulator captures execution across multiple **entry points** per sample:
+- `module_entry`: The main executable entry point
+- `thread`: Any threads spawned during emulation
+
+**The HuggingFace dataset stores each entry point as a separate row.** This means:
+- A sample spawning 100 threads = 101 rows in the dataset
+- Each row has `ep_type` field indicating its type
+
+| Approach | Behavior |
+|----------|----------|
+| `Nebula` class (recommended) | Automatically aggregates all entry points into single prediction |
+| Direct dataset loading | Each entry point treated separately - must aggregate manually |
+
+**For correct per-sample predictions when loading dataset directly:**
+```python
+from datasets import load_dataset
+
+dataset = load_dataset("dtrizna/quovadis-speakeasy")
+
+# Option 1: Use only module_entry rows (ignores thread behavior)
+module_entries = [row for row in dataset if row['ep_type'] == 'module_entry']
+
+# Option 2: Group by sample using filename from API args, then aggregate
+```
+
+Alternatively, use raw JSON reports with `PEDynamicFeatureExtractor.filter_and_normalize_report()` which concatenates all entry points into a single representation.
+
 ### Citation
 
 If you find this code or data valuable, please cite us:
@@ -106,6 +135,64 @@ INFO:root: [!] Tokenizer ready!
 INFO:root: [!] Model ready!
 
 [!] Probability of being malicious: 0.001
+```
+
+## Training Custom Tokenizers
+
+The repository includes pre-trained BPE tokenizer for `vocab_size=50000`:
+- Model: `nebula/objects/bpe_50000_sentencepiece.model`
+- Vocabulary: `nebula/objects/bpe_50000_vocab.json`
+
+For ablation experiments with different vocabulary sizes, you can train custom tokenizers using the dataset from [HuggingFace](https://huggingface.co/datasets/dtrizna/quovadis-speakeasy).
+
+> **Note:** Files under `scripts/concept-testing/` are development artifacts and should not be used for reproducing paper results. Always use files from `nebula/objects/` for the pre-trained 50k configuration.
+
+### Training a BPE Tokenizer
+
+```python
+from nebula.preprocessing import JSONTokenizerBPE
+
+# Load training corpus - concatenate all JSON reports
+import json
+from pathlib import Path
+
+reports = []
+for f in Path("path/to/reports").glob("*.json"):
+    with open(f) as fp:
+        reports.append(json.dumps(json.load(fp)))
+training_corpus = " ".join(reports)
+
+# Initialize and train tokenizer
+tokenizer = JSONTokenizerBPE(
+    vocab_size=10000,  # target vocab size
+    seq_len=512
+)
+
+tokenizer.train(
+    jsonData=training_corpus,
+    vocab_size=10000,
+    model_prefix="bpe_10000_sentencepiece",
+    model_type="bpe",
+    split_by_number=False,
+    spLength=4192
+)
+
+# Outputs: bpe_10000_sentencepiece.model, bpe_10000_sentencepiece_vocab.json
+```
+
+### Encoding Data with Custom Tokenizer
+
+```python
+# Load trained tokenizer
+tokenizer = JSONTokenizerBPE(
+    vocab_size=10000,
+    seq_len=512,
+    model_path="bpe_10000_sentencepiece.model",
+    vocab="bpe_10000_sentencepiece_vocab.json"
+)
+
+# Encode reports
+x_encoded = tokenizer.encode(json_reports, pad=True)
 ```
 
 ## Pre-training with Self-Supervised Learning (SSL)
