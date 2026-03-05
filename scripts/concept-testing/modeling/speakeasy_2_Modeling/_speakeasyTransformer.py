@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import logging
 import os
-import pickle
+import json
 import sys
 sys.path.extend(['..', '.'])
 from nebula.models.attention import TransformerEncoderModel
@@ -31,9 +31,9 @@ if train_limit:
 
 logging.warning(f" [!] Dataset size: {len(x_train)}")
 
-vocabPath = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset\speakeasy_VocabSize_1500.pkl"
-with open(vocabPath, "rb") as f:
-    vocab = pickle.load(f)
+vocabPath = r"C:\Users\dtrizna\Code\nebula\data\data_filtered\speakeasy_trainset\speakeasy_VocabSize_1500.json"
+with open(vocabPath, "r") as f:
+    vocab = json.load(f)
 
 
 # =============== DEFINE MODEL & ITS CONFIG

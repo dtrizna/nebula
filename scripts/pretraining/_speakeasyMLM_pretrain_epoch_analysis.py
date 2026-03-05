@@ -188,7 +188,7 @@ for split in range(len(split_data)):
         logging.warning(f" [!] Evaluating model from split: {split} | epoch: {epoch}")
         model_file = [x for x in pretrainModelFiles if f"epoch_{epoch}" in x][split]
         model = model_class(**model_config)
-        model.load_state_dict(torch.load(model_file))
+        model.load_state_dict(torch.load(model_file, weights_only=True))
         
         # finetune model
         modelTrainerConfig['model'] = model

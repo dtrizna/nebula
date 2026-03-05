@@ -19,7 +19,7 @@ model = NeurLuxModel(
     num_classes=1
 )
 neurlux_model_file = os.path.join(os.path.join(os.path.dirname(nebula.__file__)), "objects", "neurlux_whitespace.model")
-model.load_state_dict(torch.load(neurlux_model_file, map_location=torch.device('cpu')))
+model.load_state_dict(torch.load(neurlux_model_file, map_location=torch.device('cpu'), weights_only=True))
 model.eval()
 
 # SAMPLE PE FILE

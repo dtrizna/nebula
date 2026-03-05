@@ -364,7 +364,7 @@ class SelfSupervisedLearningEvalFramework:
         # split x and y into train and validation sets
         if os.path.exists(os.path.join(self.log_folder, f"dataset_splits_{self.timestamp}.npz")):
             print(f"[!] Loading dataset splits from 'dataset_splits_{self.timestamp}.npz'")
-            splits = np.load(os.path.join(self.log_folder, f"dataset_splits_{self.timestamp}.npz"), allow_pickle=True)
+            splits = np.load(os.path.join(self.log_folder, f"dataset_splits_{self.timestamp}.npz"))
             self.unlabeled_data = splits["unlabeled_data"]
             self.labeled_x = splits["labeled_x"]
             self.labeled_y = splits["labeled_y"]

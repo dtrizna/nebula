@@ -62,7 +62,7 @@ def load_model(skip_embedding=False):
         "norm_first": True,
         "skip_embedding": skip_embedding
     }
-    state_dict = torch.load(pretrained_model, map_location='cpu')
+    state_dict = torch.load(pretrained_model, map_location='cpu', weights_only=True)
     llm = TransformerEncoderOptionalEmbedding(**model_config)
     llm.load_state_dict(state_dict)
     llm.eval()

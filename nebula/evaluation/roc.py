@@ -76,7 +76,7 @@ def get_model_rocs(run_types, model_class, model_config, data_splits, model_file
     for run_type, model_files in types_to_model_files.items():
         for i, model_file in enumerate(model_files):
             model = model_class(**model_config).to(device)
-            model.load_state_dict(torch.load(model_file))
+            model.load_state_dict(torch.load(model_file, weights_only=True))
             model.eval()
             n_output_classes = [x for x in model.children() if isinstance(x, Linear)][-1].out_features
             if n_output_classes == 1:

@@ -406,10 +406,10 @@ class LitTrainerWrapper:
 
     def load_torch_model(self, model_file: str = None):
         assert model_file is not None, "Please provide a model file"
-        self.pytorch_model = torch.load(model_file)
-        # NOTE: you have to reset self.lit_model after this
-        # if lit_model is already initialized, then load state dict directly:
-        # self.lit_model.model.load_state_dict(state_dict)
+        state_dict = torch.load(model_file, weights_only=True)
+        self.pytorch_model.load_state_dict(state_dict)
+        if self.lit_model is not None:
+            self.lit_model.model.load_state_dict(state_dict)
 
 
     def setup_lit_model(self):
@@ -502,8 +502,8 @@ class LitTrainerWrapper:
             basename = f"{int(time())}_epoch_{self.trainer.current_epoch}_{os.path.basename(model_file)}"
             model_file = os.path.join(self.log_folder, basename)
         
-        torch.save(self.pytorch_model, model_file)
-        print(f"[!] Saved PyTorch model to {model_file}")
+        torch.save(self.pytorch_model.state_dict(), model_file)
+        print(f"[!] Saved PyTorch model state_dict to {model_file}")
     
 
     def create_dataloader(

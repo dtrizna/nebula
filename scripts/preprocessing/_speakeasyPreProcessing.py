@@ -134,8 +134,8 @@ def main(limit=None, mode="readAndFilter"):
             yHashesTrain = json.load(f)
         with open(os.path.join(testOutFolder, "speakeasy_yHashes.json"), "r") as f:
             yHashesTest = json.load(f)
-        yTrain = np.load(os.path.join(trainOutFolder, "speakeasy_y.npy"), allow_pickle=True).tolist()
-        yTest = np.load(os.path.join(testOutFolder, "speakeasy_y.npy"), allow_pickle=True).tolist()
+        yTrain = np.load(os.path.join(trainOutFolder, "speakeasy_y.npy")).tolist()
+        yTest = np.load(os.path.join(testOutFolder, "speakeasy_y.npy")).tolist()
 
     else:
         raise ValueError("Invalid mode")

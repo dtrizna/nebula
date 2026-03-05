@@ -5,7 +5,7 @@ model = PreTrainedModel(num_classes=5)
 model.out = nn.Linear(30, 10)
 
 # load the pre-trained weights, except for the output layer
-pretrained_dict = torch.load('pretrained_model.pt')
+pretrained_dict = torch.load('pretrained_model.pt', weights_only=True)
 model_dict = model.state_dict()
 
 # filter out the output layer weights from the pre-trained weights

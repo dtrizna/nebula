@@ -52,7 +52,8 @@ Body:\n{post_data}\n""")
             self._set_response_headers(code=404)
 
         if encoder_path and model_path:
-            encoder = pickle.load(open(encoder_path, "rb"))            
+            with open(encoder_path, "rb") as f:
+                encoder = pickle.load(f)
             xgb_model.load_model(model_path)
             
             try:

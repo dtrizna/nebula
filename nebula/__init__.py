@@ -122,7 +122,7 @@ class Nebula:
             }
         self.model = TransformerEncoderChunks(**torch_model_config)
 
-        state_dict = torch.load(torch_model_file) if torch_model_file is not None else {}
+        state_dict = torch.load(torch_model_file, weights_only=True) if torch_model_file is not None else {}
         self.model.load_state_dict(state_dict)
         logging.info(f" [!] Model ready!")
 
@@ -249,7 +249,7 @@ class ModelTrainer(object):
             os.makedirs(self.trainingFileFolder, exist_ok=True)
             
         if stateDict:
-            self.model.load_state_dict(torch.load(stateDict))
+            self.model.load_state_dict(torch.load(stateDict, weights_only=True))
         if modelForwardPass:
             self.model.forwardPass = modelForwardPass
         else:
@@ -262,7 +262,7 @@ class ModelTrainer(object):
         logging.warning(f" [!] Iniatialized {self.model.__name__}. Total trainable parameters: {trainable_params/1e6:.4f}e6")
 
     def loadState(self, stateDict):
-        self.model.load_state_dict(torch.load(stateDict))
+        self.model.load_state_dict(torch.load(stateDict, weights_only=True))
 
     def dumpResults(self, prefix="", model_only=False):
         if self.reporting_timestamp:
