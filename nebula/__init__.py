@@ -158,6 +158,7 @@ class Nebula:
             else {}
         )
         self.model.load_state_dict(state_dict)
+        self.model.eval()
         logging.info(f" [!] Model ready!")
 
     def dynamic_analysis_pe_file(self, pe_file: Union[str, bytes]) -> dict:

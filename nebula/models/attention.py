@@ -228,9 +228,10 @@ def generate_square_subsequent_mask(sz: int) -> Tensor:
 class PositionalEncoding(nn.Module):
     """ From: https://pytorch.org/tutorials/beginner/transformer_tutorial.html """
 
-    def __init__(self, d_model: int, dropout: float = 0.1, max_len: int = 5000):
+    def __init__(self, d_model: int, dropout: float = 0.1, max_len: int = 5000, batch_first: bool = True):
         super().__init__()
         self.dropout = nn.Dropout(p=dropout)
+        self.batch_first = batch_first
 
         pe = torch.zeros(max_len, 1, d_model)
         position = torch.arange(max_len).unsqueeze(1)
@@ -242,7 +243,13 @@ class PositionalEncoding(nn.Module):
     def forward(self, x: Tensor) -> Tensor:
         """
         Args:
-            x: Tensor, shape [seq_len, batch_size, embedding_dim]
+            x: Tensor, shape [batch_size, seq_len, embedding_dim] if batch_first
+               or [seq_len, batch_size, embedding_dim] if not batch_first
         """
-        x = x + self.pe[:x.size(0)]
+        if self.batch_first:
+            # For batch-first tensors, broadcast slot 0 across the batch to ensure
+            # batched inference matches single-sample (B=1) inference deterministically.
+            x = x + self.pe[:1]
+        else:
+            x = x + self.pe[:x.size(0)]
         return self.dropout(x)
